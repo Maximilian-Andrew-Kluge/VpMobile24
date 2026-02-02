@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="1.3.1",
+        sw_version="1.4.5",
     )
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -80,23 +80,47 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Update data via library."""
-        data = await self.api.async_get_schedule(class_name=self.class_name)
+        # Load today's data for sensors
+        today_data = await self.api.async_get_multi_day_schedule(days=1, class_name=self.class_name)
+        
+        # Load week data for calendar (7 days)
+        week_data = await self.api.async_get_multi_day_schedule(days=7, class_name=self.class_name)
         
         # Filter out excluded subjects from lessons and changes, but keep additional_info
         if self.excluded_subjects:
+            # Filter today's data for sensors
             filtered_lessons = []
             filtered_changes = []
             
-            for lesson in data.get("lessons", []):
+            for lesson in today_data.get("lessons", []):
                 if lesson.get("subject") not in self.excluded_subjects:
                     filtered_lessons.append(lesson)
             
-            for change in data.get("changes", []):
+            for change in today_data.get("changes", []):
                 if change.get("subject") not in self.excluded_subjects:
                     filtered_changes.append(change)
             
-            data["lessons"] = filtered_lessons
-            data["changes"] = filtered_changes
+            today_data["lessons"] = filtered_lessons
+            today_data["changes"] = filtered_changes
+            
+            # Filter week data for calendar
+            week_filtered_lessons = []
+            week_filtered_changes = []
+            
+            for lesson in week_data.get("lessons", []):
+                if lesson.get("subject") not in self.excluded_subjects:
+                    week_filtered_lessons.append(lesson)
+            
+            for change in week_data.get("changes", []):
+                if change.get("subject") not in self.excluded_subjects:
+                    week_filtered_changes.append(change)
+            
+            week_data["lessons"] = week_filtered_lessons
+            week_data["changes"] = week_filtered_changes
             # Keep additional_info as is - it's not subject-specific
         
-        return data
+        # Store both datasets
+        today_data["week_lessons"] = week_data.get("lessons", [])
+        today_data["week_changes"] = week_data.get("changes", [])
+        
+        return today_data

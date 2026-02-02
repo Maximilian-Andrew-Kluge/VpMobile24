@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from typing import Any
 import re
 import xml.etree.ElementTree as ET
@@ -103,6 +103,51 @@ class Stundenplan24API:
         except Exception as ex:
             _LOGGER.error("Error fetching schedule: %s", ex)
             raise
+
+    async def async_get_multi_day_schedule(self, start_date: date | None = None, days: int = 2, class_name: str | None = None) -> dict[str, Any]:
+        """Get schedule data for multiple days."""
+        if start_date is None:
+            start_date = date.today()
+        
+        all_lessons = []
+        all_changes = []
+        all_additional_info = []
+        latest_timestamp = ""
+        
+        for i in range(days):
+            current_date = start_date + timedelta(days=i)
+            try:
+                day_data = await self.async_get_schedule(current_date, class_name)
+                
+                # Add date info to each lesson and change
+                for lesson in day_data.get("lessons", []):
+                    lesson["date"] = current_date.isoformat()
+                    lesson["day_name"] = current_date.strftime("%A")
+                    all_lessons.append(lesson)
+                
+                for change in day_data.get("changes", []):
+                    change["date"] = current_date.isoformat()
+                    change["day_name"] = current_date.strftime("%A")
+                    all_changes.append(change)
+                
+                # Collect additional info (only from first day to avoid duplicates)
+                if i == 0:
+                    all_additional_info = day_data.get("additional_info", [])
+                    latest_timestamp = day_data.get("timestamp", "")
+                
+            except Exception as ex:
+                _LOGGER.warning(f"Could not fetch schedule for {current_date}: {ex}")
+                continue
+        
+        return {
+            "date": start_date.isoformat(),
+            "lessons": all_lessons,
+            "changes": all_changes,
+            "additional_info": all_additional_info,
+            "last_updated": datetime.now().isoformat(),
+            "timestamp": latest_timestamp,
+            "days_loaded": days
+        }
 
     def _parse_xml_schedule(self, xml_content: str, target_date: date, class_name: str | None = None) -> dict[str, Any]:
         """Parse XML schedule data."""

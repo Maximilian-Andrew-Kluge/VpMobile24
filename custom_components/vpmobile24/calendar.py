@@ -41,6 +41,18 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         self._attr_icon = "mdi:calendar-week"
 
     @property
+    def device_info(self):
+        """Return device information."""
+        from .const import DOMAIN
+        return {
+            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
+            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "manufacturer": "VpMobile24",
+            "model": "Stundenplan Integration",
+            "sw_version": "1.4.5",
+        }
+
+    @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
         events = self._get_week_events()
@@ -105,25 +117,31 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         """Get events for a specific date."""
         events = []
         
-        # For now, we only have today's data from coordinator
-        # In a full implementation, we'd fetch data for the target date
-        if target_date != date.today():
+        if not self.coordinator.data:
             return events
         
-        lessons = self.coordinator.data.get("lessons", [])
-        changes = self.coordinator.data.get("changes", [])
+        # Use week data from coordinator
+        week_lessons = self.coordinator.data.get("week_lessons", [])
+        week_changes = self.coordinator.data.get("week_changes", [])
         
-        # Process regular lessons
-        for lesson in lessons:
-            event = self._create_event_from_lesson(lesson, target_date)
-            if event:
-                events.append(event)
+        # Filter lessons for the target date
+        target_date_str = target_date.isoformat()
         
-        # Process changes
-        for change in changes:
-            event = self._create_event_from_lesson(change, target_date, is_change=True)
-            if event:
-                events.append(event)
+        # Process regular lessons for this date
+        for lesson in week_lessons:
+            lesson_date = lesson.get("date", "")
+            if lesson_date == target_date_str:
+                event = self._create_event_from_lesson(lesson, target_date)
+                if event:
+                    events.append(event)
+        
+        # Process changes for this date
+        for change in week_changes:
+            change_date = change.get("date", "")
+            if change_date == target_date_str:
+                event = self._create_event_from_lesson(change, target_date, is_change=True)
+                if event:
+                    events.append(event)
         
         return events
 
