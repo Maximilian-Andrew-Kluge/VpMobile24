@@ -1,15 +1,12 @@
 {
   "domain": "vpmobile24",
   "name": "VpMobile24",
-  "version": "1.0.0",
-  "documentation": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24",
-  "issue_tracker": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues",
-  "requirements": [
-    "aiohttp>=3.8.0"
-  ],
-  "iot_class": "cloud_polling",
+  "codeowners": ["@Maximilian-Andrew-Kluge"],
   "config_flow": true,
-  "codeowners": [
-    "@Maximilian-Andrew-Kluge"
-  ]
+  "dependencies": [],
+  "documentation": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "requirements": ["aiohttp>=3.8.0"],
+  "version": "1.0.1"
 }
