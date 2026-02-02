@@ -2,47 +2,54 @@
   "config": {
     "step": {
       "user": {
-        "title": "VpMobile24 einrichten",
-        "description": "Geben Sie Ihre VpMobile24 Zugangsdaten ein.",
+        "title": "Set up VpMobile24",
+        "description": "Enter your VpMobile24 credentials.",
         "data": {
-          "school_id": "Schulnummer",
-          "username": "Nutzername",
-          "password": "Passwort",
-          "class_name": "Klasse"
+          "school_id": "School ID",
+          "username": "Username",
+          "password": "Password",
+          "class_name": "Class"
         },
         "data_description": {
-          "school_id": "Die Schulnummer aus der VpMobile24 URL",
-          "username": "Ihr Benutzername für VpMobile24",
-          "password": "Ihr Passwort für VpMobile24",
-          "class_name": "Die Klasse (z.B. 5a)"
+          "school_id": "The school ID from the VpMobile24 URL",
+          "username": "Your username for VpMobile24",
+          "password": "Your password for VpMobile24",
+          "class_name": "The class (e.g. 5a)"
         }
       },
       "subjects": {
-        "title": "Fächer für Klasse {class_name} auswählen",
-        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer. {message}"
+        "title": "Select subjects for class {class_name}",
+        "description": "Choose the subjects to display. Found: {subject_count} subjects."
+      },
+      "language": {
+        "title": "Choose language for class {class_name}",
+        "description": "Select your preferred language for the integration.",
+        "data": {
+          "language": "Language"
+        }
       }
     },
     "error": {
-      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte prüfen Sie Ihre Zugangsdaten.",
-      "unknown": "Ein unbekannter Fehler ist aufgetreten."
+      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
+      "unknown": "An unknown error occurred."
     },
     "abort": {
-      "already_configured": "Diese Schule ist bereits konfiguriert."
+      "already_configured": "This school is already configured."
     }
   },
   "entity": {
     "sensor": {
       "naechste_stunde": {
-        "name": "Nächste Stunde"
+        "name": "Next Lesson"
       },
       "wochenstundenplan": {
-        "name": "Wochenstundenplan"
+        "name": "Week Schedule"
       },
       "zusatzinfos": {
-        "name": "Zusatzinfos"
+        "name": "Additional Info"
       },
       "aenderungen": {
-        "name": "Änderungen"
+        "name": "Changes"
       }
     }
   }

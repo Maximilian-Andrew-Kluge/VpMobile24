@@ -15,6 +15,71 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# Multilingual sensor names
+SENSOR_NAMES = {
+    "en": {
+        "next_lesson": "VpMobile24 Next Lesson",
+        "week_schedule": "VpMobile24 Week Schedule", 
+        "additional_info": "VpMobile24 Additional Info",
+        "changes": "VpMobile24 Changes"
+    },
+    "de": {
+        "next_lesson": "VpMobile24 Nächste Stunde",
+        "week_schedule": "VpMobile24 Wochenstundenplan",
+        "additional_info": "VpMobile24 Zusatzinfos", 
+        "changes": "VpMobile24 Änderungen"
+    },
+    "fr": {
+        "next_lesson": "VpMobile24 Prochain Cours",
+        "week_schedule": "VpMobile24 Emploi du Temps",
+        "additional_info": "VpMobile24 Infos Supplémentaires",
+        "changes": "VpMobile24 Changements"
+    }
+}
+
+# Multilingual state messages
+STATE_MESSAGES = {
+    "en": {
+        "no_data": "No data",
+        "no_lessons_today": "No more lessons today", 
+        "no_lessons": "No lessons today",
+        "lesson_today": "lesson today",
+        "lessons_today": "lessons today",
+        "no_additional_info": "No additional info",
+        "additional_info": "additional info",
+        "additional_infos": "additional infos", 
+        "no_changes": "No changes",
+        "change": "change",
+        "changes": "changes"
+    },
+    "de": {
+        "no_data": "Keine Daten",
+        "no_lessons_today": "Keine weiteren Stunden heute",
+        "no_lessons": "Keine Stunden heute", 
+        "lesson_today": "Stunde heute",
+        "lessons_today": "Stunden heute",
+        "no_additional_info": "Keine Zusatzinfos",
+        "additional_info": "Zusatzinfo",
+        "additional_infos": "Zusatzinfos",
+        "no_changes": "Keine Änderungen", 
+        "change": "Änderung",
+        "changes": "Änderungen"
+    },
+    "fr": {
+        "no_data": "Aucune donnée",
+        "no_lessons_today": "Plus de cours aujourd'hui",
+        "no_lessons": "Aucun cours aujourd'hui",
+        "lesson_today": "cours aujourd'hui", 
+        "lessons_today": "cours aujourd'hui",
+        "no_additional_info": "Aucune info supplémentaire",
+        "additional_info": "info supplémentaire",
+        "additional_infos": "infos supplémentaires",
+        "no_changes": "Aucun changement",
+        "change": "changement", 
+        "changes": "changements"
+    }
+}
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -24,11 +89,14 @@ async def async_setup_entry(
     """Richte VpMobile24 Sensoren ein."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
     
+    # Get language from config entry, default to English
+    language = config_entry.data.get("language", "en")
+    
     sensors = [
-        VpMobile24NextLessonSensor(coordinator, config_entry),
-        VpMobile24WeekScheduleSensor(coordinator, config_entry),
-        VpMobile24AdditionalInfoSensor(coordinator, config_entry),
-        VpMobile24ChangesSensor(coordinator, config_entry),
+        VpMobile24NextLessonSensor(coordinator, config_entry, language),
+        VpMobile24WeekScheduleSensor(coordinator, config_entry, language),
+        VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
+        VpMobile24ChangesSensor(coordinator, config_entry, language),
     ]
     
     async_add_entities(sensors)
@@ -37,11 +105,12 @@ async def async_setup_entry(
 class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
     """Sensor für die nächste Unterrichtsstunde."""
 
-    def __init__(self, coordinator, config_entry) -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Nächste Stunde"
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["next_lesson"]
         self._attr_unique_id = f"{config_entry.entry_id}_naechste_stunde"
         self._attr_icon = "mdi:clock-outline"
 
@@ -49,11 +118,11 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
     def state(self) -> str | None:
         """Gib den Status des Sensors zurück."""
         if not self.coordinator.data:
-            return "Keine Daten"
+            return STATE_MESSAGES[self._language]["no_data"]
         
         next_lesson = self._get_next_lesson()
         if not next_lesson:
-            return "Keine weitere Stunde heute"
+            return STATE_MESSAGES[self._language]["no_lessons_today"]
         
         subject = next_lesson.get('subject', 'Unbekannt')
         time = next_lesson.get('time', '')
@@ -67,7 +136,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
         
         next_lesson = self._get_next_lesson()
         if not next_lesson:
-            return {"status": "Keine weitere Stunde heute"}
+            return {"status": STATE_MESSAGES[self._language]["no_lessons_today"]}
         
         return {
             "fach": next_lesson.get("subject", "Unbekannt"),
@@ -106,11 +175,12 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
 class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
     """Sensor für den kompletten Wochenstundenplan."""
 
-    def __init__(self, coordinator, config_entry) -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Wochenstundenplan"
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["week_schedule"]
         self._attr_unique_id = f"{config_entry.entry_id}_wochenstundenplan"
         self._attr_icon = "mdi:calendar-week"
 
@@ -118,17 +188,17 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
     def state(self) -> str | None:
         """Gib den Status des Sensors zurück."""
         if not self.coordinator.data:
-            return "Keine Daten"
+            return STATE_MESSAGES[self._language]["no_data"]
         
         lessons = self.coordinator.data.get("lessons", [])
         lesson_count = len(lessons)
         
         if lesson_count == 0:
-            return "Keine Stunden heute"
+            return STATE_MESSAGES[self._language]["no_lessons"]
         elif lesson_count == 1:
-            return "1 Stunde heute"
+            return f"1 {STATE_MESSAGES[self._language]['lesson_today']}"
         else:
-            return f"{lesson_count} Stunden heute"
+            return f"{lesson_count} {STATE_MESSAGES[self._language]['lessons_today']}"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -176,11 +246,12 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
     """Sensor für zusätzliche Informationen."""
 
-    def __init__(self, coordinator, config_entry) -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Zusatzinfos"
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["additional_info"]
         self._attr_unique_id = f"{config_entry.entry_id}_zusatzinfos"
         self._attr_icon = "mdi:information-outline"
 
@@ -188,10 +259,14 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
     def state(self) -> str | None:
         """Gib den Status des Sensors zurück."""
         if not self.coordinator.data:
-            return "Keine Daten"
+            return STATE_MESSAGES[self._language]["no_data"]
+        
+        # Debug: Log what data we have
+        _LOGGER.debug(f"Coordinator data keys: {list(self.coordinator.data.keys())}")
         
         # Zähle ZusatzInfo aus XML
         additional_info = self.coordinator.data.get("additional_info", [])
+        _LOGGER.debug(f"Additional info count: {len(additional_info)}")
         
         # Zähle auch Zusatzinfos aus Stunden
         lessons = self.coordinator.data.get("lessons", [])
@@ -201,13 +276,14 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
                 lesson_info_count += 1
         
         total_info_count = len(additional_info) + lesson_info_count
+        _LOGGER.debug(f"Total info count: {total_info_count} (additional: {len(additional_info)}, lessons: {lesson_info_count})")
         
         if total_info_count == 0:
-            return "Keine Zusatzinfos"
+            return STATE_MESSAGES[self._language]["no_additional_info"]
         elif total_info_count == 1:
-            return "1 Zusatzinfo"
+            return f"1 {STATE_MESSAGES[self._language]['additional_info']}"
         else:
-            return f"{total_info_count} Zusatzinfos"
+            return f"{total_info_count} {STATE_MESSAGES[self._language]['additional_infos']}"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -252,17 +328,19 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
             "gesamt_infos": len(general_infos) + len(lesson_infos),
             "datum": self.coordinator.data.get("date", ""),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
+            "debug_data_keys": list(self.coordinator.data.keys()) if self.coordinator.data else [],
         }
 
 
 class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
     """Sensor für Stundenplanänderungen und Vertretungen."""
 
-    def __init__(self, coordinator, config_entry) -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Änderungen"
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["changes"]
         self._attr_unique_id = f"{config_entry.entry_id}_aenderungen"
         self._attr_icon = "mdi:swap-horizontal"
 
@@ -270,7 +348,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
     def state(self) -> str | None:
         """Gib den Status des Sensors zurück."""
         if not self.coordinator.data:
-            return "Keine Daten"
+            return STATE_MESSAGES[self._language]["no_data"]
         
         changes = self.coordinator.data.get("changes", [])
         lessons = self.coordinator.data.get("lessons", [])
@@ -284,11 +362,11 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
         total_changes = len(changes) + substitution_count
         
         if total_changes == 0:
-            return "Keine Änderungen"
+            return STATE_MESSAGES[self._language]["no_changes"]
         elif total_changes == 1:
-            return "1 Änderung"
+            return f"1 {STATE_MESSAGES[self._language]['change']}"
         else:
-            return f"{total_changes} Änderungen"
+            return f"{total_changes} {STATE_MESSAGES[self._language]['changes']}"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

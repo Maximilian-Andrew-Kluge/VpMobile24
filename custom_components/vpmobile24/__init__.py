@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers import device_registry as dr
 
 from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, DEFAULT_BASE_URL
 from .api_new import Stundenplan24API
@@ -36,6 +37,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
     
     hass.data[DOMAIN][entry.entry_id] = coordinator
+    
+    # Register device with icon
+    device_registry = dr.async_get(hass)
+    device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, entry.data["school_id"])},
+        name=f"VpMobile24 ({entry.data['school_id']})",
+        manufacturer="VpMobile24",
+        model="Stundenplan Integration",
+        sw_version="1.3.1",
+    )
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     
@@ -70,7 +82,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
         data = await self.api.async_get_schedule(class_name=self.class_name)
         
-        # Filter out excluded subjects
+        # Filter out excluded subjects from lessons and changes, but keep additional_info
         if self.excluded_subjects:
             filtered_lessons = []
             filtered_changes = []
@@ -85,5 +97,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             
             data["lessons"] = filtered_lessons
             data["changes"] = filtered_changes
+            # Keep additional_info as is - it's not subject-specific
         
         return data

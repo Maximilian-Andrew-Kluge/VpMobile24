@@ -19,7 +19,14 @@
       },
       "subjects": {
         "title": "Sélectionner les matières pour la classe {class_name}",
-        "description": "Choisissez les matières à afficher. Trouvé: {subject_count} matières. {message}"
+        "description": "Choisissez les matières à afficher. Trouvé: {subject_count} matières."
+      },
+      "language": {
+        "title": "Choisir la langue pour la classe {class_name}",
+        "description": "Sélectionnez votre langue préférée pour l'intégration.",
+        "data": {
+          "language": "Langue"
+        }
       }
     },
     "error": {

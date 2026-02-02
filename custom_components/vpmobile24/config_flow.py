@@ -184,11 +184,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if excluded_subjects:
                 self._config_data[CONF_EXCLUDED_SUBJECTS] = excluded_subjects
             
-            # Create entry
-            return self.async_create_entry(
-                title=f"VpMobile24 ({self._config_data[CONF_SCHOOL_ID]})",
-                data=self._config_data,
-            )
+            # Go to language selection step
+            return await self.async_step_language()
 
         # If no subjects found, show message and allow to continue
         if not self._available_subjects:
@@ -200,7 +197,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }),
                 description_placeholders={
                     "class_name": self._config_data.get(CONF_CLASS_NAME, ''),
-                    "message": "Keine Fächer gefunden. Die Integration wird ohne Fächerfilterung eingerichtet.",
+                    "subject_count": "0",
                 }
             )
 
@@ -216,5 +213,34 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             description_placeholders={
                 "class_name": self._config_data.get(CONF_CLASS_NAME, ''),
                 "subject_count": str(len(self._available_subjects)),
+            }
+        )
+
+    async def async_step_language(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the language selection step."""
+        if user_input is not None:
+            # Store language preference
+            self._config_data["language"] = user_input.get("language", "en")
+            
+            # Create entry
+            return self.async_create_entry(
+                title=f"VpMobile24 ({self._config_data[CONF_SCHOOL_ID]})",
+                data=self._config_data,
+            )
+
+        # Language selection form
+        return self.async_show_form(
+            step_id="language",
+            data_schema=vol.Schema({
+                vol.Optional("language", default="en"): vol.In({
+                    "en": "English",
+                    "de": "Deutsch", 
+                    "fr": "Français"
+                })
+            }),
+            description_placeholders={
+                "class_name": self._config_data.get(CONF_CLASS_NAME, ''),
             }
         )

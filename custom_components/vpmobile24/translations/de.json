@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "VpMobile24 einrichten",
-        "description": "Geben Sie Ihre stundenplan24.de Zugangsdaten ein.",
+        "description": "Geben Sie Ihre VpMobile24 Zugangsdaten ein.",
         "data": {
           "school_id": "Schulnummer",
           "username": "Nutzername",
@@ -11,23 +11,46 @@
           "class_name": "Klasse"
         },
         "data_description": {
-          "school_id": "Die Schulnummer aus der stundenplan24.de URL",
-          "username": "Ihr Benutzername für stundenplan24.de",
-          "password": "Ihr Passwort für stundenplan24.de",
+          "school_id": "Die Schulnummer aus der VpMobile24 URL",
+          "username": "Ihr Benutzername für VpMobile24",
+          "password": "Ihr Passwort für VpMobile24",
           "class_name": "Die Klasse (z.B. 5a)"
         }
       },
       "subjects": {
         "title": "Fächer für Klasse {class_name} auswählen",
-        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer. {message}"
+        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer."
+      },
+      "language": {
+        "title": "Sprache für Klasse {class_name} wählen",
+        "description": "Wählen Sie Ihre bevorzugte Sprache für die Integration.",
+        "data": {
+          "language": "Sprache"
+        }
       }
     },
     "error": {
-      "cannot_connect": "Verbindung zu stundenplan24.de fehlgeschlagen. Bitte prüfen Sie Ihre Zugangsdaten.",
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte prüfen Sie Ihre Zugangsdaten.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten."
     },
     "abort": {
       "already_configured": "Diese Schule ist bereits konfiguriert."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "naechste_stunde": {
+        "name": "Nächste Stunde"
+      },
+      "wochenstundenplan": {
+        "name": "Wochenstundenplan"
+      },
+      "zusatzinfos": {
+        "name": "Zusatzinfos"
+      },
+      "aenderungen": {
+        "name": "Änderungen"
+      }
     }
   }
 }
