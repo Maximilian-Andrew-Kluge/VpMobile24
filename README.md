@@ -1,5 +1,9 @@
 # VpMobile24 Home Assistant Integration
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![GitHub license](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE)
+
 Eine Custom Integration für Home Assistant, um Stundenpläne von stundenplan24.de einzubinden.
 
 ## 🚀 Features
@@ -20,14 +24,14 @@ Eine Custom Integration für Home Assistant, um Stundenpläne von stundenplan24.
 1. Öffne HACS in Home Assistant
 2. Gehe zu "Integrationen"
 3. Klicke auf die drei Punkte oben rechts und wähle "Benutzerdefinierte Repositories"
-4. Füge diese Repository-URL hinzu: `https://github.com/Maximilian-Andrew-Kluge/VpMobile24`
+4. Füge diese Repository-URL hinzu: `https://github.com/DEIN-USERNAME/vpmobile24-ha`
 5. Wähle Kategorie "Integration"
 6. Suche nach "VpMobile24" und installiere es
 7. Starte Home Assistant neu
 
 ### Manuelle Installation
 
-1. Lade die neueste Version von [Releases](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases) herunter
+1. Lade die neueste Version von [Releases](https://github.com/DEIN-USERNAME/vpmobile24-ha/releases) herunter
 2. Entpacke die Datei
 3. Kopiere den `custom_components/vpmobile24` Ordner in dein Home Assistant `custom_components` Verzeichnis
 4. Starte Home Assistant neu
@@ -207,4 +211,4 @@ MIT License - siehe [LICENSE](LICENSE) Datei für Details.
 
 Wenn dir diese Integration gefällt, gib dem Repository einen Stern! ⭐
 
-Bei Problemen oder Fragen, öffne bitte ein [Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues).
+Bei Problemen oder Fragen, öffne bitte ein [Issue](https://github.com/DEIN-USERNAME/vpmobile24-ha/issues).
