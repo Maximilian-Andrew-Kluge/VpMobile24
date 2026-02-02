@@ -1,0 +1,49 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up VpMobile24",
+        "description": "Enter your VpMobile24 credentials.",
+        "data": {
+          "school_id": "School ID",
+          "username": "Username",
+          "password": "Password",
+          "class_name": "Class"
+        },
+        "data_description": {
+          "school_id": "The school ID from the VpMobile24 URL",
+          "username": "Your username for VpMobile24",
+          "password": "Your password for VpMobile24",
+          "class_name": "The class (e.g. 5a)"
+        }
+      },
+      "subjects": {
+        "title": "Select subjects for class {class_name}",
+        "description": "Choose the subjects to display. Found: {subject_count} subjects. {message}"
+      }
+    },
+    "error": {
+      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
+      "unknown": "An unknown error occurred."
+    },
+    "abort": {
+      "already_configured": "This school is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "naechste_stunde": {
+        "name": "Next Lesson"
+      },
+      "wochenstundenplan": {
+        "name": "Week Schedule"
+      },
+      "zusatzinfos": {
+        "name": "Additional Info"
+      },
+      "aenderungen": {
+        "name": "Changes"
+      }
+    }
+  }
+}

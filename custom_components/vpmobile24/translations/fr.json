@@ -1,0 +1,49 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurer VpMobile24",
+        "description": "Entrez vos identifiants VpMobile24.",
+        "data": {
+          "school_id": "ID de l'école",
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe",
+          "class_name": "Classe"
+        },
+        "data_description": {
+          "school_id": "L'ID de l'école depuis l'URL VpMobile24",
+          "username": "Votre nom d'utilisateur pour VpMobile24",
+          "password": "Votre mot de passe pour VpMobile24",
+          "class_name": "La classe (ex. 5a)"
+        }
+      },
+      "subjects": {
+        "title": "Sélectionner les matières pour la classe {class_name}",
+        "description": "Choisissez les matières à afficher. Trouvé: {subject_count} matières. {message}"
+      }
+    },
+    "error": {
+      "cannot_connect": "Connexion à VpMobile24 échouée. Veuillez vérifier vos identifiants.",
+      "unknown": "Une erreur inconnue s'est produite."
+    },
+    "abort": {
+      "already_configured": "Cette école est déjà configurée."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "naechste_stunde": {
+        "name": "Prochain Cours"
+      },
+      "wochenstundenplan": {
+        "name": "Emploi du Temps"
+      },
+      "zusatzinfos": {
+        "name": "Infos Supplémentaires"
+      },
+      "aenderungen": {
+        "name": "Changements"
+      }
+    }
+  }
+}

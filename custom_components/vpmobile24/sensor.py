@@ -190,19 +190,24 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
         if not self.coordinator.data:
             return "Keine Daten"
         
-        lessons = self.coordinator.data.get("lessons", [])
-        info_count = 0
+        # Zähle ZusatzInfo aus XML
+        additional_info = self.coordinator.data.get("additional_info", [])
         
+        # Zähle auch Zusatzinfos aus Stunden
+        lessons = self.coordinator.data.get("lessons", [])
+        lesson_info_count = 0
         for lesson in lessons:
             if lesson.get("info"):
-                info_count += 1
+                lesson_info_count += 1
         
-        if info_count == 0:
+        total_info_count = len(additional_info) + lesson_info_count
+        
+        if total_info_count == 0:
             return "Keine Zusatzinfos"
-        elif info_count == 1:
+        elif total_info_count == 1:
             return "1 Zusatzinfo"
         else:
-            return f"{info_count} Zusatzinfos"
+            return f"{total_info_count} Zusatzinfos"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -210,15 +215,25 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
         if not self.coordinator.data:
             return {}
         
-        lessons = self.coordinator.data.get("lessons", [])
-        infos = []
+        # ZusatzInfo aus XML
+        additional_info = self.coordinator.data.get("additional_info", [])
+        general_infos = []
+        for info in additional_info:
+            general_infos.append({
+                "text": info.get("text", ""),
+                "typ": "Allgemeine Info"
+            })
         
+        # Zusatzinfos aus Stunden
+        lessons = self.coordinator.data.get("lessons", [])
+        lesson_infos = []
         for lesson in lessons:
             if lesson.get("info"):
                 info_entry = {
                     "zeit": lesson.get("time", ""),
                     "fach": lesson.get("subject", ""),
                     "zusatzinfo": lesson["info"],
+                    "typ": "Stunden-Info"
                 }
                 if lesson.get("teacher"):
                     info_entry["lehrer"] = lesson["teacher"]
@@ -227,11 +242,14 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
                 if lesson.get("period"):
                     info_entry["stunde"] = lesson["period"]
                 
-                infos.append(info_entry)
+                lesson_infos.append(info_entry)
         
         return {
-            "alle_zusatzinfos": infos,
-            "anzahl_infos": len(infos),
+            "allgemeine_infos": general_infos,
+            "stunden_infos": lesson_infos,
+            "anzahl_allgemeine_infos": len(general_infos),
+            "anzahl_stunden_infos": len(lesson_infos),
+            "gesamt_infos": len(general_infos) + len(lesson_infos),
             "datum": self.coordinator.data.get("date", ""),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
         }

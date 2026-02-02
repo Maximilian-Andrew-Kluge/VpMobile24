@@ -113,6 +113,7 @@ class Stundenplan24API:
                 "date": target_date.isoformat(),
                 "lessons": [],
                 "changes": [],
+                "additional_info": [],
                 "last_updated": datetime.now().isoformat(),
                 "timestamp": "",
                 "classes": []
@@ -122,6 +123,16 @@ class Stundenplan24API:
             zeitstempel = root.find('.//zeitstempel')
             if zeitstempel is not None and zeitstempel.text:
                 schedule_data["timestamp"] = zeitstempel.text
+            
+            # Parse ZusatzInfo
+            zusatz_info = root.find('.//ZusatzInfo')
+            if zusatz_info is not None:
+                for zi_zeile in zusatz_info.findall('ZiZeile'):
+                    if zi_zeile.text and zi_zeile.text.strip():
+                        schedule_data["additional_info"].append({
+                            "text": zi_zeile.text.strip(),
+                            "type": "general_info"
+                        })
             
             # Get all classes or filter by specific class
             classes_to_process = []
@@ -148,6 +159,8 @@ class Stundenplan24API:
             # Sort lessons by time and class
             schedule_data["lessons"] = self._sort_lessons(schedule_data["lessons"])
             schedule_data["changes"] = self._sort_lessons(schedule_data["changes"])
+            
+            return schedule_data
             
             return schedule_data
             
