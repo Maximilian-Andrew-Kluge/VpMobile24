@@ -29,5 +29,21 @@
     "abort": {
       "already_configured": "Diese Schule ist bereits konfiguriert."
     }
+  },
+  "entity": {
+    "sensor": {
+      "naechste_stunde": {
+        "name": "Nächste Stunde"
+      },
+      "wochenstundenplan": {
+        "name": "Wochenstundenplan"
+      },
+      "zusatzinfos": {
+        "name": "Zusatzinfos"
+      },
+      "aenderungen": {
+        "name": "Änderungen"
+      }
+    }
   }
 }
