@@ -1,0 +1,6 @@
+{
+  "vpmobile24": {
+    "name": "VpMobile24",
+    "integrations": ["vpmobile24"]
+  }
+}
