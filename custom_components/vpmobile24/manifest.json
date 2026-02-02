@@ -10,4 +10,5 @@
   "requirements": ["aiohttp>=3.8.0"],
   "version": "1.0.0",
   "icon": "icon"
+  "issue_tracker": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues"
 }
