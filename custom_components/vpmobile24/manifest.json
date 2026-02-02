@@ -1,0 +1,13 @@
+{
+  "domain": "vpmobile24",
+  "name": "VpMobile24",
+  "codeowners": ["@user"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/user/vpmobile24-hass",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "requirements": ["aiohttp>=3.8.0"],
+  "version": "1.0.0",
+  "icon": "icon"
+}

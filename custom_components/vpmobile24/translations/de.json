@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "VpMobile24 einrichten",
+        "description": "Geben Sie Ihre stundenplan24.de Zugangsdaten ein.",
+        "data": {
+          "school_id": "Schulnummer",
+          "username": "Nutzername",
+          "password": "Passwort",
+          "class_name": "Klasse"
+        },
+        "data_description": {
+          "school_id": "Die Schulnummer aus der stundenplan24.de URL",
+          "username": "Ihr Benutzername für stundenplan24.de",
+          "password": "Ihr Passwort für stundenplan24.de",
+          "class_name": "Die Klasse (z.B. 5a)"
+        }
+      },
+      "subjects": {
+        "title": "Fächer für Klasse {class_name} auswählen",
+        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer. {message}"
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu stundenplan24.de fehlgeschlagen. Bitte prüfen Sie Ihre Zugangsdaten.",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Diese Schule ist bereits konfiguriert."
+    }
+  }
+}
