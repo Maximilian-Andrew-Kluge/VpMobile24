@@ -1,55 +1,59 @@
-## VpMobile24 Home Assistant Integration
+# VpMobile24 - Stundenplan Integration
 
-Eine vollständige Home Assistant Integration für stundenplan24.de Schulstundenpläne.
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
-### ✨ Features
+Eine leistungsstarke Home Assistant Integration für stundenplan24.de Stundenpläne.
 
-- **4 verschiedene Sensoren** für umfassende Stundenplan-Informationen
-- **Kalender-Integration** mit Wochenansicht aller Unterrichtsstunden
-- **Intelligente Fächerfilterung** - wähle nur die gewünschten Fächer aus
-- **Automatische Änderungserkennung** für Vertretungsstunden
-- **Deutsche Benutzeroberfläche** mit vollständiger Lokalisierung
-- **Sichere Authentifizierung** über HTTP Basic Auth
+## ✨ Hauptfeatures
 
-### 📊 Sensoren
+### 🌍 Mehrsprachige Sensoren
+- **🇩🇪 Deutsch**: Nächste Stunde, Wochenstundenplan, Zusatzinfos, Änderungen
+- **🇺🇸 English**: Next Lesson, Week Schedule, Additional Info, Changes  
+- **🇫🇷 Français**: Prochain Cours, Emploi du Temps, Infos Supplémentaires, Changements
 
-1. **Next Lesson** - Zeigt die nächste Unterrichtsstunde
-2. **Today Schedule** - Kompletter Stundenplan für heute
-3. **Changes** - Alle Stundenplanänderungen und Vertretungen
-4. **Week Schedule** - Wochenübersicht aller Stunden
+### ⚙️ Einfache 3-Schritte Einrichtung
+1. **Zugangsdaten** - Schulnummer, Nutzername, Passwort, Klasse
+2. **Fächer auswählen** - Wähle nur die gewünschten Fächer aus
+3. **Sprache wählen** - Deutsch, Englisch oder Französisch
 
-### 📅 Kalender
+### 📊 Vier intelligente Sensoren
+- **⏰ Nächste Stunde** - Zeigt die kommende Unterrichtsstunde
+- **📅 Wochenstundenplan** - Kompletter Tagesüberblick  
+- **ℹ️ Zusatzinfos** - Wichtige Schulinformationen aus dem XML
+- **🔄 Änderungen** - Vertretungen und Stundenplanänderungen
 
-- Vollständige Kalender-Integration in Home Assistant
-- Wochenansicht aller Unterrichtsstunden
-- Vertretungen sind mit 🔄 markiert
-- Detaillierte Ereignisse mit Lehrer, Raum und Zusatzinfos
+### 📅 Kalender-Integration
+- Vollständige Wochenansicht in Home Assistant
+- Vertretungen deutlich markiert
+- Detaillierte Ereignisse mit Lehrer, Raum und Zeit
 
-### 🎯 Intelligente Fächerfilterung
+## 🎯 Intelligente Features
 
-- Scannt 4 Wochen nach allen verfügbaren Fächern
-- Automatische Erkennung von Standard-Fächern und Kurscodes
-- Einfache Checkbox-Auswahl für gewünschte Fächer
-- Echtzeitfilterung in allen Sensoren und im Kalender
+### 📋 ZusatzInfo-Parsing
+Zeigt zusätzliche Informationen direkt aus dem stundenplan24.de XML:
+- Allgemeine Schulinformationen
+- Klassenspezifische Hinweise
+- Prüfungstermine und Ankündigungen
 
-### 🔧 Einfache Einrichtung
+### 🎨 Saubere Icons
+- Material Design Icons für alle Sensoren
+- Integration-Icon: ⏰📅 (calendar-clock)
+- Konsistente Darstellung in Home Assistant
 
-1. Installation über HACS oder manuell
-2. Zugangsdaten eingeben (Schulnummer, Nutzername, Passwort, Klasse)
-3. Fächer auswählen
-4. Fertig!
+### 🔄 Automatische Updates
+- Daten werden alle 15 Minuten aktualisiert
+- Sichere HTTP Basic Authentication
+- Zuverlässige XML-Verarbeitung
 
-### 📱 Perfekt für Lovelace
+## 📱 Verwendung
 
-Funktioniert nahtlos mit allen Home Assistant Dashboards und Karten:
-- Entitäten-Karten für Sensoren
-- Kalender-Karten für Stundenplan-Übersicht
-- Automatisierungen für Benachrichtigungen
-
-### 🏫 Unterstützte Systeme
-
-Funktioniert mit allen stundenplan24.de Installationen deutschlandweit.
-
----
-
-**Hinweis**: Du benötigst gültige Anmeldedaten für deine stundenplan24.de Schule.
+### Lovelace Karten
+```yaml
+type: entities
+title: Mein Stundenplan
+entities:
+  - sensor.vpmobile24_nachste_stunde
+  - sensor.vpmobile24_wochenstundenplan
+  - sensor.vpmobile24_zusatzinfos
+  - sensor.vpmobile24_anderungen
