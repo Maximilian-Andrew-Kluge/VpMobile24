@@ -95,6 +95,7 @@ async def async_setup_entry(
     sensors = [
         VpMobile24NextLessonSensor(coordinator, config_entry, language),
         VpMobile24WeekScheduleSensor(coordinator, config_entry, language),
+        VpMobile24WeekTableSensor(coordinator, config_entry, language),
         VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
         VpMobile24ChangesSensor(coordinator, config_entry, language),
     ]
@@ -233,35 +234,26 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             return STATE_MESSAGES[self._language]["no_data"]
         
         lessons = self.coordinator.data.get("lessons", [])
+        changes = self.coordinator.data.get("changes", [])
         
-        # Filtere nur heutige Stunden
+        # Filtere nur heutige Stunden - ALLE Stunden (normale + geänderte)
         today = datetime.now().date().isoformat()
         today_lessons = []
         
+        # Normale Stunden
         for lesson in lessons:
             lesson_date = lesson.get("date", "")
             if lesson_date == today:
                 today_lessons.append(lesson)
         
-        # Prüfe welche heutigen Stunden noch nicht vorbei sind
-        current_datetime = datetime.now()
-        remaining_today_lessons = []
+        # Geänderte Stunden (diese sind auch Stunden!)
+        for change in changes:
+            change_date = change.get("date", "")
+            if change_date == today:
+                today_lessons.append(change)
         
-        for lesson in today_lessons:
-            time_start = lesson.get("time_start", "")
-            if time_start and ":" in time_start:
-                try:
-                    lesson_hour, lesson_minute = map(int, time_start.split(":"))
-                    lesson_datetime = datetime.combine(current_datetime.date(), datetime.min.time().replace(hour=lesson_hour, minute=lesson_minute))
-                    
-                    # Stunde ist noch nicht vorbei
-                    if lesson_datetime > current_datetime:
-                        remaining_today_lessons.append(lesson)
-                except (ValueError, TypeError):
-                    continue
-        
-        # Zeige nur verbleibende heutige Stunden
-        lesson_count = len(remaining_today_lessons)
+        # Zeige alle heutigen Stunden (normale + geänderte)
+        lesson_count = len(today_lessons)
         
         if lesson_count == 0:
             return STATE_MESSAGES[self._language]["no_lessons"]
@@ -272,38 +264,49 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib den kompletten Wochenstundenplan zurück."""
+        """Gib den kompletten heutigen Stundenplan zurück."""
         if not self.coordinator.data:
             return {}
         
         lessons = self.coordinator.data.get("lessons", [])
+        changes = self.coordinator.data.get("changes", [])
         
-        # Filtere nur heutige Stunden
+        # Filtere nur heutige Stunden - ALLE Stunden (normale + geänderte)
         today = datetime.now().date().isoformat()
-        today_lessons = []
+        all_today_lessons = []
         subjects_count = {}
+        current_datetime = datetime.now()
         
+        # Normale Stunden
         for lesson in lessons:
             lesson_date = lesson.get("date", "")
             if lesson_date == today:
-                subject = lesson.get("subject", "Unbekannt")
-                
-                # Zähle Fächer
-                if subject in subjects_count:
-                    subjects_count[subject] += 1
-                else:
-                    subjects_count[subject] = 1
-                
-                today_lessons.append(lesson)
+                all_today_lessons.append(lesson)
         
-        # Prüfe welche heutigen Stunden noch nicht vorbei sind
-        current_datetime = datetime.now()
-        remaining_today_lessons = []
+        # Geänderte Stunden (diese sind auch Stunden!)
+        for change in changes:
+            change_date = change.get("date", "")
+            if change_date == today:
+                all_today_lessons.append(change)
         
-        for lesson in today_lessons:
-            time_start = lesson.get("time_start", "")
+        # Verarbeite alle heutigen Stunden (normale + geänderte)
+        # Erst sortieren nach Stunde für Doppelstunden-Erkennung
+        all_today_lessons.sort(key=lambda x: int(x.get("period", "0")) if x.get("period", "").isdigit() else 0)
+        
+        # Doppelstunden-Erkennung und fehlende Stunden ergänzen
+        completed_lessons = self._complete_double_lessons(all_today_lessons)
+        
+        today_lessons = []
+        for lesson in completed_lessons:
+            subject = lesson.get("subject", "Unbekannt")
             
-            # Erstelle lesson_info
+            # Zähle Fächer
+            if subject in subjects_count:
+                subjects_count[subject] += 1
+            else:
+                subjects_count[subject] = 1
+            
+            # Erstelle lesson_info für alle heutigen Stunden
             lesson_info = {
                 "zeit": lesson.get("time", ""),
                 "fach": lesson.get("subject", ""),
@@ -317,32 +320,247 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                 lesson_info["zusatzinfo"] = lesson["info"]
             if lesson.get("is_change"):
                 lesson_info["ist_vertretung"] = True
+            if lesson.get("ist_doppelstunde"):
+                lesson_info["ist_doppelstunde"] = True
             
-            # Prüfe ob Stunde noch nicht vorbei ist
+            # Prüfe ob Stunde bereits vorbei ist
+            time_start = lesson.get("time_start", "")
             if time_start and ":" in time_start:
                 try:
                     lesson_hour, lesson_minute = map(int, time_start.split(":"))
                     lesson_datetime = datetime.combine(current_datetime.date(), datetime.min.time().replace(hour=lesson_hour, minute=lesson_minute))
                     
-                    # Stunde ist noch nicht vorbei
-                    if lesson_datetime > current_datetime:
-                        remaining_today_lessons.append(lesson_info)
+                    # Markiere vergangene Stunden
+                    if lesson_datetime <= current_datetime:
+                        lesson_info["ist_vorbei"] = True
+                    else:
+                        lesson_info["ist_vorbei"] = False
                 except (ValueError, TypeError):
-                    # Bei Fehlern die Stunde trotzdem anzeigen
-                    remaining_today_lessons.append(lesson_info)
+                    lesson_info["ist_vorbei"] = False
             else:
-                # Ohne Zeit-Info die Stunde trotzdem anzeigen
-                remaining_today_lessons.append(lesson_info)
+                lesson_info["ist_vorbei"] = False
+            
+            today_lessons.append(lesson_info)
+        
+        # Sortiere Stunden nach Stundennummer
+        today_lessons.sort(key=lambda x: int(x.get("stunde", "0")) if x.get("stunde", "").isdigit() else 0)
         
         return {
-            "stunden_heute": remaining_today_lessons,
+            "stunden_heute": today_lessons,
             "faecher_anzahl": subjects_count,
-            "gesamt_stunden": len(remaining_today_lessons),
+            "gesamt_stunden": len(today_lessons),
             "datum": today,
-            "status": f"Zeige {len(remaining_today_lessons)} verbleibende Stunden von heute",
+            "status": f"Zeige alle {len(today_lessons)} Stunden von heute (normale + geänderte)",
             "klasse": getattr(self.coordinator, 'class_name', ''),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
         }
+
+    def _complete_double_lessons(self, lessons: list) -> list:
+        """Ergänze fehlende Stunden für Doppelstunden."""
+        if not lessons:
+            return lessons
+        
+        # Erstelle ein Dictionary mit Stunden als Schlüssel
+        lessons_by_period = {}
+        for lesson in lessons:
+            period = lesson.get("period", "")
+            if period and period.isdigit():
+                lessons_by_period[int(period)] = lesson
+        
+        # Finde alle vorhandenen Stunden
+        existing_periods = sorted(lessons_by_period.keys())
+        if not existing_periods:
+            return lessons
+        
+        completed_lessons = []
+        
+        # Gehe durch alle möglichen Stunden (1-8 typisch)
+        min_period = min(existing_periods)
+        max_period = max(existing_periods)
+        
+        for period in range(min_period, max_period + 1):
+            if period in lessons_by_period:
+                # Stunde existiert bereits
+                completed_lessons.append(lessons_by_period[period])
+            else:
+                # Stunde fehlt - prüfe auf Doppelstunde
+                prev_lesson = lessons_by_period.get(period - 1)
+                next_lesson = lessons_by_period.get(period + 1)
+                
+                # Wenn vorherige Stunde existiert und gleiche Fach hat
+                if prev_lesson and prev_lesson.get("subject"):
+                    # Erstelle Doppelstunde basierend auf vorheriger Stunde
+                    double_lesson = prev_lesson.copy()
+                    double_lesson["period"] = str(period)
+                    
+                    # Berechne Zeit für die nächste Stunde (45 Min später)
+                    prev_time_start = prev_lesson.get("time_start", "")
+                    if prev_time_start and ":" in prev_time_start:
+                        try:
+                            hour, minute = map(int, prev_time_start.split(":"))
+                            # 45 Minuten später
+                            minute += 45
+                            if minute >= 60:
+                                hour += 1
+                                minute -= 60
+                            
+                            new_time_start = f"{hour:02d}:{minute:02d}"
+                            new_time_end = f"{hour:02d}:{minute + 45:02d}" if minute + 45 < 60 else f"{hour + 1:02d}:{minute + 45 - 60:02d}"
+                            
+                            double_lesson["time_start"] = new_time_start
+                            double_lesson["time_end"] = new_time_end
+                            double_lesson["time"] = f"{new_time_start}-{new_time_end}"
+                            
+                        except (ValueError, TypeError):
+                            # Fallback: verwende Zeit der vorherigen Stunde
+                            pass
+                    
+                    # Markiere als automatisch ergänzte Doppelstunde
+                    double_lesson["ist_doppelstunde"] = True
+                    completed_lessons.append(double_lesson)
+                
+                # Wenn nächste Stunde existiert und gleiches Fach hat
+                elif next_lesson and next_lesson.get("subject"):
+                    # Erstelle Doppelstunde basierend auf nächster Stunde
+                    double_lesson = next_lesson.copy()
+                    double_lesson["period"] = str(period)
+                    
+                    # Berechne Zeit für die vorherige Stunde (45 Min früher)
+                    next_time_start = next_lesson.get("time_start", "")
+                    if next_time_start and ":" in next_time_start:
+                        try:
+                            hour, minute = map(int, next_time_start.split(":"))
+                            # 45 Minuten früher
+                            minute -= 45
+                            if minute < 0:
+                                hour -= 1
+                                minute += 60
+                            
+                            new_time_start = f"{hour:02d}:{minute:02d}"
+                            new_time_end = f"{hour:02d}:{minute + 45:02d}" if minute + 45 < 60 else f"{hour + 1:02d}:{minute + 45 - 60:02d}"
+                            
+                            double_lesson["time_start"] = new_time_start
+                            double_lesson["time_end"] = new_time_end
+                            double_lesson["time"] = f"{new_time_start}-{new_time_end}"
+                            
+                        except (ValueError, TypeError):
+                            # Fallback: verwende Zeit der nächsten Stunde
+                            pass
+                    
+                    # Markiere als automatisch ergänzte Doppelstunde
+                    double_lesson["ist_doppelstunde"] = True
+                    completed_lessons.append(double_lesson)
+        
+        return completed_lessons
+
+
+class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
+    """Sensor für die komplette Wochenstundenplan-Tabelle."""
+
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        """Initialisiere den Sensor."""
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = "VpMobile24 Week Table"
+        self._attr_unique_id = f"{config_entry.entry_id}_week_table"
+        self._attr_icon = "mdi:table"
+
+    @property
+    def device_info(self):
+        """Return device information."""
+        return {
+            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
+            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "manufacturer": "VpMobile24",
+            "model": "Stundenplan Integration",
+            "sw_version": "1.4.5",
+        }
+
+    @property
+    def state(self) -> str | None:
+        """Gib den Status des Sensors zurück."""
+        if not self.coordinator.data:
+            return "Keine Daten"
+        
+        # Zugriff auf die Wochendaten vom Coordinator
+        week_lessons = getattr(self.coordinator, '_week_data', {}).get('lessons', [])
+        week_changes = getattr(self.coordinator, '_week_data', {}).get('changes', [])
+        
+        total_week_lessons = len(week_lessons) + len(week_changes)
+        
+        if total_week_lessons == 0:
+            return "Keine Wochendaten"
+        else:
+            return f"{total_week_lessons} Wochenstunden"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Gib die kompletten Wochendaten als Tabelle zurück."""
+        if not self.coordinator.data:
+            return {}
+        
+        # Zugriff auf die Wochendaten vom Coordinator
+        week_lessons = getattr(self.coordinator, '_week_data', {}).get('lessons', [])
+        week_changes = getattr(self.coordinator, '_week_data', {}).get('changes', [])
+        
+        # Kombiniere alle Wochenstunden
+        all_week_lessons = []
+        all_week_lessons.extend(week_lessons)
+        all_week_lessons.extend(week_changes)
+        
+        # Erstelle Wochentabelle
+        week_table = self._create_week_table(all_week_lessons)
+        
+        return {
+            "week_table": week_table,
+            "total_lessons": len(all_week_lessons),
+            "week_lessons_count": len(week_lessons),
+            "week_changes_count": len(week_changes),
+            "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
+        }
+
+    def _create_week_table(self, all_lessons: list) -> dict:
+        """Erstelle eine strukturierte Wochentabelle."""
+        # Wochentage (0=Montag, 4=Freitag)
+        weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+        
+        # Initialisiere Tabelle
+        week_table = {}
+        for day in weekdays:
+            week_table[day] = {}
+            for period in range(1, 7):  # Stunden 1-6
+                week_table[day][str(period)] = None
+        
+        # Fülle Tabelle mit Stunden
+        for lesson in all_lessons:
+            lesson_date = lesson.get("date", "")
+            period = lesson.get("period", "")
+            
+            if lesson_date and period:
+                try:
+                    # Konvertiere Datum zu Wochentag
+                    lesson_datetime = datetime.fromisoformat(lesson_date)
+                    weekday_index = lesson_datetime.weekday()  # 0=Montag
+                    
+                    if 0 <= weekday_index <= 4 and period.isdigit():
+                        weekday_name = weekdays[weekday_index]
+                        
+                        lesson_info = {
+                            "fach": lesson.get("subject", ""),
+                            "lehrer": lesson.get("teacher", ""),
+                            "raum": lesson.get("room", ""),
+                            "zeit": lesson.get("time", ""),
+                            "ist_vertretung": lesson.get("is_change", False),
+                            "zusatzinfo": lesson.get("info", "")
+                        }
+                        
+                        week_table[weekday_name][period] = lesson_info
+                        
+                except (ValueError, TypeError):
+                    continue
+        
+        return week_table
 
 
 class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):

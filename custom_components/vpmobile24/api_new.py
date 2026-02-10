@@ -105,7 +105,7 @@ class Stundenplan24API:
             raise
 
     async def async_get_multi_day_schedule(self, start_date: date | None = None, days: int = 2, class_name: str | None = None) -> dict[str, Any]:
-        """Get schedule data for multiple days."""
+        """Get schedule data for multiple days (only school days Mon-Fri)."""
         if start_date is None:
             start_date = date.today()
         
@@ -114,8 +114,19 @@ class Stundenplan24API:
         all_additional_info = []
         latest_timestamp = ""
         
-        for i in range(days):
-            current_date = start_date + timedelta(days=i)
+        current_date = start_date
+        days_loaded = 0
+        max_attempts = days * 2  # Safety limit to avoid infinite loops
+        attempts = 0
+        
+        while days_loaded < days and attempts < max_attempts:
+            attempts += 1
+            
+            # Skip weekends (Saturday = 5, Sunday = 6)
+            if current_date.weekday() >= 5:
+                current_date += timedelta(days=1)
+                continue
+            
             try:
                 day_data = await self.async_get_schedule(current_date, class_name)
                 
@@ -130,14 +141,18 @@ class Stundenplan24API:
                     change["day_name"] = current_date.strftime("%A")
                     all_changes.append(change)
                 
-                # Collect additional info (only from first day to avoid duplicates)
-                if i == 0:
+                # Collect additional info (only from first successful day to avoid duplicates)
+                if days_loaded == 0:
                     all_additional_info = day_data.get("additional_info", [])
                     latest_timestamp = day_data.get("timestamp", "")
                 
+                days_loaded += 1
+                
             except Exception as ex:
-                _LOGGER.warning(f"Could not fetch schedule for {current_date}: {ex}")
-                continue
+                _LOGGER.debug(f"Could not fetch schedule for {current_date} (school day): {ex}")
+                # Continue to next day even if this one fails
+            
+            current_date += timedelta(days=1)
         
         return {
             "date": start_date.isoformat(),

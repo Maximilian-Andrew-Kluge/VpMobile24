@@ -37,6 +37,18 @@
       "already_configured": "Diese Schule ist bereits konfiguriert."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VpMobile24 Optionen",
+        "description": "Ändern Sie die Einstellungen Ihrer VpMobile24 Integration.",
+        "data": {
+          "excluded_subjects": "Abzuwählende Fächer",
+          "language": "Sprache"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "naechste_stunde": {

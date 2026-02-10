@@ -1,0 +1,6 @@
+# VpMobile24 Card Resources
+# Diese Datei wird automatisch von der Integration geladen
+
+resources:
+  - url: /local/community/vpmobile24/vpmobile24-card.js
+    type: module

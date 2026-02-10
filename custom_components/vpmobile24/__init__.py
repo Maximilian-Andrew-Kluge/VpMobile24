@@ -49,6 +49,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sw_version="1.4.5",
     )
     
+    # Register the custom card (optional - may not work in all HA versions)
+    try:
+        card_path = hass.config.path(f"custom_components/{DOMAIN}/card.js")
+        if hasattr(hass.http, 'register_static_path'):
+            hass.http.register_static_path(
+                f"/local/vpmobile24/vpmobile24-card.js",
+                card_path,
+                True,
+            )
+            
+            # Also register under hacsfiles for compatibility
+            hass.http.register_static_path(
+                f"/hacsfiles/vpmobile24/vpmobile24-card.js",
+                card_path,
+                True,
+            )
+            _LOGGER.debug("Custom card registered successfully")
+        else:
+            _LOGGER.debug("Static path registration not available in this HA version")
+    except Exception as e:
+        _LOGGER.debug(f"Could not register custom card: {e}")
+        # This is not critical, continue without card registration
+    
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     
     return True
@@ -80,47 +103,110 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Update data via library."""
-        # Load today's data for sensors
-        today_data = await self.api.async_get_multi_day_schedule(days=1, class_name=self.class_name)
-        
-        # Load week data for calendar (7 days)
-        week_data = await self.api.async_get_multi_day_schedule(days=7, class_name=self.class_name)
-        
-        # Filter out excluded subjects from lessons and changes, but keep additional_info
-        if self.excluded_subjects:
-            # Filter today's data for sensors
-            filtered_lessons = []
-            filtered_changes = []
+        try:
+            _LOGGER.debug("Starting data update...")
             
-            for lesson in today_data.get("lessons", []):
-                if lesson.get("subject") not in self.excluded_subjects:
-                    filtered_lessons.append(lesson)
+            # Load week data (5 school days) - this includes today
+            week_data = await self.api.async_get_multi_day_schedule(days=5, class_name=self.class_name)
+            _LOGGER.debug(f"Week data loaded: {len(week_data.get('lessons', []))} lessons")
             
-            for change in today_data.get("changes", []):
-                if change.get("subject") not in self.excluded_subjects:
-                    filtered_changes.append(change)
+            # Store week data for the week table sensor
+            self._week_data = week_data
             
-            today_data["lessons"] = filtered_lessons
-            today_data["changes"] = filtered_changes
+            # Extract today's data from week data
+            from datetime import date
+            today_str = date.today().isoformat()
             
-            # Filter week data for calendar
-            week_filtered_lessons = []
-            week_filtered_changes = []
+            today_lessons = []
+            today_changes = []
             
             for lesson in week_data.get("lessons", []):
-                if lesson.get("subject") not in self.excluded_subjects:
-                    week_filtered_lessons.append(lesson)
+                if lesson.get("date") == today_str:
+                    today_lessons.append(lesson)
             
             for change in week_data.get("changes", []):
-                if change.get("subject") not in self.excluded_subjects:
-                    week_filtered_changes.append(change)
+                if change.get("date") == today_str:
+                    today_changes.append(change)
             
-            week_data["lessons"] = week_filtered_lessons
-            week_data["changes"] = week_filtered_changes
-            # Keep additional_info as is - it's not subject-specific
-        
-        # Store both datasets
-        today_data["week_lessons"] = week_data.get("lessons", [])
-        today_data["week_changes"] = week_data.get("changes", [])
-        
-        return today_data
+            # Create today's data structure
+            today_data = {
+                "lessons": today_lessons,
+                "changes": today_changes,
+                "additional_info": week_data.get("additional_info", []),
+                "date": today_str,
+                "timestamp": week_data.get("timestamp", "")
+            }
+            
+            _LOGGER.debug(f"Today's data extracted: {len(today_lessons)} lessons, {len(today_changes)} changes")
+            
+            # If no data available, create empty structure to prevent sensor failures
+            if not week_data.get("lessons") and not week_data.get("changes"):
+                _LOGGER.info("No schedule data available (possibly school holidays)")
+                today_data = {
+                    "lessons": [],
+                    "changes": [],
+                    "additional_info": [],
+                    "date": today_str,
+                    "timestamp": "",
+                    "week_lessons": [],
+                    "week_changes": []
+                }
+                return today_data
+            
+            # Filter out excluded subjects from lessons and changes, but keep additional_info
+            if self.excluded_subjects:
+                _LOGGER.debug(f"Filtering excluded subjects: {self.excluded_subjects}")
+                
+                # Filter today's data for sensors
+                filtered_lessons = []
+                filtered_changes = []
+                
+                for lesson in today_data.get("lessons", []):
+                    if lesson.get("subject") not in self.excluded_subjects:
+                        filtered_lessons.append(lesson)
+                
+                for change in today_data.get("changes", []):
+                    if change.get("subject") not in self.excluded_subjects:
+                        filtered_changes.append(change)
+                
+                today_data["lessons"] = filtered_lessons
+                today_data["changes"] = filtered_changes
+                _LOGGER.debug(f"Filtered today's data: {len(filtered_lessons)} lessons, {len(filtered_changes)} changes")
+                
+                # Filter week data for calendar
+                week_filtered_lessons = []
+                week_filtered_changes = []
+                
+                for lesson in week_data.get("lessons", []):
+                    if lesson.get("subject") not in self.excluded_subjects:
+                        week_filtered_lessons.append(lesson)
+                
+                for change in week_data.get("changes", []):
+                    if change.get("subject") not in self.excluded_subjects:
+                        week_filtered_changes.append(change)
+                
+                week_data["lessons"] = week_filtered_lessons
+                week_data["changes"] = week_filtered_changes
+                _LOGGER.debug(f"Filtered week data: {len(week_filtered_lessons)} lessons, {len(week_filtered_changes)} changes")
+            
+            # Store both datasets
+            today_data["week_lessons"] = week_data.get("lessons", [])
+            today_data["week_changes"] = week_data.get("changes", [])
+            
+            _LOGGER.debug("Data update completed successfully")
+            return today_data
+            
+        except Exception as e:
+            _LOGGER.error(f"Error updating data: {e}")
+            # Return empty data structure to prevent sensor failures
+            from datetime import date
+            today_str = date.today().isoformat()
+            return {
+                "lessons": [],
+                "changes": [],
+                "additional_info": [],
+                "date": today_str,
+                "timestamp": "",
+                "week_lessons": [],
+                "week_changes": []
+            }

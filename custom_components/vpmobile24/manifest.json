@@ -1,5 +1,5 @@
 {
-  "domain": "vpmobile24",
+  "domain": "Vpmobile24",
   "name": "VpMobile24",
   "version": "1.4.5",
   "documentation": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24",
@@ -10,5 +10,6 @@
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "icon": "mdi:calendar-clock",
-  "logo": "icon.png"
+  "logo": "icon.png",
+  "frontend": true
 }
