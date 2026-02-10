@@ -212,3 +212,4 @@ MIT License - siehe [LICENSE](LICENSE) Datei für Details.
 Wenn dir diese Integration gefällt, gib dem Repository einen Stern! ⭐
 
 Bei Problemen oder Fragen, öffne bitte ein [Issue](https://github.com/DEIN-USERNAME/vpmobile24-ha/issues).
+
