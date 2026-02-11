@@ -1,7 +1,7 @@
 {
   "domain": "vpmobile24",
   "name": "VpMobile24",
-  "version": "1.4.5",
+  "version": "1.2.2",
   "documentation": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24",
   "requirements": ["aiohttp>=3.8.0"],
   "dependencies": [],
