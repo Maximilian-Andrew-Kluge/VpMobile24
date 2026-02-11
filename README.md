@@ -4,7 +4,7 @@
 
 # VpMobile24 Home Assistant Integration
 
-**Aktuelle Version:** `1.2.1`  
+**Aktuelle Version:** `1.2.2`  
 **Integrationstyp:** HACS Custom Integration  
 
 Eine **Custom Integration** für Home Assistant, um Stundenpläne von [stundenplan24.de](https://www.stundenplan24.de) in Home Assistant einzubinden.
@@ -70,6 +70,7 @@ MIT License - siehe [LICENSE](LICENSE) Datei für Details.
 Wenn dir diese Integration gefällt, gib dem Repository einen Stern! ⭐
 
 Bei Problemen oder Fragen, öffne bitte ein [Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues).
+
 
 
 
