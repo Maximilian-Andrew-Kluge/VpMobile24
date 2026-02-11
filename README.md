@@ -4,7 +4,7 @@
 
 # VpMobile24 Home Assistant Integration
 
-**Aktuelle Version:** `1.0.0`  
+**Aktuelle Version:** `1.2.1`  
 **Integrationstyp:** HACS Custom Integration  
 
 Eine **Custom Integration** für Home Assistant, um Stundenpläne von [stundenplan24.de](https://www.stundenplan24.de) in Home Assistant einzubinden.
@@ -20,14 +20,6 @@ Eine **Custom Integration** für Home Assistant, um Stundenpläne von [stundenpl
 - Intelligente Fächerfilterung – wähle nur die gewünschten Fächer aus  
 - Kalender-Integration für Wochenansicht  
 - Vier verschiedene Sensoren für unterschiedliche Anwendungsfälle:  
-
-  | Sensor | Beschreibung |
-  |--------|--------------|
-  | `vpmobile24_next_lesson` | Zeigt die nächste Stunde an |
-  | `vpmobile24_current_lesson` | Zeigt die aktuelle Stunde an |
-  | `vpmobile24_today_schedule` | Zeigt alle Stunden des Tages |
-  | `vpmobile24_week_schedule` | Zeigt Stunden für die Woche |
-
 - Deutsche Benutzeroberfläche mit vollständiger Lokalisierung  
 
 ---
@@ -64,8 +56,7 @@ Eine **Custom Integration** für Home Assistant, um Stundenpläne von [stundenpl
 
 ### Optionen
 
-- Auswahl der Fächer, die angezeigt werden sollen  
-- Anpassung des Aktualisierungsintervalls  
+- Auswahl der Fächer, die angezeigt werden sollen   
 - Wahl der Sensoren für verschiedene Anwendungsfälle  
 
 ---
@@ -79,6 +70,7 @@ MIT License - siehe [LICENSE](LICENSE) Datei für Details.
 Wenn dir diese Integration gefällt, gib dem Repository einen Stern! ⭐
 
 Bei Problemen oder Fragen, öffne bitte ein [Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues).
+
 
 
 
