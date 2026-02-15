@@ -6,6 +6,7 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
 
 ## Features
 
@@ -266,5 +267,6 @@ Siehe LICENSE Datei im Repository.
 ## Credits
 
 Entwickelt für die VpMobile24 Plattform.
+
 
 
