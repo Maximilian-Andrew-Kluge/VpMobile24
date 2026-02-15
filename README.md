@@ -1,12 +1,14 @@
 # VpMobile24 Home Assistant Integration
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+
 Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne mit moderner Lovelace Card.
 
 ## Version
 
-[![HACS Badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![GitHub license](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE)
+**Integration**: v2.1.0  
+**Card**: v2.1.0
 
 ## Features
 
@@ -30,15 +32,30 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 - ✅ Responsive Design
 - ✅ Sauberes, modernes Design
 
-## Manuelle Installation
+## Installation
 
-### Integration installieren
+### Manuelle Installation
 
 1. Kopiere den `custom_components/vpmobile24` Ordner in dein Home Assistant `custom_components` Verzeichnis
 2. Starte Home Assistant neu
 3. Gehe zu **Einstellungen** → **Geräte & Dienste** → **Integration hinzufügen**
 4. Suche nach "VpMobile24"
 5. Folge dem Konfigurationsassistenten
+
+### HACS Installation (empfohlen)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
+
+1. Klicke auf den Badge oben oder:
+2. Öffne HACS in Home Assistant
+3. Gehe zu "Integrationen"
+4. Klicke auf die drei Punkte oben rechts
+5. Wähle "Benutzerdefinierte Repositories"
+6. Füge hinzu: `https://github.com/Maximilian-Andrew-Kluge/VpMobile24`
+7. Kategorie: `Integration`
+8. Klicke auf "Hinzufügen"
+9. Suche nach "VpMobile24" und installiere es
+10. Starte Home Assistant neu
 
 ### Card installieren
 
