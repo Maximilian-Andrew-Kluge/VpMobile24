@@ -4,8 +4,9 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 
 ## Version
 
-**Integration**: v2.0.0  
-**Card**: v2.0.0
+[![HACS Badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![GitHub license](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE)
 
 ## Features
 
@@ -18,6 +19,7 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 
 ### Lovelace Card
 - ✅ Moderne visuelle Konfiguration über Home Assistant UI
+- ✅ Automatische Card-Registrierung (kein manuelles Kopieren nötig!)
 - ✅ Wochenansicht (Montag bis Freitag)
 - ✅ Anpassbarer Header mit Titel und Klassenname
 - ✅ Hervorhebung des heutigen Tages
@@ -28,7 +30,7 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 - ✅ Responsive Design
 - ✅ Sauberes, modernes Design
 
-## Installation
+## Manuelle Installation
 
 ### Integration installieren
 
@@ -40,17 +42,21 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 
 ### Card installieren
 
+**Neu in v2.0.1:** Die Card wird automatisch von der Integration bereitgestellt!
+
 Siehe [CARD_INSTALLATION.md](CARD_INSTALLATION.md) für detaillierte Anweisungen.
 
 **Kurzanleitung:**
 
-1. Kopiere `vpmobile24-card.js` nach `/config/www/vpmobile24/vpmobile24-card.js`
+1. Stelle sicher, dass die Integration installiert ist
 2. Füge die Ressource hinzu:
    - **Einstellungen** → **Dashboards** → **Ressourcen** (⋮)
    - **+ Ressource hinzufügen**
-   - URL: `/local/vpmobile24/vpmobile24-card.js`
+   - URL: `/hacsfiles/vpmobile24/vpmobile24-card.js` (empfohlen)
    - Typ: `JavaScript-Modul`
 3. Füge die Card zu deinem Dashboard hinzu
+
+**Wichtig:** Du musst KEINE Datei nach `/config/www/` kopieren! Die Card wird automatisch aus `custom_components/vpmobile24/` geladen.
 
 ## Konfiguration
 
@@ -156,15 +162,19 @@ Die Integration erstellt folgende Sensoren:
 ### Card
 
 **Problem**: Card wird nicht angezeigt
-1. Überprüfe, ob die Datei unter `/config/www/vpmobile24/vpmobile24-card.js` existiert
+1. Überprüfe, ob die VpMobile24 Integration installiert ist
 2. Überprüfe, ob die Ressource korrekt hinzugefügt wurde
-3. Leere den Browser-Cache (Strg+F5)
-4. Starte Home Assistant neu
+3. Versuche eine andere URL:
+   - `/hacsfiles/vpmobile24/vpmobile24-card.js`
+   - `/local/community/vpmobile24/vpmobile24-card.js`
+   - `/local/vpmobile24/vpmobile24-card.js`
+4. Leere den Browser-Cache (Strg+F5)
+5. Starte Home Assistant neu
 
 **Problem**: Änderungen werden nicht übernommen
 1. Leere den Browser-Cache (Strg+F5)
 2. Öffne die Browser-Konsole (F12) und prüfe auf Fehler
-3. Stelle sicher, dass die neueste Version (v2.0.0) geladen wurde
+3. Stelle sicher, dass die neueste Version (v2.0.1) geladen wurde
 
 **Problem**: Entity nicht gefunden
 - Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist
@@ -182,6 +192,23 @@ Die Card verwendet ein schlichtes, modernes Design:
 - Responsive für Mobile und Desktop
 
 ## Changelog
+
+### v2.0.1 (2024)
+**Card - Automatische Registrierung**
+
+#### Neu
+- Automatische Card-Registrierung durch Integration
+- Kein manuelles Kopieren nach `/config/www/` mehr nötig
+- Card wird direkt aus `custom_components/vpmobile24/` geladen
+- Unterstützung für mehrere URL-Pfade für maximale Kompatibilität:
+  - `/hacsfiles/vpmobile24/vpmobile24-card.js`
+  - `/local/community/vpmobile24/vpmobile24-card.js`
+  - `/local/vpmobile24/vpmobile24-card.js`
+
+#### Verbessert
+- Vereinfachte Installation
+- Bessere Dokumentation
+- Automatische Pfad-Registrierung beim Start
 
 ### v2.0.0 (2024)
 **Integration & Card - Major Release**
@@ -209,7 +236,7 @@ Die Card verwendet ein schlichtes, modernes Design:
 ## Support
 
 Bei Problemen oder Fragen:
-- Erstelle ein Issue auf GitHub
+- Erstelle ein Issue auf GitHub: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 - Prüfe die Logs in Home Assistant
 - Öffne die Browser-Konsole (F12) für Card-Probleme
 

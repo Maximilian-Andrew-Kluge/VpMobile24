@@ -4,7 +4,7 @@ Eine moderne Lovelace Card für Home Assistant zur Anzeige des Wochenstundenplan
 
 ## Version
 
-**v2.0.0** - Production Release
+**v2.0.1** - Automatic Card Loading
 
 ## Features
 
@@ -21,23 +21,24 @@ Eine moderne Lovelace Card für Home Assistant zur Anzeige des Wochenstundenplan
 
 ## Installation
 
-### Schritt 1: Datei kopieren
+### Schritt 1: Integration installieren
 
-Kopiere die Datei `vpmobile24-card.js` nach:
-```
-/config/www/vpmobile24/vpmobile24-card.js
-```
-
-Falls der Ordner `/config/www/vpmobile24/` nicht existiert, erstelle ihn.
+Die Card wird automatisch mit der VpMobile24 Integration installiert. Stelle sicher, dass die Integration korrekt eingerichtet ist.
 
 ### Schritt 2: Ressource in Home Assistant hinzufügen
 
+Die Card wird automatisch von der Integration registriert. Du musst nur noch die Ressource hinzufügen:
+
 1. Gehe zu **Einstellungen** → **Dashboards** → **Ressourcen** (oben rechts, 3 Punkte)
 2. Klicke auf **+ Ressource hinzufügen**
-3. Trage ein:
-   - **URL**: `/local/vpmobile24/vpmobile24-card.js`
-   - **Ressourcentyp**: `JavaScript-Modul`
-4. Klicke auf **Erstellen**
+3. Trage eine dieser URLs ein (alle funktionieren):
+   - **Empfohlen**: `/hacsfiles/vpmobile24/vpmobile24-card.js`
+   - Alternative: `/local/community/vpmobile24/vpmobile24-card.js`
+   - Alternative: `/local/vpmobile24/vpmobile24-card.js`
+4. Wähle **Ressourcentyp**: `JavaScript-Modul`
+5. Klicke auf **Erstellen**
+
+**Wichtig:** Die Card wird direkt aus dem `custom_components/vpmobile24/` Ordner geladen. Du musst KEINE Datei nach `/config/www/` kopieren!
 
 ### Schritt 3: Card hinzufügen
 
@@ -147,20 +148,29 @@ time_settings:
 
 ### Card wird nicht angezeigt
 
-1. Überprüfe, ob die Datei unter `/config/www/vpmobile24/vpmobile24-card.js` existiert
+1. Überprüfe, ob die VpMobile24 Integration installiert ist
 2. Überprüfe, ob die Ressource korrekt hinzugefügt wurde
-3. Leere den Browser-Cache (Strg+F5)
-4. Starte Home Assistant neu
+3. Versuche eine andere URL aus der Liste oben
+4. Leere den Browser-Cache (Strg+F5)
+5. Starte Home Assistant neu
 
 ### Änderungen werden nicht übernommen
 
 1. Leere den Browser-Cache (Strg+F5)
 2. Öffne die Browser-Konsole (F12) und prüfe auf Fehler
-3. Stelle sicher, dass die neueste Version (v2.0.0) geladen wurde
+3. Stelle sicher, dass die neueste Version (v2.0.1) geladen wurde
 
 ### Entity nicht gefunden
 
 Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist und der Sensor `sensor.vpmobile24_week_table` existiert.
+
+### Ressource nicht gefunden (404 Fehler)
+
+Wenn du einen 404-Fehler bekommst:
+1. Stelle sicher, dass die Integration installiert und geladen ist
+2. Starte Home Assistant neu
+3. Versuche eine andere URL aus der Liste oben
+4. Prüfe die Logs unter Einstellungen → System → Protokolle
 
 ## Design
 
@@ -174,6 +184,12 @@ Die Card verwendet ein schlichtes, modernes Design:
 - Responsive für Mobile und Desktop
 
 ## Changelog
+
+### v2.0.1 (2024)
+- **Automatische Card-Registrierung**: Kein manuelles Kopieren nach `/config/www/` mehr nötig
+- Card wird direkt aus `custom_components/vpmobile24/` geladen
+- Unterstützung für mehrere URL-Pfade für maximale Kompatibilität
+- Verbesserte Installations-Dokumentation
 
 ### v2.0.0 (2024)
 - Production Release
@@ -189,7 +205,8 @@ Die Card verwendet ein schlichtes, modernes Design:
 
 ## Support
 
-Bei Problemen oder Fragen erstelle bitte ein Issue auf GitHub.
+Bei Problemen oder Fragen erstelle bitte ein Issue auf GitHub:
+https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 
 ## Lizenz
 

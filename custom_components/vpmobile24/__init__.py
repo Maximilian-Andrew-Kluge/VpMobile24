@@ -52,17 +52,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register the custom card
     try:
         import os
-        card_path = os.path.join(hass.config.path("custom_components"), DOMAIN, "card.js")
+        card_path = os.path.join(hass.config.path("custom_components"), DOMAIN, "vpmobile24-card.js")
         
         if hasattr(hass.http, 'register_static_path'):
             # Register under multiple paths for compatibility
             hass.http.register_static_path(
-                f"/local/community/{DOMAIN}/vpmobile24-card.js",
+                f"/hacsfiles/{DOMAIN}/vpmobile24-card.js",
                 card_path,
                 True,
             )
             hass.http.register_static_path(
-                f"/hacsfiles/{DOMAIN}/vpmobile24-card.js",
+                f"/local/community/{DOMAIN}/vpmobile24-card.js",
                 card_path,
                 True,
             )
