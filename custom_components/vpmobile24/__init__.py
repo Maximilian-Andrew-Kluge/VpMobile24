@@ -49,28 +49,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sw_version="1.4.5",
     )
     
-    # Register the custom card (optional - may not work in all HA versions)
+    # Register the custom card
     try:
-        card_path = hass.config.path(f"custom_components/{DOMAIN}/card.js")
+        import os
+        card_path = os.path.join(hass.config.path("custom_components"), DOMAIN, "card.js")
+        
         if hasattr(hass.http, 'register_static_path'):
+            # Register under multiple paths for compatibility
             hass.http.register_static_path(
-                f"/local/vpmobile24/vpmobile24-card.js",
+                f"/local/community/{DOMAIN}/vpmobile24-card.js",
                 card_path,
                 True,
             )
-            
-            # Also register under hacsfiles for compatibility
             hass.http.register_static_path(
-                f"/hacsfiles/vpmobile24/vpmobile24-card.js",
+                f"/hacsfiles/{DOMAIN}/vpmobile24-card.js",
                 card_path,
                 True,
             )
-            _LOGGER.debug("Custom card registered successfully")
+            hass.http.register_static_path(
+                f"/local/{DOMAIN}/vpmobile24-card.js",
+                card_path,
+                True,
+            )
+            _LOGGER.info(f"Custom card registered at multiple paths")
         else:
-            _LOGGER.debug("Static path registration not available in this HA version")
+            _LOGGER.warning("Static path registration not available in this HA version")
     except Exception as e:
-        _LOGGER.debug(f"Could not register custom card: {e}")
-        # This is not critical, continue without card registration
+        _LOGGER.error(f"Could not register custom card: {e}", exc_info=True)
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     

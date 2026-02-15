@@ -1,13 +1,12 @@
 {
   "domain": "vpmobile24",
   "name": "VpMobile24",
-  "version": "1.2.2",
+  "version": "2.2.0",
   "documentation": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24",
   "requirements": ["aiohttp>=3.8.0"],
   "dependencies": [],
   "codeowners": ["@Maximilian-Andrew-Kluge"],
   "config_flow": true,
   "integration_type": "service",
-  "iot_class": "cloud_polling",
-  "frontend": true
+  "iot_class": "cloud_polling"
 }

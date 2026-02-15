@@ -1,6 +1,10 @@
 # VpMobile24 Card Resources
-# Diese Datei wird automatisch von der Integration geladen
+# Diese Datei definiert die Lovelace-Ressourcen für die Custom Card
 
 resources:
   - url: /local/community/vpmobile24/vpmobile24-card.js
+    type: module
+  - url: /hacsfiles/vpmobile24/vpmobile24-card.js
+    type: module
+  - url: /local/vpmobile24/vpmobile24-card.js
     type: module
