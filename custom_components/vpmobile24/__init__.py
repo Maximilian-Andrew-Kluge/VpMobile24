@@ -46,38 +46,43 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="1.4.5",
+        sw_version="2.1.0",
     )
     
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    
+    return True
+
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the vpmobile24 component."""
     # Register the custom card
     try:
-        import os
-        card_path = os.path.join(hass.config.path("custom_components"), DOMAIN, "vpmobile24-card.js")
+        from pathlib import Path
+        import shutil
         
-        if hasattr(hass.http, 'register_static_path'):
-            # Register under multiple paths for compatibility
-            hass.http.register_static_path(
-                f"/hacsfiles/{DOMAIN}/vpmobile24-card.js",
-                card_path,
-                True,
-            )
-            hass.http.register_static_path(
-                f"/local/community/{DOMAIN}/vpmobile24-card.js",
-                card_path,
-                True,
-            )
-            hass.http.register_static_path(
-                f"/local/{DOMAIN}/vpmobile24-card.js",
-                card_path,
-                True,
-            )
-            _LOGGER.info(f"Custom card registered at multiple paths")
+        # Get the path to the card file
+        integration_dir = Path(__file__).parent
+        card_path = integration_dir / "vpmobile24-card.js"
+        
+        if card_path.exists():
+            # Copy to www folder automatically
+            www_dir = Path(hass.config.path("www"))
+            www_vpmobile_dir = www_dir / "vpmobile24"
+            www_card_path = www_vpmobile_dir / "vpmobile24-card.js"
+            
+            # Create directory if it doesn't exist
+            www_vpmobile_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Copy the card file
+            shutil.copy2(str(card_path), str(www_card_path))
+            
+            _LOGGER.info(f"Custom card automatically copied to {www_card_path}")
+            _LOGGER.info(f"Add resource with URL: /local/vpmobile24/vpmobile24-card.js")
         else:
-            _LOGGER.warning("Static path registration not available in this HA version")
+            _LOGGER.error(f"Card file not found at {card_path}")
     except Exception as e:
-        _LOGGER.error(f"Could not register custom card: {e}", exc_info=True)
-    
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        _LOGGER.error(f"Could not setup custom card: {e}", exc_info=True)
     
     return True
 

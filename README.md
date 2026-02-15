@@ -42,21 +42,22 @@ Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne 
 
 ### Card installieren
 
-**Neu in v2.0.1:** Die Card wird automatisch von der Integration bereitgestellt!
+**Neu in v2.1.0:** Die Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert!
 
 Siehe [CARD_INSTALLATION.md](CARD_INSTALLATION.md) für detaillierte Anweisungen.
 
 **Kurzanleitung:**
 
 1. Stelle sicher, dass die Integration installiert ist
-2. Füge die Ressource hinzu:
+2. Starte Home Assistant neu (Card wird automatisch kopiert)
+3. Füge die Ressource hinzu:
    - **Einstellungen** → **Dashboards** → **Ressourcen** (⋮)
    - **+ Ressource hinzufügen**
-   - URL: `/hacsfiles/vpmobile24/vpmobile24-card.js` (empfohlen)
+   - URL: `/local/vpmobile24/vpmobile24-card.js`
    - Typ: `JavaScript-Modul`
-3. Füge die Card zu deinem Dashboard hinzu
+4. Füge die Card zu deinem Dashboard hinzu
 
-**Wichtig:** Du musst KEINE Datei nach `/config/www/` kopieren! Die Card wird automatisch aus `custom_components/vpmobile24/` geladen.
+**Wichtig:** Die Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert. Du musst nichts manuell kopieren!
 
 ## Konfiguration
 
@@ -174,7 +175,7 @@ Die Integration erstellt folgende Sensoren:
 **Problem**: Änderungen werden nicht übernommen
 1. Leere den Browser-Cache (Strg+F5)
 2. Öffne die Browser-Konsole (F12) und prüfe auf Fehler
-3. Stelle sicher, dass die neueste Version (v2.0.1) geladen wurde
+3. Stelle sicher, dass die neueste Version (v2.1.0) geladen wurde
 
 **Problem**: Entity nicht gefunden
 - Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist
@@ -193,22 +194,25 @@ Die Card verwendet ein schlichtes, modernes Design:
 
 ## Changelog
 
-### v2.0.1 (2024)
-**Card - Automatische Registrierung**
+### v2.1.0 (2024)
+**Card - Automatisches Deployment**
 
 #### Neu
-- Automatische Card-Registrierung durch Integration
-- Kein manuelles Kopieren nach `/config/www/` mehr nötig
-- Card wird direkt aus `custom_components/vpmobile24/` geladen
-- Unterstützung für mehrere URL-Pfade für maximale Kompatibilität:
-  - `/hacsfiles/vpmobile24/vpmobile24-card.js`
-  - `/local/community/vpmobile24/vpmobile24-card.js`
-  - `/local/vpmobile24/vpmobile24-card.js`
+- Automatisches Kopieren der Card nach `/config/www/vpmobile24/` beim Start
+- Keine manuelle Installation mehr nötig
+- Einfache Ressourcen-URL: `/local/vpmobile24/vpmobile24-card.js`
+- Ordner wird automatisch erstellt
+- Card wird bei jedem Start aktualisiert
 
 #### Verbessert
 - Vereinfachte Installation
-- Bessere Dokumentation
-- Automatische Pfad-Registrierung beim Start
+- Besseres Logging
+- Zuverlässigere Deployment-Methode
+
+### v2.0.1 (2024)
+**Card - Automatische Registrierung (experimentell)**
+- Versuch der automatischen Card-Registrierung
+- Unterstützung für mehrere URL-Pfade
 
 ### v2.0.0 (2024)
 **Integration & Card - Major Release**

@@ -4,7 +4,7 @@ Eine moderne Lovelace Card für Home Assistant zur Anzeige des Wochenstundenplan
 
 ## Version
 
-**v2.0.1** - Automatic Card Loading
+**v2.1.0** - Automatic Card Deployment
 
 ## Features
 
@@ -27,18 +27,16 @@ Die Card wird automatisch mit der VpMobile24 Integration installiert. Stelle sic
 
 ### Schritt 2: Ressource in Home Assistant hinzufügen
 
-Die Card wird automatisch von der Integration registriert. Du musst nur noch die Ressource hinzufügen:
+Die Card wird beim Start von Home Assistant automatisch nach `/config/www/vpmobile24/` kopiert!
 
 1. Gehe zu **Einstellungen** → **Dashboards** → **Ressourcen** (oben rechts, 3 Punkte)
 2. Klicke auf **+ Ressource hinzufügen**
-3. Trage eine dieser URLs ein (alle funktionieren):
-   - **Empfohlen**: `/hacsfiles/vpmobile24/vpmobile24-card.js`
-   - Alternative: `/local/community/vpmobile24/vpmobile24-card.js`
-   - Alternative: `/local/vpmobile24/vpmobile24-card.js`
-4. Wähle **Ressourcentyp**: `JavaScript-Modul`
-5. Klicke auf **Erstellen**
+3. Trage ein:
+   - **URL**: `/local/vpmobile24/vpmobile24-card.js`
+   - **Ressourcentyp**: `JavaScript-Modul`
+4. Klicke auf **Erstellen**
 
-**Wichtig:** Die Card wird direkt aus dem `custom_components/vpmobile24/` Ordner geladen. Du musst KEINE Datei nach `/config/www/` kopieren!
+**Wichtig:** Die Card wird beim Start automatisch kopiert. Du musst NICHTS manuell kopieren!
 
 ### Schritt 3: Card hinzufügen
 
@@ -158,7 +156,7 @@ time_settings:
 
 1. Leere den Browser-Cache (Strg+F5)
 2. Öffne die Browser-Konsole (F12) und prüfe auf Fehler
-3. Stelle sicher, dass die neueste Version (v2.0.1) geladen wurde
+3. Stelle sicher, dass die neueste Version (v2.1.0) geladen wurde
 
 ### Entity nicht gefunden
 
@@ -185,11 +183,17 @@ Die Card verwendet ein schlichtes, modernes Design:
 
 ## Changelog
 
+### v2.1.0 (2024)
+- **Automatisches Kopieren der Card**: Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert
+- Keine manuelle Installation mehr nötig
+- Einfache Ressourcen-URL: `/local/vpmobile24/vpmobile24-card.js`
+- Verbesserte Fehlerbehandlung
+- Besseres Logging
+
 ### v2.0.1 (2024)
-- **Automatische Card-Registrierung**: Kein manuelles Kopieren nach `/config/www/` mehr nötig
-- Card wird direkt aus `custom_components/vpmobile24/` geladen
-- Unterstützung für mehrere URL-Pfade für maximale Kompatibilität
-- Verbesserte Installations-Dokumentation
+- Versuch der automatischen Card-Registrierung
+- Unterstützung für mehrere URL-Pfade
+- Verbesserte Dokumentation
 
 ### v2.0.0 (2024)
 - Production Release

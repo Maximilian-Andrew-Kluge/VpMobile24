@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.0.1 - Automatic card loading
-console.info('%c VpMobile24-CARD %c v2.0.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.1.0 - Automatic card deployment
+console.info('%c VpMobile24-CARD %c v2.1.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -431,4 +431,4 @@ window.customCards.push({
   preview: true,
 });
 
-console.log('✅ VpMobile24 Card v2.0.1 loaded');
+console.log('✅ VpMobile24 Card v2.1.0 loaded');
