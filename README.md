@@ -1,14 +1,11 @@
 # VpMobile24 Home Assistant Integration
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-
 Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne mit moderner Lovelace Card.
 
 ## Version
 
-**Integration**: v2.1.0  
-**Card**: v2.1.0
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
 ## Features
 
@@ -268,3 +265,4 @@ Siehe LICENSE Datei im Repository.
 ## Credits
 
 Entwickelt für die VpMobile24 Plattform.
+
