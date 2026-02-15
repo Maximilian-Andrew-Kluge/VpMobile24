@@ -257,6 +257,7 @@ Bei Problemen oder Fragen:
 - Erstelle ein Issue auf GitHub: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 - Prüfe die Logs in Home Assistant
 - Öffne die Browser-Konsole (F12) für Card-Probleme
+- 💬 Discord Support Server: [Hier beitreten](https://discord.gg/24csAgGAhf)
 
 ## Lizenz
 
@@ -265,4 +266,5 @@ Siehe LICENSE Datei im Repository.
 ## Credits
 
 Entwickelt für die VpMobile24 Plattform.
+
 
