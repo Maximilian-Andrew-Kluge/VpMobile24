@@ -1,31 +1,20 @@
 # VpMobile24 Home Assistant Integration
 
-<<<<<<< HEAD
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 ![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
 
-=======
-Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne mit moderner Lovelace Card.
->>>>>>> 2d99c754808f802ee5b4787750d7ba51f9866d48
-
 ---
 
-<<<<<<< HEAD
 ## 📸 Screenshots
-=======
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
->>>>>>> 2d99c754808f802ee5b4787750d7ba51f9866d48
 
 ### Stundenplan Card
 
 <table>
   <tr>
-    <td><img src="docs/images/card-overview.png" alt="Card Übersicht" width="400"/></td>
-    <td><img src="docs/images/card-config.png" alt="Visuelle Konfiguration" width="400"/></td>
+    <td><img src="docs/card-overview.png" alt="Card Übersicht" width="400"/></td>
+    <td><img src="docs/card-config.png" alt="Visuelle Konfiguration" width="400"/></td>
   </tr>
   <tr>
     <td align="center"><b>Stundenplan Ansicht</b><br/>Wochenübersicht mit Hervorhebung</td>
@@ -293,7 +282,6 @@ Die Card verwendet ein schlichtes, modernes Design:
 - 💬 Beschreibe dein Problem so genau wie möglich
 - 📋 Füge Logs und Screenshots hinzu
 
-<<<<<<< HEAD
 ### Logs finden
 =======
 Bei Problemen oder Fragen:
@@ -301,7 +289,6 @@ Bei Problemen oder Fragen:
 - Prüfe die Logs in Home Assistant
 - Öffne die Browser-Konsole (F12) für Card-Probleme
 - 💬 Discord Support Server: [Hier beitreten](https://discord.gg/24csAgGAhf)
->>>>>>> 2d99c754808f802ee5b4787750d7ba51f9866d48
 
 1. Gehe zu **Einstellungen** → **System** → **Protokolle**
 2. Suche nach "vpmobile24"
@@ -313,7 +300,6 @@ Bei Problemen oder Fragen:
 2. Gehe zum **"Console"** Tab
 3. Suche nach Fehlern (rot markiert)
 
-<<<<<<< HEAD
 ---
 
 ## 📄 Lizenz
@@ -335,3 +321,4 @@ Entwickelt für die VpMobile24 Plattform.
 
 
 >>>>>>> 2d99c754808f802ee5b4787750d7ba51f9866d48
+
