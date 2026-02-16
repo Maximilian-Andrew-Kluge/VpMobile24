@@ -308,18 +308,7 @@ Siehe [LICENSE](LICENSE) Datei im Repository.
 
 ---
 
-## 👨‍💻 Entwickelt für
-
-Diese Integration wurde speziell für die **VpMobile24 Plattform** entwickelt und ermöglicht es Schülern, Lehrern und Eltern, den Stundenplan und Vertretungsplan direkt in Home Assistant zu sehen.
-
----
-
 **Gefällt dir diese Integration?** Gib dem Projekt einen ⭐ auf GitHub!
-=======
-Entwickelt für die VpMobile24 Plattform.
 
-
-
->>>>>>> 2d99c754808f802ee5b4787750d7ba51f9866d48
 
 
