@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.1.0 - Automatic card deployment
-console.info('%c VpMobile24-CARD %c v2.1.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.1.1 - Modern today highlighting
+console.info('%c VpMobile24-CARD %c v2.1.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -308,11 +308,22 @@ class VpMobile24Card extends HTMLElement {
         .schedule-table tbody tr:last-child td {
           border-bottom: none;
         }
+        
         .today-column {
-          background: ${primaryColor} !important;
-          color: white !important;
-          font-weight: 500 !important;
+          background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.05) !important;
+          position: relative;
         }
+        
+        .today-column::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 2px;
+          height: 100%;
+          background: var(--primary-color);
+        }
+        
         .pause-row td {
           background: var(--secondary-background-color);
           color: var(--secondary-text-color);
@@ -431,4 +442,4 @@ window.customCards.push({
   preview: true,
 });
 
-console.log('✅ VpMobile24 Card v2.1.0 loaded');
+console.log('✅ VpMobile24 Card v2.1.1 loaded');

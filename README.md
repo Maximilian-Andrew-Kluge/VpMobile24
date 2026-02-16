@@ -2,115 +2,154 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
 
-Eine vollständige Home Assistant Integration für VpMobile24 Vertretungspläne mit moderner Lovelace Card.
 
-## Version
+---
 
-**Integration**: v2.1.0  
-**Card**: v2.1.0
+## 📸 Screenshots
 
-## Features
+### Stundenplan Card
 
-### Integration
-- ✅ Automatischer Abruf von Vertretungsplänen
-- ✅ Wochentabellen-Sensor mit allen Stunden
-- ✅ Tägliche Sensoren für jeden Wochentag
-- ✅ Unterstützung für mehrere Klassen
-- ✅ Automatische Updates
+<table>
+  <tr>
+    <td><img src="docs/images/card-overview.png" alt="Card Übersicht" width="400"/></td>
+    <td><img src="docs/images/card-config.png" alt="Visuelle Konfiguration" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Stundenplan Ansicht</b><br/>Wochenübersicht mit Hervorhebung</td>
+    <td align="center"><b>Visueller Editor</b><br/>Einfache Konfiguration ohne YAML</td>
+  </tr>
+</table>
 
-### Lovelace Card
-- ✅ Moderne visuelle Konfiguration über Home Assistant UI
-- ✅ Automatische Card-Registrierung (kein manuelles Kopieren nötig!)
-- ✅ Wochenansicht (Montag bis Freitag)
-- ✅ Anpassbarer Header mit Titel und Klassenname
-- ✅ Hervorhebung des heutigen Tages
-- ✅ Anzeige von Vertretungen (rot markiert)
-- ✅ Konfigurierbare Uhrzeiten (1-10 Stunden)
-- ✅ Konfigurierbare Pausen (0-5 Pausen)
-- ✅ Theme-Integration (nutzt Home Assistant Themes)
-- ✅ Responsive Design
-- ✅ Sauberes, modernes Design
+---
 
-## Installation
+## ✨ Features
 
-### Manuelle Installation
+### 🎓 Integration
+- ✅ **Automatischer Abruf** von Vertretungsplänen
+- ✅ **Wochentabellen-Sensor** mit allen Stunden
+- ✅ **Tägliche Sensoren** für jeden Wochentag (Mo-Fr)
+- ✅ **Mehrere Klassen** gleichzeitig möglich
+- ✅ **Automatische Updates** alle 15 Minuten
 
-1. Kopiere den `custom_components/vpmobile24` Ordner in dein Home Assistant `custom_components` Verzeichnis
-2. Starte Home Assistant neu
-3. Gehe zu **Einstellungen** → **Geräte & Dienste** → **Integration hinzufügen**
-4. Suche nach "VpMobile24"
-5. Folge dem Konfigurationsassistenten
+### 🎨 Lovelace Card
+- ✅ **Visueller Editor** - Keine YAML-Kenntnisse nötig!
+- ✅ **Automatische Installation** - Card wird beim Start kopiert
+- ✅ **Wochenansicht** (Montag bis Freitag)
+- ✅ **Anpassbarer Header** mit Titel und Klassenname
+- ✅ **Hervorhebung** des heutigen Tages
+- ✅ **Vertretungen** werden rot markiert
+- ✅ **Flexible Uhrzeiten** - 1-10 Stunden konfigurierbar
+- ✅ **Pausen** - 0-5 Pausen mit individuellen Zeiten
+- ✅ **Theme-Integration** - Passt sich automatisch an
+- ✅ **Responsive Design** - Funktioniert auf Handy und Desktop
 
-### HACS Installation (empfohlen)
+---
+
+## 📦 Installation & Einrichtung
+
+### Schritt 1: Integration & Card installieren
+
+#### Option A: HACS (Empfohlen)
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
 
-1. Klicke auf den Badge oben oder:
-2. Öffne HACS in Home Assistant
-3. Gehe zu "Integrationen"
-4. Klicke auf die drei Punkte oben rechts
-5. Wähle "Benutzerdefinierte Repositories"
+1. **Klicke auf den Badge oben** oder:
+2. Öffne **HACS** in Home Assistant
+3. Gehe zu **"Integrationen"**
+4. Klicke auf die **drei Punkte** oben rechts
+5. Wähle **"Benutzerdefinierte Repositories"**
 6. Füge hinzu: `https://github.com/Maximilian-Andrew-Kluge/VpMobile24`
-7. Kategorie: `Integration`
-8. Klicke auf "Hinzufügen"
-9. Suche nach "VpMobile24" und installiere es
-10. Starte Home Assistant neu
+7. Kategorie: **Integration**
+8. Klicke auf **"Hinzufügen"**
+9. Suche nach **"VpMobile24"** und installiere es
+10. **Starte Home Assistant neu**
 
-### Card installieren
+#### Option B: Manuelle Installation
 
-**Neu in v2.1.0:** Die Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert!
+1. Lade die neueste Version von [GitHub Releases](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases) herunter
+2. Entpacke die ZIP-Datei
+3. Kopiere den Ordner `custom_components/vpmobile24` nach `/config/custom_components/`
+4. Deine Ordnerstruktur sollte so aussehen:
+   ```
+   /config/custom_components/vpmobile24/
+   ├── __init__.py
+   ├── manifest.json
+   ├── vpmobile24-card.js
+   └── ...
+   ```
+5. **Starte Home Assistant neu**
 
-Siehe [CARD_INSTALLATION.md](CARD_INSTALLATION.md) für detaillierte Anweisungen.
+#### Card-Ressource hinzufügen
 
-**Kurzanleitung:**
+**Die Card wird beim Neustart automatisch nach `/config/www/vpmobile24/` kopiert!** 🎉
 
-1. Stelle sicher, dass die Integration installiert ist
-2. Starte Home Assistant neu (Card wird automatisch kopiert)
-3. Füge die Ressource hinzu:
-   - **Einstellungen** → **Dashboards** → **Ressourcen** (⋮)
-   - **+ Ressource hinzufügen**
-   - URL: `/local/vpmobile24/vpmobile24-card.js`
-   - Typ: `JavaScript-Modul`
-4. Füge die Card zu deinem Dashboard hinzu
+Füge jetzt die Ressource hinzu:
 
-**Wichtig:** Die Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert. Du musst nichts manuell kopieren!
+1. Gehe zu **Einstellungen** → **Dashboards**
+2. Klicke oben rechts auf die **drei Punkte** (⋮)
+3. Wähle **"Ressourcen"**
+4. Klicke auf **"+ Ressource hinzufügen"**
+5. Trage ein:
+   - **URL**: `/local/vpmobile24/vpmobile24-card.js`
+   - **Ressourcentyp**: `JavaScript-Modul`
+6. Klicke auf **"Erstellen"**
+7. **Leere den Browser-Cache** (Strg+F5)
 
-## Konfiguration
+### Schritt 2: Integration einrichten
 
-### Integration
+1. Gehe zu **Einstellungen** → **Geräte & Dienste**
+2. Klicke auf **"+ Integration hinzufügen"**
+3. Suche nach **"VpMobile24"**
+4. Gib deine Zugangsdaten ein:
+   - **Schul-ID** (z.B. "12345")
+   - **Benutzername**
+   - **Passwort**
+   - **Klassenname** (z.B. "5a", "10b")
+5. Klicke auf **"Weiter"**
 
-Die Integration wird über die UI konfiguriert. Du benötigst:
-- VpMobile24 Schul-ID
-- Benutzername
-- Passwort
-- Klassenname(n)
+✅ Die Integration erstellt automatisch folgende Sensoren:
+- `sensor.vpmobile24_week_table` - Komplette Wochentabelle
+- `sensor.vpmobile24_monday` bis `sensor.vpmobile24_friday` - Einzelne Tage
 
-### Card
+### Schritt 3: Card zum Dashboard hinzufügen
 
-Die Card kann vollständig über die visuelle Oberfläche konfiguriert werden:
+1. Öffne dein Dashboard
+2. Klicke auf **"Bearbeiten"** (oben rechts)
+3. Klicke auf **"+ Karte hinzufügen"**
+4. Suche nach **"VpMobile24 Card"**
+5. Konfiguriere die Card über den **visuellen Editor**:
+   - Wähle den Sensor `sensor.vpmobile24_week_table` aus
+   - Passe Titel und Klassenname an
+   - Aktiviere/Deaktiviere Features nach Wunsch
+6. Klicke auf **"Speichern"**
 
-#### Basis-Einstellungen
-- Week Table Sensor auswählen
-- Header anzeigen (Toggle)
-- Theme auswählen
-- Heutigen Tag hervorheben (Toggle)
-- Uhrzeiten anzeigen (Toggle)
-- Eigene Uhrzeiten verwenden (Toggle)
+✅ **Fertig!** Dein Stundenplan wird jetzt angezeigt.
 
-#### Header-Einstellungen (Expandable)
-- Titel anpassen
-- Klassenname anpassen
+---
 
-#### Uhrzeiten-Anpassung (Expandable)
-- Anzahl der Stunden (1-10)
-- Anzahl der Pausen (0-5)
-- Individuelle Uhrzeiten für jede Stunde
-- Pausenzeiten und Position konfigurieren
+## 🎨 Konfiguration
 
-## Beispiel-Konfiguration
+Die Card kann komplett über den **visuellen Editor** konfiguriert werden - kein YAML nötig!
 
-### Einfache Konfiguration
+### Basis-Einstellungen
+
+| Einstellung | Beschreibung | Standard |
+|-------------|--------------|----------|
+| **Week Table Sensor** | Wähle den Wochentabellen-Sensor | `sensor.vpmobile24_week_table` |
+| **Header anzeigen** | Zeigt Titel und Klassenname oben | ✅ An |
+| **Theme** | Wähle ein Home Assistant Theme | Auto |
+| **Heutigen Tag hervorheben** | Hebt die heutige Spalte farblich hervor | ✅ An |
+| **Uhrzeiten anzeigen** | Zeigt die Uhrzeiten für jede Stunde | ✅ An |
+| **Eigene Uhrzeiten verwenden** | Aktiviert die Uhrzeiten-Anpassung | ❌ Aus |
+
+---
+
+## 📝 Beispiele
+
+### Einfache Konfiguration (YAML)
 
 ```yaml
 type: custom:vpmobile24-card
@@ -118,7 +157,7 @@ entity: sensor.vpmobile24_week_table
 show_header: true
 header_settings:
   title: Stundenplan
-  class_name: 5a
+  class_name: 10b
 custom_theme: auto
 highlight_today: true
 show_time: true
@@ -157,114 +196,117 @@ time_settings:
   pause_3_after: 6
 ```
 
-## Sensoren
+---
 
-Die Integration erstellt folgende Sensoren:
-
-- `sensor.vpmobile24_week_table` - Komplette Wochentabelle
-- `sensor.vpmobile24_monday` - Montag
-- `sensor.vpmobile24_tuesday` - Dienstag
-- `sensor.vpmobile24_wednesday` - Mittwoch
-- `sensor.vpmobile24_thursday` - Donnerstag
-- `sensor.vpmobile24_friday` - Freitag
-
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### Integration
 
-**Problem**: Integration kann nicht hinzugefügt werden
-- Überprüfe die Zugangsdaten
-- Stelle sicher, dass die Schul-ID korrekt ist
-- Prüfe die Logs unter **Einstellungen** → **System** → **Protokolle**
+**Problem: Integration kann nicht hinzugefügt werden**
+- ✅ Überprüfe die Zugangsdaten
+- ✅ Stelle sicher, dass die Schul-ID korrekt ist
+- ✅ Prüfe die Logs: **Einstellungen** → **System** → **Protokolle**
+
+**Problem: Keine Daten verfügbar**
+- ✅ Prüfe, ob Daten auf der VpMobile24-Website verfügbar sind
+- ✅ Während der Ferien gibt es oft keine Daten (404-Fehler sind normal)
+- ✅ Warte 15 Minuten auf das nächste Update
 
 ### Card
 
-**Problem**: Card wird nicht angezeigt
-1. Überprüfe, ob die VpMobile24 Integration installiert ist
-2. Überprüfe, ob die Ressource korrekt hinzugefügt wurde
-3. Versuche eine andere URL:
-   - `/hacsfiles/vpmobile24/vpmobile24-card.js`
-   - `/local/community/vpmobile24/vpmobile24-card.js`
-   - `/local/vpmobile24/vpmobile24-card.js`
-4. Leere den Browser-Cache (Strg+F5)
-5. Starte Home Assistant neu
+**Problem: Card wird nicht gefunden**
+1. ✅ Stelle sicher, dass die Integration installiert ist
+2. ✅ Starte Home Assistant neu (Card wird automatisch kopiert)
+3. ✅ Prüfe, ob die Datei existiert: `/config/www/vpmobile24/vpmobile24-card.js`
+4. ✅ Prüfe die Logs nach: "Custom card automatically copied"
+5. ✅ Füge die Ressource hinzu (siehe Schritt 2 oben)
+6. ✅ Leere den Browser-Cache (Strg+F5)
 
-**Problem**: Änderungen werden nicht übernommen
-1. Leere den Browser-Cache (Strg+F5)
-2. Öffne die Browser-Konsole (F12) und prüfe auf Fehler
-3. Stelle sicher, dass die neueste Version (v2.1.0) geladen wurde
+**Problem: Änderungen werden nicht übernommen**
+1. ✅ Leere den Browser-Cache (Strg+F5)
+2. ✅ Öffne die Browser-Konsole (F12) und prüfe auf Fehler
+3. ✅ Stelle sicher, dass Version v2.1.0 geladen wurde
 
-**Problem**: Entity nicht gefunden
-- Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist
-- Überprüfe, ob der Sensor `sensor.vpmobile24_week_table` existiert
+**Problem: Visueller Editor wird nicht unterstützt**
+1. ✅ Stelle sicher, dass die Ressource korrekt hinzugefügt wurde
+2. ✅ Prüfe die Browser-Konsole (F12) auf JavaScript-Fehler
+3. ✅ Leere den Browser-Cache komplett
+4. ✅ Starte Home Assistant neu
 
-## Design
+---
+
+## 🎨 Design
 
 Die Card verwendet ein schlichtes, modernes Design:
-- 8px Border-Radius
-- Keine Box-Shadow, nur Border
-- Horizontale Trennlinien zwischen Zeilen
-- 3px vertikale Trennlinie zwischen Stunden-Spalte und Tages-Spalten
-- 1px vertikale Trennlinien zwischen Tages-Spalten
-- Vollständige Theme-Integration
-- Responsive für Mobile und Desktop
 
-## Changelog
+- **8px Border-Radius** für abgerundete Ecken
+- **Keine Box-Shadow**, nur ein dezenter Border
+- **Horizontale Trennlinien** zwischen den Zeilen
+- **3px vertikale Trennlinie** zwischen Stunden- und Tages-Spalten
+- **1px vertikale Trennlinien** zwischen den Tages-Spalten
+- **Vollständige Theme-Integration** - nutzt alle Farben deines Themes
+- **Responsive Design** - funktioniert auf allen Geräten
 
-### v2.1.0 (2024)
-**Card - Automatisches Deployment**
+---
 
-#### Neu
-- Automatisches Kopieren der Card nach `/config/www/vpmobile24/` beim Start
-- Keine manuelle Installation mehr nötig
-- Einfache Ressourcen-URL: `/local/vpmobile24/vpmobile24-card.js`
-- Ordner wird automatisch erstellt
-- Card wird bei jedem Start aktualisiert
+## 📋 Changelog
 
-#### Verbessert
-- Vereinfachte Installation
-- Besseres Logging
-- Zuverlässigere Deployment-Methode
+### v2.1.0 (2026) - Aktuell
+**Automatisches Card-Deployment**
+- ✨ Card wird beim Start automatisch nach `/config/www/vpmobile24/` kopiert
+- ✨ Keine manuelle Installation mehr nötig
+- ✨ Einfache Ressourcen-URL: `/local/vpmobile24/vpmobile24-card.js`
+- ✨ Ordner wird automatisch erstellt
+- ✨ Card wird bei jedem Start aktualisiert
+- 🔧 Besseres Logging
+- 🔧 Zuverlässigere Deployment-Methode
 
-### v2.0.1 (2024)
-**Card - Automatische Registrierung (experimentell)**
-- Versuch der automatischen Card-Registrierung
-- Unterstützung für mehrere URL-Pfade
+### v2.0.0 (2026)
+**Major Release**
+- ✨ Visuelle Konfiguration mit getConfigForm()
+- ✨ Expandable Sektionen für Header und Uhrzeiten
+- ✨ Theme-Integration
+- ✨ Konfigurierbare Uhrzeiten (1-10 Stunden)
+- ✨ Konfigurierbare Pausen (0-5 Pausen)
+- ✨ Vertikale Trennlinien
+- ✨ Responsive Design
+- 🔧 Optimierte Performance
 
-### v2.0.0 (2024)
-**Integration & Card - Major Release**
+---
 
-#### Card Features
-- Visuelle Konfiguration mit getConfigForm()
-- Expandable Sektionen für Header und Uhrzeiten
-- Unterstützung für verschachtelte Config-Objekte
-- Theme-Integration (nutzt Home Assistant Themes)
-- Vertikale Trennlinien zwischen Spalten
-- Konfigurierbare Uhrzeiten (1-10 Stunden)
-- Konfigurierbare Pausen (0-5 Pausen)
-- Hervorhebung des heutigen Tages
-- Vertretungen rot markiert
-- Responsive Design
-- Optimierte Performance
+## 🤝 Support
 
-#### Integration Features
-- Automatischer Abruf von Vertretungsplänen
-- Wochentabellen-Sensor
-- Tägliche Sensoren für jeden Wochentag
-- Verbesserte Fehlerbehandlung
-- Optimierte API-Aufrufe
+### Hilfe benötigt?
 
-## Support
+- 📖 Lies die [detaillierte Card-Anleitung](CARD_INSTALLATION.md)
+- 🐛 [Erstelle ein Issue auf GitHub](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+- 💬 Beschreibe dein Problem so genau wie möglich
+- 📋 Füge Logs und Screenshots hinzu
 
-Bei Problemen oder Fragen:
-- Erstelle ein Issue auf GitHub: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
-- Prüfe die Logs in Home Assistant
-- Öffne die Browser-Konsole (F12) für Card-Probleme
+### Logs finden
 
-## Lizenz
+1. Gehe zu **Einstellungen** → **System** → **Protokolle**
+2. Suche nach "vpmobile24"
+3. Kopiere relevante Fehlermeldungen
 
-Siehe LICENSE Datei im Repository.
+### Browser-Konsole öffnen
 
-## Credits
+1. Drücke **F12** in deinem Browser
+2. Gehe zum **"Console"** Tab
+3. Suche nach Fehlern (rot markiert)
 
-Entwickelt für die VpMobile24 Plattform.
+---
+
+## 📄 Lizenz
+
+Siehe [LICENSE](LICENSE) Datei im Repository.
+
+---
+
+## 👨‍💻 Entwickelt für
+
+Diese Integration wurde speziell für die **VpMobile24 Plattform** entwickelt und ermöglicht es Schülern, Lehrern und Eltern, den Stundenplan und Vertretungsplan direkt in Home Assistant zu sehen.
+
+---
+
+**Gefällt dir diese Integration?** Gib dem Projekt einen ⭐ auf GitHub!
