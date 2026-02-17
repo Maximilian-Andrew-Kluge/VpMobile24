@@ -1,25 +1,31 @@
 # VpMobile24 Home Assistant Integration
 
-<<<<<<< HEAD
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 ![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)
+<<<<<<< HEAD
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
+=======
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
+>>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 ---
 
 ## 📸 Screenshots
+<<<<<<< HEAD
 =======
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
+=======
+>>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 ### Stundenplan Card
 
 <table>
   <tr>
-    <td><img src="docs/images/card-overview.png" alt="Card Übersicht" width="400"/></td>
-    <td><img src="docs/images/card-config.png" alt="Visuelle Konfiguration" width="400"/></td>
+    <td><img src="docs/card-overview.png" alt="Card Übersicht" width="400"/></td>
+    <td><img src="docs/card-config.png" alt="Visuelle Konfiguration" width="400"/></td>
   </tr>
   <tr>
     <td align="center"><b>Stundenplan Ansicht</b><br/>Wochenübersicht mit Hervorhebung</td>
@@ -293,7 +299,11 @@ Bei Problemen oder Fragen:
 - Erstelle ein Issue auf GitHub: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 - Prüfe die Logs in Home Assistant
 - Öffne die Browser-Konsole (F12) für Card-Probleme
+<<<<<<< HEAD
 - 💬 Discord Support Server: [Hier beitreten](https://discord.gg/24csAgGAhf)
+=======
+- 💬 Discord Support Server: [Hier beitreten](https://discord.gg/57uvCeRw43)
+>>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 1. Gehe zu **Einstellungen** → **System** → **Protokolle**
 2. Suche nach "vpmobile24"
@@ -313,12 +323,12 @@ Siehe [LICENSE](LICENSE) Datei im Repository.
 
 ---
 
-## 👨‍💻 Entwickelt für
-
-Diese Integration wurde speziell für die **VpMobile24 Plattform** entwickelt und ermöglicht es Schülern, Lehrern und Eltern, den Stundenplan und Vertretungsplan direkt in Home Assistant zu sehen.
-
----
-
 **Gefällt dir diese Integration?** Gib dem Projekt einen ⭐ auf GitHub!
+<<<<<<< HEAD
 =======
 Entwickelt für die VpMobile24 Plattform.
+=======
+
+
+
+>>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
