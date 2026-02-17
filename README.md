@@ -2,23 +2,12 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-![Version](https://img.shields.io/badge/Version-2.1.0-blue.svg)
-<<<<<<< HEAD
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
-=======
+![Version](https://img.shields.io/badge/Version-2.1.1-blue.svg)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
->>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 ---
 
 ## 📸 Screenshots
-<<<<<<< HEAD
-=======
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/24csAgGAhf)
-=======
->>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 ### Stundenplan Card
 
@@ -294,16 +283,11 @@ Die Card verwendet ein schlichtes, modernes Design:
 - 📋 Füge Logs und Screenshots hinzu
 
 ### Logs finden
-=======
 Bei Problemen oder Fragen:
 - Erstelle ein Issue auf GitHub: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 - Prüfe die Logs in Home Assistant
 - Öffne die Browser-Konsole (F12) für Card-Probleme
-<<<<<<< HEAD
-- 💬 Discord Support Server: [Hier beitreten](https://discord.gg/24csAgGAhf)
-=======
 - 💬 Discord Support Server: [Hier beitreten](https://discord.gg/57uvCeRw43)
->>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
 
 1. Gehe zu **Einstellungen** → **System** → **Protokolle**
 2. Suche nach "vpmobile24"
@@ -324,11 +308,3 @@ Siehe [LICENSE](LICENSE) Datei im Repository.
 ---
 
 **Gefällt dir diese Integration?** Gib dem Projekt einen ⭐ auf GitHub!
-<<<<<<< HEAD
-=======
-Entwickelt für die VpMobile24 Plattform.
-=======
-
-
-
->>>>>>> e42350cde96d593f8bebd176c0f2f6bb128c6819
