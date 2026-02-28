@@ -15,7 +15,7 @@ from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vpmobile24 from a config entry."""
@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.1.0",
+        sw_version="2.2.0",
     )
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
