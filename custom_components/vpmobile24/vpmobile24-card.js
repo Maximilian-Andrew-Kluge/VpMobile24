@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.2.0 - Mobile optimized view
-console.info('%c VpMobile24-CARD %c v2.2.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.3.0 - Smart filtering and popup improvements
+console.info('%c VpMobile24-CARD %c v2.3.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -318,6 +318,11 @@ class VpMobile24Card extends HTMLElement {
     }
   }
 
+  _handlePopupClick(event) {
+    // Verhindere dass Klicks auf das Popup zum Overlay durchgehen
+    event.stopPropagation();
+  }
+
   _render() {
     if (!this._hass || !this._config) return;
 
@@ -491,7 +496,7 @@ class VpMobile24Card extends HTMLElement {
           display: block;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
           .desktop-view {
             display: none;
           }
@@ -710,8 +715,8 @@ class VpMobile24Card extends HTMLElement {
         <div class="desktop-view">${this._renderTable(weekTable, showTime, highlightToday, useCustomTimes)}</div>
         <div class="mobile-view">${this._renderMobileView(weekTable, showTime, useCustomTimes)}</div>
       </ha-card>
-      <div id="info-popup-overlay" class="info-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
-      <div id="info-popup" class="info-popup hidden">
+      <div id="info-popup-overlay" class="info-popup-overlay hidden"></div>
+      <div id="info-popup" class="info-popup hidden" onclick="this.getRootNode().host._handlePopupClick(event)">
         <div class="info-popup-header">Zusatzinformationen</div>
         <div id="info-popup-content" class="info-popup-content"></div>
         <div class="info-popup-footer">
@@ -1007,4 +1012,4 @@ window.customCards.push({
   preview: true,
 });
 
-console.log('✅ VpMobile24 Card v2.2.0 loaded');
+console.log('✅ VpMobile24 Card v2.3.0 loaded');

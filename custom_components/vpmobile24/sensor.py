@@ -123,7 +123,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.3.0",
         }
 
     @property
@@ -224,7 +224,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.3.0",
         }
 
     @property
@@ -474,7 +474,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.3.0",
         }
 
     @property
@@ -483,9 +483,9 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         if not self.coordinator.data:
             return "Keine Daten"
         
-        # Zugriff auf die Wochendaten vom Coordinator
-        week_lessons = getattr(self.coordinator, '_week_data', {}).get('lessons', [])
-        week_changes = getattr(self.coordinator, '_week_data', {}).get('changes', [])
+        # Zugriff auf die bereits gefilterten Wochendaten vom Coordinator
+        week_lessons = self.coordinator.data.get("week_lessons", [])
+        week_changes = self.coordinator.data.get("week_changes", [])
         
         total_week_lessons = len(week_lessons) + len(week_changes)
         
@@ -500,11 +500,12 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         if not self.coordinator.data:
             return {}
         
-        # Zugriff auf die Wochendaten vom Coordinator
-        week_lessons = getattr(self.coordinator, '_week_data', {}).get('lessons', [])
-        week_changes = getattr(self.coordinator, '_week_data', {}).get('changes', [])
+        # Zugriff auf die bereits gefilterten Wochendaten vom Coordinator
+        # Diese sind bereits nach excluded_subjects gefiltert
+        week_lessons = self.coordinator.data.get("week_lessons", [])
+        week_changes = self.coordinator.data.get("week_changes", [])
         
-        # Kombiniere alle Wochenstunden
+        # Kombiniere alle Wochenstunden (bereits gefiltert)
         all_week_lessons = []
         all_week_lessons.extend(week_lessons)
         all_week_lessons.extend(week_changes)
@@ -525,11 +526,11 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         # Wochentage (0=Montag, 4=Freitag)
         weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
         
-        # Initialisiere Tabelle
+        # Initialisiere Tabelle mit mehr Stunden (1-10)
         week_table = {}
         for day in weekdays:
             week_table[day] = {}
-            for period in range(1, 7):  # Stunden 1-6
+            for period in range(1, 11):  # Stunden 1-10
                 week_table[day][str(period)] = None
         
         # Fülle Tabelle mit Stunden
@@ -545,17 +546,21 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                     
                     if 0 <= weekday_index <= 4 and period.isdigit():
                         weekday_name = weekdays[weekday_index]
+                        period_int = int(period)
                         
-                        lesson_info = {
-                            "fach": lesson.get("subject", ""),
-                            "lehrer": lesson.get("teacher", ""),
-                            "raum": lesson.get("room", ""),
-                            "zeit": lesson.get("time", ""),
-                            "ist_vertretung": lesson.get("is_change", False),
-                            "zusatzinfo": lesson.get("info", "")
-                        }
-                        
-                        week_table[weekday_name][period] = lesson_info
+                        # Nur Stunden 1-10 speichern
+                        if 1 <= period_int <= 10:
+                            lesson_info = {
+                                "fach": lesson.get("subject", ""),
+                                "lehrer": lesson.get("teacher", ""),
+                                "raum": lesson.get("room", ""),
+                                "zeit": lesson.get("time", ""),
+                                "datum": lesson_date,
+                                "ist_vertretung": lesson.get("is_change", False),
+                                "zusatzinfo": lesson.get("info", "")
+                            }
+                            
+                            week_table[weekday_name][period] = lesson_info
                         
                 except (ValueError, TypeError):
                     continue
@@ -583,7 +588,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.3.0",
         }
 
     @property
@@ -624,11 +629,17 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
         
         # ZusatzInfo aus XML - nur der Text ohne typ
         additional_info = self.coordinator.data.get("additional_info", [])
+        _LOGGER.debug(f"Additional info raw data: {additional_info}")
         general_infos = []
         for info in additional_info:
-            text = info.get("text", "").strip()
+            if isinstance(info, dict):
+                text = info.get("text", "").strip()
+            else:
+                text = str(info).strip()
             if text:
                 general_infos.append(text)
+        
+        _LOGGER.debug(f"Processed general_infos: {general_infos}")
         
         # Zusatzinfos aus Stunden - nur der Text
         lessons = self.coordinator.data.get("lessons", [])
@@ -674,7 +685,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.3.0",
         }
 
     @property
