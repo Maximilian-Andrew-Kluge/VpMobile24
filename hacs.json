@@ -1,8 +1,7 @@
 {
   "name": "VpMobile24",
   "content_in_root": false,
-  "filename": "vpmobile24.zip",
-  "country": ["DE"],
+  "domains": ["vpmobile24"],
   "homeassistant": "2023.1.0",
   "render_readme": true
 }
