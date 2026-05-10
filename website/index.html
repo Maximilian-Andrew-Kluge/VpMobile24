@@ -83,151 +83,135 @@
 
       <div class="hero-right">
         <div class="hero-mockup-wrap">
-          <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="hero-mockup-svg">
-            <defs>
-              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="6" result="blur"/>
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-            </defs>
-
-            <!-- Browser frame -->
-            <rect width="520" height="360" rx="12" fill="#0d1117"/>
-            <!-- Titlebar -->
-            <rect width="520" height="34" rx="12" fill="#161b22"/>
-            <rect y="24" width="520" height="10" fill="#161b22"/>
-            <!-- Traffic lights -->
-            <circle cx="18" cy="17" r="5" fill="#ff5f57"/>
-            <circle cx="34" cy="17" r="5" fill="#febc2e"/>
-            <circle cx="50" cy="17" r="5" fill="#28c840"/>
-            <!-- URL bar -->
-            <rect x="68" y="9" width="384" height="16" rx="8" fill="#0d1117"/>
-            <text x="260" y="21" text-anchor="middle" fill="#484f58" font-size="8.5" font-family="Inter,sans-serif">homeassistant.local:8123/lovelace/default_view</text>
+          <svg viewBox="0 0 520 390" xmlns="http://www.w3.org/2000/svg" class="hero-mockup-svg">
+            <!-- Browser chrome -->
+            <rect width="520" height="390" rx="12" fill="#1a1a1a"/>
+            <rect width="520" height="32" rx="12" fill="#2a2a2a"/>
+            <rect y="22" width="520" height="10" fill="#2a2a2a"/>
+            <circle cx="16" cy="16" r="5" fill="#ff5f57"/>
+            <circle cx="32" cy="16" r="5" fill="#febc2e"/>
+            <circle cx="48" cy="16" r="5" fill="#28c840"/>
+            <rect x="66" y="8" width="388" height="16" rx="8" fill="#1a1a1a"/>
+            <text x="260" y="20" text-anchor="middle" fill="#555" font-size="8" font-family="Inter,sans-serif">homeassistant.local:8123</text>
 
             <!-- HA Sidebar -->
-            <rect x="0" y="34" width="52" height="326" fill="#161b22"/>
-            <!-- HA logo icon -->
-            <rect x="14" y="50" width="24" height="24" rx="5" fill="#1d4ed8"/>
-            <text x="26" y="66" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif">⌂</text>
-            <!-- nav items -->
-            <rect x="14" y="86" width="24" height="24" rx="4" fill="#21262d"/>
-            <rect x="14" y="120" width="24" height="24" rx="4" fill="#21262d"/>
-            <rect x="14" y="154" width="24" height="24" rx="4" fill="#21262d"/>
-            <rect x="14" y="188" width="24" height="24" rx="4" fill="#21262d"/>
-            <!-- divider -->
-            <line x1="14" y1="228" x2="38" y2="228" stroke="#30363d" stroke-width="1"/>
-            <rect x="14" y="238" width="24" height="24" rx="4" fill="#21262d"/>
+            <rect x="0" y="32" width="48" height="358" fill="#222"/>
+            <rect x="12" y="48" width="24" height="24" rx="5" fill="#00bcd4"/>
+            <text x="24" y="64" text-anchor="middle" fill="white" font-size="11" font-family="sans-serif">⌂</text>
+            <rect x="12" y="84" width="24" height="24" rx="4" fill="#2a2a2a"/>
+            <rect x="12" y="118" width="24" height="24" rx="4" fill="#2a2a2a"/>
+            <rect x="12" y="152" width="24" height="24" rx="4" fill="#2a2a2a"/>
 
-            <!-- Main content area -->
-            <rect x="52" y="34" width="468" height="326" fill="#0d1117"/>
+            <!-- Main area -->
+            <rect x="48" y="32" width="472" height="358" fill="#1a1a1a"/>
 
-            <!-- Page header bar -->
-            <rect x="52" y="34" width="468" height="40" fill="#161b22"/>
-            <text x="72" y="58" fill="#e6edf3" font-size="12" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
-            <!-- Edit button -->
-            <rect x="446" y="44" width="64" height="22" rx="5" fill="#1d4ed8"/>
-            <text x="478" y="59" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Bearbeiten</text>
+            <!-- Page header -->
+            <rect x="48" y="32" width="472" height="36" fill="#222"/>
+            <text x="66" y="54" fill="#eee" font-size="11" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
+            <rect x="432" y="40" width="78" height="20" rx="5" fill="#2a2a2a" stroke="#444" stroke-width="1"/>
+            <text x="471" y="54" text-anchor="middle" fill="#aaa" font-size="8" font-family="Inter,sans-serif">Bearbeiten</text>
 
-            <!-- ===== LOVELACE CARD ===== -->
-            <rect x="60" y="84" width="452" height="268" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+            <!-- ===== CARD ===== -->
+            <rect x="56" y="76" width="456" height="302" rx="6" fill="#1c1c1c" stroke="#333" stroke-width="1"/>
 
-            <!-- Card header row -->
-            <rect x="60" y="84" width="452" height="42" rx="10" fill="#161b22"/>
-            <rect x="60" y="114" width="452" height="12" fill="#161b22"/>
-            <!-- calendar icon circle -->
-            <circle cx="84" cy="105" r="12" fill="#1d4ed8" opacity=".2"/>
-            <text x="84" y="110" text-anchor="middle" fill="#60a5fa" font-size="13" font-family="sans-serif">📅</text>
-            <text x="102" y="103" fill="#e6edf3" font-size="11" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
-            <text x="102" y="116" fill="#484f58" font-size="8.5" font-family="Inter,sans-serif">Klasse 10b</text>
-            <!-- date chip -->
-            <rect x="432" y="96" width="72" height="18" rx="9" fill="#21262d" stroke="#30363d" stroke-width="1"/>
-            <text x="468" y="108" text-anchor="middle" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Di, 13. Mai</text>
+            <!-- Cyan header -->
+            <rect x="56" y="76" width="456" height="38" rx="6" fill="#00bcd4"/>
+            <rect x="56" y="96" width="456" height="18" fill="#00bcd4"/>
+            <text x="72" y="100" fill="white" font-size="12" font-weight="700" font-family="Inter,sans-serif">Stundenplan - Klasse 10b</text>
+            <!-- Neu laden button -->
+            <rect x="390" y="83" width="110" height="24" rx="5" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+            <text x="445" y="99" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">↺  Neu laden</text>
 
-            <!-- Column header row -->
-            <rect x="60" y="126" width="452" height="22" fill="#0d1117"/>
-            <!-- Nr col -->
-            <text x="76" y="140" fill="#484f58" font-size="8" font-weight="600" font-family="Inter,sans-serif">#</text>
-            <!-- Zeit col -->
-            <text x="108" y="140" fill="#484f58" font-size="8" font-weight="600" font-family="Inter,sans-serif">Zeit</text>
-            <!-- Day headers -->
-            <text x="186" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Montag</text>
-            <!-- Today highlight -->
-            <rect x="232" y="126" width="88" height="22" fill="#1d4ed8"/>
-            <text x="276" y="140" text-anchor="middle" fill="white" font-size="8.5" font-weight="700" font-family="Inter,sans-serif">Dienstag</text>
-            <text x="364" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Mittwoch</text>
-            <text x="452" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Donnerstag</text>
-            <text x="496" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Freitag</text>
+            <!-- Column headers -->
+            <rect x="56" y="114" width="456" height="22" fill="#252525"/>
+            <text x="72" y="129" fill="#888" font-size="7.5" font-weight="700" font-family="Inter,sans-serif" letter-spacing="1">STUNDE</text>
+            <text x="196" y="129" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">MO</text>
+            <text x="264" y="129" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">DI</text>
+            <text x="332" y="129" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">MI</text>
+            <text x="400" y="129" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">DO</text>
+            <text x="468" y="129" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">FR</text>
+            <!-- vertical divider after STUNDE col -->
+            <line x1="152" y1="114" x2="152" y2="378" stroke="#333" stroke-width="1"/>
 
             <!-- Row 1 -->
-            <rect x="60" y="148" width="452" height="26" fill="#0d1117"/>
-            <text x="76" y="164" fill="#484f58" font-size="8" font-family="Inter,sans-serif">1</text>
-            <text x="96" y="164" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">07:45</text>
-            <text x="186" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-            <text x="276" y="164" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Deutsch</text>
-            <text x="364" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-            <text x="452" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-            <text x="496" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Sport</text>
+            <rect x="56" y="136" width="456" height="30" fill="#1c1c1c"/>
+            <line x1="56" y1="136" x2="512" y2="136" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="155" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">1. 07:45-08:30</text>
+            <!-- MO: Vertretung (rot) -->
+            <rect x="156" y="138" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="155" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="155" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="332" y="155" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="400" y="155" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Physik</text>
+            <text x="468" y="155" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Sport</text>
 
             <!-- Row 2 -->
-            <rect x="60" y="174" width="452" height="26" fill="#161b22"/>
-            <text x="76" y="190" fill="#484f58" font-size="8" font-family="Inter,sans-serif">2</text>
-            <text x="96" y="190" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">08:35</text>
-            <text x="186" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-            <text x="276" y="190" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Mathe</text>
-            <text x="364" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-            <text x="452" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-            <text x="496" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Physik</text>
+            <rect x="56" y="166" width="456" height="30" fill="#222"/>
+            <line x1="56" y1="166" x2="512" y2="166" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="185" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">2. 08:40-09:25</text>
+            <rect x="156" y="168" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="185" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="185" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="332" y="185" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="400" y="185" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Geschichte</text>
+            <text x="468" y="185" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Physik</text>
 
-            <!-- Row 3 – Vertretung -->
-            <rect x="60" y="200" width="452" height="26" fill="#0d1117"/>
-            <text x="76" y="216" fill="#484f58" font-size="8" font-family="Inter,sans-serif">3</text>
-            <text x="96" y="216" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">09:40</text>
-            <text x="186" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Physik</text>
-            <!-- Vertretung badge -->
-            <rect x="236" y="203" width="80" height="20" rx="4" fill="rgba(239,68,68,0.18)"/>
-            <text x="276" y="216" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">Chemie zt.</text>
-            <text x="364" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-            <text x="452" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-            <text x="496" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <!-- Row 3 -->
+            <rect x="56" y="196" width="456" height="30" fill="#1c1c1c"/>
+            <line x1="56" y1="196" x2="512" y2="196" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="215" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">3. 09:25-10:10</text>
+            <rect x="156" y="198" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="215" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="215" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="332" y="215" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Chemie</text>
+            <text x="400" y="215" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Kunst</text>
+            <text x="468" y="215" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
 
-            <!-- Pause row -->
-            <rect x="60" y="226" width="452" height="18" fill="#080c12"/>
-            <line x1="60" y1="226" x2="512" y2="226" stroke="#21262d" stroke-width="1"/>
-            <line x1="60" y1="244" x2="512" y2="244" stroke="#21262d" stroke-width="1"/>
-            <text x="286" y="238" text-anchor="middle" fill="#484f58" font-size="8" font-family="Inter,sans-serif">— Pause  11:15 – 11:40 —</text>
+            <!-- Pause 1 -->
+            <rect x="56" y="226" width="456" height="24" fill="#1a1a1a"/>
+            <line x1="56" y1="226" x2="512" y2="226" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="241" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">10:10-10:30</text>
+            <text x="340" y="241" text-anchor="middle" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
 
             <!-- Row 4 -->
-            <rect x="60" y="244" width="452" height="26" fill="#161b22"/>
-            <text x="76" y="260" fill="#484f58" font-size="8" font-family="Inter,sans-serif">4</text>
-            <text x="96" y="260" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">11:40</text>
-            <text x="186" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Geschichte</text>
-            <text x="276" y="260" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Englisch</text>
-            <text x="364" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-            <text x="452" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Chemie</text>
-            <text x="496" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <rect x="56" y="250" width="456" height="30" fill="#222"/>
+            <line x1="56" y1="250" x2="512" y2="250" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="269" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">4. 10:35-11:20</text>
+            <rect x="156" y="252" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="269" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="269" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Physik</text>
+            <text x="332" y="269" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="400" y="269" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="468" y="269" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Englisch</text>
 
             <!-- Row 5 -->
-            <rect x="60" y="270" width="452" height="26" fill="#0d1117"/>
-            <text x="76" y="286" fill="#484f58" font-size="8" font-family="Inter,sans-serif">5</text>
-            <text x="96" y="286" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">12:30</text>
-            <text x="186" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
-            <text x="276" y="286" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Sport</text>
-            <text x="364" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Kunst</text>
-            <text x="452" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-            <text x="496" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <rect x="56" y="280" width="456" height="30" fill="#1c1c1c"/>
+            <line x1="56" y1="280" x2="512" y2="280" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="299" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">5. 11:30-12:15</text>
+            <rect x="156" y="282" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="299" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="299" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Sport</text>
+            <text x="332" y="299" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
+            <text x="400" y="299" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="468" y="299" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Mathe</text>
 
-            <!-- Legend row -->
-            <rect x="60" y="330" width="452" height="22" fill="#161b22" rx="0"/>
-            <rect x="60" y="330" width="452" height="22" rx="0" fill="#161b22"/>
-            <!-- bottom corners -->
-            <rect x="60" y="340" width="452" height="12" rx="0" fill="#161b22"/>
-            <rect x="60" y="330" width="452" height="22" rx="10" fill="#161b22"/>
-            <circle cx="80" cy="341" r="4" fill="#3b82f6"/>
-            <text x="90" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Heute</text>
-            <circle cx="130" cy="341" r="4" fill="#ef4444"/>
-            <text x="140" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Vertretung</text>
-            <circle cx="192" cy="341" r="4" fill="#484f58"/>
-            <text x="202" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Pause</text>
+            <!-- Pause 2 -->
+            <rect x="56" y="310" width="456" height="24" fill="#1a1a1a"/>
+            <line x1="56" y1="310" x2="512" y2="310" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="325" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">12:15-12:45</text>
+            <text x="340" y="325" text-anchor="middle" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
+
+            <!-- Row 6 -->
+            <rect x="56" y="334" width="456" height="30" fill="#222"/>
+            <line x1="56" y1="334" x2="512" y2="334" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="72" y="353" fill="#ddd" font-size="9" font-weight="600" font-family="Inter,sans-serif">6. 12:45-13:30</text>
+            <rect x="156" y="336" width="64" height="26" fill="#f06060"/>
+            <text x="188" y="353" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="264" y="353" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
+            <text x="332" y="353" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Sport</text>
+            <text x="400" y="353" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Musik</text>
+            <text x="468" y="353" text-anchor="middle" fill="#ccc" font-size="9" font-family="Inter,sans-serif">Kunst</text>
+            <line x1="56" y1="364" x2="512" y2="364" stroke="#2a2a2a" stroke-width="1"/>
           </svg>
         </div>
       </div>
@@ -661,115 +645,141 @@ show_time: true</code></pre>
               Wochenübersicht (Desktop)
             </div>
             <div class="dash-img-wrap dash-svg-wrap">
-              <!-- HA Desktop Browser Mockup -->
-              <svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
+              <!-- HA Desktop Browser Mockup – echter Card-Style -->
+              <svg viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
                 <!-- Browser chrome -->
-                <rect width="680" height="400" rx="10" fill="#0f172a"/>
-                <rect width="680" height="36" rx="10" fill="#1e293b"/>
-                <rect y="26" width="680" height="10" fill="#1e293b"/>
-                <circle cx="18" cy="18" r="5" fill="#ef4444" opacity=".8"/>
-                <circle cx="34" cy="18" r="5" fill="#f59e0b" opacity=".8"/>
-                <circle cx="50" cy="18" r="5" fill="#22c55e" opacity=".8"/>
-                <rect x="70" y="10" width="540" height="16" rx="8" fill="#0f172a"/>
-                <text x="340" y="22" text-anchor="middle" fill="#475569" font-size="9" font-family="Inter,sans-serif">homeassistant.local:8123</text>
+                <rect width="680" height="430" rx="10" fill="#1a1a1a"/>
+                <rect width="680" height="32" rx="10" fill="#2a2a2a"/>
+                <rect y="22" width="680" height="10" fill="#2a2a2a"/>
+                <circle cx="16" cy="16" r="5" fill="#ff5f57" opacity=".9"/>
+                <circle cx="32" cy="16" r="5" fill="#febc2e" opacity=".9"/>
+                <circle cx="48" cy="16" r="5" fill="#28c840" opacity=".9"/>
+                <rect x="66" y="8" width="548" height="16" rx="8" fill="#1a1a1a"/>
+                <text x="340" y="20" text-anchor="middle" fill="#555" font-size="8.5" font-family="Inter,sans-serif">homeassistant.local:8123</text>
 
                 <!-- HA Sidebar -->
-                <rect x="0" y="36" width="56" height="364" fill="#1e293b"/>
-                <!-- sidebar icons -->
-                <rect x="16" y="56" width="24" height="24" rx="4" fill="#3b82f6" opacity=".9"/>
-                <rect x="16" y="92" width="24" height="24" rx="4" fill="#334155"/>
-                <rect x="16" y="128" width="24" height="24" rx="4" fill="#334155"/>
-                <rect x="16" y="164" width="24" height="24" rx="4" fill="#334155"/>
+                <rect x="0" y="32" width="52" height="398" fill="#222"/>
+                <rect x="14" y="48" width="24" height="24" rx="5" fill="#00bcd4"/>
+                <text x="26" y="64" text-anchor="middle" fill="white" font-size="11" font-family="sans-serif">⌂</text>
+                <rect x="14" y="82" width="24" height="24" rx="4" fill="#2a2a2a"/>
+                <rect x="14" y="116" width="24" height="24" rx="4" fill="#2a2a2a"/>
+                <rect x="14" y="150" width="24" height="24" rx="4" fill="#2a2a2a"/>
 
                 <!-- Main area -->
-                <rect x="56" y="36" width="624" height="364" fill="#0f172a"/>
+                <rect x="52" y="32" width="628" height="398" fill="#1a1a1a"/>
+                <rect x="52" y="32" width="628" height="34" fill="#222"/>
+                <text x="70" y="52" fill="#eee" font-size="11" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
+                <rect x="570" y="38" width="96" height="20" rx="5" fill="#2a2a2a" stroke="#444" stroke-width="1"/>
+                <text x="618" y="52" text-anchor="middle" fill="#aaa" font-size="8" font-family="Inter,sans-serif">Bearbeiten</text>
 
-                <!-- Page header -->
-                <text x="76" y="62" fill="#f1f5f9" font-size="13" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
-                <rect x="600" y="48" width="64" height="22" rx="5" fill="#1d4ed8"/>
-                <text x="632" y="63" text-anchor="middle" fill="white" font-size="9" font-family="Inter,sans-serif">Bearbeiten</text>
+                <!-- ===== CARD ===== -->
+                <rect x="60" y="74" width="612" height="344" rx="6" fill="#1c1c1c" stroke="#333" stroke-width="1"/>
 
-                <!-- Card container -->
-                <rect x="68" y="76" width="596" height="308" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                <!-- Cyan header -->
+                <rect x="60" y="74" width="612" height="36" rx="6" fill="#00bcd4"/>
+                <rect x="60" y="92" width="612" height="18" fill="#00bcd4"/>
+                <text x="76" y="97" fill="white" font-size="12" font-weight="700" font-family="Inter,sans-serif">Stundenplan - Klasse 10b</text>
+                <rect x="530" y="80" width="130" height="22" rx="5" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+                <text x="595" y="95" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">↺  Neu laden</text>
 
-                <!-- Card header -->
-                <rect x="68" y="76" width="596" height="44" rx="10" fill="#1e293b"/>
-                <rect x="68" y="106" width="596" height="14" fill="#1e293b"/>
-                <text x="88" y="102" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Inter,sans-serif">📅 Stundenplan</text>
-                <text x="108" y="114" fill="#64748b" font-size="9" font-family="Inter,sans-serif">Klasse 10b</text>
-                <rect x="570" y="88" width="80" height="18" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-                <text x="610" y="100" text-anchor="middle" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Di, 13. Mai</text>
-
-                <!-- Table header -->
-                <rect x="68" y="120" width="596" height="24" fill="#162032"/>
-                <text x="88" y="135" fill="#64748b" font-size="8" font-family="Inter,sans-serif">#</text>
-                <!-- Day headers -->
-                <text x="168" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Montag</text>
-                <rect x="228" y="120" width="110" height="24" fill="#1d4ed8"/>
-                <text x="283" y="135" text-anchor="middle" fill="white" font-size="8" font-weight="700" font-family="Inter,sans-serif">Dienstag</text>
-                <text x="398" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Mittwoch</text>
-                <text x="513" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Donnerstag</text>
-                <text x="618" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Freitag</text>
+                <!-- Column headers -->
+                <rect x="60" y="110" width="612" height="22" fill="#252525"/>
+                <text x="76" y="125" fill="#888" font-size="7.5" font-weight="700" font-family="Inter,sans-serif" letter-spacing="1">STUNDE</text>
+                <text x="248" y="125" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">MO</text>
+                <text x="344" y="125" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">DI</text>
+                <text x="440" y="125" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">MI</text>
+                <text x="536" y="125" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">DO</text>
+                <text x="632" y="125" text-anchor="middle" fill="#aaa" font-size="8" font-weight="700" font-family="Inter,sans-serif">FR</text>
+                <line x1="200" y1="110" x2="200" y2="418" stroke="#333" stroke-width="1"/>
 
                 <!-- Row 1 -->
-                <rect x="68" y="144" width="596" height="28" fill="#0f172a"/>
-                <text x="88" y="161" fill="#475569" font-size="8" font-family="Inter,sans-serif">1  07:45</text>
-                <text x="168" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-                <text x="283" y="161" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-                <text x="398" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-                <text x="513" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-                <text x="618" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Sport</text>
+                <rect x="60" y="132" width="612" height="32" fill="#1c1c1c"/>
+                <line x1="60" y1="132" x2="672" y2="132" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="152" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">1. 07:45-08:30</text>
+                <rect x="204" y="134" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="152" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="152" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Mathe</text>
+                <text x="440" y="152" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Englisch</text>
+                <text x="536" y="152" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Physik</text>
+                <text x="632" y="152" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Sport</text>
 
                 <!-- Row 2 -->
-                <rect x="68" y="172" width="596" height="28" fill="#111827"/>
-                <text x="88" y="189" fill="#475569" font-size="8" font-family="Inter,sans-serif">2  08:35</text>
-                <text x="168" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-                <text x="283" y="189" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-                <text x="398" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-                <text x="513" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-                <text x="618" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Physik</text>
+                <rect x="60" y="164" width="612" height="32" fill="#222"/>
+                <line x1="60" y1="164" x2="672" y2="164" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="184" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">2. 08:40-09:25</text>
+                <rect x="204" y="166" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="184" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="184" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="440" y="184" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Mathe</text>
+                <text x="536" y="184" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Geschichte</text>
+                <text x="632" y="184" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Physik</text>
 
-                <!-- Row 3 – Vertretung -->
-                <rect x="68" y="200" width="596" height="28" fill="#0f172a"/>
-                <text x="88" y="217" fill="#475569" font-size="8" font-family="Inter,sans-serif">3  09:40</text>
-                <text x="168" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Physik</text>
-                <rect x="238" y="203" width="90" height="22" rx="4" fill="rgba(239,68,68,0.18)"/>
-                <text x="283" y="217" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="Inter,sans-serif">Chemie zt.</text>
-                <text x="398" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
-                <text x="513" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-                <text x="618" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+                <!-- Row 3 -->
+                <rect x="60" y="196" width="612" height="32" fill="#1c1c1c"/>
+                <line x1="60" y1="196" x2="672" y2="196" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="216" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">3. 09:25-10:10</text>
+                <rect x="204" y="198" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="216" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="216" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Englisch</text>
+                <text x="440" y="216" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Chemie</text>
+                <text x="536" y="216" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Kunst</text>
+                <text x="632" y="216" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Deutsch</text>
 
-                <!-- Pause -->
-                <rect x="68" y="228" width="596" height="20" fill="#0a0f1e"/>
-                <line x1="68" y1="228" x2="664" y2="228" stroke="#1e293b" stroke-width="1"/>
-                <line x1="68" y1="248" x2="664" y2="248" stroke="#1e293b" stroke-width="1"/>
-                <text x="340" y="241" text-anchor="middle" fill="#475569" font-size="8" font-family="Inter,sans-serif">Pause  11:15 – 11:40</text>
+                <!-- Pause 1 -->
+                <rect x="60" y="228" width="612" height="24" fill="#1a1a1a"/>
+                <line x1="60" y1="228" x2="672" y2="228" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="243" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">10:10-10:30</text>
+                <text x="436" y="243" text-anchor="middle" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
 
                 <!-- Row 4 -->
-                <rect x="68" y="248" width="596" height="28" fill="#111827"/>
-                <text x="88" y="265" fill="#475569" font-size="8" font-family="Inter,sans-serif">4  11:40</text>
-                <text x="168" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Geschichte</text>
-                <text x="283" y="265" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-                <text x="398" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
-                <text x="513" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Chemie</text>
-                <text x="618" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+                <rect x="60" y="252" width="612" height="32" fill="#222"/>
+                <line x1="60" y1="252" x2="672" y2="252" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="272" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">4. 10:35-11:20</text>
+                <rect x="204" y="254" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="272" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="272" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Physik</text>
+                <text x="440" y="272" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="536" y="272" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Mathe</text>
+                <text x="632" y="272" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Englisch</text>
 
                 <!-- Row 5 -->
-                <rect x="68" y="276" width="596" height="28" fill="#0f172a"/>
-                <text x="88" y="293" fill="#475569" font-size="8" font-family="Inter,sans-serif">5  12:30</text>
-                <text x="168" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
-                <text x="283" y="293" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Sport</text>
-                <text x="398" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Kunst</text>
-                <text x="513" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
-                <text x="618" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <rect x="60" y="284" width="612" height="32" fill="#1c1c1c"/>
+                <line x1="60" y1="284" x2="672" y2="284" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="304" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">5. 11:30-12:15</text>
+                <rect x="204" y="286" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="304" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="304" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Sport</text>
+                <text x="440" y="304" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Erdkunde</text>
+                <text x="536" y="304" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Englisch</text>
+                <text x="632" y="304" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Mathe</text>
 
-                <!-- Legend -->
-                <circle cx="88" cy="352" r="4" fill="#3b82f6"/>
-                <text x="98" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Heute</text>
-                <circle cx="138" cy="352" r="4" fill="#ef4444"/>
-                <text x="148" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Vertretung</text>
-                <circle cx="198" cy="352" r="4" fill="#475569"/>
-                <text x="208" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Pause</text>
+                <!-- Pause 2 -->
+                <rect x="60" y="316" width="612" height="24" fill="#1a1a1a"/>
+                <line x1="60" y1="316" x2="672" y2="316" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="331" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">12:15-12:45</text>
+                <text x="436" y="331" text-anchor="middle" fill="#666" font-size="8.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
+
+                <!-- Row 6 -->
+                <rect x="60" y="340" width="612" height="32" fill="#222"/>
+                <line x1="60" y1="340" x2="672" y2="340" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="360" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">6. 12:45-13:30</text>
+                <rect x="204" y="342" width="88" height="28" fill="#f06060"/>
+                <text x="248" y="360" text-anchor="middle" fill="white" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="344" y="360" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Erdkunde</text>
+                <text x="440" y="360" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Sport</text>
+                <text x="536" y="360" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Musik</text>
+                <text x="632" y="360" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Kunst</text>
+
+                <!-- Row 7 -->
+                <rect x="60" y="372" width="612" height="32" fill="#1c1c1c"/>
+                <line x1="60" y1="372" x2="672" y2="372" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="76" y="392" fill="#ddd" font-size="9.5" font-weight="600" font-family="Inter,sans-serif">7. 13:40-14:25</text>
+                <text x="248" y="392" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Musik</text>
+                <text x="344" y="392" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Informatik</text>
+                <text x="440" y="392" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Sport</text>
+                <text x="536" y="392" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Kunst</text>
+                <text x="632" y="392" text-anchor="middle" fill="#ccc" font-size="9.5" font-family="Inter,sans-serif">Informatik</text>
+                <line x1="60" y1="404" x2="672" y2="404" stroke="#2a2a2a" stroke-width="1"/>
               </svg>
             </div>
           </div>
@@ -781,75 +791,112 @@ show_time: true</code></pre>
               Mobile Ansicht
             </div>
             <div class="dash-img-wrap dash-svg-wrap">
-              <svg viewBox="0 0 240 420" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
+              <svg viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
                 <!-- Phone frame -->
-                <rect width="240" height="420" rx="24" fill="#0a0f1e"/>
-                <rect x="4" y="4" width="232" height="412" rx="21" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
-                <!-- Notch -->
-                <rect x="80" y="8" width="80" height="12" rx="6" fill="#0a0f1e"/>
-                <!-- Status bar -->
-                <text x="20" y="30" fill="#64748b" font-size="8" font-family="Inter,sans-serif">10:30</text>
-                <text x="200" y="30" text-anchor="end" fill="#64748b" font-size="8" font-family="Inter,sans-serif">●●●</text>
+                <rect width="240" height="460" rx="24" fill="#111"/>
+                <rect x="4" y="4" width="232" height="452" rx="21" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+                <rect x="80" y="8" width="80" height="12" rx="6" fill="#111"/>
+                <text x="20" y="30" fill="#555" font-size="8" font-family="Inter,sans-serif">10:30</text>
+                <text x="200" y="30" text-anchor="end" fill="#555" font-size="8" font-family="Inter,sans-serif">●●●</text>
 
                 <!-- Card -->
-                <rect x="12" y="40" width="216" height="360" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                <rect x="10" y="38" width="220" height="408" rx="8" fill="#1c1c1c" stroke="#333" stroke-width="1"/>
 
-                <!-- Card header -->
-                <text x="28" y="62" fill="#f1f5f9" font-size="10" font-weight="700" font-family="Inter,sans-serif">📅 Stundenplan</text>
-                <text x="28" y="75" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Klasse 10b</text>
-                <text x="210" y="62" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Di, 13. Mai</text>
+                <!-- Cyan header -->
+                <rect x="10" y="38" width="220" height="34" rx="8" fill="#00bcd4"/>
+                <rect x="10" y="56" width="220" height="16" fill="#00bcd4"/>
+                <text x="20" y="59" fill="white" font-size="9.5" font-weight="700" font-family="Inter,sans-serif">Stundenplan - Klasse 10b</text>
 
-                <!-- Day tabs -->
-                <rect x="12" y="82" width="216" height="22" fill="#162032"/>
-                <text x="38" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Mo</text>
-                <rect x="58" y="82" width="36" height="22" fill="#1d4ed8"/>
-                <text x="76" y="96" text-anchor="middle" fill="white" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Di</text>
-                <text x="114" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Mi</text>
-                <text x="152" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Do</text>
-                <text x="190" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Fr</text>
+                <!-- Column headers -->
+                <rect x="10" y="72" width="220" height="20" fill="#252525"/>
+                <text x="20" y="85" fill="#888" font-size="6.5" font-weight="700" font-family="Inter,sans-serif" letter-spacing="0.5">STUNDE</text>
+                <text x="120" y="85" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Inter,sans-serif">MO</text>
+                <text x="152" y="85" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Inter,sans-serif">DI</text>
+                <text x="184" y="85" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Inter,sans-serif">MI</text>
+                <text x="216" y="85" text-anchor="middle" fill="#aaa" font-size="7" font-weight="700" font-family="Inter,sans-serif">DO</text>
+                <line x1="100" y1="72" x2="100" y2="446" stroke="#333" stroke-width="1"/>
 
-                <!-- Rows -->
-                <rect x="12" y="104" width="216" height="26" fill="#0f172a"/>
-                <text x="28" y="120" fill="#475569" font-size="7" font-family="Inter,sans-serif">1</text>
-                <text x="50" y="120" fill="#64748b" font-size="7" font-family="Inter,sans-serif">07:45</text>
-                <text x="120" y="120" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Deutsch</text>
+                <!-- Row 1 -->
+                <rect x="10" y="92" width="220" height="28" fill="#1c1c1c"/>
+                <line x1="10" y1="92" x2="230" y2="92" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="109" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">1. 07:45-08:30</text>
+                <rect x="102" y="94" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="109" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="109" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Mathe</text>
+                <text x="184" y="109" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Engl.</text>
+                <text x="216" y="109" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Physik</text>
 
-                <rect x="12" y="130" width="216" height="26" fill="#111827"/>
-                <text x="28" y="146" fill="#475569" font-size="7" font-family="Inter,sans-serif">2</text>
-                <text x="50" y="146" fill="#64748b" font-size="7" font-family="Inter,sans-serif">08:35</text>
-                <text x="120" y="146" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Mathe</text>
+                <!-- Row 2 -->
+                <rect x="10" y="120" width="220" height="28" fill="#222"/>
+                <line x1="10" y1="120" x2="230" y2="120" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="137" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">2. 08:40-09:25</text>
+                <rect x="102" y="122" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="137" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="137" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Dt.</text>
+                <text x="184" y="137" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Mathe</text>
+                <text x="216" y="137" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Gesch.</text>
 
-                <rect x="12" y="156" width="216" height="26" fill="#0f172a"/>
-                <text x="28" y="172" fill="#475569" font-size="7" font-family="Inter,sans-serif">3</text>
-                <text x="50" y="172" fill="#64748b" font-size="7" font-family="Inter,sans-serif">09:40</text>
-                <rect x="80" y="159" width="80" height="20" rx="4" fill="rgba(239,68,68,0.2)"/>
-                <text x="120" y="172" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">Chemie zt.</text>
+                <!-- Row 3 -->
+                <rect x="10" y="148" width="220" height="28" fill="#1c1c1c"/>
+                <line x1="10" y1="148" x2="230" y2="148" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="165" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">3. 09:25-10:10</text>
+                <rect x="102" y="150" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="165" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="165" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Engl.</text>
+                <text x="184" y="165" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Chemie</text>
+                <text x="216" y="165" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Kunst</text>
 
-                <!-- Pause -->
-                <rect x="12" y="182" width="216" height="18" fill="#0a0f1e"/>
-                <line x1="12" y1="182" x2="228" y2="182" stroke="#1e293b" stroke-width="1"/>
-                <text x="120" y="194" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">Pause  11:15 – 11:40</text>
+                <!-- Pause 1 -->
+                <rect x="10" y="176" width="220" height="20" fill="#1a1a1a"/>
+                <line x1="10" y1="176" x2="230" y2="176" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="189" fill="#555" font-size="7.5" font-style="italic" font-family="Inter,sans-serif">10:10-10:30</text>
+                <text x="165" y="189" text-anchor="middle" fill="#555" font-size="7.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
 
-                <rect x="12" y="200" width="216" height="26" fill="#111827"/>
-                <text x="28" y="216" fill="#475569" font-size="7" font-family="Inter,sans-serif">4</text>
-                <text x="50" y="216" fill="#64748b" font-size="7" font-family="Inter,sans-serif">11:40</text>
-                <text x="120" y="216" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Englisch</text>
+                <!-- Row 4 -->
+                <rect x="10" y="196" width="220" height="28" fill="#222"/>
+                <line x1="10" y1="196" x2="230" y2="196" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="213" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">4. 10:35-11:20</text>
+                <rect x="102" y="198" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="213" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="213" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Physik</text>
+                <text x="184" y="213" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Dt.</text>
+                <text x="216" y="213" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Mathe</text>
 
-                <rect x="12" y="226" width="216" height="26" fill="#0f172a"/>
-                <text x="28" y="242" fill="#475569" font-size="7" font-family="Inter,sans-serif">5</text>
-                <text x="50" y="242" fill="#64748b" font-size="7" font-family="Inter,sans-serif">12:30</text>
-                <text x="120" y="242" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Sport</text>
+                <!-- Row 5 -->
+                <rect x="10" y="224" width="220" height="28" fill="#1c1c1c"/>
+                <line x1="10" y1="224" x2="230" y2="224" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="241" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">5. 11:30-12:15</text>
+                <rect x="102" y="226" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="241" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="241" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Sport</text>
+                <text x="184" y="241" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Erdk.</text>
+                <text x="216" y="241" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Engl.</text>
 
-                <rect x="12" y="252" width="216" height="26" fill="#111827"/>
-                <text x="28" y="268" fill="#475569" font-size="7" font-family="Inter,sans-serif">6</text>
-                <text x="50" y="268" fill="#64748b" font-size="7" font-family="Inter,sans-serif">13:15</text>
-                <text x="120" y="268" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Erdkunde</text>
+                <!-- Pause 2 -->
+                <rect x="10" y="252" width="220" height="20" fill="#1a1a1a"/>
+                <line x1="10" y1="252" x2="230" y2="252" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="265" fill="#555" font-size="7.5" font-style="italic" font-family="Inter,sans-serif">12:15-12:45</text>
+                <text x="165" y="265" text-anchor="middle" fill="#555" font-size="7.5" font-style="italic" font-family="Inter,sans-serif">Pause</text>
 
-                <!-- Legend -->
-                <circle cx="28" cy="310" r="4" fill="#3b82f6"/>
-                <text x="38" y="314" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Heute</text>
-                <circle cx="80" cy="310" r="4" fill="#ef4444"/>
-                <text x="90" y="314" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Vertretung</text>
+                <!-- Row 6 -->
+                <rect x="10" y="272" width="220" height="28" fill="#222"/>
+                <line x1="10" y1="272" x2="230" y2="272" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="289" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">6. 12:45-13:30</text>
+                <rect x="102" y="274" width="34" height="24" fill="#f06060"/>
+                <text x="119" y="289" text-anchor="middle" fill="white" font-size="8" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <text x="152" y="289" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Erdk.</text>
+                <text x="184" y="289" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Sport</text>
+                <text x="216" y="289" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Musik</text>
+
+                <!-- Row 7 -->
+                <rect x="10" y="300" width="220" height="28" fill="#1c1c1c"/>
+                <line x1="10" y1="300" x2="230" y2="300" stroke="#2a2a2a" stroke-width="1"/>
+                <text x="20" y="317" fill="#ddd" font-size="8" font-weight="600" font-family="Inter,sans-serif">7. 13:40-14:25</text>
+                <text x="119" y="317" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Musik</text>
+                <text x="152" y="317" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Info.</text>
+                <text x="184" y="317" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Sport</text>
+                <text x="216" y="317" text-anchor="middle" fill="#ccc" font-size="8" font-family="Inter,sans-serif">Kunst</text>
+                <line x1="10" y1="328" x2="230" y2="328" stroke="#2a2a2a" stroke-width="1"/>
               </svg>
             </div>
           </div>

@@ -6,7 +6,7 @@
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
 <p align="center">
-  <a href="https://deine-website.de">
+  <a href="https://maximilian-andrew-kluge.github.io/VpMobile24/website/">
     <img src="docs/Banner.png" alt="VpMobile24 Banner" width="100%">
   </a>
 </p>
