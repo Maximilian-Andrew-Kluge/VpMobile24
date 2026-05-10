@@ -261,77 +261,115 @@ class VpMobile24Card extends HTMLElement {
     const className = this.config.class_name || '5a';
     const title = this.config.title || 'Stundenplan';
 
+    const now = new Date();
+    const wdn = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+    const mon = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    const dateChip = `${wdn[now.getDay()]}, ${now.getDate()}. ${mon[now.getMonth()]}`;
+
     this.shadowRoot.innerHTML = `
       <style>
-        ha-card {
-          background: var(--card-background-color);
-          border-radius: var(--ha-card-border-radius, 4px);
-          box-shadow: var(--ha-card-box-shadow, 0 2px 4px rgba(0,0,0,0.1));
-          overflow: hidden;
+        :host {
+          --vp-bg:         #0f1729;
+          --vp-card-bg:    #162040;
+          --vp-cell-bg:    #1a2a50;
+          --vp-cell-hover: #1e3060;
+          --vp-today-bg:   #2563eb;
+          --vp-sub-bg:     #7f1d1d;
+          --vp-sub-text:   #fca5a5;
+          --vp-pause:      #64748b;
+          --vp-text:       #e2e8f0;
+          --vp-muted:      #94a3b8;
+          --vp-dim:        #475569;
+          --vp-border:     rgba(255,255,255,0.07);
+          --vp-r:          10px;
+          --vp-rs:         7px;
         }
-        .card-header {
-          background: var(--primary-color);
-          color: white;
-          padding: 16px 20px;
-          font-size: 1.3em;
-          font-weight: 500;
+        ha-card {
+          background: var(--vp-bg);
+          border-radius: var(--vp-r);
+          overflow: hidden;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+          border: 1px solid var(--vp-border);
+        }
+        .vp-header {
+          display: flex; align-items: center; gap: 14px;
+          padding: 18px 20px 14px;
+        }
+        .vp-icon {
+          width: 44px; height: 44px;
+          background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+          border-radius: 10px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.4em; flex-shrink: 0;
+          box-shadow: 0 2px 8px rgba(29,78,216,0.4);
+        }
+        .vp-title { font-size:1.35em; font-weight:700; color:var(--vp-text); line-height:1.2; }
+        .vp-sub   { font-size:0.85em; color:var(--vp-muted); margin-top:2px; }
+        .vp-chip  {
+          margin-left: auto;
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 20px; padding: 6px 14px;
+          font-size: 0.82em; color: var(--vp-muted); white-space: nowrap;
         }
         .schedule-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .schedule-table th,
-        .schedule-table td {
-          padding: 12px 8px;
-          text-align: center;
-          border: 1px solid var(--divider-color);
-          font-size: 0.95em;
+          width: 100%; border-collapse: separate; border-spacing: 0;
+          padding: 0 12px 12px;
         }
         .schedule-table th {
-          background: var(--secondary-background-color);
-          color: var(--primary-text-color);
-          font-weight: 600;
+          padding: 10px 6px; text-align: center;
+          color: var(--vp-dim); font-size: 0.78em; font-weight: 600;
+          text-transform: uppercase; letter-spacing: 0.5px;
+          border-bottom: 1px solid var(--vp-border);
         }
-        .schedule-table th:first-child,
-        .schedule-table td:first-child {
-          text-align: left;
-          padding-left: 16px;
-          min-width: 140px;
-          background: var(--secondary-background-color);
-          font-weight: 500;
+        .schedule-table th:first-child { width: 28px; }
+        .schedule-table td { padding: 5px 4px; text-align: center; vertical-align: middle; }
+        .schedule-table td:first-child { color:var(--vp-dim); font-size:0.82em; font-weight:500; width:28px; }
+        .cell-tile {
+          background: var(--vp-cell-bg); border-radius: var(--vp-rs);
+          padding: 9px 6px; font-size: 0.88em; font-weight: 500;
+          color: var(--vp-text); min-height: 36px;
+          display: flex; align-items: center; justify-content: center;
+          transition: background 0.15s;
         }
-        .today-column {
-          background: var(--primary-color) !important;
-          color: white !important;
+        .cell-tile.empty { background: transparent; color: var(--vp-dim); }
+        .today-col .cell-tile { background: var(--vp-today-bg); color:#fff; font-weight:600; }
+        .today-col .cell-tile.empty { background: rgba(37,99,235,0.25); color: rgba(255,255,255,0.35); }
+        .today-header-pill {
+          background: var(--vp-today-bg); color:#fff !important;
+          border-radius: 8px; padding: 5px 10px;
+          display: inline-block; font-weight:700 !important;
+          font-size: 0.82em !important; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .pause-row td {
-          background: var(--secondary-background-color);
-          color: var(--secondary-text-color);
-          font-style: italic;
+        .cell-tile.substitution { background: var(--vp-sub-bg) !important; color: var(--vp-sub-text) !important; font-weight:600; }
+        .pause-row td { padding: 4px 0; }
+        .pause-cell {
+          text-align: center; color: var(--vp-pause); font-size: 0.82em;
+          padding: 6px 0;
+          border-top: 1px solid var(--vp-border);
+          border-bottom: 1px solid var(--vp-border);
         }
-        .lesson-substitution {
-          background: var(--error-color) !important;
-          color: white !important;
+        .vp-legend {
+          display: flex; gap: 18px; padding: 10px 20px 16px; font-size: 0.82em;
         }
-        .empty-cell {
-          color: var(--secondary-text-color);
-        }
-        @media (max-width: 768px) {
-          .schedule-table th,
-          .schedule-table td {
-            padding: 8px 4px;
-            font-size: 0.85em;
-          }
-          .schedule-table th:first-child,
-          .schedule-table td:first-child {
-            padding-left: 8px;
-            min-width: 100px;
-          }
-        }
+        .vp-legend-item { display: flex; align-items: center; gap: 6px; }
+        .ldot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .ldot.t { background:#3b82f6; }
+        .ldot.s { background:#ef4444; }
+        .lt { color:#60a5fa; font-weight:600; }
+        .ls { color:#f87171; font-weight:600; }
       </style>
       <ha-card>
-        <div class="card-header">${title} - Klasse ${className}</div>
+        <div class="vp-header">
+          <div class="vp-icon">📅</div>
+          <div><div class="vp-title">${title}</div><div class="vp-sub">Klasse ${className}</div></div>
+          <div class="vp-chip">${dateChip}</div>
+        </div>
         ${this._renderTable(weekTableEntity)}
+        <div class="vp-legend">
+          <div class="vp-legend-item"><span class="ldot t"></span><span class="lt">Heute</span></div>
+          <div class="vp-legend-item"><span class="ldot s"></span><span class="ls">Vertretung</span></div>
+        </div>
       </ha-card>
     `;
   }
@@ -365,40 +403,35 @@ class VpMobile24Card extends HTMLElement {
     const today = new Date().getDay();
     const todayIndex = highlightToday && today !== 0 ? today - 1 : -1;
 
-    let html = '<table class="schedule-table"><thead><tr><th>Stunde</th>';
+    let html = '<table class="schedule-table"><thead><tr><th>#</th>';
     weekDays.forEach((day, i) => {
-      html += `<th class="${i === todayIndex ? 'today-column' : ''}">${day}</th>`;
+      const isToday = i === todayIndex;
+      const label = isToday ? `<span class="today-header-pill">${day}</span>` : day;
+      html += `<th class="${isToday ? 'today-col' : ''}">${label}</th>`;
     });
     html += '</tr></thead><tbody>';
 
     timeSlots.forEach(slot => {
       if (slot.isPause) {
-        html += `<tr class="pause-row"><td>${showTime ? slot.time : slot.label}</td><td colspan="5" style="text-align: center;">${slot.label}</td></tr>`;
+        html += `<tr class="pause-row"><td colspan="6"><div class="pause-cell">Pause ${slot.time}</div></td></tr>`;
       } else {
         const periodNum = slot.period.replace('.', '');
-        const timeDisplay = showTime ? ` ${slot.time}` : '';
-        html += `<tr><td>${slot.period}${timeDisplay}</td>`;
-        
+        html += `<tr><td>${slot.period}</td>`;
         weekDays.forEach((day, dayIndex) => {
           const dayKey = weekDayKeys[dayIndex];
           const daySchedule = weekTable[dayKey] || {};
           const lesson = daySchedule[periodNum];
-          
-          let cellContent = '';
-          let cellClass = '';
-          
+          const isToday = dayIndex === todayIndex;
+          let tileClass = 'cell-tile';
+          let content = '';
           if (lesson && lesson.fach) {
-            cellContent = lesson.fach;
-            if (lesson.ist_vertretung) {
-              cellClass = 'lesson-substitution';
-            }
+            content = lesson.fach;
+            if (lesson.ist_vertretung) tileClass += ' substitution';
           } else {
-            cellClass = 'empty-cell';
+            tileClass += ' empty';
           }
-          
-          html += `<td class="${cellClass} ${dayIndex === todayIndex ? 'today-column' : ''}">${cellContent}</td>`;
+          html += `<td class="${isToday ? 'today-col' : ''}"><div class="${tileClass}">${content}</div></td>`;
         });
-        
         html += '</tr>';
       }
     });

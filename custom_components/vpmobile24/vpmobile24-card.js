@@ -348,143 +348,231 @@ class VpMobile24Card extends HTMLElement {
 
     const primaryColor = 'var(--primary-color)';
 
+    // Build today's date string for the header chip
+    const now = new Date();
+    const weekdayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+    const dateChip = `${weekdayNames[now.getDay()]}, ${now.getDate()}. ${monthNames[now.getMonth()]}`;
+
     this.shadowRoot.innerHTML = `
       <style>
+        :host {
+          --vp-bg:          #0f1729;
+          --vp-card-bg:     #162040;
+          --vp-cell-bg:     #1a2a50;
+          --vp-cell-hover:  #1e3060;
+          --vp-today-bg:    #2563eb;
+          --vp-today-hover: #1d4ed8;
+          --vp-sub-bg:      #7f1d1d;
+          --vp-sub-text:    #fca5a5;
+          --vp-pause-color: #64748b;
+          --vp-text:        #e2e8f0;
+          --vp-text-muted:  #94a3b8;
+          --vp-text-dim:    #475569;
+          --vp-border:      rgba(255,255,255,0.07);
+          --vp-radius:      10px;
+          --vp-radius-sm:   7px;
+        }
         ha-card {
-          background: var(--card-background-color);
-          border-radius: 8px;
+          background: var(--vp-bg);
+          border-radius: var(--vp-radius);
           overflow: hidden;
-          box-shadow: none;
-          border: 1px solid var(--divider-color);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+          border: 1px solid var(--vp-border);
+          font-family: var(--paper-font-body1_-_font-family, 'Inter', sans-serif);
         }
-        .card-header {
-          background: ${primaryColor};
-          color: white;
-          padding: 16px 20px;
-          font-size: 1.3em;
-          font-weight: 500;
-          display: ${showHeader ? 'block' : 'none'};
+
+        /* ── HEADER ── */
+        .vp-header {
+          display: ${showHeader ? 'flex' : 'none'};
+          align-items: center;
+          gap: 14px;
+          padding: 18px 20px 14px;
           position: relative;
         }
-        .reload-button {
-          position: absolute;
-          top: 16px;
-          right: 20px;
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 4px;
-          padding: 6px 12px;
-          color: white;
-          cursor: pointer;
-          font-size: 0.9em;
-          transition: all 0.2s;
-        }
-        .reload-button:hover {
-          background: rgba(255, 255, 255, 0.2);
-          border-color: rgba(255, 255, 255, 0.5);
-        }
-        .reload-button:active {
-          transform: scale(0.95);
-        }
-        .schedule-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .schedule-table th,
-        .schedule-table td {
-          padding: 12px 16px;
-          text-align: center;
-          border-bottom: 1px solid var(--divider-color);
-          border-right: 1px solid var(--divider-color);
-          font-size: 0.9em;
-        }
-        .schedule-table th:last-child,
-        .schedule-table td:last-child {
-          border-right: none;
-        }
-        .schedule-table th {
-          background: var(--card-background-color);
-          color: var(--secondary-text-color);
-          font-weight: 500;
-          text-transform: uppercase;
-          font-size: 0.75em;
-          position: relative;
-        }
-        .info-indicator {
-          position: absolute;
-          top: 2px;
-          right: 2px;
-          width: 18px;
-          height: 18px;
-          background: var(--warning-color, #ff9800);
-          border-radius: 50%;
+        .vp-header-icon {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.7em;
-          color: white;
-          font-weight: bold;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          font-size: 1.4em;
+          flex-shrink: 0;
+          box-shadow: 0 2px 8px rgba(29,78,216,0.4);
+        }
+        .vp-header-text { flex: 1; }
+        .vp-header-title {
+          font-size: 1.35em;
+          font-weight: 700;
+          color: var(--vp-text);
+          line-height: 1.2;
+        }
+        .vp-header-sub {
+          font-size: 0.85em;
+          color: var(--vp-text-muted);
+          margin-top: 2px;
+        }
+        .vp-date-chip {
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 20px;
+          padding: 6px 14px;
+          font-size: 0.82em;
+          color: var(--vp-text-muted);
+          white-space: nowrap;
         }
         .reload-button {
-          position: absolute;
-          top: 16px;
-          right: 20px;
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 4px;
-          padding: 6px 12px;
-          color: white;
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 7px;
+          padding: 7px 13px;
+          color: var(--vp-text-muted);
           cursor: pointer;
-          font-size: 0.9em;
+          font-size: 0.82em;
           transition: all 0.2s;
+          white-space: nowrap;
         }
         .reload-button:hover {
-          background: rgba(255, 255, 255, 0.2);
-          border-color: rgba(255, 255, 255, 0.5);
+          background: rgba(255,255,255,0.13);
+          color: var(--vp-text);
         }
-        .reload-button:active {
-          transform: scale(0.95);
+        .reload-button:active { transform: scale(0.95); }
+
+        /* ── TABLE ── */
+        .schedule-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          padding: 0 12px 12px;
         }
-        .schedule-table th:first-child,
+        .schedule-table th {
+          padding: 10px 6px;
+          text-align: center;
+          color: var(--vp-text-dim);
+          font-size: 0.78em;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          border-bottom: 1px solid var(--vp-border);
+        }
+        .schedule-table th:first-child {
+          text-align: center;
+          width: 28px;
+          color: var(--vp-text-dim);
+        }
+        .schedule-table td {
+          padding: 5px 4px;
+          text-align: center;
+          vertical-align: middle;
+        }
         .schedule-table td:first-child {
-          text-align: left;
-          padding-left: 20px;
+          color: var(--vp-text-dim);
+          font-size: 0.82em;
           font-weight: 500;
-          border-right: 3px solid var(--divider-color);
+          width: 28px;
+          text-align: center;
         }
-        .schedule-table tbody tr:last-child td {
-          border-bottom: none;
+
+        /* ── CELL TILES ── */
+        .cell-tile {
+          background: var(--vp-cell-bg);
+          border-radius: var(--vp-radius-sm);
+          padding: 9px 6px;
+          font-size: 0.88em;
+          font-weight: 500;
+          color: var(--vp-text);
+          transition: background 0.15s;
+          min-height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        
-        .today-column {
-          background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.05) !important;
-          position: relative;
+        .cell-tile:hover { background: var(--vp-cell-hover); }
+        .cell-tile.empty {
+          background: transparent;
+          color: var(--vp-text-dim);
         }
-        
-        .today-column::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 2px;
-          height: 100%;
-          background: var(--primary-color);
+
+        /* Today column tiles */
+        .today-col .cell-tile {
+          background: var(--vp-today-bg);
+          color: #fff;
+          font-weight: 600;
         }
-        
+        .today-col .cell-tile:hover { background: var(--vp-today-hover); }
+        .today-col .cell-tile.empty {
+          background: rgba(37,99,235,0.25);
+          color: rgba(255,255,255,0.4);
+        }
+
+        /* Today header pill */
+        .today-header-pill {
+          background: var(--vp-today-bg);
+          color: #fff !important;
+          border-radius: 8px;
+          padding: 5px 10px;
+          display: inline-block;
+          font-weight: 700 !important;
+          font-size: 0.82em !important;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        /* Substitution */
+        .cell-tile.substitution {
+          background: var(--vp-sub-bg) !important;
+          color: var(--vp-sub-text) !important;
+          font-weight: 600;
+        }
+        .cell-tile.substitution:hover { background: #991b1b !important; }
+
+        /* Pause row */
         .pause-row td {
-          background: var(--secondary-background-color);
-          color: var(--secondary-text-color);
-          font-style: italic;
-          font-size: 0.85em;
+          padding: 4px 0;
         }
-        .lesson-substitution {
-          background: #ff5252 !important;
-          color: white !important;
-          font-weight: 500 !important;
+        .pause-cell {
+          text-align: center;
+          color: var(--vp-pause-color);
+          font-size: 0.82em;
+          padding: 6px 0;
+          border-top: 1px solid var(--vp-border);
+          border-bottom: 1px solid var(--vp-border);
         }
-        .empty-cell {
-          color: var(--disabled-text-color);
+
+        /* ── LEGEND ── */
+        .vp-legend {
+          display: flex;
+          gap: 18px;
+          padding: 10px 20px 16px;
+          font-size: 0.82em;
+        }
+        .vp-legend-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .legend-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        .legend-dot.today { background: #3b82f6; }
+        .legend-dot.sub   { background: #ef4444; }
+        .legend-label-today { color: #60a5fa; font-weight: 600; }
+        .legend-label-sub   { color: #f87171; font-weight: 600; }
+
+        /* ── INFO INDICATOR ── */
+        .info-indicator {
+          position: absolute;
+          top: 2px; right: 2px;
+          width: 16px; height: 16px;
+          background: var(--warning-color, #f59e0b);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.65em; color: white; font-weight: bold;
         }
         
         /* Mobile View - Card Layout */
@@ -708,12 +796,27 @@ class VpMobile24Card extends HTMLElement {
         }
       </style>
       <ha-card>
-        ${showHeader ? `<div class="card-header">
-          ${title} - Klasse ${className}
-          ${this._config.reload_entity ? `<button class="reload-button" onclick="this.getRootNode().host._handleReload()">🔄 Neu laden</button>` : ''}
-        </div>` : ''}
+        <div class="vp-header">
+          <div class="vp-header-icon">📅</div>
+          <div class="vp-header-text">
+            <div class="vp-header-title">${title}</div>
+            <div class="vp-header-sub">Klasse ${className}</div>
+          </div>
+          <div class="vp-date-chip">${dateChip}</div>
+          ${this._config.reload_entity ? `<button class="reload-button" onclick="this.getRootNode().host._handleReload()">↺ Neu laden</button>` : ''}
+        </div>
         <div class="desktop-view">${this._renderTable(weekTable, showTime, highlightToday, useCustomTimes)}</div>
         <div class="mobile-view">${this._renderMobileView(weekTable, showTime, useCustomTimes)}</div>
+        <div class="vp-legend">
+          <div class="vp-legend-item">
+            <span class="legend-dot today"></span>
+            <span class="legend-label-today">Heute</span>
+          </div>
+          <div class="vp-legend-item">
+            <span class="legend-dot sub"></span>
+            <span class="legend-label-sub">Vertretung</span>
+          </div>
+        </div>
       </ha-card>
       <div id="info-popup-overlay" class="info-popup-overlay hidden"></div>
       <div id="info-popup" class="info-popup hidden" onclick="this.getRootNode().host._handlePopupClick(event)">
@@ -787,42 +890,42 @@ class VpMobile24Card extends HTMLElement {
     const today = new Date().getDay();
     const todayIndex = highlightToday && today !== 0 && today !== 6 ? today - 1 : -1;
 
-    let html = '<table class="schedule-table"><thead><tr><th>Stunde</th>';
+    let html = '<table class="schedule-table"><thead><tr><th>#</th>';
     weekDays.forEach((day, i) => {
       const hasInfo = hasInfoPerDay[weekDayKeys[i]] || false;
       const infoIcon = hasInfo ? '<span class="info-indicator">!</span>' : '';
-      const clickable = hasInfo ? 'day-header-clickable' : '';
+      const isToday = i === todayIndex;
+      const clickable = hasInfo ? 'style="cursor:pointer"' : '';
       const onclick = hasInfo ? `onclick="this.getRootNode().host._showInfoPopup()"` : '';
-      html += `<th class="${i === todayIndex ? 'today-column' : ''} ${clickable}" ${onclick}>${day}${infoIcon}</th>`;
+      const dayLabel = isToday
+        ? `<span class="today-header-pill">${day}</span>`
+        : day;
+      html += `<th class="${isToday ? 'today-col' : ''}" ${clickable} ${onclick}>${dayLabel}${infoIcon}</th>`;
     });
     html += '</tr></thead><tbody>';
 
     timeSlots.forEach(slot => {
       if (slot.isPause) {
-        html += `<tr class="pause-row"><td>${showTime ? slot.time : slot.label}</td><td colspan="5" style="text-align: center;">${slot.label}</td></tr>`;
+        html += `<tr class="pause-row"><td colspan="6"><div class="pause-cell">Pause ${slot.time}</div></td></tr>`;
       } else {
-        const timeDisplay = showTime ? ` ${slot.time}` : '';
-        html += `<tr><td>${slot.period}${timeDisplay}</td>`;
-        
+        html += `<tr><td>${slot.period}</td>`;
         weekDays.forEach((day, dayIndex) => {
           const daySchedule = weekTable[weekDayKeys[dayIndex]] || {};
           const lesson = daySchedule[slot.lessonNumber];
-          
+          const isToday = dayIndex === todayIndex;
+          let tileClass = 'cell-tile';
           let cellContent = '';
-          let cellClass = '';
-          
+
           if (lesson && lesson.fach) {
             cellContent = lesson.fach;
-            if (lesson.ist_vertretung) {
-              cellClass = 'lesson-substitution';
-            }
+            if (lesson.ist_vertretung) tileClass += ' substitution';
           } else {
-            cellClass = 'empty-cell';
+            tileClass += ' empty';
+            cellContent = '';
           }
-          
-          html += `<td class="${cellClass} ${dayIndex === todayIndex ? 'today-column' : ''}">${cellContent}</td>`;
+
+          html += `<td class="${isToday ? 'today-col' : ''}"><div class="${tileClass}">${cellContent}</div></td>`;
         });
-        
         html += '</tr>';
       }
     });
