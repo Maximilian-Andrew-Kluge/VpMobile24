@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://maximilian-andrew-kluge.github.io/VpMobile24/website/">
-    <img src="docs/Banner.png" alt="VpMobile24 Banner" width="100%">
+    <img src="https://maximilian-andrew-kluge.github.io/VpMobile24/docs/Banner.png" alt="VpMobile24 Banner" width="100%">
   </a>
 </p>
 
@@ -40,19 +40,19 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ### Übersicht
 
-![Overview](docs/overview.png)
+![Overview](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/overview.png)
 
 ---
 
 ### Lovelace Card
 
-![Card](docs/card.png)
+![Card](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/card.png)
 
 ---
 
 ### Konfiguration
 
-![Config](docs/config.png)
+![Config](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/config.png)
 
 ---
 
