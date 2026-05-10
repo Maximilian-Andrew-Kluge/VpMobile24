@@ -6,8 +6,8 @@
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
 <p align="center">
-  <a href="https://maximilian-andrew-kluge.github.io/VpMobile24/website/">
-    <img src="https://maximilian-andrew-kluge.github.io/VpMobile24/docs/Banner.png" alt="VpMobile24 Banner" width="100%">
+  <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24">
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Banner.png" alt="VpMobile24 Banner" width="100%">
   </a>
 </p>
 
@@ -40,19 +40,19 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ### Übersicht
 
-![Overview](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/overview.png)
+![Overview](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png)
 
 ---
 
 ### Lovelace Card
 
-![Card](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/card.png)
+![Card](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png)
 
 ---
 
 ### Konfiguration
 
-![Config](https://maximilian-andrew-kluge.github.io/VpMobile24/docs/config.png)
+![Config](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png)
 
 ---
 
