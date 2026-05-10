@@ -5,7 +5,7 @@
 ![Version](https://img.shields.io/badge/Version-2.1.1-blue.svg)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
-[![VpMobile24 Banner](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Banner.png)
+![Banner](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Banner.png)
 
 ---
 
