@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VpMobile24 – Home Assistant Integration</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="container hero-inner">
+      <div class="hero-left">
+        <div class="hero-logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="12" fill="url(#logoGrad)"/>
+              <rect x="10" y="14" width="28" height="22" rx="3" stroke="white" stroke-width="2.5" fill="none"/>
+              <line x1="10" y1="20" x2="38" y2="20" stroke="white" stroke-width="2.5"/>
+              <line x1="18" y1="10" x2="18" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="30" y1="10" x2="30" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="32" cy="32" r="8" fill="#1a56db"/>
+              <line x1="32" y1="28" x2="32" y2="32" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <line x1="32" y1="32" x2="35" y2="35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48">
+                  <stop offset="0%" stop-color="#1e40af"/>
+                  <stop offset="100%" stop-color="#1d4ed8"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
+        </div>
+        <div class="hero-badge">Home Assistant Integration</div>
+        <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
+
+        <div class="hero-features">
+          <div class="hf-item">
+            <span class="hf-icon">🔄</span>
+            <div>
+              <strong>Automatischer Datenabruf</strong>
+              <span>Alle 15 Minuten</span>
+            </div>
+          </div>
+          <div class="hf-item">
+            <span class="hf-icon">👥</span>
+            <div>
+              <strong>Mehrere Klassen</strong>
+              <span>Flexibel &amp; einfach</span>
+            </div>
+          </div>
+          <div class="hf-item">
+            <span class="hf-icon">📊</span>
+            <div>
+              <strong>Strukturierte Sensoren</strong>
+              <span>Woche &amp; Tage</span>
+            </div>
+          </div>
+          <div class="hf-item">
+            <span class="hf-icon">🎨</span>
+            <div>
+              <strong>Moderne Lovelace Card</strong>
+              <span>Vollständig anpassbar</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-badges-row">
+          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill ha">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/></svg>
+            Works with Home Assistant
+          </a>
+          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill hacs">HACS</a>
+          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill custom">Custom Integration</a>
+          <a href="https://discord.gg/57uvCeRw43" class="badge-pill discord">Discord Community</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-mockup-wrap">
+          <svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg" class="hero-mockup-svg">
+            <defs>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="6" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- Browser frame -->
+            <rect width="520" height="360" rx="12" fill="#0d1117"/>
+            <!-- Titlebar -->
+            <rect width="520" height="34" rx="12" fill="#161b22"/>
+            <rect y="24" width="520" height="10" fill="#161b22"/>
+            <!-- Traffic lights -->
+            <circle cx="18" cy="17" r="5" fill="#ff5f57"/>
+            <circle cx="34" cy="17" r="5" fill="#febc2e"/>
+            <circle cx="50" cy="17" r="5" fill="#28c840"/>
+            <!-- URL bar -->
+            <rect x="68" y="9" width="384" height="16" rx="8" fill="#0d1117"/>
+            <text x="260" y="21" text-anchor="middle" fill="#484f58" font-size="8.5" font-family="Inter,sans-serif">homeassistant.local:8123/lovelace/default_view</text>
+
+            <!-- HA Sidebar -->
+            <rect x="0" y="34" width="52" height="326" fill="#161b22"/>
+            <!-- HA logo icon -->
+            <rect x="14" y="50" width="24" height="24" rx="5" fill="#1d4ed8"/>
+            <text x="26" y="66" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif">⌂</text>
+            <!-- nav items -->
+            <rect x="14" y="86" width="24" height="24" rx="4" fill="#21262d"/>
+            <rect x="14" y="120" width="24" height="24" rx="4" fill="#21262d"/>
+            <rect x="14" y="154" width="24" height="24" rx="4" fill="#21262d"/>
+            <rect x="14" y="188" width="24" height="24" rx="4" fill="#21262d"/>
+            <!-- divider -->
+            <line x1="14" y1="228" x2="38" y2="228" stroke="#30363d" stroke-width="1"/>
+            <rect x="14" y="238" width="24" height="24" rx="4" fill="#21262d"/>
+
+            <!-- Main content area -->
+            <rect x="52" y="34" width="468" height="326" fill="#0d1117"/>
+
+            <!-- Page header bar -->
+            <rect x="52" y="34" width="468" height="40" fill="#161b22"/>
+            <text x="72" y="58" fill="#e6edf3" font-size="12" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
+            <!-- Edit button -->
+            <rect x="446" y="44" width="64" height="22" rx="5" fill="#1d4ed8"/>
+            <text x="478" y="59" text-anchor="middle" fill="white" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Bearbeiten</text>
+
+            <!-- ===== LOVELACE CARD ===== -->
+            <rect x="60" y="84" width="452" height="268" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+
+            <!-- Card header row -->
+            <rect x="60" y="84" width="452" height="42" rx="10" fill="#161b22"/>
+            <rect x="60" y="114" width="452" height="12" fill="#161b22"/>
+            <!-- calendar icon circle -->
+            <circle cx="84" cy="105" r="12" fill="#1d4ed8" opacity=".2"/>
+            <text x="84" y="110" text-anchor="middle" fill="#60a5fa" font-size="13" font-family="sans-serif">📅</text>
+            <text x="102" y="103" fill="#e6edf3" font-size="11" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
+            <text x="102" y="116" fill="#484f58" font-size="8.5" font-family="Inter,sans-serif">Klasse 10b</text>
+            <!-- date chip -->
+            <rect x="432" y="96" width="72" height="18" rx="9" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+            <text x="468" y="108" text-anchor="middle" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Di, 13. Mai</text>
+
+            <!-- Column header row -->
+            <rect x="60" y="126" width="452" height="22" fill="#0d1117"/>
+            <!-- Nr col -->
+            <text x="76" y="140" fill="#484f58" font-size="8" font-weight="600" font-family="Inter,sans-serif">#</text>
+            <!-- Zeit col -->
+            <text x="108" y="140" fill="#484f58" font-size="8" font-weight="600" font-family="Inter,sans-serif">Zeit</text>
+            <!-- Day headers -->
+            <text x="186" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Montag</text>
+            <!-- Today highlight -->
+            <rect x="232" y="126" width="88" height="22" fill="#1d4ed8"/>
+            <text x="276" y="140" text-anchor="middle" fill="white" font-size="8.5" font-weight="700" font-family="Inter,sans-serif">Dienstag</text>
+            <text x="364" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Mittwoch</text>
+            <text x="452" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Donnerstag</text>
+            <text x="496" y="140" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Freitag</text>
+
+            <!-- Row 1 -->
+            <rect x="60" y="148" width="452" height="26" fill="#0d1117"/>
+            <text x="76" y="164" fill="#484f58" font-size="8" font-family="Inter,sans-serif">1</text>
+            <text x="96" y="164" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">07:45</text>
+            <text x="186" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="276" y="164" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="364" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="452" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="496" y="164" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Sport</text>
+
+            <!-- Row 2 -->
+            <rect x="60" y="174" width="452" height="26" fill="#161b22"/>
+            <text x="76" y="190" fill="#484f58" font-size="8" font-family="Inter,sans-serif">2</text>
+            <text x="96" y="190" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">08:35</text>
+            <text x="186" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="276" y="190" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Mathe</text>
+            <text x="364" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="452" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="496" y="190" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Physik</text>
+
+            <!-- Row 3 – Vertretung -->
+            <rect x="60" y="200" width="452" height="26" fill="#0d1117"/>
+            <text x="76" y="216" fill="#484f58" font-size="8" font-family="Inter,sans-serif">3</text>
+            <text x="96" y="216" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">09:40</text>
+            <text x="186" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Physik</text>
+            <!-- Vertretung badge -->
+            <rect x="236" y="203" width="80" height="20" rx="4" fill="rgba(239,68,68,0.18)"/>
+            <text x="276" y="216" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">Chemie zt.</text>
+            <text x="364" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+            <text x="452" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="496" y="216" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+
+            <!-- Pause row -->
+            <rect x="60" y="226" width="452" height="18" fill="#080c12"/>
+            <line x1="60" y1="226" x2="512" y2="226" stroke="#21262d" stroke-width="1"/>
+            <line x1="60" y1="244" x2="512" y2="244" stroke="#21262d" stroke-width="1"/>
+            <text x="286" y="238" text-anchor="middle" fill="#484f58" font-size="8" font-family="Inter,sans-serif">— Pause  11:15 – 11:40 —</text>
+
+            <!-- Row 4 -->
+            <rect x="60" y="244" width="452" height="26" fill="#161b22"/>
+            <text x="76" y="260" fill="#484f58" font-size="8" font-family="Inter,sans-serif">4</text>
+            <text x="96" y="260" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">11:40</text>
+            <text x="186" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Geschichte</text>
+            <text x="276" y="260" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Englisch</text>
+            <text x="364" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+            <text x="452" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Chemie</text>
+            <text x="496" y="260" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+
+            <!-- Row 5 -->
+            <rect x="60" y="270" width="452" height="26" fill="#0d1117"/>
+            <text x="76" y="286" fill="#484f58" font-size="8" font-family="Inter,sans-serif">5</text>
+            <text x="96" y="286" fill="#484f58" font-size="7.5" font-family="Inter,sans-serif">12:30</text>
+            <text x="186" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
+            <text x="276" y="286" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Sport</text>
+            <text x="364" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Kunst</text>
+            <text x="452" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+            <text x="496" y="286" text-anchor="middle" fill="#8b949e" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+
+            <!-- Legend row -->
+            <rect x="60" y="330" width="452" height="22" fill="#161b22" rx="0"/>
+            <rect x="60" y="330" width="452" height="22" rx="0" fill="#161b22"/>
+            <!-- bottom corners -->
+            <rect x="60" y="340" width="452" height="12" rx="0" fill="#161b22"/>
+            <rect x="60" y="330" width="452" height="22" rx="10" fill="#161b22"/>
+            <circle cx="80" cy="341" r="4" fill="#3b82f6"/>
+            <text x="90" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Heute</text>
+            <circle cx="130" cy="341" r="4" fill="#ef4444"/>
+            <text x="140" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Vertretung</text>
+            <circle cx="192" cy="341" r="4" fill="#484f58"/>
+            <text x="202" y="345" fill="#8b949e" font-size="8" font-family="Inter,sans-serif">Pause</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-bottom-bar">
+      <div class="container hero-bottom-inner">
+        <div class="hb-item"><span>📱</span><div><strong>Responsive Design</strong><small>Für Mobile &amp; Desktop</small></div></div>
+        <div class="hb-item"><span>🎨</span><div><strong>Theme-Unterstützung</strong><small>Passt sich deinem Setup an</small></div></div>
+        <div class="hb-item"><span>⚙️</span><div><strong>Einfache Konfiguration</strong><small>Kein YAML erforderlich</small></div></div>
+        <div class="hb-item"><span>⚡</span><div><strong>Immer aktuell</strong><small>Automatische Updates</small></div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== NAV ===== -->
+  <nav class="topnav">
+    <div class="container topnav-inner">
+      <div class="topnav-logo">VpMobile<span class="accent">24</span></div>
+      <div class="topnav-links">
+        <a href="#installation">Installation</a>
+        <a href="#konfiguration">Konfiguration</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#card">Lovelace Card</a>
+        <a href="#sensors">Sensoren</a>
+        <a href="#troubleshooting">Hilfe</a>
+      </div>
+      <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="topnav-cta">GitHub →</a>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main>
+
+    <!-- INSTALLATION TABS -->
+    <section class="section" id="installation">
+      <div class="container">
+        <div class="section-label">Installation</div>
+        <h2 class="section-title">In 3 Schritten startklar</h2>
+        <p class="section-desc">Wähle deine bevorzugte Installationsmethode. HACS ist der empfohlene Weg.</p>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="hacs">⭐ HACS (empfohlen)</button>
+          <button class="tab-btn" data-tab="manual">🔧 Manuell</button>
+        </div>
+
+        <div class="tab-content active" id="tab-hacs">
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h3>HACS öffnen &amp; Repository hinzufügen</h3>
+                <p>Öffne HACS in Home Assistant. Klicke oben rechts auf das Menü <code>⋮</code> und wähle <strong>„Benutzerdefiniertes Repository"</strong>.</p>
+                <div class="code-block">
+                  <div class="code-label">Repository URL</div>
+                  <div class="code-line">
+                    <code>https://github.com/Maximilian-Andrew-Kluge/VpMobile24</code>
+                    <button class="copy-btn" onclick="copyText(this, 'https://github.com/Maximilian-Andrew-Kluge/VpMobile24')">Kopieren</button>
+                  </div>
+                </div>
+                <p>Wähle als Kategorie <strong>Integration</strong> und klicke auf <strong>Hinzufügen</strong>.</p>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h3>Integration installieren &amp; HA neu starten</h3>
+                <p>Suche in HACS nach <strong>VpMobile24</strong>, klicke auf <strong>Installieren</strong> und starte Home Assistant anschließend neu.</p>
+                <div class="info-box">
+                  <span>💡</span>
+                  <span>Nach dem Neustart erscheint die Integration automatisch in der Integrationsliste.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h3>Integration einrichten</h3>
+                <p>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</strong> und suche nach <strong>VpMobile24</strong>.</p>
+                <div class="config-fields">
+                  <div class="config-field">
+                    <span class="cf-label">Schul-ID</span>
+                    <span class="cf-desc">Die ID deiner Schule (z.B. <code>10001329</code>)</span>
+                  </div>
+                  <div class="config-field">
+                    <span class="cf-label">Benutzername</span>
+                    <span class="cf-desc">Dein VpMobile24-Benutzername</span>
+                  </div>
+                  <div class="config-field">
+                    <span class="cf-label">Passwort</span>
+                    <span class="cf-desc">Dein VpMobile24-Passwort</span>
+                  </div>
+                  <div class="config-field">
+                    <span class="cf-label">Klasse</span>
+                    <span class="cf-desc">Klassenname, z.B. <code>10b</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-manual">
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <h3>Repository herunterladen</h3>
+                <p>Lade das Repository als ZIP herunter oder klone es mit Git:</p>
+                <div class="code-block">
+                  <div class="code-label">Git Clone</div>
+                  <div class="code-line">
+                    <code>git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git</code>
+                    <button class="copy-btn" onclick="copyText(this, 'git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git')">Kopieren</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <h3>Dateien kopieren</h3>
+                <p>Kopiere den Ordner <code>custom_components/vpmobile24/</code> in dein Home Assistant Konfigurationsverzeichnis:</p>
+                <div class="code-block">
+                  <div class="code-label">Zielpfad</div>
+                  <div class="code-line">
+                    <code>/config/custom_components/vpmobile24/</code>
+                    <button class="copy-btn" onclick="copyText(this, '/config/custom_components/vpmobile24/')">Kopieren</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <h3>Home Assistant neu starten &amp; einrichten</h3>
+                <p>Starte Home Assistant neu. Gehe dann zu <strong>Einstellungen → Geräte &amp; Dienste</strong> und füge die <strong>VpMobile24</strong> Integration hinzu.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD INSTALLATION -->
+    <section class="section section-alt" id="card">
+      <div class="container">
+        <div class="section-label">Lovelace Card</div>
+        <h2 class="section-title">Die Stundenplan Card einrichten</h2>
+        <p class="section-desc">Die Card wird automatisch mit der Integration installiert. Du musst nur noch die Ressource registrieren.</p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Ressource in Home Assistant hinzufügen</h3>
+              <p>Gehe zu <strong>Einstellungen → Dashboards</strong>, klicke oben rechts auf <code>⋮</code> und wähle <strong>Ressourcen</strong>.</p>
+              <p>Klicke auf <strong>+ Ressource hinzufügen</strong> und trage folgendes ein:</p>
+              <div class="config-fields">
+                <div class="config-field">
+                  <span class="cf-label">URL</span>
+                  <div class="code-line inline">
+                    <code>/local/vpmobile24/vpmobile24-card.js</code>
+                    <button class="copy-btn" onclick="copyText(this, '/local/vpmobile24/vpmobile24-card.js')">Kopieren</button>
+                  </div>
+                </div>
+                <div class="config-field">
+                  <span class="cf-label">Ressourcentyp</span>
+                  <span class="cf-desc"><strong>JavaScript-Modul</strong></span>
+                </div>
+              </div>
+              <div class="info-box">
+                <span>💡</span>
+                <span>Die Card-Datei wird beim Start von Home Assistant automatisch nach <code>/config/www/vpmobile24/</code> kopiert. Du musst nichts manuell kopieren!</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Card zum Dashboard hinzufügen</h3>
+              <p>Öffne dein Dashboard, klicke auf <strong>Bearbeiten → + Karte hinzufügen</strong> und suche nach <strong>VpMobile24 Card</strong>.</p>
+              <p>Alternativ kannst du die Card direkt per YAML hinzufügen:</p>
+              <div class="code-block">
+                <div class="code-label">Minimale YAML-Konfiguration</div>
+                <pre class="code-pre"><code>type: custom:vpmobile24-card
+entity: sensor.vpmobile24_week_table
+show_header: true
+header_settings:
+  title: Stundenplan
+  class_name: 10b
+highlight_today: true
+show_time: true</code></pre>
+                <button class="copy-btn copy-pre" onclick="copyPre(this)">Kopieren</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Card konfigurieren</h3>
+              <p>Die Card bietet eine vollständige visuelle Konfiguration – kein YAML nötig. Alle Optionen im Überblick:</p>
+              <div class="options-table">
+                <div class="ot-head">
+                  <span>Option</span><span>Beschreibung</span><span>Standard</span>
+                </div>
+                <div class="ot-row"><span><code>entity</code></span><span>Week Table Sensor</span><span><code>sensor.vpmobile24_week_table</code></span></div>
+                <div class="ot-row"><span><code>show_header</code></span><span>Header anzeigen</span><span><code>true</code></span></div>
+                <div class="ot-row"><span><code>highlight_today</code></span><span>Heutigen Tag hervorheben</span><span><code>true</code></span></div>
+                <div class="ot-row"><span><code>show_time</code></span><span>Uhrzeiten anzeigen</span><span><code>true</code></span></div>
+                <div class="ot-row"><span><code>use_custom_times</code></span><span>Eigene Uhrzeiten verwenden</span><span><code>false</code></span></div>
+                <div class="ot-row"><span><code>custom_theme</code></span><span>Theme auswählen</span><span><code>auto</code></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIGURATION PREVIEW -->
+    <section class="section" id="konfiguration">
+      <div class="container">
+        <div class="section-label">Konfiguration</div>
+        <h2 class="section-title">So richtest du die Integration ein</h2>
+        <p class="section-desc">Nach der Installation führt dich Home Assistant durch einen einfachen Setup-Dialog. Kein YAML, keine Konfigurationsdateien.</p>
+
+        <div class="preview-layout">
+          <!-- Left: HA Dialog Mockup – interaktiv -->
+          <div class="preview-left">
+            <div class="mockup-window">
+              <div class="mockup-titlebar">
+                <div class="mockup-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="mockup-title">Integration hinzufügen · VpMobile24</div>
+              </div>
+              <div class="mockup-body">
+                <div class="ha-dialog">
+                  <div class="ha-dialog-header">
+                    <div class="ha-dialog-icon">
+                      <svg viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="10" fill="#1d4ed8"/><rect x="10" y="14" width="28" height="22" rx="3" stroke="white" stroke-width="2.5" fill="none"/><line x1="10" y1="20" x2="38" y2="20" stroke="white" stroke-width="2.5"/><line x1="18" y1="10" x2="18" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="10" x2="30" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="32" r="8" fill="#1a56db"/><line x1="32" y1="28" x2="32" y2="32" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="32" y1="32" x2="35" y2="35" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                      <div class="ha-dialog-name">VpMobile24</div>
+                      <div class="ha-dialog-sub">Zugangsdaten eingeben</div>
+                    </div>
+                  </div>
+
+                  <form class="ha-form" onsubmit="handleDemoSubmit(event)">
+                    <div class="ha-field">
+                      <label for="demo-school">Schul-ID *</label>
+                      <input
+                        id="demo-school"
+                        class="ha-input-real"
+                        type="text"
+                        placeholder="z.B. 10001329"
+                        maxlength="20"
+                        autocomplete="off"
+                      />
+                      <div class="ha-hint">Die numerische ID deiner Schule auf stundenplan24.de</div>
+                    </div>
+
+                    <div class="ha-field">
+                      <label for="demo-user">Benutzername *</label>
+                      <input
+                        id="demo-user"
+                        class="ha-input-real"
+                        type="text"
+                        placeholder="Dein Benutzername"
+                        autocomplete="off"
+                      />
+                    </div>
+
+                    <div class="ha-field">
+                      <label for="demo-pw">Passwort *</label>
+                      <div class="ha-input-pw-wrap">
+                        <input
+                          id="demo-pw"
+                          class="ha-input-real"
+                          type="password"
+                          placeholder="Dein Passwort"
+                          autocomplete="new-password"
+                        />
+                        <button type="button" class="ha-pw-toggle" onclick="togglePw()" title="Passwort anzeigen">
+                          <svg id="pw-eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3C5 3 1.73 7.11 1.05 8.45a1 1 0 000 .9C1.73 10.89 5 15 10 15s8.27-4.11 8.95-5.45a1 1 0 000-.9C18.27 7.11 15 3 10 3zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                          <svg id="pw-eye-hide" viewBox="0 0 20 20" fill="currentColor" style="display:none"><path d="M3.28 2.22a.75.75 0 00-1.06 1.06l14.5 14.5a.75.75 0 101.06-1.06l-1.76-1.76A9.94 9.94 0 0018.95 9.9a1 1 0 000-.9C18.27 7.61 15 3.5 10 3.5c-1.6 0-3.1.42-4.38 1.14L3.28 2.22zM10 5.5c.34 0 .68.03 1 .1L5.66 10.94A4 4 0 0110 5.5zm0 9a4 4 0 01-3.34-1.8l1.06-1.06A2 2 0 0010 13.5a2 2 0 002-2c0-.28-.06-.55-.16-.8l1.06-1.06A4 4 0 0110 14.5z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="ha-field">
+                      <label for="demo-class">Klasse *</label>
+                      <input
+                        id="demo-class"
+                        class="ha-input-real"
+                        type="text"
+                        placeholder="z.B. 10b"
+                        maxlength="10"
+                        autocomplete="off"
+                      />
+                      <div class="ha-hint">Klassenname genau wie in VpMobile24, z.B. 5a, 10b, Q1</div>
+                    </div>
+
+                    <div id="demo-msg" class="ha-demo-msg" style="display:none"></div>
+
+                    <div class="ha-dialog-actions">
+                      <button type="button" class="ha-btn-cancel" onclick="resetDemo()">Abbrechen</button>
+                      <button type="submit" class="ha-btn-submit">Senden</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="preview-caption">
+              <span class="caption-live">● Live-Demo</span> — Probiere den Dialog einfach aus
+            </div>
+          </div>
+
+          <!-- Right: SVG screenshot mockup + field explanations -->
+          <div class="preview-right">
+            <div class="real-screenshot-wrap">
+              <!-- Inline SVG: HA Config Dialog Screenshot -->
+              <svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" class="real-screenshot-svg">
+                <!-- HA background -->
+                <rect width="420" height="320" fill="#111827"/>
+                <!-- Sidebar -->
+                <rect width="52" height="320" fill="#1e293b"/>
+                <rect x="14" y="20" width="24" height="24" rx="5" fill="#3b82f6" opacity=".9"/>
+                <rect x="14" y="56" width="24" height="24" rx="4" fill="#334155"/>
+                <rect x="14" y="92" width="24" height="24" rx="4" fill="#334155"/>
+                <rect x="14" y="128" width="24" height="24" rx="4" fill="#334155"/>
+                <!-- Main -->
+                <rect x="52" width="368" height="320" fill="#0f172a"/>
+                <!-- Dimmed overlay -->
+                <rect x="52" width="368" height="320" fill="rgba(0,0,0,0.55)"/>
+                <!-- Dialog card -->
+                <rect x="96" y="30" width="280" height="262" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                <!-- Dialog header -->
+                <rect x="96" y="30" width="280" height="56" rx="12" fill="#1e293b"/>
+                <rect x="96" y="74" width="280" height="12" fill="#1e293b"/>
+                <!-- Icon -->
+                <rect x="112" y="42" width="32" height="32" rx="7" fill="#1d4ed8"/>
+                <text x="128" y="62" text-anchor="middle" fill="white" font-size="14" font-family="sans-serif">📅</text>
+                <!-- Title -->
+                <text x="152" y="56" fill="#f1f5f9" font-size="11" font-weight="700" font-family="Inter,sans-serif">VpMobile24</text>
+                <text x="152" y="70" fill="#64748b" font-size="8.5" font-family="Inter,sans-serif">Zugangsdaten eingeben</text>
+                <!-- Close -->
+                <text x="362" y="56" text-anchor="middle" fill="#475569" font-size="14" font-family="sans-serif">✕</text>
+
+                <!-- Field 1: Schul-ID -->
+                <text x="112" y="102" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">SCHUL-ID *</text>
+                <rect x="112" y="107" width="248" height="26" rx="6" fill="#0f172a" stroke="#3b82f6" stroke-width="1.5"/>
+                <text x="122" y="124" fill="#e2e8f0" font-size="9" font-family="'Fira Code',monospace">10001329</text>
+                <rect x="348" y="115" width="1.5" height="12" fill="#3b82f6" opacity=".9">
+                  <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+                </rect>
+                <text x="112" y="142" fill="#475569" font-size="7.5" font-family="Inter,sans-serif">Die numerische ID deiner Schule auf stundenplan24.de</text>
+
+                <!-- Field 2: Benutzername -->
+                <text x="112" y="158" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">BENUTZERNAME *</text>
+                <rect x="112" y="163" width="248" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <text x="122" y="180" fill="#e2e8f0" font-size="9" font-family="'Fira Code',monospace">schueler</text>
+
+                <!-- Field 3: Passwort -->
+                <text x="112" y="200" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">PASSWORT *</text>
+                <rect x="112" y="205" width="248" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <text x="122" y="222" fill="#e2e8f0" font-size="11" font-family="sans-serif">••••••••</text>
+                <text x="348" y="222" text-anchor="middle" fill="#475569" font-size="11" font-family="sans-serif">👁</text>
+
+                <!-- Field 4: Klasse -->
+                <text x="112" y="242" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">KLASSE *</text>
+                <rect x="112" y="247" width="248" height="26" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <text x="122" y="264" fill="#e2e8f0" font-size="9" font-family="'Fira Code',monospace">10b</text>
+
+                <!-- Buttons -->
+                <rect x="112" y="282" width="80" height="24" rx="6" fill="transparent" stroke="#334155" stroke-width="1"/>
+                <text x="152" y="298" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Abbrechen</text>
+                <rect x="204" y="282" width="156" height="24" rx="6" fill="#1d4ed8"/>
+                <text x="282" y="298" text-anchor="middle" fill="white" font-size="9" font-weight="700" font-family="Inter,sans-serif">Senden</text>
+              </svg>
+              <div class="screenshot-badge">So sieht es aus</div>
+            </div>
+
+            <div class="field-explainer">
+              <h3>Was du brauchst</h3>
+              <div class="fe-item">
+                <div class="fe-icon">🏫</div>
+                <div>
+                  <strong>Schul-ID</strong>
+                  <p>Die numerische ID deiner Schule auf <a href="https://www.stundenplan24.de" target="_blank">stundenplan24.de</a>. Sie steht in der URL, wenn du deinen Stundenplan aufrufst, z.B. <code>10001329</code>.</p>
+                </div>
+              </div>
+              <div class="fe-item">
+                <div class="fe-icon">👤</div>
+                <div>
+                  <strong>Benutzername &amp; Passwort</strong>
+                  <p>Deine VpMobile24-Zugangsdaten – dieselben, die du auch in der App oder im Browser verwendest.</p>
+                </div>
+              </div>
+              <div class="fe-item">
+                <div class="fe-icon">🎓</div>
+                <div>
+                  <strong>Klasse</strong>
+                  <p>Der Klassenname genau so, wie er in VpMobile24 hinterlegt ist, z.B. <code>5a</code>, <code>10b</code> oder <code>Q1</code>. Mehrere Klassen können als separate Integrationen hinzugefügt werden.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD PREVIEW -->
+    <section class="section section-alt" id="dashboard">
+      <div class="container">
+        <div class="section-label">Dashboard</div>
+        <h2 class="section-title">So sieht es in Home Assistant aus</h2>
+        <p class="section-desc">Die Lovelace Card zeigt deinen Stundenplan übersichtlich an – mit Hervorhebung des heutigen Tages und farblicher Markierung von Vertretungen.</p>
+
+        <div class="dashboard-screenshots">
+          <!-- Desktop Mockup (inline SVG) -->
+          <div class="dash-shot dash-shot-main">
+            <div class="dash-shot-label">
+              <span class="dash-label-dot dot-blue"></span>
+              Wochenübersicht (Desktop)
+            </div>
+            <div class="dash-img-wrap dash-svg-wrap">
+              <!-- HA Desktop Browser Mockup -->
+              <svg viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
+                <!-- Browser chrome -->
+                <rect width="680" height="400" rx="10" fill="#0f172a"/>
+                <rect width="680" height="36" rx="10" fill="#1e293b"/>
+                <rect y="26" width="680" height="10" fill="#1e293b"/>
+                <circle cx="18" cy="18" r="5" fill="#ef4444" opacity=".8"/>
+                <circle cx="34" cy="18" r="5" fill="#f59e0b" opacity=".8"/>
+                <circle cx="50" cy="18" r="5" fill="#22c55e" opacity=".8"/>
+                <rect x="70" y="10" width="540" height="16" rx="8" fill="#0f172a"/>
+                <text x="340" y="22" text-anchor="middle" fill="#475569" font-size="9" font-family="Inter,sans-serif">homeassistant.local:8123</text>
+
+                <!-- HA Sidebar -->
+                <rect x="0" y="36" width="56" height="364" fill="#1e293b"/>
+                <!-- sidebar icons -->
+                <rect x="16" y="56" width="24" height="24" rx="4" fill="#3b82f6" opacity=".9"/>
+                <rect x="16" y="92" width="24" height="24" rx="4" fill="#334155"/>
+                <rect x="16" y="128" width="24" height="24" rx="4" fill="#334155"/>
+                <rect x="16" y="164" width="24" height="24" rx="4" fill="#334155"/>
+
+                <!-- Main area -->
+                <rect x="56" y="36" width="624" height="364" fill="#0f172a"/>
+
+                <!-- Page header -->
+                <text x="76" y="62" fill="#f1f5f9" font-size="13" font-weight="700" font-family="Inter,sans-serif">Mein Dashboard</text>
+                <rect x="600" y="48" width="64" height="22" rx="5" fill="#1d4ed8"/>
+                <text x="632" y="63" text-anchor="middle" fill="white" font-size="9" font-family="Inter,sans-serif">Bearbeiten</text>
+
+                <!-- Card container -->
+                <rect x="68" y="76" width="596" height="308" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+
+                <!-- Card header -->
+                <rect x="68" y="76" width="596" height="44" rx="10" fill="#1e293b"/>
+                <rect x="68" y="106" width="596" height="14" fill="#1e293b"/>
+                <text x="88" y="102" fill="#f1f5f9" font-size="12" font-weight="700" font-family="Inter,sans-serif">📅 Stundenplan</text>
+                <text x="108" y="114" fill="#64748b" font-size="9" font-family="Inter,sans-serif">Klasse 10b</text>
+                <rect x="570" y="88" width="80" height="18" rx="5" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                <text x="610" y="100" text-anchor="middle" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Di, 13. Mai</text>
+
+                <!-- Table header -->
+                <rect x="68" y="120" width="596" height="24" fill="#162032"/>
+                <text x="88" y="135" fill="#64748b" font-size="8" font-family="Inter,sans-serif">#</text>
+                <!-- Day headers -->
+                <text x="168" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Montag</text>
+                <rect x="228" y="120" width="110" height="24" fill="#1d4ed8"/>
+                <text x="283" y="135" text-anchor="middle" fill="white" font-size="8" font-weight="700" font-family="Inter,sans-serif">Dienstag</text>
+                <text x="398" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Mittwoch</text>
+                <text x="513" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Donnerstag</text>
+                <text x="618" y="135" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Freitag</text>
+
+                <!-- Row 1 -->
+                <rect x="68" y="144" width="596" height="28" fill="#0f172a"/>
+                <text x="88" y="161" fill="#475569" font-size="8" font-family="Inter,sans-serif">1  07:45</text>
+                <text x="168" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+                <text x="283" y="161" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="398" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <text x="513" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+                <text x="618" y="161" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Sport</text>
+
+                <!-- Row 2 -->
+                <rect x="68" y="172" width="596" height="28" fill="#111827"/>
+                <text x="88" y="189" fill="#475569" font-size="8" font-family="Inter,sans-serif">2  08:35</text>
+                <text x="168" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <text x="283" y="189" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+                <text x="398" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="513" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="618" y="189" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Physik</text>
+
+                <!-- Row 3 – Vertretung -->
+                <rect x="68" y="200" width="596" height="28" fill="#0f172a"/>
+                <text x="88" y="217" fill="#475569" font-size="8" font-family="Inter,sans-serif">3  09:40</text>
+                <text x="168" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Physik</text>
+                <rect x="238" y="203" width="90" height="22" rx="4" fill="rgba(239,68,68,0.18)"/>
+                <text x="283" y="217" text-anchor="middle" fill="#fca5a5" font-size="9" font-family="Inter,sans-serif">Chemie zt.</text>
+                <text x="398" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+                <text x="513" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <text x="618" y="217" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+
+                <!-- Pause -->
+                <rect x="68" y="228" width="596" height="20" fill="#0a0f1e"/>
+                <line x1="68" y1="228" x2="664" y2="228" stroke="#1e293b" stroke-width="1"/>
+                <line x1="68" y1="248" x2="664" y2="248" stroke="#1e293b" stroke-width="1"/>
+                <text x="340" y="241" text-anchor="middle" fill="#475569" font-size="8" font-family="Inter,sans-serif">Pause  11:15 – 11:40</text>
+
+                <!-- Row 4 -->
+                <rect x="68" y="248" width="596" height="28" fill="#111827"/>
+                <text x="88" y="265" fill="#475569" font-size="8" font-family="Inter,sans-serif">4  11:40</text>
+                <text x="168" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Geschichte</text>
+                <text x="283" y="265" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <text x="398" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Deutsch</text>
+                <text x="513" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Chemie</text>
+                <text x="618" y="265" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Mathe</text>
+
+                <!-- Row 5 -->
+                <rect x="68" y="276" width="596" height="28" fill="#0f172a"/>
+                <text x="88" y="293" fill="#475569" font-size="8" font-family="Inter,sans-serif">5  12:30</text>
+                <text x="168" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Erdkunde</text>
+                <text x="283" y="293" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="Inter,sans-serif">Sport</text>
+                <text x="398" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Kunst</text>
+                <text x="513" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+                <text x="618" y="293" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Englisch</text>
+
+                <!-- Legend -->
+                <circle cx="88" cy="352" r="4" fill="#3b82f6"/>
+                <text x="98" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="138" cy="352" r="4" fill="#ef4444"/>
+                <text x="148" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Vertretung</text>
+                <circle cx="198" cy="352" r="4" fill="#475569"/>
+                <text x="208" y="356" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Pause</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Mobile Card Mockup (inline SVG) -->
+          <div class="dash-shot">
+            <div class="dash-shot-label">
+              <span class="dash-label-dot dot-blue"></span>
+              Mobile Ansicht
+            </div>
+            <div class="dash-img-wrap dash-svg-wrap">
+              <svg viewBox="0 0 240 420" xmlns="http://www.w3.org/2000/svg" class="dash-svg">
+                <!-- Phone frame -->
+                <rect width="240" height="420" rx="24" fill="#0a0f1e"/>
+                <rect x="4" y="4" width="232" height="412" rx="21" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+                <!-- Notch -->
+                <rect x="80" y="8" width="80" height="12" rx="6" fill="#0a0f1e"/>
+                <!-- Status bar -->
+                <text x="20" y="30" fill="#64748b" font-size="8" font-family="Inter,sans-serif">10:30</text>
+                <text x="200" y="30" text-anchor="end" fill="#64748b" font-size="8" font-family="Inter,sans-serif">●●●</text>
+
+                <!-- Card -->
+                <rect x="12" y="40" width="216" height="360" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+
+                <!-- Card header -->
+                <text x="28" y="62" fill="#f1f5f9" font-size="10" font-weight="700" font-family="Inter,sans-serif">📅 Stundenplan</text>
+                <text x="28" y="75" fill="#64748b" font-size="8" font-family="Inter,sans-serif">Klasse 10b</text>
+                <text x="210" y="62" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Di, 13. Mai</text>
+
+                <!-- Day tabs -->
+                <rect x="12" y="82" width="216" height="22" fill="#162032"/>
+                <text x="38" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Mo</text>
+                <rect x="58" y="82" width="36" height="22" fill="#1d4ed8"/>
+                <text x="76" y="96" text-anchor="middle" fill="white" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Di</text>
+                <text x="114" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Mi</text>
+                <text x="152" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Do</text>
+                <text x="190" y="96" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Fr</text>
+
+                <!-- Rows -->
+                <rect x="12" y="104" width="216" height="26" fill="#0f172a"/>
+                <text x="28" y="120" fill="#475569" font-size="7" font-family="Inter,sans-serif">1</text>
+                <text x="50" y="120" fill="#64748b" font-size="7" font-family="Inter,sans-serif">07:45</text>
+                <text x="120" y="120" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Deutsch</text>
+
+                <rect x="12" y="130" width="216" height="26" fill="#111827"/>
+                <text x="28" y="146" fill="#475569" font-size="7" font-family="Inter,sans-serif">2</text>
+                <text x="50" y="146" fill="#64748b" font-size="7" font-family="Inter,sans-serif">08:35</text>
+                <text x="120" y="146" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Mathe</text>
+
+                <rect x="12" y="156" width="216" height="26" fill="#0f172a"/>
+                <text x="28" y="172" fill="#475569" font-size="7" font-family="Inter,sans-serif">3</text>
+                <text x="50" y="172" fill="#64748b" font-size="7" font-family="Inter,sans-serif">09:40</text>
+                <rect x="80" y="159" width="80" height="20" rx="4" fill="rgba(239,68,68,0.2)"/>
+                <text x="120" y="172" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">Chemie zt.</text>
+
+                <!-- Pause -->
+                <rect x="12" y="182" width="216" height="18" fill="#0a0f1e"/>
+                <line x1="12" y1="182" x2="228" y2="182" stroke="#1e293b" stroke-width="1"/>
+                <text x="120" y="194" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">Pause  11:15 – 11:40</text>
+
+                <rect x="12" y="200" width="216" height="26" fill="#111827"/>
+                <text x="28" y="216" fill="#475569" font-size="7" font-family="Inter,sans-serif">4</text>
+                <text x="50" y="216" fill="#64748b" font-size="7" font-family="Inter,sans-serif">11:40</text>
+                <text x="120" y="216" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Englisch</text>
+
+                <rect x="12" y="226" width="216" height="26" fill="#0f172a"/>
+                <text x="28" y="242" fill="#475569" font-size="7" font-family="Inter,sans-serif">5</text>
+                <text x="50" y="242" fill="#64748b" font-size="7" font-family="Inter,sans-serif">12:30</text>
+                <text x="120" y="242" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Sport</text>
+
+                <rect x="12" y="252" width="216" height="26" fill="#111827"/>
+                <text x="28" y="268" fill="#475569" font-size="7" font-family="Inter,sans-serif">6</text>
+                <text x="50" y="268" fill="#64748b" font-size="7" font-family="Inter,sans-serif">13:15</text>
+                <text x="120" y="268" text-anchor="middle" fill="#93c5fd" font-size="9" font-weight="600" font-family="Inter,sans-serif">Erdkunde</text>
+
+                <!-- Legend -->
+                <circle cx="28" cy="310" r="4" fill="#3b82f6"/>
+                <text x="38" y="314" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="80" cy="310" r="4" fill="#ef4444"/>
+                <text x="90" y="314" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Vertretung</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-features">
+          <div class="df-item">
+            <div class="df-dot dot-blue"></div>
+            <div>
+              <strong>Heute hervorgehoben</strong>
+              <span>Der aktuelle Tag wird farblich markiert</span>
+            </div>
+          </div>
+          <div class="df-item">
+            <div class="df-dot dot-red"></div>
+            <div>
+              <strong>Vertretungen rot markiert</strong>
+              <span>Sofort erkennbar auf einen Blick</span>
+            </div>
+          </div>
+          <div class="df-item">
+            <div class="df-dot dot-green"></div>
+            <div>
+              <strong>Pausen angezeigt</strong>
+              <span>Konfigurierbare Pausenzeiten</span>
+            </div>
+          </div>
+          <div class="df-item">
+            <div class="df-dot dot-purple"></div>
+            <div>
+              <strong>Theme-Integration</strong>
+              <span>Passt sich deinem HA-Theme an</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SENSORS -->
+    <section class="section" id="sensors">
+      <div class="container">
+        <div class="section-label">Sensoren</div>
+        <h2 class="section-title">Erstellte Sensoren</h2>
+        <p class="section-desc">Nach der Einrichtung stehen dir folgende Sensoren in Home Assistant zur Verfügung:</p>
+
+        <div class="sensors-grid">
+          <div class="sensor-card sensor-main">
+            <div class="sensor-icon">📅</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_week_table</code></div>
+            <div class="sensor-desc">Vollständige Wochenübersicht – wird von der Lovelace Card verwendet</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">📆</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_monday</code></div>
+            <div class="sensor-desc">Stundenplan für Montag</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">📆</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_tuesday</code></div>
+            <div class="sensor-desc">Stundenplan für Dienstag</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">📆</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_wednesday</code></div>
+            <div class="sensor-desc">Stundenplan für Mittwoch</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">📆</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_thursday</code></div>
+            <div class="sensor-desc">Stundenplan für Donnerstag</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">📆</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_friday</code></div>
+            <div class="sensor-desc">Stundenplan für Freitag</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TROUBLESHOOTING -->
+    <section class="section section-alt" id="troubleshooting">
+      <div class="container">
+        <div class="section-label">Hilfe</div>
+        <h2 class="section-title">Troubleshooting</h2>
+        <p class="section-desc">Etwas funktioniert nicht? Hier sind die häufigsten Probleme und ihre Lösungen.</p>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Card wird nicht angezeigt</summary>
+            <div class="faq-body">
+              <ol>
+                <li>Überprüfe, ob die VpMobile24 Integration installiert ist</li>
+                <li>Überprüfe, ob die Ressource korrekt hinzugefügt wurde (<code>/local/vpmobile24/vpmobile24-card.js</code>)</li>
+                <li>Leere den Browser-Cache mit <kbd>Strg</kbd> + <kbd>F5</kbd></li>
+                <li>Starte Home Assistant neu</li>
+              </ol>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Änderungen werden nicht übernommen</summary>
+            <div class="faq-body">
+              <ol>
+                <li>Leere den Browser-Cache mit <kbd>Strg</kbd> + <kbd>F5</kbd></li>
+                <li>Öffne die Browser-Konsole (<kbd>F12</kbd>) und prüfe auf Fehler</li>
+                <li>Stelle sicher, dass die neueste Version geladen wurde</li>
+              </ol>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Entity nicht gefunden / Sensor fehlt</summary>
+            <div class="faq-body">
+              <p>Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist und der Sensor <code>sensor.vpmobile24_week_table</code> existiert. Gehe zu <strong>Einstellungen → Geräte &amp; Dienste</strong> und prüfe den Status der Integration.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>404-Fehler bei der Ressource</summary>
+            <div class="faq-body">
+              <ol>
+                <li>Stelle sicher, dass die Integration installiert und geladen ist</li>
+                <li>Starte Home Assistant neu – die Card wird beim Start automatisch kopiert</li>
+                <li>Prüfe die Logs unter <strong>Einstellungen → System → Protokolle</strong></li>
+              </ol>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Stundenplan wird nicht aktualisiert</summary>
+            <div class="faq-body">
+              <p>Die Integration ruft Daten alle 15 Minuten ab. Prüfe deine Zugangsdaten und stelle sicher, dass deine Schule VpMobile24 / Stundenplan24 verwendet. Bei anhaltenden Problemen erstelle ein Issue auf GitHub.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-section">
+      <div class="container cta-inner">
+        <h2>Bereit loszulegen?</h2>
+        <p>Installiere VpMobile24 jetzt und hab deinen Stundenplan immer im Blick.</p>
+        <div class="cta-buttons">
+          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="btn btn-primary">GitHub Repository</a>
+          <a href="https://discord.gg/57uvCeRw43" class="btn btn-secondary">Discord Community</a>
+        </div>
+        <div class="version-badge">Version 2.3.0 · Beta</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">VpMobile<span class="accent">24</span></div>
+      <div class="footer-links">
+        <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24">GitHub</a>
+        <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues">Issues</a>
+        <a href="https://discord.gg/57uvCeRw43">Discord</a>
+        <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE">Lizenz</a>
+      </div>
+      <div class="footer-copy">Made with ❤️ for Home Assistant</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

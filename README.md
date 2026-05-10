@@ -1,11 +1,15 @@
 # VpMobile24 Home Assistant Integration
 
-Eine Home Assistant Integration zur Anzeige und Verarbeitung von VpMobile24-Stundenplänen inklusive Lovelace Card.
-
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 ![Version](https://img.shields.io/badge/Version-2.1.1-blue.svg)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
+
+<p align="center">
+  <a href="https://deine-website.de">
+    <img src="docs/Banner.png" alt="VpMobile24 Banner" width="100%">
+  </a>
+</p>
 
 ---
 
