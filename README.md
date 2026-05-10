@@ -5,9 +5,11 @@
 ![Version](https://img.shields.io/badge/Version-2.1.1-blue.svg)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
+![VpMobile24 Banner](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Banner.png)
+
 <p align="center">
   <a href="https://maximilian-andrew-kluge.github.io/VpMobile24/website/">
-    <img src="docs/Banner.png" alt="VpMobile24 Banner" width="100%">
+    <img src="https://img.shields.io/badge/🌐_Besuche_die_Website-blue?style=for-the-badge" alt="Website">
   </a>
 </p>
 
