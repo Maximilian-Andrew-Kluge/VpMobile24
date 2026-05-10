@@ -2,8 +2,12 @@
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const tabId = btn.dataset.tab;
+
+    // Update buttons
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+
+    // Update content
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabId).classList.add('active');
   });
@@ -14,7 +18,10 @@ function copyText(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Kopiert!';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => {
+      btn.textContent = 'Kopieren';
+      btn.classList.remove('copied');
+    }, 2000);
   });
 }
 
@@ -24,75 +31,14 @@ function copyPre(btn) {
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Kopiert!';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => {
+      btn.textContent = 'Kopieren';
+      btn.classList.remove('copied');
+    }, 2000);
   });
 }
 
-// ===== PASSWORD TOGGLE =====
-function togglePw() {
-  const input = document.getElementById('demo-pw');
-  const showIcon = document.getElementById('pw-eye-show');
-  const hideIcon = document.getElementById('pw-eye-hide');
-  if (input.type === 'password') {
-    input.type = 'text';
-    showIcon.style.display = 'none';
-    hideIcon.style.display = 'block';
-  } else {
-    input.type = 'password';
-    showIcon.style.display = 'block';
-    hideIcon.style.display = 'none';
-  }
-}
-
-// ===== DEMO FORM SUBMIT =====
-function handleDemoSubmit(e) {
-  e.preventDefault();
-  const school = document.getElementById('demo-school');
-  const user   = document.getElementById('demo-user');
-  const pw     = document.getElementById('demo-pw');
-  const cls    = document.getElementById('demo-class');
-  const msg    = document.getElementById('demo-msg');
-
-  // Clear errors
-  [school, user, pw, cls].forEach(f => f.classList.remove('ha-error'));
-  msg.style.display = 'none';
-
-  let valid = true;
-  if (!school.value.trim()) { school.classList.add('ha-error'); valid = false; }
-  if (!user.value.trim())   { user.classList.add('ha-error');   valid = false; }
-  if (!pw.value.trim())     { pw.classList.add('ha-error');     valid = false; }
-  if (!cls.value.trim())    { cls.classList.add('ha-error');    valid = false; }
-
-  if (!valid) {
-    msg.className = 'ha-demo-msg error';
-    msg.textContent = '⚠️ Bitte alle Pflichtfelder ausfüllen.';
-    msg.style.display = 'block';
-    return;
-  }
-
-  // Success state
-  msg.className = 'ha-demo-msg success';
-  msg.textContent = '✅ Demo erfolgreich! In Home Assistant würde die Integration jetzt eingerichtet werden.';
-  msg.style.display = 'block';
-
-  // Reset after 3s
-  setTimeout(() => {
-    msg.style.display = 'none';
-    [school, user, pw, cls].forEach(f => f.value = '');
-  }, 3500);
-}
-
-function resetDemo() {
-  const msg = document.getElementById('demo-msg');
-  msg.style.display = 'none';
-  ['demo-school','demo-user','demo-pw','demo-class'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = '';
-    el.classList.remove('ha-error');
-  });
-}
-
-// ===== SMOOTH SCROLL =====
+// ===== SMOOTH SCROLL for nav links =====
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const target = document.querySelector(a.getAttribute('href'));
