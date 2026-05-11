@@ -1,4 +1,4 @@
-"""Sensor platform für VpMobile24."""
+"""Sensor platform fÃ¼r VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -24,15 +24,15 @@ SENSOR_NAMES = {
         "changes": "VpMobile24 Changes"
     },
     "de": {
-        "next_lesson": "VpMobile24 Nächste Stunde",
+        "next_lesson": "VpMobile24 NÃ¤chste Stunde",
         "week_schedule": "VpMobile24 Heutiger Stundenplan",
         "additional_info": "VpMobile24 Zusatzinfos", 
-        "changes": "VpMobile24 Änderungen"
+        "changes": "VpMobile24 Ã„nderungen"
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
         "week_schedule": "VpMobile24 Emploi Aujourd'hui",
-        "additional_info": "VpMobile24 Infos Supplémentaires",
+        "additional_info": "VpMobile24 Infos SupplÃ©mentaires",
         "changes": "VpMobile24 Changements"
     }
 }
@@ -61,19 +61,19 @@ STATE_MESSAGES = {
         "no_additional_info": "Keine Zusatzinfos",
         "additional_info": "Zusatzinfo",
         "additional_infos": "Zusatzinfos",
-        "no_changes": "Keine Änderungen", 
-        "change": "Änderung",
-        "changes": "Änderungen"
+        "no_changes": "Keine Ã„nderungen", 
+        "change": "Ã„nderung",
+        "changes": "Ã„nderungen"
     },
     "fr": {
-        "no_data": "Aucune donnée",
+        "no_data": "Aucune donnÃ©e",
         "no_lessons_today": "Plus de cours aujourd'hui",
         "no_lessons": "Aucun cours aujourd'hui",
         "lesson_today": "cours aujourd'hui", 
         "lessons_today": "cours aujourd'hui",
-        "no_additional_info": "Aucune info supplémentaire",
-        "additional_info": "info supplémentaire",
-        "additional_infos": "infos supplémentaires",
+        "no_additional_info": "Aucune info supplÃ©mentaire",
+        "additional_info": "info supplÃ©mentaire",
+        "additional_infos": "infos supplÃ©mentaires",
         "no_changes": "Aucun changement",
         "change": "changement", 
         "changes": "changements"
@@ -104,7 +104,7 @@ async def async_setup_entry(
 
 
 class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für die nächste Unterrichtsstunde."""
+    """Sensor fÃ¼r die nÃ¤chste Unterrichtsstunde."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
@@ -123,12 +123,12 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.3.0",
+            "sw_version": "2.4.1",
         }
 
     @property
     def state(self) -> str | None:
-        """Gib den Status des Sensors zurück."""
+        """Gib den Status des Sensors zurÃ¼ck."""
         if not self.coordinator.data:
             return STATE_MESSAGES[self._language]["no_data"]
         
@@ -142,7 +142,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib zusätzliche Attribute zurück."""
+        """Gib zusÃ¤tzliche Attribute zurÃ¼ck."""
         if not self.coordinator.data:
             return {}
         
@@ -163,7 +163,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
         }
 
     def _get_next_lesson(self) -> dict[str, Any] | None:
-        """Finde die nächste Stunde nur für heute."""
+        """Finde die nÃ¤chste Stunde nur fÃ¼r heute."""
         if not self.coordinator.data:
             return None
             
@@ -190,13 +190,13 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
                         lesson_hour, lesson_minute = map(int, time_start.split(":"))
                         lesson_datetime = datetime.combine(lesson_date, datetime.min.time().replace(hour=lesson_hour, minute=lesson_minute))
                         
-                        # Nur zukünftige Stunden von heute
+                        # Nur zukÃ¼nftige Stunden von heute
                         if lesson_datetime > current_datetime:
                             today_lessons.append((lesson_datetime, lesson))
                 except (ValueError, TypeError):
                     continue
         
-        # Sortiere nach Zeit und gib die erste zurück
+        # Sortiere nach Zeit und gib die erste zurÃ¼ck
         if today_lessons:
             today_lessons.sort(key=lambda x: x[0])
             return today_lessons[0][1]
@@ -205,7 +205,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für den kompletten Wochenstundenplan."""
+    """Sensor fÃ¼r den kompletten Wochenstundenplan."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
@@ -224,19 +224,19 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.3.0",
+            "sw_version": "2.4.1",
         }
 
     @property
     def state(self) -> str | None:
-        """Gib den Status des Sensors zurück."""
+        """Gib den Status des Sensors zurÃ¼ck."""
         if not self.coordinator.data:
             return STATE_MESSAGES[self._language]["no_data"]
         
         lessons = self.coordinator.data.get("lessons", [])
         changes = self.coordinator.data.get("changes", [])
         
-        # Filtere nur heutige Stunden - ALLE Stunden (normale + geänderte)
+        # Filtere nur heutige Stunden - ALLE Stunden (normale + geÃ¤nderte)
         today = datetime.now().date().isoformat()
         today_lessons = []
         
@@ -246,13 +246,13 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             if lesson_date == today:
                 today_lessons.append(lesson)
         
-        # Geänderte Stunden (diese sind auch Stunden!)
+        # GeÃ¤nderte Stunden (diese sind auch Stunden!)
         for change in changes:
             change_date = change.get("date", "")
             if change_date == today:
                 today_lessons.append(change)
         
-        # Zeige alle heutigen Stunden (normale + geänderte)
+        # Zeige alle heutigen Stunden (normale + geÃ¤nderte)
         lesson_count = len(today_lessons)
         
         if lesson_count == 0:
@@ -264,14 +264,14 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib den kompletten heutigen Stundenplan zurück."""
+        """Gib den kompletten heutigen Stundenplan zurÃ¼ck."""
         if not self.coordinator.data:
             return {}
         
         lessons = self.coordinator.data.get("lessons", [])
         changes = self.coordinator.data.get("changes", [])
         
-        # Filtere nur heutige Stunden - ALLE Stunden (normale + geänderte)
+        # Filtere nur heutige Stunden - ALLE Stunden (normale + geÃ¤nderte)
         today = datetime.now().date().isoformat()
         all_today_lessons = []
         subjects_count = {}
@@ -283,30 +283,30 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             if lesson_date == today:
                 all_today_lessons.append(lesson)
         
-        # Geänderte Stunden (diese sind auch Stunden!)
+        # GeÃ¤nderte Stunden (diese sind auch Stunden!)
         for change in changes:
             change_date = change.get("date", "")
             if change_date == today:
                 all_today_lessons.append(change)
         
-        # Verarbeite alle heutigen Stunden (normale + geänderte)
-        # Erst sortieren nach Stunde für Doppelstunden-Erkennung
+        # Verarbeite alle heutigen Stunden (normale + geÃ¤nderte)
+        # Erst sortieren nach Stunde fÃ¼r Doppelstunden-Erkennung
         all_today_lessons.sort(key=lambda x: int(x.get("period", "0")) if x.get("period", "").isdigit() else 0)
         
-        # Doppelstunden-Erkennung und fehlende Stunden ergänzen
+        # Doppelstunden-Erkennung und fehlende Stunden ergÃ¤nzen
         completed_lessons = self._complete_double_lessons(all_today_lessons)
         
         today_lessons = []
         for lesson in completed_lessons:
             subject = lesson.get("subject", "Unbekannt")
             
-            # Zähle Fächer
+            # ZÃ¤hle FÃ¤cher
             if subject in subjects_count:
                 subjects_count[subject] += 1
             else:
                 subjects_count[subject] = 1
             
-            # Erstelle lesson_info für alle heutigen Stunden
+            # Erstelle lesson_info fÃ¼r alle heutigen Stunden
             lesson_info = {
                 "zeit": lesson.get("time", ""),
                 "fach": lesson.get("subject", ""),
@@ -323,7 +323,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             if lesson.get("ist_doppelstunde"):
                 lesson_info["ist_doppelstunde"] = True
             
-            # Prüfe ob Stunde bereits vorbei ist
+            # PrÃ¼fe ob Stunde bereits vorbei ist
             time_start = lesson.get("time_start", "")
             if time_start and ":" in time_start:
                 try:
@@ -350,17 +350,17 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "faecher_anzahl": subjects_count,
             "gesamt_stunden": len(today_lessons),
             "datum": today,
-            "status": f"Zeige alle {len(today_lessons)} Stunden von heute (normale + geänderte)",
+            "status": f"Zeige alle {len(today_lessons)} Stunden von heute (normale + geÃ¤nderte)",
             "klasse": getattr(self.coordinator, 'class_name', ''),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
         }
 
     def _complete_double_lessons(self, lessons: list) -> list:
-        """Ergänze fehlende Stunden für Doppelstunden."""
+        """ErgÃ¤nze fehlende Stunden fÃ¼r Doppelstunden."""
         if not lessons:
             return lessons
         
-        # Erstelle ein Dictionary mit Stunden als Schlüssel
+        # Erstelle ein Dictionary mit Stunden als SchlÃ¼ssel
         lessons_by_period = {}
         for lesson in lessons:
             period = lesson.get("period", "")
@@ -374,7 +374,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
         
         completed_lessons = []
         
-        # Gehe durch alle möglichen Stunden (1-8 typisch)
+        # Gehe durch alle mÃ¶glichen Stunden (1-8 typisch)
         min_period = min(existing_periods)
         max_period = max(existing_periods)
         
@@ -383,7 +383,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                 # Stunde existiert bereits
                 completed_lessons.append(lessons_by_period[period])
             else:
-                # Stunde fehlt - prüfe auf Doppelstunde
+                # Stunde fehlt - prÃ¼fe auf Doppelstunde
                 prev_lesson = lessons_by_period.get(period - 1)
                 next_lesson = lessons_by_period.get(period + 1)
                 
@@ -393,12 +393,12 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                     double_lesson = prev_lesson.copy()
                     double_lesson["period"] = str(period)
                     
-                    # Berechne Zeit für die nächste Stunde (45 Min später)
+                    # Berechne Zeit fÃ¼r die nÃ¤chste Stunde (45 Min spÃ¤ter)
                     prev_time_start = prev_lesson.get("time_start", "")
                     if prev_time_start and ":" in prev_time_start:
                         try:
                             hour, minute = map(int, prev_time_start.split(":"))
-                            # 45 Minuten später
+                            # 45 Minuten spÃ¤ter
                             minute += 45
                             if minute >= 60:
                                 hour += 1
@@ -415,22 +415,22 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                             # Fallback: verwende Zeit der vorherigen Stunde
                             pass
                     
-                    # Markiere als automatisch ergänzte Doppelstunde
+                    # Markiere als automatisch ergÃ¤nzte Doppelstunde
                     double_lesson["ist_doppelstunde"] = True
                     completed_lessons.append(double_lesson)
                 
-                # Wenn nächste Stunde existiert und gleiches Fach hat
+                # Wenn nÃ¤chste Stunde existiert und gleiches Fach hat
                 elif next_lesson and next_lesson.get("subject"):
-                    # Erstelle Doppelstunde basierend auf nächster Stunde
+                    # Erstelle Doppelstunde basierend auf nÃ¤chster Stunde
                     double_lesson = next_lesson.copy()
                     double_lesson["period"] = str(period)
                     
-                    # Berechne Zeit für die vorherige Stunde (45 Min früher)
+                    # Berechne Zeit fÃ¼r die vorherige Stunde (45 Min frÃ¼her)
                     next_time_start = next_lesson.get("time_start", "")
                     if next_time_start and ":" in next_time_start:
                         try:
                             hour, minute = map(int, next_time_start.split(":"))
-                            # 45 Minuten früher
+                            # 45 Minuten frÃ¼her
                             minute -= 45
                             if minute < 0:
                                 hour -= 1
@@ -444,10 +444,10 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                             double_lesson["time"] = f"{new_time_start}-{new_time_end}"
                             
                         except (ValueError, TypeError):
-                            # Fallback: verwende Zeit der nächsten Stunde
+                            # Fallback: verwende Zeit der nÃ¤chsten Stunde
                             pass
                     
-                    # Markiere als automatisch ergänzte Doppelstunde
+                    # Markiere als automatisch ergÃ¤nzte Doppelstunde
                     double_lesson["ist_doppelstunde"] = True
                     completed_lessons.append(double_lesson)
         
@@ -455,7 +455,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für die komplette Wochenstundenplan-Tabelle."""
+    """Sensor fÃ¼r die komplette Wochenstundenplan-Tabelle."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
@@ -474,12 +474,12 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.3.0",
+            "sw_version": "2.4.1",
         }
 
     @property
     def state(self) -> str | None:
-        """Gib den Status des Sensors zurück."""
+        """Gib den Status des Sensors zurÃ¼ck."""
         if not self.coordinator.data:
             return "Keine Daten"
         
@@ -496,7 +496,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib die kompletten Wochendaten als Tabelle zurück."""
+        """Gib die kompletten Wochendaten als Tabelle zurÃ¼ck."""
         if not self.coordinator.data:
             return {}
         
@@ -533,7 +533,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             for period in range(1, 11):  # Stunden 1-10
                 week_table[day][str(period)] = None
         
-        # Fülle Tabelle mit Stunden
+        # FÃ¼lle Tabelle mit Stunden
         for lesson in all_lessons:
             lesson_date = lesson.get("date", "")
             period = lesson.get("period", "")
@@ -569,10 +569,9 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für zusätzliche Informationen."""
+    """Sensor fÃ¼r zusÃ¤tzliche Informationen â€“ gesamte Woche."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
-        """Initialisiere den Sensor."""
         super().__init__(coordinator)
         self._config_entry = config_entry
         self._language = language
@@ -582,91 +581,118 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def device_info(self):
-        """Return device information."""
         return {
             "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.3.0",
+            "sw_version": "2.4.1",
         }
 
     @property
     def state(self) -> str | None:
-        """Gib den Status des Sensors zurück."""
         if not self.coordinator.data:
             return STATE_MESSAGES[self._language]["no_data"]
-        
-        # Debug: Log what data we have
-        _LOGGER.debug(f"Coordinator data keys: {list(self.coordinator.data.keys())}")
-        
-        # Zähle ZusatzInfo aus XML
-        additional_info = self.coordinator.data.get("additional_info", [])
-        _LOGGER.debug(f"Additional info count: {len(additional_info)}")
-        
-        # Zähle auch Zusatzinfos aus Stunden
-        lessons = self.coordinator.data.get("lessons", [])
-        lesson_info_count = 0
-        for lesson in lessons:
-            if lesson.get("info"):
-                lesson_info_count += 1
-        
-        total_info_count = len(additional_info) + lesson_info_count
-        _LOGGER.debug(f"Total info count: {total_info_count} (additional: {len(additional_info)}, lessons: {lesson_info_count})")
-        
-        if total_info_count == 0:
+
+        week_infos = self._build_week_infos()
+        total = sum(
+            len(v.get("allgemeine_infos", [])) + len(v.get("stunden_infos", []))
+            for v in week_infos.values()
+        )
+
+        if total == 0:
             return STATE_MESSAGES[self._language]["no_additional_info"]
-        elif total_info_count == 1:
+        elif total == 1:
             return f"1 {STATE_MESSAGES[self._language]['additional_info']}"
         else:
-            return f"{total_info_count} {STATE_MESSAGES[self._language]['additional_infos']}"
+            return f"{total} {STATE_MESSAGES[self._language]['additional_infos']}"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib alle zusätzlichen Informationen zurück."""
         if not self.coordinator.data:
             return {}
-        
-        # ZusatzInfo aus XML - nur der Text ohne typ
-        additional_info = self.coordinator.data.get("additional_info", [])
-        _LOGGER.debug(f"Additional info raw data: {additional_info}")
-        general_infos = []
-        for info in additional_info:
-            if isinstance(info, dict):
-                text = info.get("text", "").strip()
-            else:
-                text = str(info).strip()
-            if text:
-                general_infos.append(text)
-        
-        _LOGGER.debug(f"Processed general_infos: {general_infos}")
-        
-        # Zusatzinfos aus Stunden - nur der Text
-        lessons = self.coordinator.data.get("lessons", [])
-        lesson_infos = []
-        for lesson in lessons:
-            if lesson.get("info"):
-                lesson_text = lesson["info"].strip()
-                if lesson_text:
-                    # Optional: Kontext hinzufügen (Fach und Zeit)
-                    context = ""
-                    if lesson.get("subject") and lesson.get("time"):
-                        context = f" ({lesson['subject']} - {lesson['time']})"
-                    lesson_infos.append(f"{lesson_text}{context}")
-        
+
+        week_infos = self._build_week_infos()
+
+        # Flatten today's infos for backwards compatibility
+        today_str = datetime.now().date().isoformat()
+        today_key = self._date_to_weekday_key(today_str)
+        today_data = week_infos.get(today_key, {})
+
         return {
-            "allgemeine_infos": general_infos,
-            "stunden_infos": lesson_infos,
-            "anzahl_allgemeine_infos": len(general_infos),
-            "anzahl_stunden_infos": len(lesson_infos),
-            "gesamt_infos": len(general_infos) + len(lesson_infos),
-            "datum": self.coordinator.data.get("date", ""),
+            # Per-day infos for the whole week
+            "week_infos": week_infos,
+            # Today's infos (backwards compat)
+            "allgemeine_infos": today_data.get("allgemeine_infos", []),
+            "stunden_infos":    today_data.get("stunden_infos", []),
+            # Counts
+            "anzahl_allgemeine_infos": len(today_data.get("allgemeine_infos", [])),
+            "anzahl_stunden_infos":    len(today_data.get("stunden_infos", [])),
+            "gesamt_infos": sum(
+                len(v.get("allgemeine_infos", [])) + len(v.get("stunden_infos", []))
+                for v in week_infos.values()
+            ),
+            "datum": today_str,
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
         }
 
+    # â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    def _date_to_weekday_key(self, date_str: str) -> str:
+        """Convert ISO date string to weekday key (monday â€¦ friday)."""
+        keys = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        try:
+            wd = datetime.fromisoformat(date_str).weekday()  # 0=Mon
+            return keys[wd] if 0 <= wd <= 4 else ""
+        except (ValueError, TypeError):
+            return ""
+
+    def _build_week_infos(self) -> dict:
+        """Build a dict with per-day additional infos for the whole week."""
+        weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday"]
+        result: dict[str, dict] = {d: {"allgemeine_infos": [], "stunden_infos": [], "datum": ""} for d in weekdays}
+
+        data = self.coordinator.data or {}
+
+        # â”€â”€ General ZusatzInfo from XML (stored per-day in week_data_cache) â”€â”€
+        # The coordinator caches raw day data; we read additional_info per date
+        week_data_cache: dict = getattr(self.coordinator, "_week_data_cache", {})
+        for date_str, day_cache in week_data_cache.items():
+            key = self._date_to_weekday_key(date_str)
+            if not key:
+                continue
+            result[key]["datum"] = date_str
+            for info in day_cache.get("additional_info", []):
+                text = info.get("text", "").strip() if isinstance(info, dict) else str(info).strip()
+                if text and text not in result[key]["allgemeine_infos"]:
+                    result[key]["allgemeine_infos"].append(text)
+
+        # â”€â”€ Lesson-level info (If field) â”€â”€
+        all_lessons = data.get("week_lessons", []) + data.get("week_changes", []) + data.get("lessons", []) + data.get("changes", [])
+        seen: set = set()
+        for lesson in all_lessons:
+            info_text = (lesson.get("info") or "").strip()
+            if not info_text:
+                continue
+            date_str = lesson.get("date", "")
+            key = self._date_to_weekday_key(date_str)
+            if not key:
+                continue
+            # Build context string
+            subject = lesson.get("subject", "")
+            time_val = lesson.get("time", "")
+            context = f" ({subject} â€“ {time_val})" if subject and time_val else (f" ({subject})" if subject else "")
+            entry = f"{info_text}{context}"
+            uid = (key, entry)
+            if uid not in seen:
+                seen.add(uid)
+                result[key]["stunden_infos"].append(entry)
+
+        return result
+
 
 class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für Stundenplanänderungen und Vertretungen."""
+    """Sensor fÃ¼r StundenplanÃ¤nderungen und Vertretungen."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Sensor."""
@@ -685,19 +711,19 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.3.0",
+            "sw_version": "2.4.1",
         }
 
     @property
     def state(self) -> str | None:
-        """Gib den Status des Sensors zurück."""
+        """Gib den Status des Sensors zurÃ¼ck."""
         if not self.coordinator.data:
             return STATE_MESSAGES[self._language]["no_data"]
         
         changes = self.coordinator.data.get("changes", [])
         lessons = self.coordinator.data.get("lessons", [])
         
-        # Filtere Änderungen nach ausgewählten Fächern
+        # Filtere Ã„nderungen nach ausgewÃ¤hlten FÃ¤chern
         excluded_subjects = getattr(self.coordinator, 'excluded_subjects', [])
         
         filtered_changes = []
@@ -706,7 +732,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             if subject and subject not in excluded_subjects:
                 filtered_changes.append(change)
         
-        # Zähle Vertretungen in den Stunden (bereits gefiltert durch Coordinator)
+        # ZÃ¤hle Vertretungen in den Stunden (bereits gefiltert durch Coordinator)
         substitution_count = 0
         for lesson in lessons:
             if lesson.get("is_change"):
@@ -723,24 +749,24 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Gib alle Änderungen und Vertretungen zurück."""
+        """Gib alle Ã„nderungen und Vertretungen zurÃ¼ck."""
         if not self.coordinator.data:
             return {}
         
         changes = self.coordinator.data.get("changes", [])
         lessons = self.coordinator.data.get("lessons", [])
         
-        # Filtere Änderungen nach ausgewählten Fächern
+        # Filtere Ã„nderungen nach ausgewÃ¤hlten FÃ¤chern
         excluded_subjects = getattr(self.coordinator, 'excluded_subjects', [])
         
         all_changes = []
         
-        # Explizite Änderungen - nur für ausgewählte Fächer
+        # Explizite Ã„nderungen - nur fÃ¼r ausgewÃ¤hlte FÃ¤cher
         for change in changes:
             subject = change.get("subject", "")
             if subject and subject not in excluded_subjects:
                 change_entry = {
-                    "typ": "Änderung",
+                    "typ": "Ã„nderung",
                     "zeit": change.get("time", ""),
                     "fach": change.get("subject", ""),
                     "datum": change.get("date", ""),

@@ -1,5 +1,5 @@
-﻿// VpMobile24 Card v2.4.0
-console.info('%c VpMobile24-CARD %c v2.4.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.1
+console.info('%c VpMobile24-CARD %c v2.4.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -99,12 +99,27 @@ class VpMobile24Card extends HTMLElement {
   setConfig(config) {
     if (!config || !config.entity) throw new Error('Entity ist erforderlich');
     this._config = JSON.parse(JSON.stringify(config));
+    this._popupOpen = false;
+    this._popupData = null;
+    this._infoPopupOpen = false;
     if (this._hass) this._render();
   }
 
   set hass(hass) {
     this._hass = hass;
-    if (this._config) this._render();
+    if (this._config) {
+      const anyPopupOpen = this._popupOpen || this._infoPopupOpen;
+      if (anyPopupOpen) {
+        // Only update table content, keep popups alive
+        this._updateTableOnly();
+        // If info popup is open, refresh its content with latest data
+        if (this._infoPopupOpen) {
+          this._renderInfoPopupContent();
+        }
+      } else {
+        this._render();
+      }
+    }
   }
   get hass() { return this._hass; }
   getCardSize() { return 6; }
@@ -116,24 +131,207 @@ class VpMobile24Card extends HTMLElement {
 
   _showInfoPopup() {
     if (!this._config.additional_info_entity) return;
-    const ent = this._hass.states[this._config.additional_info_entity];
-    if (!ent) return;
-    const infos = [...(ent.attributes.allgemeine_infos||[]), ...(ent.attributes.stunden_infos||[])];
-    const html = infos.length ? infos.map(i=>`<div class="info-item">${i}</div>`).join('') : '<div class="info-item">Keine Zusatzinformationen</div>';
-    this.shadowRoot.getElementById('popup-content').innerHTML = html;
-    this.shadowRoot.getElementById('popup').classList.remove('hidden');
-    this.shadowRoot.getElementById('popup-overlay').classList.remove('hidden');
+    this._infoPopupOpen = true;
+    this._renderInfoPopupContent();
+  }
+
+  _renderInfoPopupContent() {
+    const popup   = this.shadowRoot.getElementById('info-popup');
+    const overlay = this.shadowRoot.getElementById('info-popup-overlay');
+    const content = this.shadowRoot.getElementById('info-popup-content');
+    if (!popup || !overlay || !content) return;
+
+    const wdKeys = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    const wdDE   = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const todayIdx = new Date().getDay();
+    const todayKey = wdKeys[todayIdx];
+    const todayName = wdDE[todayIdx];
+
+    const ent = this._hass && this._config.additional_info_entity
+      ? this._hass.states[this._config.additional_info_entity]
+      : null;
+
+    // Try week_infos first (new sensor format), fall back to flat arrays
+    const weekInfos = ent && ent.attributes && ent.attributes.week_infos;
+    let allg  = [];
+    let stund = [];
+
+    if (weekInfos && weekInfos[todayKey]) {
+      allg  = weekInfos[todayKey].allgemeine_infos  || [];
+      stund = weekInfos[todayKey].stunden_infos     || [];
+    } else if (ent && ent.attributes) {
+      // Fallback: flat arrays (old sensor format) — filter by today's name
+      const rawAllg  = ent.attributes.allgemeine_infos  || [];
+      const rawStund = ent.attributes.stunden_infos     || [];
+      const filterDay = (arr) => arr.filter(t => {
+        const text = String(t);
+        const hasDayRef = wdDE.some(d => text.includes(d));
+        return !hasDayRef || text.includes(todayName);
+      });
+      allg  = filterDay(rawAllg);
+      stund = filterDay(rawStund);
+    }
+
+    let html = '';
+
+    if (allg.length > 0) {
+      html += '<div class="vp-info-section">'
+        + '<div class="vp-info-section-label">📢 Allgemeine Informationen</div>'
+        + allg.map(t => '<div class="vp-info-entry"><span>' + t + '</span></div>').join('')
+        + '</div>';
+    }
+
+    if (!html) {
+      html = '<div class="vp-info-none">Keine Zusatzinformationen für ' + todayName + ' verfügbar.</div>';
+    } else {
+      html += '<div style="height:8px"></div>';
+    }
+
+    content.innerHTML = html;
+    popup.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+  }
+
+  _closeInfoPopup() {
+    this._infoPopupOpen = false;
+    const popup   = this.shadowRoot.getElementById('info-popup');
+    const overlay = this.shadowRoot.getElementById('info-popup-overlay');
+    if (popup)   popup.classList.add('hidden');
+    if (overlay) overlay.classList.add('hidden');
   }
 
   _closePopup() {
-    this.shadowRoot.getElementById('popup').classList.add('hidden');
-    this.shadowRoot.getElementById('popup-overlay').classList.add('hidden');
+    this._popupOpen = false;
+    this._popupData = null;
+    const popup   = this.shadowRoot.getElementById('popup');
+    const overlay = this.shadowRoot.getElementById('popup-overlay');
+    if (popup)   popup.classList.add('hidden');
+    if (overlay) overlay.classList.add('hidden');
+  }
+
+  _showLessonDetail(lesson, dayName, slotPeriod, slotTime) {
+    // Save state so re-renders don't close the popup
+    this._popupOpen = true;
+    this._popupData = { lesson, dayName, slotPeriod, slotTime };
+    this._renderPopupContent(lesson, dayName, slotPeriod, slotTime);
+  }
+
+  _renderPopupContent(lesson, dayName, slotPeriod, slotTime) {
+    const popup   = this.shadowRoot.getElementById('popup');
+    const overlay = this.shadowRoot.getElementById('popup-overlay');
+    const title   = this.shadowRoot.getElementById('popup-title');
+    const content = this.shadowRoot.getElementById('popup-content');
+    if (!popup || !overlay || !title || !content) return;
+
+    const fach   = (lesson && lesson.fach)    || '—';
+    const lehrer = (lesson && lesson.lehrer)  || '';
+    const raum   = (lesson && lesson.raum)    || '';
+    const zeit   = (lesson && lesson.zeit)    || slotTime || '';
+    const isSub  = !!(lesson && lesson.ist_vertretung);
+    const info   = (lesson && lesson.zusatzinfo) || '';
+
+    // Title
+    const subBadge = isSub
+      ? '<span class="vp-detail-badge vp-detail-sub">Vertretung</span>'
+      : '';
+    title.innerHTML =
+      '<span class="vp-detail-num">' + slotPeriod + '. Stunde</span>' +
+      '<span class="vp-detail-fach">' + fach + '</span>' +
+      subBadge;
+
+    // Rows
+    let rows = '';
+    rows += '<div class="vp-detail-row">'
+      + '<span class="vp-detail-icon">📅</span>'
+      + '<span class="vp-detail-label">Tag</span>'
+      + '<span class="vp-detail-val">' + dayName + '</span></div>';
+
+    if (zeit) rows += '<div class="vp-detail-row">'
+      + '<span class="vp-detail-icon">🕐</span>'
+      + '<span class="vp-detail-label">Zeit</span>'
+      + '<span class="vp-detail-val">' + zeit + '</span></div>';
+
+    if (lehrer) rows += '<div class="vp-detail-row">'
+      + '<span class="vp-detail-icon">👤</span>'
+      + '<span class="vp-detail-label">Lehrer</span>'
+      + '<span class="vp-detail-val">' + lehrer + '</span></div>';
+
+    if (raum) rows += '<div class="vp-detail-row">'
+      + '<span class="vp-detail-icon">🚪</span>'
+      + '<span class="vp-detail-label">Raum</span>'
+      + '<span class="vp-detail-val">' + raum + '</span></div>';
+
+    if (info) rows += '<div class="vp-detail-row vp-detail-info-row">'
+      + '<span class="vp-detail-icon">ℹ️</span>'
+      + '<span class="vp-detail-label">Info</span>'
+      + '<span class="vp-detail-val">' + info + '</span></div>';
+
+    if (!lehrer && !raum && !info) {
+      rows += '<div class="vp-detail-empty">Keine weiteren Details verfügbar</div>';
+    }
+
+    content.innerHTML = rows;
+    popup.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+  }
+
+  // Update only table body without destroying popup
+  _updateTableOnly() {
+    if (!this._hass || !this._config) return;
+    const entity = this._hass.states[this._config.entity];
+    if (!entity) return;
+    const weekTable = entity.attributes && entity.attributes.week_table;
+    if (!weekTable) return;
+
+    const showTime       = this._config.show_time !== false;
+    const highlightToday = this._config.highlight_today !== false;
+    const useCustomTimes = this._config.use_custom_times === true;
+    const days    = ['Mo','Di','Mi','Do','Fr'];
+    const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
+    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const todayDow = new Date().getDay();
+    const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
+    const slots = this._buildTimeSlots(useCustomTimes);
+
+    const tbody = this.shadowRoot.querySelector('.vp-table tbody');
+    if (!tbody) { this._render(); return; }
+
+    let bodyHtml = '';
+    slots.forEach(slot => {
+      if (slot.isPause) {
+        bodyHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">Pause ' + slot.time + '</div></td></tr>';
+      } else {
+        const numHtml = showTime
+          ? '<div class="vp-snum">' + slot.period + '</div><div class="vp-stime">' + slot.time + '</div>'
+          : '<div class="vp-snum">' + slot.period + '</div>';
+        bodyHtml += '<tr><td class="vp-td-num">' + numHtml + '</td>';
+        days.forEach((d, di) => {
+          const lesson = (weekTable[dayKeys[di]] || {})[slot.lessonNumber];
+          const isToday = di === todayIdx;
+          let cls = 'vp-tile';
+          let text = '';
+          if (lesson && lesson.fach) {
+            text = lesson.fach;
+            if (lesson.ist_vertretung) cls += ' vp-sub';
+            else if (isToday) cls += ' vp-today-tile';
+            cls += ' vp-tile-clickable';
+          } else {
+            cls += isToday ? ' vp-today-tile vp-empty' : ' vp-empty';
+          }
+          const onclickAttr = (lesson && lesson.fach)
+            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\')"'
+            : '';
+          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + '>' + text + '</div></td>';
+        });
+        bodyHtml += '</tr>';
+      }
+    });
+    tbody.innerHTML = bodyHtml;
   }
 
   _switchMobDay(idx) {
-    // Re-render mobile content for selected day index
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
-    const days    = ['Mo','Di','Mi','Do','Fr'];
+    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
     const showTime = this._config.show_time !== false;
     const useCustomTimes = this._config.use_custom_times === true;
     const entity = this._hass && this._hass.states[this._config.entity];
@@ -142,6 +340,7 @@ class VpMobile24Card extends HTMLElement {
 
     const slots = this._buildTimeSlots(useCustomTimes);
     const sched = weekTable[dayKeys[idx]] || {};
+    const dName = dayFullNames[idx];
 
     let rows = '';
     slots.forEach(slot => {
@@ -156,22 +355,25 @@ class VpMobile24Card extends HTMLElement {
           subj = lesson.fach;
           isSub = !!lesson.ist_vertretung;
           if (isSub) rowCls += ' vp-mob-sub';
+          rowCls += ' vp-mob-clickable';
         } else {
           rowCls += ' vp-mob-empty';
         }
+        const onclickAttr = (lesson && lesson.fach)
+          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\')"'
+          : '';
         const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
           + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
         const subjPart = subj
           ? '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>'
           : '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
-        rows += '<div class="' + rowCls + '">' + numPart + subjPart + '</div>';
+        rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
       }
     });
 
     const content = this.shadowRoot.getElementById('vp-mob-content');
     if (content) content.innerHTML = rows;
 
-    // Update tab active state
     this.shadowRoot.querySelectorAll('.vp-mob-tab').forEach((btn, i) => {
       btn.classList.toggle('vp-mob-tab-active', i === idx);
     });
@@ -254,6 +456,20 @@ class VpMobile24Card extends HTMLElement {
 
     const slots = this._buildTimeSlots(useCustomTimes);
 
+    // ── INFO BUTTON & POPUP DATA ──
+    let infoBtn = '';
+    let infoBtnHasInfo = false;
+    if (this._config.additional_info_entity) {
+      const infoEnt = this._hass.states[this._config.additional_info_entity];
+      if (infoEnt && infoEnt.attributes) {
+        const allg  = infoEnt.attributes.allgemeine_infos  || [];
+        const stund = infoEnt.attributes.stunden_infos     || [];
+        infoBtnHasInfo = (allg.length + stund.length) > 0;
+      }
+      const pulseClass = infoBtnHasInfo ? ' has-info' : '';
+      infoBtn = '<button class="vp-info-btn' + pulseClass + '" onclick="this.getRootNode().host._showInfoPopup()" title="Zusatzinformationen">ⓘ</button>';
+    }
+
     // ── TABLE HTML ──
     let tableHtml = '<table class="vp-table"><thead><tr><th class="vp-th-num">#</th>';
     days.forEach((d, i) => {
@@ -273,6 +489,7 @@ class VpMobile24Card extends HTMLElement {
           ? '<div class="vp-snum">' + slot.period + '</div><div class="vp-stime">' + slot.time + '</div>'
           : '<div class="vp-snum">' + slot.period + '</div>';
         tableHtml += '<tr><td class="vp-td-num">' + numHtml + '</td>';
+        const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
         days.forEach((d, di) => {
           const lesson = (weekTable[dayKeys[di]] || {})[slot.lessonNumber];
           const isToday = di === todayIdx;
@@ -282,10 +499,14 @@ class VpMobile24Card extends HTMLElement {
             text = lesson.fach;
             if (lesson.ist_vertretung) cls += ' vp-sub';
             else if (isToday) cls += ' vp-today-tile';
+            cls += ' vp-tile-clickable';
           } else {
             cls += isToday ? ' vp-today-tile vp-empty' : ' vp-empty';
           }
-          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '">' + text + '</div></td>';
+          const onclickAttr = (lesson && lesson.fach)
+            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\')"'
+            : '';
+          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + '>' + text + '</div></td>';
         });
         tableHtml += '</tr>';
       }
@@ -308,8 +529,10 @@ class VpMobile24Card extends HTMLElement {
     mobTabs += '</div>';
 
     // Build rows for a given day
-    const buildMobRows = (dayKey) => {
+    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const buildMobRows = (dayKey, dayIdx) => {
       const sched = weekTable[dayKey] || {};
+      const dName = dayFullNames[dayIdx] || dayKey;
       let rows = '';
       slots.forEach(slot => {
         if (slot.isPause) {
@@ -323,21 +546,25 @@ class VpMobile24Card extends HTMLElement {
             subj = lesson.fach;
             isSub = !!lesson.ist_vertretung;
             if (isSub) rowCls += ' vp-mob-sub';
+            rowCls += ' vp-mob-clickable';
           } else {
             rowCls += ' vp-mob-empty';
           }
+          const onclickAttr = (lesson && lesson.fach)
+            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\')"'
+            : '';
           const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
           const subjPart = subj
             ? '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>'
             : '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
-          rows += '<div class="' + rowCls + '">' + numPart + subjPart + '</div>';
+          rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
         }
       });
       return rows;
     };
 
-    let mobileHtml = mobTabs + '<div id="vp-mob-content">' + buildMobRows(mobDayKey) + '</div>';
+    let mobileHtml = mobTabs + '<div id="vp-mob-content">' + buildMobRows(mobDayKey, mobDayIdx) + '</div>';
 
     this.shadowRoot.innerHTML = `
 <style>
@@ -372,6 +599,9 @@ ha-card {
   border-radius: 20px; padding: 6px 14px; font-size: 0.82em;
   color: #94a3b8; white-space: nowrap; flex-shrink: 0;
 }
+.vp-chip-group {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
 .vp-reload {
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
   border-radius: 8px; padding: 7px 13px; color: #94a3b8;
@@ -403,6 +633,7 @@ ha-card {
 .vp-today-col .vp-tile { background: #2563eb; color: #fff; font-weight: 600; }
 .vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
 .vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
+.vp-th-info { display: inline-flex; align-items: center; margin-left: 5px; vertical-align: middle; }
 .vp-today-pill {
   background: #2563eb; color: #fff; border-radius: 8px;
   padding: 5px 12px; font-weight: 700; font-size: .82em;
@@ -469,12 +700,70 @@ ha-card {
 }
 /* POPUP */
 .vp-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 999; }
-.vp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #162040; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,.6); padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; z-index: 1000; border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; }
-.vp-popup-title { font-size: 1.2em; font-weight: 700; margin-bottom: 14px; color: #fff; border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: 10px; }
-.info-item { padding: 10px 12px; margin-bottom: 8px; background: rgba(255,255,255,.05); border-radius: 6px; border-left: 3px solid #f59e0b; font-size: .9em; color: #94a3b8; }
-.vp-popup-footer { margin-top: 14px; text-align: right; }
-.vp-popup-btn { background: #2563eb; color: #fff; border: none; border-radius: 7px; padding: 9px 22px; cursor: pointer; font-size: .9em; font-family: inherit; }
+.vp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #162040; border-radius: 14px; box-shadow: 0 12px 48px rgba(0,0,0,.7); padding: 0; max-width: 380px; width: 92%; z-index: 1000; border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; overflow: hidden; }
+.vp-popup-title { font-size: 1em; font-weight: 700; color: #fff; padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.vp-detail-num { font-size: .78em; font-weight: 600; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 5px; }
+.vp-detail-fach { font-size: 1.1em; font-weight: 800; color: #fff; }
+.vp-detail-badge { font-size: .7em; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+.vp-detail-sub { background: rgba(239,68,68,.2); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+/* Detail rows */
+.vp-detail-row { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.vp-detail-row:last-child { border-bottom: none; }
+.vp-detail-info-row { background: rgba(245,158,11,.06); }
+.vp-detail-icon { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
+.vp-detail-label { font-size: .78em; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 52px; }
+.vp-detail-val { font-size: .95em; font-weight: 500; color: #e2e8f0; flex: 1; }
+.vp-detail-empty { padding: 16px 20px; color: #475569; font-size: .88em; font-style: italic; }
+/* Clickable tiles */
+.vp-tile-clickable { cursor: pointer; }
+.vp-tile-clickable:hover { filter: brightness(1.15); transform: scale(1.03); transition: transform .12s, filter .12s; }
+.vp-mob-clickable { cursor: pointer; }
+.vp-mob-clickable:hover { filter: brightness(1.1); }
+/* INFO BUTTON */
+.vp-info-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(245,158,11,.15); border: 1.5px solid rgba(245,158,11,.4);
+  color: #fcd34d; font-size: .9em; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .2s; font-family: inherit;
+  line-height: 1;
+}
+.vp-info-btn:hover { background: rgba(245,158,11,.3); border-color: #fcd34d; transform: scale(1.1); }
+.vp-info-btn.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
+@keyframes vp-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+}
+/* INFO POPUP */
+.vp-info-popup-title {
+  padding: 16px 20px 12px;
+  font-size: 1em; font-weight: 700; color: #fcd34d;
+  border-bottom: 1px solid rgba(245,158,11,.2);
+  display: flex; align-items: center; gap: 8px;
+}
+.vp-info-popup-date {
+  font-size: .78em; font-weight: 500; color: #94a3b8;
+  margin-left: auto;
+}
+.vp-info-section { padding: 12px 20px 4px; }
+.vp-info-section-label {
+  font-size: .7em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: #64748b; margin-bottom: 8px;
+}
+.vp-info-entry {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 12px; margin-bottom: 6px;
+  background: rgba(245,158,11,.07);
+  border: 1px solid rgba(245,158,11,.15);
+  border-radius: 8px; font-size: .88em; color: #e2e8f0; line-height: 1.5;
+}
+.vp-info-entry-icon { flex-shrink: 0; font-size: 1em; margin-top: 1px; }
+.vp-info-none { padding: 16px 20px; color: #475569; font-size: .88em; font-style: italic; }
+/* Popup footer */
+.vp-popup-footer { padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
+.vp-popup-btn { background: #2563eb; color: #fff; border: none; border-radius: 7px; padding: 9px 22px; cursor: pointer; font-size: .9em; font-family: inherit; transition: background .2s; }
 .vp-popup-btn:hover { background: #1d4ed8; }
+.info-item { padding: 10px 12px; margin-bottom: 8px; background: rgba(255,255,255,.05); border-radius: 6px; border-left: 3px solid #f59e0b; font-size: .9em; color: #94a3b8; }
 .hidden { display: none !important; }
 </style>
 <ha-card>
@@ -484,6 +773,7 @@ ha-card {
       <div class="vp-hdr-title">${title}</div>
       <div class="vp-hdr-sub">Klasse ${className}</div>
     </div>
+    ${infoBtn}
     <div class="vp-chip">${dateChip}</div>
     ${this._config.reload_entity ? '<button class="vp-reload" onclick="this.getRootNode().host._handleReload()">↺ Neu laden</button>' : ''}
   </div>
@@ -494,11 +784,22 @@ ha-card {
     <div class="vp-legend-item"><span class="vp-ldot vp-ldot-s"></span><span class="vp-ls">Vertretung</span></div>
   </div>
 </ha-card>
+<!-- Lesson detail popup -->
 <div id="popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
 <div id="popup" class="vp-popup hidden">
-  <div class="vp-popup-title">Zusatzinformationen</div>
+  <div id="popup-title" class="vp-popup-title">Details</div>
   <div id="popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">OK</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">Schließen</button></div>
+</div>
+<!-- Info popup -->
+<div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
+<div id="info-popup" class="vp-popup hidden">
+  <div class="vp-info-popup-title">
+    ℹ️ Zusatzinformationen
+    <span class="vp-info-popup-date">${dateChip}</span>
+  </div>
+  <div id="info-popup-content"></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">Schließen</button></div>
 </div>`;
   }
 }
@@ -506,5 +807,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.0 loaded');
+console.log('✅ VpMobile24 Card v2.4.1 loaded');
 

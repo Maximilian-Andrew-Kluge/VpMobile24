@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.4.0",
+        sw_version="2.4.1",
     )
 
     # Re-copy card on every config entry setup (catches HACS updates)
@@ -100,7 +100,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         try:
             from homeassistant.components.lovelace import _get_lovelace_data  # noqa: F401
         except ImportError:
-            pass  # older HA versions – skip resource update
+            pass  # older HA versions â€“ skip resource update
 
         try:
             # Access the Lovelace resource storage directly
@@ -166,7 +166,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self.class_name = class_name
         self.excluded_subjects = excluded_subjects or []
         self._week_data = None  # Initialize week data storage
-        self._week_data_cache = {}  # Cache für einzelne Tage: {date_str: day_data}
+        self._week_data_cache = {}  # Cache fÃ¼r einzelne Tage: {date_str: day_data}
         self._current_week_monday = None  # Speichert den Montag der aktuellen Woche
         super().__init__(
             hass,
@@ -190,7 +190,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             monday_this_week = today - timedelta(days=days_since_monday)
             monday_str = monday_this_week.isoformat()
             
-            # Prüfe ob neue Woche begonnen hat - wenn ja, Cache leeren
+            # PrÃ¼fe ob neue Woche begonnen hat - wenn ja, Cache leeren
             if self._current_week_monday != monday_str:
                 _LOGGER.info(f"New week detected (Monday: {monday_str}), clearing cache")
                 self._week_data_cache = {}
@@ -211,14 +211,14 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     "days_loaded": 0
                 }
             
-            # Prüfe welche Tage bereits im Cache sind
+            # PrÃ¼fe welche Tage bereits im Cache sind
             cached_dates = set(self._week_data_cache.keys())
             _LOGGER.debug(f"Cached dates: {cached_dates}")
             
             # Lade nur heute und fehlende Tage
             dates_to_load = []
             
-            # Heute immer neu laden (für aktuelle Änderungen)
+            # Heute immer neu laden (fÃ¼r aktuelle Ã„nderungen)
             dates_to_load.append(today)
             
             # Fehlende Tage der Woche laden
@@ -232,7 +232,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             
             _LOGGER.debug(f"Loading dates: {[d.isoformat() for d in dates_to_load]}")
             
-            # Lade die benötigten Tage
+            # Lade die benÃ¶tigten Tage
             for target_date in dates_to_load:
                 try:
                     date_str = target_date.isoformat()
@@ -252,7 +252,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     
                 except Exception as ex:
                     _LOGGER.warning(f"Could not fetch schedule for {target_date}: {ex}")
-                    # Wenn Laden fehlschlägt, behalte alte Daten im Cache
+                    # Wenn Laden fehlschlÃ¤gt, behalte alte Daten im Cache
                     continue
             
             # Baue week_data aus dem Cache zusammen
@@ -272,16 +272,16 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         date_obj = date.fromisoformat(date_str)
                         weekday_index = date_obj.weekday()  # 0=Montag
                         
-                        # Sammle normale Stunden für Basis-Stundenplan
+                        # Sammle normale Stunden fÃ¼r Basis-Stundenplan
                         for lesson in cached_day.get("lessons", []):
                             period = lesson.get("period", "")
                             subject = lesson.get("subject", "")
                             is_change = lesson.get("is_change", False)
                             
-                            # Nur normale Stunden (keine Vertretungen) für Basis-Stundenplan
-                            if period and subject and not is_change and subject not in ["—", "", " "]:
+                            # Nur normale Stunden (keine Vertretungen) fÃ¼r Basis-Stundenplan
+                            if period and subject and not is_change and subject not in ["â€”", "", " "]:
                                 key = (weekday_index, period)
-                                # Speichere nur wenn noch nicht vorhanden (erste normale Stunde zählt)
+                                # Speichere nur wenn noch nicht vorhanden (erste normale Stunde zÃ¤hlt)
                                 if key not in base_schedule:
                                     base_schedule[key] = subject
                     
@@ -295,7 +295,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                 if date_str in self._week_data_cache:
                     cached_day = self._week_data_cache[date_str]
                     
-                    # Füge Datum und Tag zu jeder Stunde hinzu
+                    # FÃ¼ge Datum und Tag zu jeder Stunde hinzu
                     try:
                         date_obj = date.fromisoformat(date_str)
                         day_name = date_obj.strftime("%A")
@@ -305,19 +305,19 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             subject = lesson.get("subject", "")
                             period = lesson.get("period", "")
                             
-                            # Prüfe ob es eine Ausfallstunde ist (subject ist leer oder "—")
-                            if subject in ["—", "", " ", None]:
+                            # PrÃ¼fe ob es eine Ausfallstunde ist (subject ist leer oder "â€”")
+                            if subject in ["â€”", "", " ", None]:
                                 # Schaue im Basis-Stundenplan nach, welches Fach normalerweise hier ist
                                 key = (weekday_index, period)
                                 original_subject = base_schedule.get(key, "")
                                 
-                                # Wenn das ursprüngliche Fach ausgeschlossen ist, überspringe diese Stunde
+                                # Wenn das ursprÃ¼ngliche Fach ausgeschlossen ist, Ã¼berspringe diese Stunde
                                 if original_subject and original_subject in self.excluded_subjects:
                                     _LOGGER.debug(f"Skipping cancelled lesson for excluded subject {original_subject} on {date_str} period {period}")
                                     continue
                             
-                            # Filtere ausgeschlossene Fächer (normale Stunden)
-                            if subject and subject not in ["—", "", " ", None] and subject in self.excluded_subjects:
+                            # Filtere ausgeschlossene FÃ¤cher (normale Stunden)
+                            if subject and subject not in ["â€”", "", " ", None] and subject in self.excluded_subjects:
                                 continue
                             
                             lesson_copy = lesson.copy()
@@ -329,8 +329,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             subject = change.get("subject", "")
                             period = change.get("period", "")
                             
-                            # Prüfe ob es eine Ausfallstunde ist
-                            if subject in ["—", "", " ", None]:
+                            # PrÃ¼fe ob es eine Ausfallstunde ist
+                            if subject in ["â€”", "", " ", None]:
                                 key = (weekday_index, period)
                                 original_subject = base_schedule.get(key, "")
                                 
@@ -338,8 +338,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                     _LOGGER.debug(f"Skipping cancelled change for excluded subject {original_subject} on {date_str} period {period}")
                                     continue
                             
-                            # Filtere ausgeschlossene Fächer
-                            if subject and subject not in ["—", "", " ", None] and subject in self.excluded_subjects:
+                            # Filtere ausgeschlossene FÃ¤cher
+                            if subject and subject not in ["â€”", "", " ", None] and subject in self.excluded_subjects:
                                 continue
                             
                             change_copy = change.copy()
@@ -349,7 +349,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         
                         # Zusatzinfos sammeln (von allen Tagen, aber Duplikate vermeiden)
                         for info in cached_day.get("additional_info", []):
-                            # Prüfe ob diese Info schon in der Liste ist
+                            # PrÃ¼fe ob diese Info schon in der Liste ist
                             info_text = info.get("text", "") if isinstance(info, dict) else str(info)
                             if info_text and info_text not in [
                                 i.get("text", "") if isinstance(i, dict) else str(i) 
