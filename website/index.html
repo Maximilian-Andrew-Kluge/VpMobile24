@@ -41,25 +41,48 @@
       <div class="hero-left">
         <div class="hero-logo">
           <div class="logo-icon">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="48" height="48" rx="12" fill="url(#logoGrad)"/>
-              <rect x="10" y="14" width="28" height="22" rx="3" stroke="white" stroke-width="2.5" fill="none"/>
-              <line x1="10" y1="20" x2="38" y2="20" stroke="white" stroke-width="2.5"/>
-              <line x1="18" y1="10" x2="18" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-              <line x1="30" y1="10" x2="30" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-              <circle cx="32" cy="32" r="8" fill="#1a56db"/>
-              <line x1="32" y1="28" x2="32" y2="32" stroke="white" stroke-width="2" stroke-linecap="round"/>
-              <line x1="32" y1="32" x2="35" y2="35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <!-- Modern calendar + clock icon -->
+            <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
-                <linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48">
-                  <stop offset="0%" stop-color="#1e40af"/>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="56" y2="56">
+                  <stop offset="0%" stop-color="#3b82f6"/>
                   <stop offset="100%" stop-color="#1d4ed8"/>
                 </linearGradient>
+                <linearGradient id="logoGrad2" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#60a5fa"/>
+                  <stop offset="100%" stop-color="#2563eb"/>
+                </linearGradient>
               </defs>
+              <!-- Card background with rounded corners -->
+              <rect width="56" height="56" rx="14" fill="url(#logoGrad)"/>
+              <!-- Calendar body -->
+              <rect x="9" y="16" width="30" height="26" rx="4" fill="white" fill-opacity="0.15"/>
+              <rect x="9" y="16" width="30" height="26" rx="4" stroke="white" stroke-width="1.5" fill="none"/>
+              <!-- Calendar header bar -->
+              <rect x="9" y="16" width="30" height="8" rx="4" fill="white" fill-opacity="0.25"/>
+              <rect x="9" y="20" width="30" height="4" fill="white" fill-opacity="0.25"/>
+              <!-- Binding rings -->
+              <rect x="17" y="12" width="3" height="8" rx="1.5" fill="white" fill-opacity="0.9"/>
+              <rect x="28" y="12" width="3" height="8" rx="1.5" fill="white" fill-opacity="0.9"/>
+              <!-- Grid dots -->
+              <rect x="14" y="29" width="4" height="3" rx="1" fill="white" fill-opacity="0.7"/>
+              <rect x="21" y="29" width="4" height="3" rx="1" fill="white" fill-opacity="0.7"/>
+              <rect x="14" y="35" width="4" height="3" rx="1" fill="white" fill-opacity="0.7"/>
+              <rect x="21" y="35" width="4" height="3" rx="1" fill="white" fill-opacity="0.7"/>
+              <!-- Clock circle (bottom right overlay) -->
+              <circle cx="40" cy="40" r="10" fill="#0f1729"/>
+              <circle cx="40" cy="40" r="9" fill="url(#logoGrad2)"/>
+              <!-- Clock face -->
+              <circle cx="40" cy="40" r="6.5" fill="none" stroke="white" stroke-width="1.2" stroke-opacity="0.6"/>
+              <!-- Clock hands -->
+              <line x1="40" y1="40" x2="40" y2="35.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="40" y1="40" x2="43" y2="42" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- Center dot -->
+              <circle cx="40" cy="40" r="1" fill="white"/>
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag gh-version">v2.4.0</span>
+          <span class="version-tag gh-version">v2.4.1</span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -80,17 +103,17 @@
             </div>
           </div>
           <div class="hf-item">
-            <span class="hf-icon">📊</span>
+            <span class="hf-icon">🖱️</span>
             <div>
-              <strong>Strukturierte Sensoren</strong>
-              <span>Woche &amp; Tage</span>
+              <strong>Klick-Details</strong>
+              <span>Lehrer &amp; Raum per Klick</span>
             </div>
           </div>
           <div class="hf-item">
-            <span class="hf-icon">🎨</span>
+            <span class="hf-icon">ℹ️</span>
             <div>
-              <strong>Moderne Lovelace Card</strong>
-              <span>Vollständig anpassbar</span>
+              <strong>Zusatzinfos</strong>
+              <span>Pro Tag anzeigen</span>
             </div>
           </div>
         </div>
@@ -107,62 +130,147 @@
       </div>
 
       <div class="hero-right">
-        <div class="card-preview">
-          <div class="card-header">
-            <span class="card-header-icon">📅</span>
-            <div>
-              <div class="card-title">Stundenplan</div>
-              <div class="card-subtitle">Klasse 10b</div>
-            </div>
-            <div class="card-date">Di, 13. Mai</div>
-          </div>
-          <div class="card-table">
-            <div class="table-head">
-              <div class="th-cell th-nr">#</div>
-              <div class="th-cell">Mo</div>
-              <div class="th-cell th-today">Di</div>
-              <div class="th-cell">Mi</div>
-              <div class="th-cell">Do</div>
-              <div class="th-cell">Fr</div>
-            </div>
-            <div class="table-row">
-              <div class="td-nr">1</div>
-              <div class="td-cell">Mathe</div>
-              <div class="td-cell td-today">Deutsch</div>
-              <div class="td-cell">Englisch</div>
-              <div class="td-cell">Mathe</div>
-              <div class="td-cell">Sport</div>
-            </div>
-            <div class="table-row">
-              <div class="td-nr">2</div>
-              <div class="td-cell">Englisch</div>
-              <div class="td-cell td-today">Mathe</div>
-              <div class="td-cell">Deutsch</div>
-              <div class="td-cell">Deutsch</div>
-              <div class="td-cell">Physik</div>
-            </div>
-            <div class="table-row">
-              <div class="td-nr">3</div>
-              <div class="td-cell">Physik</div>
-              <div class="td-cell td-today td-sub">Chemie zt.</div>
-              <div class="td-cell">Mathe</div>
-              <div class="td-cell">Englisch</div>
-              <div class="td-cell">Deutsch</div>
-            </div>
-            <div class="table-pause" colspan="6">Pause 11:30 – 11:50</div>
-            <div class="table-row">
-              <div class="td-nr">4</div>
-              <div class="td-cell">Geschichte</div>
-              <div class="td-cell td-today">Englisch</div>
-              <div class="td-cell">Deutsch</div>
-              <div class="td-cell">Chemie</div>
-              <div class="td-cell">Mathe</div>
-            </div>
-          </div>
-          <div class="card-legend">
-            <span class="legend-today">● Heute</span>
-            <span class="legend-sub">● Vertretung</span>
-          </div>
+        <!-- Navy Card Mockup – echter Style -->
+        <div class="hero-mockup-wrap">
+          <svg viewBox="0 0 480 380" xmlns="http://www.w3.org/2000/svg" class="hero-mockup-svg">
+            <!-- Card background -->
+            <rect width="480" height="380" rx="14" fill="#0f1729" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+            <!-- Header -->
+            <rect x="16" y="16" width="36" height="36" rx="9" fill="url(#hdrGrad)"/>
+            <text x="34" y="38" text-anchor="middle" font-size="16" font-family="sans-serif">📅</text>
+            <text x="62" y="33" fill="#fff" font-size="13" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
+            <text x="62" y="47" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Klasse 10b</text>
+            <!-- ⓘ button -->
+            <circle cx="340" cy="34" r="12" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+            <text x="340" y="39" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">ⓘ</text>
+            <!-- Date chip -->
+            <rect x="358" y="22" width="72" height="24" rx="12" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <text x="394" y="38" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="Inter,sans-serif">Di, 13. Mai</text>
+            <!-- Reload -->
+            <rect x="436" y="22" width="28" height="24" rx="7" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <text x="450" y="38" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="sans-serif">↺</text>
+
+            <!-- Column headers -->
+            <rect x="0" y="64" width="480" height="22" fill="rgba(0,0,0,0.2)"/>
+            <text x="38" y="79" fill="#475569" font-size="8" font-weight="600" font-family="Inter,sans-serif">#</text>
+            <!-- Today pill MO -->
+            <rect x="60" y="66" width="72" height="18" rx="6" fill="#2563eb"/>
+            <text x="96" y="79" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="700" font-family="Inter,sans-serif">MO</text>
+            <text x="180" y="79" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">DI</text>
+            <text x="264" y="79" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">MI</text>
+            <text x="348" y="79" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">DO</text>
+            <text x="432" y="79" text-anchor="middle" fill="#475569" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">FR</text>
+
+            <!-- Row 1 -->
+            <rect x="0" y="86" width="480" height="34" fill="#0f1729"/>
+            <text x="38" y="107" text-anchor="middle" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">1</text>
+            <text x="38" y="116" text-anchor="middle" fill="#475569" font-size="6.5" font-family="Inter,sans-serif">07:45</text>
+            <rect x="62" y="89" width="68" height="28" rx="7" fill="#2563eb"/>
+            <text x="96" y="107" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">MA</text>
+            <rect x="142" y="89" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="176" y="107" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">SPO</text>
+            <rect x="226" y="89" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="260" y="107" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">EN</text>
+            <rect x="310" y="89" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+            <rect x="394" y="89" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+
+            <!-- Row 2 -->
+            <rect x="0" y="120" width="480" height="34" fill="rgba(255,255,255,0.015)"/>
+            <text x="38" y="141" text-anchor="middle" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">2</text>
+            <text x="38" y="150" text-anchor="middle" fill="#475569" font-size="6.5" font-family="Inter,sans-serif">08:40</text>
+            <rect x="62" y="123" width="68" height="28" rx="7" fill="#2563eb"/>
+            <text x="96" y="141" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">MA</text>
+            <!-- Vertretung -->
+            <rect x="142" y="123" width="68" height="28" rx="7" fill="#7f1d1d"/>
+            <text x="176" y="141" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">SPO</text>
+            <rect x="226" y="123" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="260" y="141" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">DE</text>
+            <rect x="310" y="123" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+            <rect x="394" y="123" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+
+            <!-- Row 3 -->
+            <rect x="0" y="154" width="480" height="34" fill="#0f1729"/>
+            <text x="38" y="175" text-anchor="middle" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">3</text>
+            <text x="38" y="184" text-anchor="middle" fill="#475569" font-size="6.5" font-family="Inter,sans-serif">09:25</text>
+            <rect x="62" y="157" width="68" height="28" rx="7" fill="#2563eb"/>
+            <text x="96" y="175" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">EB</text>
+            <rect x="142" y="157" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="176" y="175" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">EN</text>
+            <rect x="226" y="157" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="260" y="175" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">MA</text>
+            <rect x="310" y="157" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+            <rect x="394" y="157" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+
+            <!-- Pause -->
+            <rect x="0" y="188" width="480" height="20" fill="rgba(0,0,0,0.2)"/>
+            <line x1="0" y1="188" x2="480" y2="188" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <line x1="0" y1="208" x2="480" y2="208" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <text x="240" y="202" text-anchor="middle" fill="#64748b" font-size="8" font-style="italic" font-family="Inter,sans-serif">Pause 10:10 – 10:30</text>
+
+            <!-- Row 4 -->
+            <rect x="0" y="208" width="480" height="34" fill="rgba(255,255,255,0.015)"/>
+            <text x="38" y="229" text-anchor="middle" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">4</text>
+            <text x="38" y="238" text-anchor="middle" fill="#475569" font-size="6.5" font-family="Inter,sans-serif">10:35</text>
+            <rect x="62" y="211" width="68" height="28" rx="7" fill="#2563eb"/>
+            <text x="96" y="229" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">DE</text>
+            <rect x="142" y="211" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="176" y="229" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">MA</text>
+            <rect x="226" y="211" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="260" y="229" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">EN</text>
+            <rect x="310" y="211" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+            <rect x="394" y="211" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+
+            <!-- Row 5 -->
+            <rect x="0" y="242" width="480" height="34" fill="#0f1729"/>
+            <text x="38" y="263" text-anchor="middle" fill="#94a3b8" font-size="8" font-weight="600" font-family="Inter,sans-serif">5</text>
+            <text x="38" y="272" text-anchor="middle" fill="#475569" font-size="6.5" font-family="Inter,sans-serif">11:30</text>
+            <rect x="62" y="245" width="68" height="28" rx="7" fill="#2563eb"/>
+            <text x="96" y="263" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">DE</text>
+            <!-- Vertretung -->
+            <rect x="142" y="245" width="68" height="28" rx="7" fill="#7f1d1d"/>
+            <text x="176" y="263" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <rect x="226" y="245" width="68" height="28" rx="7" fill="#1a2a50"/>
+            <text x="260" y="263" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">MA</text>
+            <rect x="310" y="245" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+            <rect x="394" y="245" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
+
+            <!-- Legend -->
+            <circle cx="20" cy="300" r="4" fill="#3b82f6"/>
+            <text x="30" y="304" fill="#60a5fa" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Heute</text>
+            <circle cx="72" cy="300" r="4" fill="#ef4444"/>
+            <text x="82" y="304" fill="#f87171" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">Vertretung</text>
+
+            <!-- Click popup overlay hint -->
+            <rect x="62" y="89" width="68" height="28" rx="7" fill="rgba(255,255,255,0.08)" opacity="0.6"/>
+            <!-- Popup -->
+            <rect x="110" y="60" width="200" height="130" rx="10" fill="#162040" stroke="rgba(255,255,255,0.12)" stroke-width="1" filter="url(#shadow)"/>
+            <rect x="110" y="60" width="200" height="36" rx="10" fill="#162040"/>
+            <rect x="110" y="84" width="200" height="12" fill="#162040"/>
+            <text x="122" y="76" fill="#94a3b8" font-size="7.5" font-family="Inter,sans-serif">1. Stunde</text>
+            <text x="160" y="76" fill="#fff" font-size="10" font-weight="800" font-family="Inter,sans-serif">MA</text>
+            <line x1="110" y1="96" x2="310" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <text x="122" y="112" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">TAG</text>
+            <text x="175" y="112" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">Montag</text>
+            <text x="122" y="128" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">LEHRER</text>
+            <text x="175" y="128" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">Müller</text>
+            <text x="122" y="144" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">RAUM</text>
+            <text x="175" y="144" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">A204</text>
+            <text x="122" y="160" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">ZEIT</text>
+            <text x="175" y="160" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">07:45–08:30</text>
+            <rect x="240" y="174" width="62" height="18" rx="6" fill="#2563eb"/>
+            <text x="271" y="186" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+
+            <defs>
+              <linearGradient id="hdrGrad" x1="0" y1="0" x2="36" y2="36">
+                <stop offset="0%" stop-color="#3b82f6"/>
+                <stop offset="100%" stop-color="#1d4ed8"/>
+              </linearGradient>
+              <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,0.6)"/>
+              </filter>
+            </defs>
+          </svg>
         </div>
       </div>
     </div>
@@ -173,9 +281,10 @@
     <div class="container topnav-inner">
       <div class="topnav-logo">VpMobile<span class="accent">24</span></div>
       <div class="topnav-links">
+        <a href="#features">Features</a>
         <a href="#installation">Installation</a>
         <a href="#card">Card einrichten</a>
-        <a href="#sensors">Erstellte Sensoren</a>
+        <a href="#sensors">Sensoren</a>
         <a href="#troubleshooting">Hilfe</a>
       </div>
       <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="topnav-cta" target="_blank" rel="noopener">GitHub →</a>
@@ -184,15 +293,200 @@
       </button>
     </div>
     <div class="nav-mobile-menu" id="navMobileMenu">
+      <a href="#features" onclick="toggleNav()">Features</a>
       <a href="#installation" onclick="toggleNav()">Installation</a>
       <a href="#card" onclick="toggleNav()">Card einrichten</a>
-      <a href="#sensors" onclick="toggleNav()">Erstellte Sensoren</a>
+      <a href="#sensors" onclick="toggleNav()">Sensoren</a>
       <a href="#troubleshooting" onclick="toggleNav()">Hilfe</a>
     </div>
   </nav>
 
   <!-- ===== MAIN CONTENT ===== -->
   <main>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Alles was du brauchst</h2>
+        <p class="section-desc">VpMobile24 bringt deinen Stundenplan direkt in Home Assistant – mit einem modernen Navy-Design und praktischen Funktionen.</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🖱️</div>
+            <h3>Klick-Details</h3>
+            <p>Klicke auf jede Fach-Kachel um ein Popup mit <strong>Lehrer</strong>, <strong>Raum</strong>, <strong>Uhrzeit</strong> und <strong>Zusatzinfo</strong> zu sehen.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">ⓘ</div>
+            <h3>Zusatzinfos</h3>
+            <p>Der <strong>ⓘ-Button</strong> neben dem heutigen Tag zeigt alle allgemeinen Zusatzinformationen des aktuellen Tages – pulsiert wenn Infos vorhanden.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Mobiler Modus</h3>
+            <p>Auf dem Handy: kompakte Einzelspalten-Ansicht mit <strong>Tag-Tabs</strong> (Mo–Fr). Heute wird automatisch vorausgewählt.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Auto-Update</h3>
+            <p>Die Card-Datei wird bei jedem HA-Start automatisch aktualisiert. <strong>Cache-Busting</strong> sorgt dafür dass Browser immer die neueste Version laden.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>Navy Design</h3>
+            <p>Festes dunkles Navy-Design – unabhängig vom HA-Theme. Heute-Spalte blau, Vertretungen dunkelrot, abgerundete Kacheln.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⏰</div>
+            <h3>Eigene Uhrzeiten</h3>
+            <p>Passen deine Schulzeiten nicht zu den Defaults? Trage eigene Stunden- und Pausenzeiten direkt in der visuellen Konfiguration ein.</p>
+          </div>
+        </div>
+
+        <!-- Feature showcase: Click popup + Info popup side by side -->
+        <div class="feature-showcase">
+          <div class="showcase-item">
+            <div class="showcase-label">
+              <span class="showcase-dot dot-blue"></span>
+              Klick auf Fach → Detail-Popup
+            </div>
+            <div class="showcase-mockup">
+              <!-- SVG: Lesson detail popup -->
+              <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <!-- Background card -->
+                <rect width="320" height="200" rx="10" fill="#0f1729"/>
+                <!-- Dimmed table behind -->
+                <rect x="10" y="10" width="300" height="100" rx="6" fill="#162040" opacity="0.5"/>
+                <text x="30" y="35" fill="#475569" font-size="7" font-family="Inter,sans-serif">#</text>
+                <text x="80" y="35" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">MO</text>
+                <rect x="120" y="22" width="60" height="16" rx="5" fill="#2563eb"/>
+                <text x="150" y="34" text-anchor="middle" fill="#fff" font-size="7" font-weight="700" font-family="Inter,sans-serif">DI</text>
+                <text x="220" y="35" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">MI</text>
+                <!-- Highlighted tile -->
+                <rect x="55" y="45" width="50" height="22" rx="5" fill="#2563eb" opacity="0.4"/>
+                <text x="80" y="60" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="Inter,sans-serif">MA</text>
+                <rect x="120" y="45" width="50" height="22" rx="5" fill="#2563eb"/>
+                <text x="145" y="60" text-anchor="middle" fill="#fff" font-size="8" font-weight="600" font-family="Inter,sans-serif">DE</text>
+                <!-- Popup -->
+                <rect x="60" y="90" width="200" height="100" rx="10" fill="#162040" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <rect x="60" y="90" width="200" height="32" rx="10" fill="#162040"/>
+                <rect x="60" y="110" width="200" height="12" fill="#162040"/>
+                <text x="74" y="106" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2. Stunde</text>
+                <text x="120" y="106" fill="#fff" font-size="10" font-weight="800" font-family="Inter,sans-serif">Deutsch</text>
+                <line x1="60" y1="122" x2="260" y2="122" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <text x="74" y="136" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">LEHRER</text>
+                <text x="120" y="136" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">Müller</text>
+                <text x="74" y="150" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">RAUM</text>
+                <text x="120" y="150" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">B102</text>
+                <text x="74" y="164" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">ZEIT</text>
+                <text x="120" y="164" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">08:40–09:25</text>
+                <rect x="190" y="176" width="62" height="16" rx="6" fill="#2563eb"/>
+                <text x="221" y="187" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-label">
+              <span class="showcase-dot dot-yellow"></span>
+              ⓘ-Button → Zusatzinfo-Popup
+            </div>
+            <div class="showcase-mockup">
+              <!-- SVG: Info popup -->
+              <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="320" height="200" rx="10" fill="#0f1729"/>
+                <!-- Header with info button highlighted -->
+                <rect x="10" y="10" width="300" height="40" rx="6" fill="#162040" opacity="0.6"/>
+                <rect x="20" y="18" width="24" height="24" rx="6" fill="#1d4ed8"/>
+                <text x="32" y="33" text-anchor="middle" font-size="12" font-family="sans-serif">📅</text>
+                <text x="52" y="28" fill="#fff" font-size="9" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
+                <text x="52" y="40" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">Klasse 10b</text>
+                <!-- Info button highlighted -->
+                <circle cx="220" cy="30" r="11" fill="rgba(245,158,11,0.3)" stroke="#fcd34d" stroke-width="1.5"/>
+                <text x="220" y="35" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">ⓘ</text>
+                <rect x="238" y="18" width="62" height="24" rx="12" fill="rgba(255,255,255,0.08)"/>
+                <text x="269" y="33" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="Inter,sans-serif">Mo, 11. Mai</text>
+                <!-- Info popup -->
+                <rect x="30" y="60" width="260" height="130" rx="10" fill="#162040" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
+                <rect x="30" y="60" width="260" height="32" rx="10" fill="#162040"/>
+                <rect x="30" y="80" width="260" height="12" fill="#162040"/>
+                <text x="44" y="80" fill="#fcd34d" font-size="9" font-weight="700" font-family="Inter,sans-serif">ℹ️ Zusatzinformationen</text>
+                <text x="240" y="80" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Montag</text>
+                <line x1="30" y1="92" x2="290" y2="92" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
+                <text x="44" y="106" fill="#64748b" font-size="6.5" font-weight="700" font-family="Inter,sans-serif">📢 ALLGEMEINE INFORMATIONEN</text>
+                <rect x="40" y="112" width="240" height="28" rx="6" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
+                <text x="52" y="124" fill="#e2e8f0" font-size="7.5" font-family="Inter,sans-serif">Unterricht beginnt heute 2. Stunde</text>
+                <text x="52" y="135" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">Bitte Sportzeug mitbringen</text>
+                <rect x="200" y="170" width="72" height="16" rx="6" fill="#2563eb"/>
+                <text x="236" y="181" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="showcase-item">
+            <div class="showcase-label">
+              <span class="showcase-dot dot-blue"></span>
+              Mobiler Modus mit Tag-Tabs
+            </div>
+            <div class="showcase-mockup">
+              <!-- SVG: Mobile view -->
+              <svg viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <!-- Phone frame -->
+                <rect width="200" height="320" rx="20" fill="#0a0f1e"/>
+                <rect x="3" y="3" width="194" height="314" rx="18" fill="#0f1729" stroke="#1e293b" stroke-width="1"/>
+                <rect x="70" y="7" width="60" height="8" rx="4" fill="#0a0f1e"/>
+                <!-- Header -->
+                <rect x="10" y="20" width="180" height="30" rx="6" fill="#162040" opacity="0.7"/>
+                <text x="22" y="38" fill="#fff" font-size="9" font-weight="700" font-family="Inter,sans-serif">📅 Stundenplan</text>
+                <text x="22" y="46" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Klasse 10b</text>
+                <!-- Day tabs -->
+                <rect x="10" y="56" width="180" height="22" rx="0" fill="#0f1729"/>
+                <rect x="10" y="56" width="36" height="22" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="28" y="70" text-anchor="middle" fill="#64748b" font-size="7.5" font-weight="600" font-family="Inter,sans-serif">Mo</text>
+                <rect x="48" y="56" width="36" height="22" rx="6" fill="#2563eb"/>
+                <text x="66" y="70" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Di</text>
+                <rect x="86" y="56" width="36" height="22" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="104" y="70" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Mi</text>
+                <rect x="124" y="56" width="36" height="22" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="142" y="70" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Do</text>
+                <rect x="162" y="56" width="36" height="22" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="180" y="70" text-anchor="middle" fill="#64748b" font-size="7.5" font-family="Inter,sans-serif">Fr</text>
+                <!-- Lesson rows -->
+                <rect x="10" y="80" width="180" height="26" fill="#0f1729"/>
+                <text x="22" y="95" fill="#94a3b8" font-size="8" font-weight="700" font-family="Inter,sans-serif">1</text>
+                <text x="22" y="103" fill="#475569" font-size="6" font-family="Inter,sans-serif">07:45</text>
+                <rect x="50" y="83" width="132" height="20" rx="6" fill="#1a2a50"/>
+                <text x="116" y="97" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-weight="500" font-family="Inter,sans-serif">SPO</text>
+                <rect x="10" y="106" width="180" height="26" fill="rgba(255,255,255,0.015)"/>
+                <text x="22" y="121" fill="#94a3b8" font-size="8" font-weight="700" font-family="Inter,sans-serif">2</text>
+                <text x="22" y="129" fill="#475569" font-size="6" font-family="Inter,sans-serif">08:40</text>
+                <rect x="50" y="109" width="132" height="20" rx="6" fill="#7f1d1d"/>
+                <text x="116" y="123" text-anchor="middle" fill="#fca5a5" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">SPO</text>
+                <!-- Pause -->
+                <rect x="10" y="132" width="180" height="16" fill="rgba(0,0,0,0.15)"/>
+                <text x="100" y="143" text-anchor="middle" fill="#64748b" font-size="6.5" font-style="italic" font-family="Inter,sans-serif">Pause 10:10–10:30</text>
+                <rect x="10" y="148" width="180" height="26" fill="#0f1729"/>
+                <text x="22" y="163" fill="#94a3b8" font-size="8" font-weight="700" font-family="Inter,sans-serif">3</text>
+                <text x="22" y="171" fill="#475569" font-size="6" font-family="Inter,sans-serif">10:35</text>
+                <rect x="50" y="151" width="132" height="20" rx="6" fill="#1a2a50"/>
+                <text x="116" y="165" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-weight="500" font-family="Inter,sans-serif">EN</text>
+                <rect x="10" y="174" width="180" height="26" fill="rgba(255,255,255,0.015)"/>
+                <text x="22" y="189" fill="#94a3b8" font-size="8" font-weight="700" font-family="Inter,sans-serif">4</text>
+                <text x="22" y="197" fill="#475569" font-size="6" font-family="Inter,sans-serif">11:30</text>
+                <rect x="50" y="177" width="132" height="20" rx="6" fill="#1a2a50"/>
+                <text x="116" y="191" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-weight="500" font-family="Inter,sans-serif">DE</text>
+                <!-- Legend -->
+                <circle cx="22" cy="240" r="4" fill="#3b82f6"/>
+                <text x="30" y="244" fill="#60a5fa" font-size="7.5" font-weight="600" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="70" cy="240" r="4" fill="#ef4444"/>
+                <text x="78" y="244" fill="#f87171" font-size="7.5" font-weight="600" font-family="Inter,sans-serif">Vertretung</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- INSTALLATION TABS -->
     <section class="section" id="installation">
@@ -378,15 +672,18 @@
               <p>Öffne dein Dashboard, klicke auf <strong>Bearbeiten → + Karte hinzufügen</strong> und suche nach <strong>VpMobile24 Card</strong>.</p>
               <p>Alternativ kannst du die Card direkt per YAML hinzufügen:</p>
               <div class="code-block">
-                <div class="code-label">Minimale YAML-Konfiguration</div>
+                <div class="code-label">Vollständige YAML-Konfiguration</div>
                 <pre class="code-pre"><code>type: custom:vpmobile24-card
 entity: sensor.vpmobile24_week_table
+additional_info_entity: sensor.vpmobile24_zusatzinfos
+reload_entity: button.vpmobile24_reload
 show_header: true
 header_settings:
   title: Stundenplan
   class_name: 10b
 highlight_today: true
-show_time: true</code></pre>
+show_time: true
+use_custom_times: false</code></pre>
                 <button class="copy-btn copy-pre" onclick="copyPre(this)">Kopieren</button>
               </div>
             </div>
@@ -406,6 +703,7 @@ show_time: true</code></pre>
                 <div class="ot-row"><span><code>highlight_today</code></span><span>Heutigen Tag hervorheben</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>show_time</code></span><span>Uhrzeiten anzeigen</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>use_custom_times</code></span><span>Eigene Uhrzeiten verwenden</span><span><code>false</code></span></div>
+                <div class="ot-row"><span><code>additional_info_entity</code></span><span>Zusatzinfo-Sensor (ⓘ-Button)</span><span><code>—</code></span></div>
                 <div class="ot-row"><span><code>reload_entity</code></span><span>Neu-laden Button Entity</span><span><code>—</code></span></div>
               </div>
             </div>
@@ -527,6 +825,19 @@ show_time: true</code></pre>
               </div>
             </div>
           </details>
+
+          <details class="faq-item">
+            <summary>ⓘ-Button wird nicht angezeigt</summary>
+            <div class="faq-body">
+              <p>Der ⓘ-Button erscheint nur wenn <code>additional_info_entity</code> in der Card-Konfiguration gesetzt ist:</p>
+              <div class="code-block" style="margin-top:10px">
+                <div class="code-label">YAML</div>
+                <div class="code-line">
+                  <code>additional_info_entity: sensor.vpmobile24_zusatzinfos</code>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </section>
@@ -558,6 +869,13 @@ show_time: true</code></pre>
       <div class="footer-copy">Made with ❤️ for Home Assistant · <span class="by">@by Maximilian</span></div>
     </div>
   </footer>
+
+  <!-- Scroll to top -->
+  <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Nach oben" aria-label="Nach oben scrollen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  </button>
 
   <script src="script.js"></script>
 </body>
