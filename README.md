@@ -73,7 +73,6 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 - 🔥 heutiger Tag hervorgehoben
 - ⛔ Vertretungen farblich markiert
 - ⚙️ vollständig anpassbar
-- 🌗 Theme-Unterstützung
 
 ---
 

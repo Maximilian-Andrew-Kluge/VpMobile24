@@ -1,0 +1,319 @@
+<svg viewBox="0 0 1024 320" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Inter, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#060d1f"/>
+      <stop offset="50%" stop-color="#0d1f4a"/>
+      <stop offset="100%" stop-color="#0a1535"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="bottomGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.35)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.35)"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="14" flood-color="rgba(0,0,0,0.6)"/>
+    </filter>
+    <clipPath id="bannerClip">
+      <rect width="1024" height="320" rx="12"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="320" rx="12" fill="url(#bgGrad)"/>
+  <g clip-path="url(#bannerClip)">
+    <!-- Glow blobs -->
+    <ellipse cx="200" cy="120" rx="220" ry="160" fill="rgba(29,78,216,0.12)"/>
+    <ellipse cx="750" cy="160" rx="300" ry="200" fill="rgba(29,78,216,0.08)"/>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- LEFT SECTION -->
+    <!-- ═══════════════════════════════════════════════════ -->
+
+    <!-- App Icon -->
+    <rect x="28" y="28" width="58" height="58" rx="14" fill="url(#iconGrad)" filter="url(#glow)"/>
+    <!-- Calendar body -->
+    <rect x="37" y="42" width="40" height="32" rx="4" fill="none" stroke="white" stroke-width="2"/>
+    <rect x="37" y="42" width="40" height="10" rx="4" fill="rgba(255,255,255,0.25)"/>
+    <rect x="37" y="48" width="40" height="4" fill="rgba(255,255,255,0.25)"/>
+    <rect x="44" y="37" width="4" height="10" rx="2" fill="white" fill-opacity="0.9"/>
+    <rect x="56" y="37" width="4" height="10" rx="2" fill="white" fill-opacity="0.9"/>
+    <!-- Clock overlay -->
+    <circle cx="72" cy="72" r="11" fill="#0f1729"/>
+    <circle cx="72" cy="72" r="10" fill="url(#iconGrad)"/>
+    <circle cx="72" cy="72" r="7" fill="none" stroke="white" stroke-width="1.2" stroke-opacity="0.7"/>
+    <line x1="72" y1="72" x2="72" y2="67" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="72" y1="72" x2="75" y2="74" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="72" cy="72" r="1.2" fill="white"/>
+
+    <!-- Title -->
+    <text x="96" y="62" fill="white" font-size="32" font-weight="800" letter-spacing="-0.5">VpMobile<tspan fill="#60a5fa">24</tspan></text>
+
+    <!-- Badge -->
+    <rect x="96" y="70" width="178" height="22" rx="11" fill="url(#badgeGrad)"/>
+    <text x="185" y="85" text-anchor="middle" fill="white" font-size="11" font-weight="600" letter-spacing="0.3">Home Assistant Integration</text>
+
+    <!-- Tagline -->
+    <text x="28" y="118" fill="#94a3b8" font-size="13.5">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</text>
+
+    <!-- Feature icons row -->
+    <!-- Auto fetch -->
+    <text x="28" y="148" font-size="14">🔄</text>
+    <text x="48" y="145" fill="white" font-size="10" font-weight="600">Automatischer</text>
+    <text x="48" y="157" fill="white" font-size="10" font-weight="600">Datenabruf</text>
+    <text x="48" y="168" fill="#64748b" font-size="9">Alle 15 Minuten</text>
+
+    <!-- Multi class -->
+    <text x="118" y="148" font-size="14">👥</text>
+    <text x="138" y="145" fill="white" font-size="10" font-weight="600">Mehrere Klassen</text>
+    <text x="138" y="157" fill="white" font-size="10" font-weight="600">unterstützt</text>
+    <text x="138" y="168" fill="#64748b" font-size="9">Flexibel &amp; einfach</text>
+
+    <!-- Click details -->
+    <text x="218" y="148" font-size="14">🖱️</text>
+    <text x="238" y="145" fill="white" font-size="10" font-weight="600">Klick-Details</text>
+    <text x="238" y="157" fill="white" font-size="10" font-weight="600">Lehrer &amp; Raum</text>
+    <text x="238" y="168" fill="#64748b" font-size="9">Per Klick sichtbar</text>
+
+    <!-- Info -->
+    <text x="318" y="148" font-size="14">ℹ️</text>
+    <text x="338" y="145" fill="white" font-size="10" font-weight="600">Zusatzinfos</text>
+    <text x="338" y="157" fill="white" font-size="10" font-weight="600">pro Tag</text>
+    <text x="338" y="168" fill="#64748b" font-size="9">ⓘ-Button im Header</text>
+
+    <!-- Badge pills row -->
+    <!-- HA -->
+    <rect x="28" y="186" width="118" height="28" rx="6" fill="rgba(24,118,210,0.15)" stroke="#1876d2" stroke-width="1"/>
+    <text x="42" y="204" font-size="12">⌂</text>
+    <text x="56" y="200" fill="#90caf9" font-size="9" font-weight="600">Works with</text>
+    <text x="56" y="211" fill="#90caf9" font-size="9" font-weight="600">Home Assistant</text>
+
+    <!-- HACS -->
+    <rect x="152" y="186" width="56" height="28" rx="6" fill="rgba(255,140,0,0.12)" stroke="#ff8c00" stroke-width="1"/>
+    <text x="180" y="204" text-anchor="middle" fill="#ffb347" font-size="10" font-weight="700">HACS</text>
+
+    <!-- Custom -->
+    <rect x="214" y="186" width="80" height="28" rx="6" fill="rgba(96,165,250,0.1)" stroke="#3b82f6" stroke-width="1"/>
+    <text x="254" y="197" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="600">CUSTOM</text>
+    <text x="254" y="208" text-anchor="middle" fill="#60a5fa" font-size="8" font-weight="600">INTEGRATION</text>
+
+    <!-- Discord -->
+    <rect x="300" y="186" width="72" height="28" rx="6" fill="rgba(88,101,242,0.15)" stroke="#5865f2" stroke-width="1"/>
+    <text x="336" y="197" text-anchor="middle" fill="#a5b4fc" font-size="8" font-weight="600">DISCORD</text>
+    <text x="336" y="208" text-anchor="middle" fill="#a5b4fc" font-size="8" font-weight="600">COMMUNITY</text>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- CENTER: Phone mockup -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <g filter="url(#shadow)">
+      <!-- Phone frame -->
+      <rect x="388" y="18" width="108" height="196" rx="16" fill="#0a0f1e" stroke="#1e293b" stroke-width="1.5"/>
+      <rect x="392" y="22" width="100" height="188" rx="13" fill="#0f1729"/>
+      <!-- Notch -->
+      <rect x="422" y="24" width="40" height="7" rx="3.5" fill="#0a0f1e"/>
+      <!-- Status bar -->
+      <text x="398" y="38" fill="#475569" font-size="6.5">10:30</text>
+      <text x="484" y="38" text-anchor="end" fill="#475569" font-size="6.5">●●●</text>
+
+      <!-- Card header -->
+      <text x="400" y="54" fill="white" font-size="8" font-weight="700">📅 Stundenplan</text>
+      <text x="400" y="64" fill="#64748b" font-size="6">Klasse 10b</text>
+
+      <!-- Day tabs -->
+      <rect x="392" y="70" width="100" height="16" fill="#162040"/>
+      <rect x="392" y="70" width="20" height="16" rx="4" fill="rgba(255,255,255,0.05)"/>
+      <text x="402" y="81" text-anchor="middle" fill="#64748b" font-size="6" font-weight="600">Mo</text>
+      <rect x="414" y="70" width="20" height="16" rx="4" fill="#2563eb"/>
+      <text x="424" y="81" text-anchor="middle" fill="white" font-size="6" font-weight="700">Di</text>
+      <rect x="436" y="70" width="20" height="16" rx="4" fill="rgba(255,255,255,0.05)"/>
+      <text x="446" y="81" text-anchor="middle" fill="#64748b" font-size="6">Mi</text>
+      <rect x="458" y="70" width="20" height="16" rx="4" fill="rgba(255,255,255,0.05)"/>
+      <text x="468" y="81" text-anchor="middle" fill="#64748b" font-size="6">Do</text>
+      <rect x="480" y="70" width="12" height="16" rx="4" fill="rgba(255,255,255,0.05)"/>
+      <text x="486" y="81" text-anchor="middle" fill="#64748b" font-size="6">Fr</text>
+
+      <!-- Rows -->
+      <rect x="392" y="88" width="100" height="18" fill="#0f1729"/>
+      <text x="398" y="99" fill="#94a3b8" font-size="6" font-weight="700">1</text>
+      <text x="398" y="107" fill="#475569" font-size="5">07:45</text>
+      <rect x="412" y="90" width="72" height="14" rx="4" fill="#1a2a50"/>
+      <text x="448" y="100" text-anchor="middle" fill="#e2e8f0" font-size="6.5" font-weight="500">Mathe</text>
+
+      <rect x="392" y="108" width="100" height="18" fill="rgba(255,255,255,0.01)"/>
+      <text x="398" y="119" fill="#94a3b8" font-size="6" font-weight="700">2</text>
+      <text x="398" y="127" fill="#475569" font-size="5">08:40</text>
+      <rect x="412" y="110" width="72" height="14" rx="4" fill="#7f1d1d"/>
+      <text x="448" y="120" text-anchor="middle" fill="#fca5a5" font-size="6.5" font-weight="600">SPO</text>
+
+      <!-- Pause -->
+      <rect x="392" y="128" width="100" height="12" fill="rgba(0,0,0,0.2)"/>
+      <text x="442" y="137" text-anchor="middle" fill="#64748b" font-size="5.5" font-style="italic">Pause 10:10–10:30</text>
+
+      <rect x="392" y="142" width="100" height="18" fill="#0f1729"/>
+      <text x="398" y="153" fill="#94a3b8" font-size="6" font-weight="700">3</text>
+      <text x="398" y="161" fill="#475569" font-size="5">10:35</text>
+      <rect x="412" y="144" width="72" height="14" rx="4" fill="#1a2a50"/>
+      <text x="448" y="154" text-anchor="middle" fill="#e2e8f0" font-size="6.5" font-weight="500">Englisch</text>
+
+      <rect x="392" y="162" width="100" height="18" fill="rgba(255,255,255,0.01)"/>
+      <text x="398" y="173" fill="#94a3b8" font-size="6" font-weight="700">4</text>
+      <text x="398" y="181" fill="#475569" font-size="5">11:30</text>
+      <rect x="412" y="164" width="72" height="14" rx="4" fill="#1a2a50"/>
+      <text x="448" y="174" text-anchor="middle" fill="#e2e8f0" font-size="6.5" font-weight="500">Deutsch</text>
+
+      <!-- Legend -->
+      <circle cx="398" cy="196" r="3" fill="#3b82f6"/>
+      <text x="404" y="199" fill="#60a5fa" font-size="5.5" font-weight="600">Heute</text>
+      <circle cx="428" cy="196" r="3" fill="#ef4444"/>
+      <text x="434" y="199" fill="#f87171" font-size="5.5" font-weight="600">Vertretung</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- RIGHT: Desktop card mockup -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <g filter="url(#cardShadow)">
+      <rect x="510" y="14" width="500" height="248" rx="12" fill="#0f1729" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+      <!-- Card header -->
+      <rect x="524" y="26" width="32" height="32" rx="8" fill="url(#iconGrad)"/>
+      <text x="540" y="46" text-anchor="middle" font-size="14">📅</text>
+      <text x="564" y="40" fill="white" font-size="12" font-weight="700">Stundenplan</text>
+      <text x="564" y="52" fill="#94a3b8" font-size="8">Klasse 10b</text>
+
+      <!-- ⓘ button -->
+      <circle cx="870" cy="42" r="10" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" stroke-width="1.2"/>
+      <text x="870" y="46" text-anchor="middle" fill="#fcd34d" font-size="9">ⓘ</text>
+
+      <!-- Date chip -->
+      <rect x="884" y="32" width="68" height="20" rx="10" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <text x="918" y="45" text-anchor="middle" fill="#94a3b8" font-size="7.5">Di, 13. Mai</text>
+
+      <!-- Reload -->
+      <rect x="956" y="32" width="44" height="20" rx="6" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="978" y="45" text-anchor="middle" fill="#94a3b8" font-size="8">↺ Neu</text>
+
+      <!-- Column headers -->
+      <rect x="510" y="64" width="500" height="18" fill="rgba(0,0,0,0.25)"/>
+      <text x="534" y="76" fill="#475569" font-size="7" font-weight="600">#</text>
+      <!-- Today pill -->
+      <rect x="556" y="65" width="68" height="16" rx="5" fill="#2563eb"/>
+      <text x="590" y="76" text-anchor="middle" fill="white" font-size="7.5" font-weight="700">MO</text>
+      <text x="672" y="76" text-anchor="middle" fill="#475569" font-size="7.5" font-weight="600">DI</text>
+      <text x="754" y="76" text-anchor="middle" fill="#475569" font-size="7.5" font-weight="600">MI</text>
+      <text x="836" y="76" text-anchor="middle" fill="#475569" font-size="7.5" font-weight="600">DO</text>
+      <text x="918" y="76" text-anchor="middle" fill="#475569" font-size="7.5" font-weight="600">FR</text>
+      <text x="984" y="76" text-anchor="middle" fill="#475569" font-size="7.5" font-weight="600">SA</text>
+
+      <!-- Row 1 -->
+      <rect x="510" y="82" width="500" height="26" fill="#0f1729"/>
+      <text x="534" y="97" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">1</text>
+      <text x="534" y="105" text-anchor="middle" fill="#475569" font-size="5.5">07:45</text>
+      <rect x="558" y="84" width="64" height="22" rx="6" fill="#2563eb"/>
+      <text x="590" y="98" text-anchor="middle" fill="white" font-size="8" font-weight="600">MA</text>
+      <rect x="640" y="84" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="672" y="98" text-anchor="middle" fill="#e2e8f0" font-size="8">SPO</text>
+      <rect x="722" y="84" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="754" y="98" text-anchor="middle" fill="#e2e8f0" font-size="8">EN</text>
+      <rect x="804" y="84" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="886" y="84" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="958" y="84" width="44" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+
+      <!-- Row 2 -->
+      <rect x="510" y="108" width="500" height="26" fill="rgba(255,255,255,0.012)"/>
+      <text x="534" y="123" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">2</text>
+      <text x="534" y="131" text-anchor="middle" fill="#475569" font-size="5.5">08:40</text>
+      <rect x="558" y="110" width="64" height="22" rx="6" fill="#2563eb"/>
+      <text x="590" y="124" text-anchor="middle" fill="white" font-size="8" font-weight="600">MA</text>
+      <rect x="640" y="110" width="64" height="22" rx="6" fill="#7f1d1d"/>
+      <text x="672" y="124" text-anchor="middle" fill="#fca5a5" font-size="8" font-weight="600">SPO</text>
+      <rect x="722" y="110" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="754" y="124" text-anchor="middle" fill="#e2e8f0" font-size="8">DE</text>
+      <rect x="804" y="110" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="886" y="110" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="958" y="110" width="44" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+
+      <!-- Row 3 -->
+      <rect x="510" y="134" width="500" height="26" fill="#0f1729"/>
+      <text x="534" y="149" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">3</text>
+      <text x="534" y="157" text-anchor="middle" fill="#475569" font-size="5.5">09:25</text>
+      <rect x="558" y="136" width="64" height="22" rx="6" fill="#2563eb"/>
+      <text x="590" y="150" text-anchor="middle" fill="white" font-size="8" font-weight="600">EB</text>
+      <rect x="640" y="136" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="672" y="150" text-anchor="middle" fill="#e2e8f0" font-size="8">EN</text>
+      <rect x="722" y="136" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="754" y="150" text-anchor="middle" fill="#e2e8f0" font-size="8">MA</text>
+      <rect x="804" y="136" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="886" y="136" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="958" y="136" width="44" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+
+      <!-- Pause -->
+      <rect x="510" y="160" width="500" height="16" fill="rgba(0,0,0,0.25)"/>
+      <line x1="510" y1="160" x2="1010" y2="160" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="760" y="171" text-anchor="middle" fill="#64748b" font-size="7" font-style="italic">Pause 10:10 – 10:30</text>
+
+      <!-- Row 4 -->
+      <rect x="510" y="176" width="500" height="26" fill="rgba(255,255,255,0.012)"/>
+      <text x="534" y="191" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">4</text>
+      <text x="534" y="199" text-anchor="middle" fill="#475569" font-size="5.5">10:35</text>
+      <rect x="558" y="178" width="64" height="22" rx="6" fill="#2563eb"/>
+      <text x="590" y="192" text-anchor="middle" fill="white" font-size="8" font-weight="600">DE</text>
+      <rect x="640" y="178" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="672" y="192" text-anchor="middle" fill="#e2e8f0" font-size="8">MA</text>
+      <rect x="722" y="178" width="64" height="22" rx="6" fill="#1a2a50"/>
+      <text x="754" y="192" text-anchor="middle" fill="#e2e8f0" font-size="8">EN</text>
+      <rect x="804" y="178" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="886" y="178" width="64" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+      <rect x="958" y="178" width="44" height="22" rx="6" fill="rgba(255,255,255,0.03)"/>
+
+      <!-- Legend -->
+      <circle cx="524" cy="222" r="4" fill="#3b82f6"/>
+      <text x="532" y="226" fill="#60a5fa" font-size="8" font-weight="600">Heute</text>
+      <circle cx="568" cy="222" r="4" fill="#ef4444"/>
+      <text x="576" y="226" fill="#f87171" font-size="8" font-weight="600">Vertretung</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- BOTTOM BAR -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <rect x="0" y="270" width="1024" height="50" fill="rgba(0,0,0,0.35)"/>
+    <line x1="0" y1="270" x2="1024" y2="270" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+    <!-- Item 1 -->
+    <text x="100" y="291" text-anchor="middle" font-size="16">📱</text>
+    <text x="120" y="289" fill="white" font-size="10" font-weight="600">Responsive Design</text>
+    <text x="120" y="302" fill="#64748b" font-size="9">Für Mobile &amp; Desktop</text>
+
+    <!-- Item 2 -->
+    <text x="356" y="291" text-anchor="middle" font-size="16">🖱️</text>
+    <text x="376" y="289" fill="white" font-size="10" font-weight="600">Klick-Details</text>
+    <text x="376" y="302" fill="#64748b" font-size="9">Lehrer &amp; Raum per Klick</text>
+
+    <!-- Item 3 -->
+    <text x="612" y="291" text-anchor="middle" font-size="16">⚙️</text>
+    <text x="632" y="289" fill="white" font-size="10" font-weight="600">Einfache Konfiguration</text>
+    <text x="632" y="302" fill="#64748b" font-size="9">Kein YAML erforderlich</text>
+
+    <!-- Item 4 -->
+    <text x="868" y="291" text-anchor="middle" font-size="16">⚡</text>
+    <text x="888" y="289" fill="white" font-size="10" font-weight="600">Immer aktuell</text>
+    <text x="888" y="302" fill="#64748b" font-size="9">Automatische Updates</text>
+
+    <!-- Dividers -->
+    <line x1="256" y1="278" x2="256" y2="312" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <line x1="512" y1="278" x2="512" y2="312" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+    <line x1="768" y1="278" x2="768" y2="312" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  </g>
+</svg>
