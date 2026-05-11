@@ -42,19 +42,19 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ### Übersicht
 
-![Overview](docs/overview.png)
+![Overview](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png)
 
 ---
 
 ### Lovelace Card
 
-![Card](docs/card.png)
+![Card](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png)
 
 ---
 
 ### Konfiguration
 
-![Config](docs/config.png)
+![Config](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png)
 
 ---
 
