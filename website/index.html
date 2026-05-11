@@ -7,6 +7,30 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- GitHub latest release version fetched at runtime -->
+  <script>
+    async function loadGithubVersion() {
+      try {
+        const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases/latest');
+        const d = await r.json();
+        const tag = d.tag_name || 'v2.4.0';
+        const pre = d.prerelease;
+        const label = pre ? 'Beta' : 'Stable';
+        const cls   = pre ? 'ver-beta' : 'ver-stable';
+        document.querySelectorAll('.gh-version').forEach(el => {
+          el.textContent = tag;
+        });
+        document.querySelectorAll('.gh-version-full').forEach(el => {
+          el.innerHTML = tag + ' <span class="ver-label ' + cls + '">' + label + '</span>';
+        });
+        document.querySelectorAll('.version-tag').forEach(el => {
+          el.textContent = tag;
+          el.className = 'version-tag ' + cls;
+        });
+      } catch(e) { /* keep fallback text */ }
+    }
+    document.addEventListener('DOMContentLoaded', loadGithubVersion);
+  </script>
 </head>
 <body>
 
@@ -35,6 +59,7 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
+          <span class="version-tag gh-version">v2.4.0</span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -71,11 +96,11 @@
         </div>
 
         <div class="hero-badges-row">
-          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill ha">
+          <a href="https://www.home-assistant.io/" class="badge-pill ha">
             <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/></svg>
             Works with Home Assistant
           </a>
-          <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill hacs">HACS</a>
+          <a href="https://www.hacs.xyz/" class="badge-pill hacs">HACS</a>
           <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="badge-pill custom">Custom Integration</a>
           <a href="https://discord.gg/57uvCeRw43" class="badge-pill discord">Discord Community</a>
         </div>
@@ -141,16 +166,30 @@
         </div>
       </div>
     </div>
-
-    <div class="hero-bottom-bar">
-      <div class="container hero-bottom-inner">
-        <div class="hb-item"><span>📱</span><div><strong>Responsive Design</strong><small>Für Mobile &amp; Desktop</small></div></div>
-        <div class="hb-item"><span>🎨</span><div><strong>Theme-Unterstützung</strong><small>Passt sich deinem Setup an</small></div></div>
-        <div class="hb-item"><span>⚙️</span><div><strong>Einfache Konfiguration</strong><small>Kein YAML erforderlich</small></div></div>
-        <div class="hb-item"><span>⚡</span><div><strong>Immer aktuell</strong><small>Automatische Updates</small></div></div>
-      </div>
-    </div>
   </header>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="topnav" id="topnav">
+    <div class="container topnav-inner">
+      <div class="topnav-logo">VpMobile<span class="accent">24</span></div>
+      <div class="topnav-links">
+        <a href="#installation">Installation</a>
+        <a href="#card">Card einrichten</a>
+        <a href="#sensors">Erstellte Sensoren</a>
+        <a href="#troubleshooting">Hilfe</a>
+      </div>
+      <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="topnav-cta" target="_blank" rel="noopener">GitHub →</a>
+      <button class="nav-burger" onclick="toggleNav()" aria-label="Menü">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile-menu" id="navMobileMenu">
+      <a href="#installation" onclick="toggleNav()">Installation</a>
+      <a href="#card" onclick="toggleNav()">Card einrichten</a>
+      <a href="#sensors" onclick="toggleNav()">Erstellte Sensoren</a>
+      <a href="#troubleshooting" onclick="toggleNav()">Hilfe</a>
+    </div>
+  </nav>
 
   <!-- ===== MAIN CONTENT ===== -->
   <main>
@@ -173,15 +212,29 @@
               <div class="step-num">1</div>
               <div class="step-body">
                 <h3>HACS öffnen &amp; Repository hinzufügen</h3>
-                <p>Öffne HACS in Home Assistant. Klicke oben rechts auf das Menü <code>⋮</code> und wähle <strong>„Benutzerdefiniertes Repository"</strong>.</p>
-                <div class="code-block">
-                  <div class="code-label">Repository URL</div>
-                  <div class="code-line">
-                    <code>https://github.com/Maximilian-Andrew-Kluge/VpMobile24</code>
-                    <button class="copy-btn" onclick="copyText(this, 'https://github.com/Maximilian-Andrew-Kluge/VpMobile24')">Kopieren</button>
+                <p>Wähle eine der folgenden Methoden um VpMobile24 in HACS hinzuzufügen:</p>
+                <div class="option-grid">
+                  <div class="option-card option-card-featured">
+                    <div class="option-card-title">⭐ Option A – Direkt in HACS öffnen</div>
+                    <p>Klicke auf den Button und HACS öffnet sich automatisch mit dem vorausgefüllten Repository:</p>
+                    <a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge" class="hacs-btn" target="_blank" rel="noopener">
+                      <span>🏠</span> In HACS öffnen
+                    </a>
+                    <p class="option-note">Empfohlen – funktioniert nur wenn <code>my.home-assistant.io</code> in deiner HA-Instanz konfiguriert ist.</p>
+                  </div>
+                  <div class="option-card">
+                    <div class="option-card-title">🔗 Option B – Repository URL manuell</div>
+                    <p>Öffne HACS, klicke auf <code>⋮</code> → <strong>„Benutzerdefiniertes Repository"</strong> und füge diese URL ein:</p>
+                    <div class="code-block">
+                      <div class="code-label">Repository URL</div>
+                      <div class="code-line">
+                        <code>https://github.com/Maximilian-Andrew-Kluge/VpMobile24</code>
+                        <button class="copy-btn" onclick="copyText(this, 'https://github.com/Maximilian-Andrew-Kluge/VpMobile24')">Kopieren</button>
+                      </div>
+                    </div>
+                    <p class="option-note">Kategorie: <strong>Integration</strong> → Hinzufügen klicken.</p>
                   </div>
                 </div>
-                <p>Wähle als Kategorie <strong>Integration</strong> und klicke auf <strong>Hinzufügen</strong>.</p>
               </div>
             </div>
 
@@ -230,13 +283,28 @@
             <div class="step">
               <div class="step-num">1</div>
               <div class="step-body">
-                <h3>Repository herunterladen</h3>
-                <p>Lade das Repository als ZIP herunter oder klone es mit Git:</p>
-                <div class="code-block">
-                  <div class="code-label">Git Clone</div>
-                  <div class="code-line">
-                    <code>git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git</code>
-                    <button class="copy-btn" onclick="copyText(this, 'git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git')">Kopieren</button>
+                <h3>Integration herunterladen</h3>
+                <p>Wähle eine der folgenden Methoden:</p>
+                <div class="option-grid">
+                  <div class="option-card">
+                    <div class="option-card-title">Option A – Git Clone</div>
+                    <p>Klone das komplette Repository mit Git:</p>
+                    <div class="code-block">
+                      <div class="code-label">Terminal</div>
+                      <div class="code-line">
+                        <code>git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git</code>
+                        <button class="copy-btn" onclick="copyText(this, 'git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24.git')">Kopieren</button>
+                      </div>
+                    </div>
+                    <p class="option-note">Danach liegt der Ordner <code>VpMobile24/custom_components/vpmobile24/</code> lokal vor.</p>
+                  </div>
+                  <div class="option-card">
+                    <div class="option-card-title">Option B – ZIP herunterladen</div>
+                    <p>Lade nur den <code>custom_components</code>-Ordner als ZIP herunter — immer die neueste Version:</p>
+                    <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/archive/refs/heads/main.zip" class="download-btn">
+                      ⬇️ custom_components herunterladen
+                    </a>
+                    <p class="option-note">ZIP enthält den kompletten Repo-Stand. Entpacke und kopiere nur den Ordner <code>custom_components/vpmobile24/</code>.</p>
                   </div>
                 </div>
               </div>
@@ -338,7 +406,7 @@ show_time: true</code></pre>
                 <div class="ot-row"><span><code>highlight_today</code></span><span>Heutigen Tag hervorheben</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>show_time</code></span><span>Uhrzeiten anzeigen</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>use_custom_times</code></span><span>Eigene Uhrzeiten verwenden</span><span><code>false</code></span></div>
-                <div class="ot-row"><span><code>custom_theme</code></span><span>Theme auswählen</span><span><code>auto</code></span></div>
+                <div class="ot-row"><span><code>reload_entity</code></span><span>Neu-laden Button Entity</span><span><code>—</code></span></div>
               </div>
             </div>
           </div>
@@ -443,6 +511,22 @@ show_time: true</code></pre>
               <p>Die Integration ruft Daten alle 15 Minuten ab. Prüfe deine Zugangsdaten und stelle sicher, dass deine Schule VpMobile24 / Stundenplan24 verwendet. Bei anhaltenden Problemen erstelle ein Issue auf GitHub.</p>
             </div>
           </details>
+
+          <details class="faq-item">
+            <summary>Pausen-Zeiten werden nicht übernommen</summary>
+            <div class="faq-body">
+              <p>Wenn du eigene Pausenzeiten verwenden möchtest, musst du nach dem Aktivieren von <strong>„Eigene Uhrzeiten verwenden"</strong> die gewünschten Zeiten im aufklappbaren Bereich <strong>„Uhrzeiten-Anpassung"</strong> eintragen.</p>
+              <ol>
+                <li>Aktiviere die Option <strong>„Eigene Uhrzeiten verwenden"</strong> in der Card-Konfiguration</li>
+                <li>Klappe den Abschnitt <strong>„Uhrzeiten-Anpassung"</strong> auf – er erscheint direkt darunter</li>
+                <li>Trage dort deine gewünschten Pausen-Zeiten ein und speichere die Konfiguration</li>
+              </ol>
+              <div class="info-box" style="margin-top: 10px;">
+                <span>💡</span>
+                <span>Die Zeiten werden erst übernommen, wenn sie im aufgeklappten Bereich eingetragen und gespeichert wurden.</span>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </section>
@@ -456,7 +540,7 @@ show_time: true</code></pre>
           <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="btn btn-primary">GitHub Repository</a>
           <a href="https://discord.gg/57uvCeRw43" class="btn btn-secondary">Discord Community</a>
         </div>
-        <div class="version-badge">Version 2.3.3 · Beta</div>
+        <div class="version-badge">Version <span class="gh-version-full">v2.4.0 <span class="ver-label ver-stable">Stable</span></span></div>
       </div>
     </section>
 
@@ -471,7 +555,7 @@ show_time: true</code></pre>
         <a href="https://discord.gg/57uvCeRw43">Discord</a>
         <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE">Lizenz</a>
       </div>
-      <div class="footer-copy">Made with ❤️ for Home Assistant</div>
+      <div class="footer-copy">Made with ❤️ for Home Assistant · <span class="by">@by Maximilian</span></div>
     </div>
   </footer>
 

@@ -46,8 +46,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.3.0",
+        sw_version="2.4.0",
     )
+
+    # Re-copy card on every config entry setup (catches HACS updates)
+    try:
+        from pathlib import Path
+        import shutil
+
+        card_source = Path(__file__).parent / "vpmobile24-card.js"
+        if card_source.exists():
+            www_dir = Path(hass.config.path("www")) / "vpmobile24"
+            www_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(str(card_source), str(www_dir / "vpmobile24-card.js"))
+            shutil.copy2(str(card_source), str(www_dir / "card.js"))
+            _LOGGER.info("VpMobile24 card refreshed in www folder (vpmobile24-card.js + card.js)")
+    except Exception as copy_err:
+        _LOGGER.warning(f"Could not refresh card file: {copy_err}")
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     
@@ -56,34 +71,80 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the vpmobile24 component."""
-    # Register the custom card
     try:
         from pathlib import Path
         import shutil
-        
-        # Get the path to the card file
+        import time
+
         integration_dir = Path(__file__).parent
-        card_path = integration_dir / "vpmobile24-card.js"
-        
-        if card_path.exists():
-            # Copy to www folder automatically
-            www_dir = Path(hass.config.path("www"))
-            www_vpmobile_dir = www_dir / "vpmobile24"
-            www_card_path = www_vpmobile_dir / "vpmobile24-card.js"
-            
-            # Create directory if it doesn't exist
-            www_vpmobile_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Copy the card file
-            shutil.copy2(str(card_path), str(www_card_path))
-            
-            _LOGGER.info(f"Custom card automatically copied to {www_card_path}")
-            _LOGGER.info(f"Add resource with URL: /local/vpmobile24/vpmobile24-card.js")
-        else:
-            _LOGGER.error(f"Card file not found at {card_path}")
+        card_source = integration_dir / "vpmobile24-card.js"
+
+        if not card_source.exists():
+            _LOGGER.error(f"Card file not found at {card_source}")
+            return True
+
+        # Copy card to www/vpmobile24/
+        www_dir = Path(hass.config.path("www")) / "vpmobile24"
+        www_dir.mkdir(parents=True, exist_ok=True)
+        www_card = www_dir / "vpmobile24-card.js"
+        shutil.copy2(str(card_source), str(www_card))
+        # Also copy as card.js for backwards compatibility with old resource URLs
+        shutil.copy2(str(card_source), str(www_dir / "card.js"))
+        _LOGGER.info(f"VpMobile24 card copied to {www_card} (and card.js)")
+
+        # Cache-busting: update the Lovelace resource URL with a version timestamp
+        # so every HA restart forces browsers to reload the latest card file.
+        version = str(int(time.time()))
+        new_url = f"/local/vpmobile24/vpmobile24-card.js?v={version}"
+
+        try:
+            from homeassistant.components.lovelace import _get_lovelace_data  # noqa: F401
+        except ImportError:
+            pass  # older HA versions – skip resource update
+
+        try:
+            # Access the Lovelace resource storage directly
+            lovelace = hass.data.get("lovelace")
+            if lovelace and hasattr(lovelace, "resources"):
+                resources = lovelace.resources
+                await resources.async_load()
+                existing = resources.async_items()
+
+                # Find any existing vpmobile24-card resource
+                old_id = None
+                for item in existing:
+                    url = item.get("url", "")
+                    if "vpmobile24-card.js" in url or "/vpmobile24/card.js" in url:
+                        old_id = item.get("id")
+                        break
+
+                if old_id is not None:
+                    # Update existing resource with new versioned URL
+                    await resources.async_update_item(
+                        old_id,
+                        {"res_type": "module", "url": new_url}
+                    )
+                    _LOGGER.info(f"VpMobile24 resource URL updated to {new_url}")
+                else:
+                    # Create new resource entry
+                    await resources.async_create_item(
+                        {"res_type": "module", "url": new_url}
+                    )
+                    _LOGGER.info(f"VpMobile24 resource registered: {new_url}")
+            else:
+                _LOGGER.info(
+                    f"Lovelace resource store not available yet. "
+                    f"Please set resource URL to: {new_url}"
+                )
+        except Exception as res_err:
+            _LOGGER.warning(
+                f"Could not auto-update Lovelace resource URL: {res_err}. "
+                f"Manually set resource to: {new_url}"
+            )
+
     except Exception as e:
         _LOGGER.error(f"Could not setup custom card: {e}", exc_info=True)
-    
+
     return True
 
 
