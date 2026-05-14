@@ -13,7 +13,7 @@
       try {
         const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases/latest');
         const d = await r.json();
-        const tag = d.tag_name || 'v2.4.0';
+        const tag = d.tag_name || 'v2.4.2';
         const pre = d.prerelease;
         const label = pre ? 'Beta' : 'Stable';
         const cls   = pre ? 'ver-beta' : 'ver-stable';
@@ -82,7 +82,7 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag gh-version">v2.4.1</span>
+          <span class="version-tag gh-version">v2.4.2</span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -309,120 +309,161 @@
       <div class="container">
         <div class="section-label">Features</div>
         <h2 class="section-title">Alles was du brauchst</h2>
-        <p class="section-desc">VpMobile24 bringt deinen Stundenplan direkt in Home Assistant – mit einem modernen Navy-Design und praktischen Funktionen.</p>
+        <p class="section-desc">VpMobile24 bringt deinen Stundenplan direkt in Home Assistant – mit modernem Navy-Design und smarten Funktionen.</p>
 
         <div class="features-grid">
           <div class="feature-card">
             <div class="feature-icon">🖱️</div>
             <h3>Klick-Details</h3>
-            <p>Klicke auf jede Fach-Kachel um ein Popup mit <strong>Lehrer</strong>, <strong>Raum</strong>, <strong>Uhrzeit</strong> und <strong>Zusatzinfo</strong> zu sehen.</p>
+            <p>Klicke auf jede Fach-Kachel für ein Popup mit <strong>Lehrer</strong>, <strong>Raum</strong> und <strong>Uhrzeit</strong>. Ausfallstunden zeigen ein rotes <strong>AUSFALL</strong>-Popup mit Glow.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🟢</div>
+            <h3>Aktuelle Stunde</h3>
+            <p>Die gerade laufende Stunde wird <strong>grün hervorgehoben</strong> – automatisch anhand der konfigurierten Uhrzeiten erkannt.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">ⓘ</div>
             <h3>Zusatzinfos</h3>
-            <p>Der <strong>ⓘ-Button</strong> neben dem heutigen Tag zeigt alle allgemeinen Zusatzinformationen des aktuellen Tages – pulsiert wenn Infos vorhanden.</p>
+            <p>Der <strong>ⓘ-Button</strong> neben dem Titel zeigt Zusatzinformationen des aktuellen Tages – pulsiert wenn Infos vorhanden.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📱</div>
             <h3>Mobiler Modus</h3>
-            <p>Auf dem Handy: kompakte Einzelspalten-Ansicht mit <strong>Tag-Tabs</strong> (Mo–Fr). Heute wird automatisch vorausgewählt.</p>
+            <p>Kompakte Einzelspalten-Ansicht mit <strong>Tag-Tabs inkl. Datum</strong> (Mo/11). Heute wird automatisch vorausgewählt.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">🔄</div>
             <h3>Auto-Update</h3>
-            <p>Die Card-Datei wird bei jedem HA-Start automatisch aktualisiert. <strong>Cache-Busting</strong> sorgt dafür dass Browser immer die neueste Version laden.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3>Navy Design</h3>
-            <p>Festes dunkles Navy-Design – unabhängig vom HA-Theme. Heute-Spalte blau, Vertretungen dunkelrot, abgerundete Kacheln.</p>
+            <p>Card wird bei jedem HA-Start automatisch aktualisiert. <strong>Cache-Busting</strong> sorgt für immer die neueste Version.</p>
           </div>
           <div class="feature-card">
             <div class="feature-icon">⏰</div>
             <h3>Eigene Uhrzeiten</h3>
-            <p>Passen deine Schulzeiten nicht zu den Defaults? Trage eigene Stunden- und Pausenzeiten direkt in der visuellen Konfiguration ein.</p>
+            <p>Eigene Stunden- und Pausenzeiten direkt in der visuellen Konfiguration – kein YAML nötig.</p>
           </div>
         </div>
 
-        <!-- Feature showcase: Click popup + Info popup side by side -->
+        <!-- Feature Showcase SVGs -->
         <div class="feature-showcase">
+
+          <!-- 1: Detail Popup -->
           <div class="showcase-item">
-            <div class="showcase-label">
-              <span class="showcase-dot dot-blue"></span>
-              Klick auf Fach → Detail-Popup
-            </div>
+            <div class="showcase-label"><span class="showcase-dot dot-blue"></span>Klick → Detail-Popup</div>
             <div class="showcase-mockup">
-              <!-- SVG: Lesson detail popup -->
-              <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
-                <!-- Background card -->
-                <rect width="320" height="200" rx="10" fill="#0f1729"/>
-                <!-- Dimmed table behind -->
-                <rect x="10" y="10" width="300" height="100" rx="6" fill="#162040" opacity="0.5"/>
-                <text x="30" y="35" fill="#475569" font-size="7" font-family="Inter,sans-serif">#</text>
-                <text x="80" y="35" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">MO</text>
-                <rect x="120" y="22" width="60" height="16" rx="5" fill="#2563eb"/>
-                <text x="150" y="34" text-anchor="middle" fill="#fff" font-size="7" font-weight="700" font-family="Inter,sans-serif">DI</text>
-                <text x="220" y="35" text-anchor="middle" fill="#475569" font-size="7" font-family="Inter,sans-serif">MI</text>
-                <!-- Highlighted tile -->
-                <rect x="55" y="45" width="50" height="22" rx="5" fill="#2563eb" opacity="0.4"/>
-                <text x="80" y="60" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="Inter,sans-serif">MA</text>
-                <rect x="120" y="45" width="50" height="22" rx="5" fill="#2563eb"/>
-                <text x="145" y="60" text-anchor="middle" fill="#fff" font-size="8" font-weight="600" font-family="Inter,sans-serif">DE</text>
+              <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="300" height="190" rx="10" fill="#0f1729"/>
+                <rect x="8" y="8" width="284" height="70" rx="6" fill="#162040" opacity="0.6"/>
+                <!-- tiles -->
+                <rect x="60" y="18" width="52" height="22" rx="5" fill="#2563eb" opacity="0.4"/>
+                <text x="86" y="33" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="Inter,sans-serif">MA</text>
+                <rect x="120" y="18" width="52" height="22" rx="5" fill="#2563eb"/>
+                <text x="146" y="33" text-anchor="middle" fill="#fff" font-size="8" font-weight="600" font-family="Inter,sans-serif">DE</text>
+                <rect x="180" y="18" width="52" height="22" rx="5" fill="#1a2a50"/>
+                <text x="206" y="33" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EN</text>
                 <!-- Popup -->
-                <rect x="60" y="90" width="200" height="100" rx="10" fill="#162040" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-                <rect x="60" y="90" width="200" height="32" rx="10" fill="#162040"/>
-                <rect x="60" y="110" width="200" height="12" fill="#162040"/>
-                <text x="74" y="106" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2. Stunde</text>
-                <text x="120" y="106" fill="#fff" font-size="10" font-weight="800" font-family="Inter,sans-serif">Deutsch</text>
-                <line x1="60" y1="122" x2="260" y2="122" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                <text x="74" y="136" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">LEHRER</text>
-                <text x="120" y="136" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">Müller</text>
-                <text x="74" y="150" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">RAUM</text>
-                <text x="120" y="150" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">B102</text>
-                <text x="74" y="164" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">ZEIT</text>
-                <text x="120" y="164" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">08:40–09:25</text>
-                <rect x="190" y="176" width="62" height="16" rx="6" fill="#2563eb"/>
-                <text x="221" y="187" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+                <rect x="40" y="82" width="220" height="100" rx="10" fill="#162040" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <rect x="40" y="82" width="220" height="30" rx="10" fill="#162040"/>
+                <rect x="40" y="100" width="220" height="12" fill="#162040"/>
+                <text x="54" y="98" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2. Stunde</text>
+                <text x="100" y="98" fill="#fff" font-size="10" font-weight="800" font-family="Inter,sans-serif">Deutsch</text>
+                <line x1="40" y1="112" x2="260" y2="112" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                <text x="54" y="126" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">🕐 2. Stunde</text>
+                <text x="120" y="126" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">08:40–09:25</text>
+                <text x="54" y="142" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">👤 Lehrer</text>
+                <text x="120" y="142" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">Müller</text>
+                <text x="54" y="158" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">🚪 Raum</text>
+                <text x="120" y="158" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">B102</text>
+                <rect x="186" y="168" width="66" height="16" rx="6" fill="#2563eb"/>
+                <text x="219" y="179" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
               </svg>
             </div>
           </div>
 
+          <!-- 2: Ausfall Popup -->
           <div class="showcase-item">
-            <div class="showcase-label">
-              <span class="showcase-dot dot-yellow"></span>
-              ⓘ-Button → Zusatzinfo-Popup
-            </div>
+            <div class="showcase-label"><span class="showcase-dot" style="background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.6)"></span>Ausfall → Rotes Glow-Popup</div>
             <div class="showcase-mockup">
-              <!-- SVG: Info popup -->
-              <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
-                <rect width="320" height="200" rx="10" fill="#0f1729"/>
-                <!-- Header with info button highlighted -->
-                <rect x="10" y="10" width="300" height="40" rx="6" fill="#162040" opacity="0.6"/>
-                <rect x="20" y="18" width="24" height="24" rx="6" fill="#1d4ed8"/>
-                <text x="32" y="33" text-anchor="middle" font-size="12" font-family="sans-serif">📅</text>
-                <text x="52" y="28" fill="#fff" font-size="9" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
-                <text x="52" y="40" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">Klasse 10b</text>
-                <!-- Info button highlighted -->
-                <circle cx="220" cy="30" r="11" fill="rgba(245,158,11,0.3)" stroke="#fcd34d" stroke-width="1.5"/>
-                <text x="220" y="35" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">ⓘ</text>
-                <rect x="238" y="18" width="62" height="24" rx="12" fill="rgba(255,255,255,0.08)"/>
-                <text x="269" y="33" text-anchor="middle" fill="#94a3b8" font-size="7.5" font-family="Inter,sans-serif">Mo, 11. Mai</text>
-                <!-- Info popup -->
-                <rect x="30" y="60" width="260" height="130" rx="10" fill="#162040" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
-                <rect x="30" y="60" width="260" height="32" rx="10" fill="#162040"/>
-                <rect x="30" y="80" width="260" height="12" fill="#162040"/>
-                <text x="44" y="80" fill="#fcd34d" font-size="9" font-weight="700" font-family="Inter,sans-serif">ℹ️ Zusatzinformationen</text>
-                <text x="240" y="80" text-anchor="end" fill="#64748b" font-size="7" font-family="Inter,sans-serif">Montag</text>
-                <line x1="30" y1="92" x2="290" y2="92" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
-                <text x="44" y="106" fill="#64748b" font-size="6.5" font-weight="700" font-family="Inter,sans-serif">📢 ALLGEMEINE INFORMATIONEN</text>
-                <rect x="40" y="112" width="240" height="28" rx="6" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
-                <text x="52" y="124" fill="#e2e8f0" font-size="7.5" font-family="Inter,sans-serif">Unterricht beginnt heute 2. Stunde</text>
-                <text x="52" y="135" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">Bitte Sportzeug mitbringen</text>
-                <rect x="200" y="170" width="72" height="16" rx="6" fill="#2563eb"/>
-                <text x="236" y="181" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+              <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="300" height="190" rx="10" fill="#0f1729"/>
+                <rect width="300" height="190" rx="10" fill="rgba(0,0,0,0.45)"/>
+                <defs>
+                  <filter id="rg2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <!-- Red popup -->
+                <rect x="20" y="15" width="260" height="160" rx="12" fill="#7f1d1d" stroke="rgba(239,68,68,0.5)" stroke-width="1.5" filter="url(#rg2)"/>
+                <!-- Title -->
+                <rect x="20" y="15" width="260" height="34" rx="12" fill="rgba(0,0,0,0.25)"/>
+                <rect x="20" y="37" width="260" height="12" fill="rgba(0,0,0,0.25)"/>
+                <text x="36" y="36" fill="#fca5a5" font-size="7.5" font-family="Inter,sans-serif">1. Stunde</text>
+                <text x="82" y="36" fill="#fca5a5" font-size="8" font-family="Inter,sans-serif">—</text>
+                <rect x="96" y="24" width="46" height="18" rx="5" fill="rgba(239,68,68,0.3)" stroke="rgba(239,68,68,0.5)" stroke-width="1"/>
+                <text x="119" y="36" text-anchor="middle" fill="#fca5a5" font-size="8" font-weight="700" font-family="Inter,sans-serif">Ausfall</text>
+                <!-- AUSFALL text -->
+                <text x="150" y="112" text-anchor="middle" fill="#fca5a5" font-size="26" font-weight="900" letter-spacing="3" font-family="Inter,sans-serif">AUSFALL</text>
+                <!-- Schließen -->
+                <rect x="196" y="152" width="66" height="18" rx="7" fill="#2563eb"/>
+                <text x="229" y="164" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
               </svg>
             </div>
           </div>
+
+          <!-- 3: Green current + blue pause -->
+          <div class="showcase-item">
+            <div class="showcase-label"><span class="showcase-dot" style="background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.6)"></span>Aktuelle Stunde grün + Pause hervorgehoben</div>
+            <div class="showcase-mockup">
+              <svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="300" height="210" rx="10" fill="#0f1729"/>
+                <!-- Headers -->
+                <rect x="0" y="0" width="300" height="20" fill="rgba(0,0,0,0.2)"/>
+                <text x="32" y="13" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">#</text>
+                <rect x="50" y="2" width="58" height="16" rx="5" fill="#2563eb"/>
+                <text x="79" y="13" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">MO</text>
+                <text x="157" y="13" text-anchor="middle" fill="#475569" font-size="7.5" font-family="Inter,sans-serif">DI</text>
+                <text x="235" y="13" text-anchor="middle" fill="#475569" font-size="7.5" font-family="Inter,sans-serif">MI</text>
+                <!-- Row 1 -->
+                <rect x="0" y="20" width="300" height="30" fill="#0f1729"/>
+                <text x="32" y="37" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">1</text>
+                <rect x="52" y="23" width="54" height="24" rx="6" fill="#2563eb"/>
+                <text x="79" y="38" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">MA</text>
+                <rect x="130" y="23" width="54" height="24" rx="6" fill="#1a2a50"/>
+                <text x="157" y="38" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">SPO</text>
+                <rect x="208" y="23" width="54" height="24" rx="6" fill="#7f1d1d"/>
+                <text x="235" y="38" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="600" font-family="Inter,sans-serif">—</text>
+                <!-- Row 2 – current green -->
+                <rect x="0" y="50" width="300" height="30" fill="rgba(255,255,255,0.01)"/>
+                <text x="32" y="67" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2</text>
+                <rect x="52" y="53" width="54" height="24" rx="6" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+                <text x="79" y="68" text-anchor="middle" fill="#86efac" font-size="8.5" font-weight="700" font-family="Inter,sans-serif">MA</text>
+                <rect x="130" y="53" width="54" height="24" rx="6" fill="#7f1d1d"/>
+                <text x="157" y="68" text-anchor="middle" fill="#fca5a5" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">SPO</text>
+                <rect x="208" y="53" width="54" height="24" rx="6" fill="#1a2a50"/>
+                <text x="235" y="68" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">DE</text>
+                <!-- Pause – blue highlight -->
+                <rect x="0" y="80" width="300" height="22" fill="rgba(37,99,235,0.1)"/>
+                <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <line x1="0" y1="102" x2="300" y2="102" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <text x="150" y="94" text-anchor="middle" fill="#93c5fd" font-size="8" font-style="italic" font-weight="500" font-family="Inter,sans-serif">Pause 10:10 – 10:30</text>
+                <!-- Row 3 -->
+                <rect x="0" y="102" width="300" height="30" fill="#0f1729"/>
+                <text x="32" y="119" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">3</text>
+                <rect x="52" y="105" width="54" height="24" rx="6" fill="#2563eb"/>
+                <text x="79" y="120" text-anchor="middle" fill="#fff" font-size="8.5" font-weight="600" font-family="Inter,sans-serif">EB</text>
+                <rect x="130" y="105" width="54" height="24" rx="6" fill="#1a2a50"/>
+                <text x="157" y="120" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">EN</text>
+                <rect x="208" y="105" width="54" height="24" rx="6" fill="#1a2a50"/>
+                <text x="235" y="120" text-anchor="middle" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">MA</text>
+                <!-- Legend -->
+                <circle cx="14" cy="152" r="4" fill="#3b82f6"/>
+                <text x="22" y="156" fill="#60a5fa" font-size="8" font-weight="600" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="62" cy="152" r="4" fill="#ef4444"/>
+                <text x="70" y="156" fill="#f87171" font-size="8" font-weight="600" font-family="Inter,sans-serif">Vertretung</text>
+                <circle cx="122" cy="152" r="4" fill="#22c55e"/>
+                <text x="130" y="156" fill="#86efac" font-size="8" font-weight="600" font-family="Inter,sans-serif">Jetzt</text>
+              </svg>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -766,7 +807,23 @@ use_custom_times: false</code></pre>
           </details>
 
           <details class="faq-item">
-            <summary>ⓘ-Button wird nicht angezeigt</summary>
+            <summary>Aktuelle Stunde wird nicht grün markiert</summary>
+            <div class="faq-body">
+              <p>Die grüne Hervorhebung funktioniert nur wenn <code>show_time: true</code> gesetzt ist und die Uhrzeiten korrekt konfiguriert sind. Die Card liest die Stunden-Zeiten und vergleicht sie mit der aktuellen Uhrzeit.</p>
+              <ol>
+                <li>Stelle sicher dass <strong>„Uhrzeiten anzeigen"</strong> aktiviert ist</li>
+                <li>Bei eigenen Zeiten: prüfe ob die Zeiten im Format <code>07:45-08:30</code> eingetragen sind</li>
+                <li>Die Markierung erscheint nur am heutigen Tag</li>
+              </ol>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Ausfallstunden werden grau statt rot angezeigt</summary>
+            <div class="faq-body">
+              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.2</strong> aktualisiert ist.</p>
+            </div>
+          </details>
             <div class="faq-body">
               <p>Der ⓘ-Button erscheint nur wenn <code>additional_info_entity</code> in der Card-Konfiguration gesetzt ist:</p>
               <div class="code-block" style="margin-top:10px">
@@ -790,7 +847,7 @@ use_custom_times: false</code></pre>
           <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="btn btn-primary">GitHub Repository</a>
           <a href="https://discord.gg/57uvCeRw43" class="btn btn-secondary">Discord Community</a>
         </div>
-        <div class="version-badge">Version <span class="gh-version-full">v2.4.0 <span class="ver-label ver-stable">Stable</span></span></div>
+        <div class="version-badge">Version <span class="gh-version-full">v2.4.2 <span class="ver-label ver-stable">Stable</span></span></div>
       </div>
     </section>
 

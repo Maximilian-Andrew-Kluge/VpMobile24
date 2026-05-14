@@ -123,7 +123,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.1",
+            "sw_version": "2.4.2",
         }
 
     @property
@@ -224,7 +224,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.1",
+            "sw_version": "2.4.2",
         }
 
     @property
@@ -474,7 +474,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.1",
+            "sw_version": "2.4.2",
         }
 
     @property
@@ -586,7 +586,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.1",
+            "sw_version": "2.4.2",
         }
 
     @property
@@ -711,7 +711,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.1",
+            "sw_version": "2.4.2",
         }
 
     @property
