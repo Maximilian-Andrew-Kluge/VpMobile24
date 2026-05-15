@@ -347,68 +347,104 @@
         <!-- Feature Showcase SVGs -->
         <div class="feature-showcase">
 
-          <!-- 1: Detail Popup -->
+          <!-- 1: Desktop Card – exact style from screenshot -->
           <div class="showcase-item">
-            <div class="showcase-label"><span class="showcase-dot dot-blue"></span>Klick → Detail-Popup</div>
+            <div class="showcase-label"><span class="showcase-dot dot-blue"></span>Desktop – Wochenansicht</div>
             <div class="showcase-mockup">
-              <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
-                <rect width="300" height="190" rx="10" fill="#0f1729"/>
-                <rect x="8" y="8" width="284" height="70" rx="6" fill="#162040" opacity="0.6"/>
-                <!-- tiles -->
-                <rect x="60" y="18" width="52" height="22" rx="5" fill="#2563eb" opacity="0.4"/>
-                <text x="86" y="33" text-anchor="middle" fill="#93c5fd" font-size="8" font-family="Inter,sans-serif">MA</text>
-                <rect x="120" y="18" width="52" height="22" rx="5" fill="#2563eb"/>
-                <text x="146" y="33" text-anchor="middle" fill="#fff" font-size="8" font-weight="600" font-family="Inter,sans-serif">DE</text>
-                <rect x="180" y="18" width="52" height="22" rx="5" fill="#1a2a50"/>
-                <text x="206" y="33" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EN</text>
-                <!-- Popup -->
-                <rect x="40" y="82" width="220" height="100" rx="10" fill="#162040" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-                <rect x="40" y="82" width="220" height="30" rx="10" fill="#162040"/>
-                <rect x="40" y="100" width="220" height="12" fill="#162040"/>
-                <text x="54" y="98" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2. Stunde</text>
-                <text x="100" y="98" fill="#fff" font-size="10" font-weight="800" font-family="Inter,sans-serif">Deutsch</text>
-                <line x1="40" y1="112" x2="260" y2="112" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                <text x="54" y="126" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">🕐 2. Stunde</text>
-                <text x="120" y="126" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">08:40–09:25</text>
-                <text x="54" y="142" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">👤 Lehrer</text>
-                <text x="120" y="142" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">Müller</text>
-                <text x="54" y="158" fill="#64748b" font-size="6.5" font-weight="600" font-family="Inter,sans-serif">🚪 Raum</text>
-                <text x="120" y="158" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">B102</text>
-                <rect x="186" y="168" width="66" height="16" rx="6" fill="#2563eb"/>
-                <text x="219" y="179" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+              <svg viewBox="0 0 420 340" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="420" height="340" rx="12" fill="#0f1729" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                <!-- Header -->
+                <rect x="14" y="14" width="34" height="34" rx="8" fill="url(#sg1)"/>
+                <text x="31" y="35" text-anchor="middle" font-size="14" font-family="sans-serif">��</text>
+                <text x="56" y="28" fill="#fff" font-size="11" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
+                <text x="56" y="40" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">Klasse 10b</text>
+                <!-- ⓘ -->
+                <circle cx="168" cy="31" r="9" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" stroke-width="1.2"/>
+                <text x="168" y="35" text-anchor="middle" fill="#fcd34d" font-size="9" font-family="sans-serif">ⓘ</text>
+                <!-- Aktualisieren -->
+                <rect x="310" y="20" width="96" height="22" rx="11" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.13)" stroke-width="1"/>
+                <text x="358" y="34" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="Inter,sans-serif">↺ Aktualisieren</text>
+                <!-- Column headers with date -->
+                <rect x="0" y="56" width="420" height="22" fill="rgba(0,0,0,0.2)"/>
+                <text x="36" y="70" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">#</text>
+                <text x="90" y="67" text-anchor="middle" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">MO</text>
+                <text x="90" y="76" text-anchor="middle" fill="#334155" font-size="6.5" font-family="Inter,sans-serif">11</text>
+                <text x="162" y="67" text-anchor="middle" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">DI</text>
+                <text x="162" y="76" text-anchor="middle" fill="#334155" font-size="6.5" font-family="Inter,sans-serif">12</text>
+                <text x="234" y="67" text-anchor="middle" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">MI</text>
+                <text x="234" y="76" text-anchor="middle" fill="#334155" font-size="6.5" font-family="Inter,sans-serif">13</text>
+                <text x="306" y="67" text-anchor="middle" fill="#475569" font-size="7" font-weight="600" font-family="Inter,sans-serif">DO</text>
+                <text x="306" y="76" text-anchor="middle" fill="#334155" font-size="6.5" font-family="Inter,sans-serif">14</text>
+                <!-- FR today pill -->
+                <rect x="356" y="58" width="50" height="20" rx="6" fill="#2563eb"/>
+                <text x="381" y="67" text-anchor="middle" fill="#fff" font-size="7" font-weight="700" font-family="Inter,sans-serif">FR</text>
+                <text x="381" y="76" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="6.5" font-family="Inter,sans-serif">15</text>
+                <!-- Row 1: ausfall MO, SPO DI, ausfall MI -->
+                <rect x="0" y="78" width="420" height="30" fill="#0f1729"/>
+                <text x="36" y="95" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">1</text>
+                <text x="36" y="103" text-anchor="middle" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">07:45</text>
+                <rect x="58" y="81" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="89" y="97" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <rect x="130" y="81" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="161" y="97" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">SPO</text>
+                <rect x="202" y="81" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="233" y="97" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <rect x="274" y="81" width="62" height="24" rx="6" fill="rgba(255,255,255,0.03)"/>
+                <rect x="346" y="81" width="62" height="24" rx="6" fill="rgba(37,99,235,0.15)"/>
+                <!-- Row 2: MA, SPO red, EN -->
+                <rect x="0" y="108" width="420" height="30" fill="rgba(255,255,255,0.01)"/>
+                <text x="36" y="125" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">2</text>
+                <text x="36" y="133" text-anchor="middle" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">08:40</text>
+                <rect x="58" y="111" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="89" y="127" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">MA</text>
+                <rect x="130" y="111" width="62" height="24" rx="6" fill="#7f1d1d"/>
+                <text x="161" y="127" text-anchor="middle" fill="#fca5a5" font-size="8" font-weight="600" font-family="Inter,sans-serif">SPO</text>
+                <rect x="202" y="111" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="233" y="127" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EN</text>
+                <rect x="274" y="111" width="62" height="24" rx="6" fill="rgba(255,255,255,0.03)"/>
+                <rect x="346" y="111" width="62" height="24" rx="6" fill="rgba(37,99,235,0.15)"/>
+                <!-- Row 3 -->
+                <rect x="0" y="138" width="420" height="30" fill="#0f1729"/>
+                <text x="36" y="155" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">3</text>
+                <text x="36" y="163" text-anchor="middle" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">09:25</text>
+                <rect x="58" y="141" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="89" y="157" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">MA</text>
+                <rect x="130" y="141" width="62" height="24" rx="6" fill="#7f1d1d"/>
+                <text x="161" y="157" text-anchor="middle" fill="#fca5a5" font-size="8" font-weight="600" font-family="Inter,sans-serif">SPO</text>
+                <rect x="202" y="141" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="233" y="157" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EN</text>
+                <rect x="274" y="141" width="62" height="24" rx="6" fill="rgba(255,255,255,0.03)"/>
+                <rect x="346" y="141" width="62" height="24" rx="6" fill="rgba(37,99,235,0.15)"/>
+                <!-- Pause blue -->
+                <rect x="0" y="168" width="420" height="20" fill="rgba(37,99,235,0.1)"/>
+                <line x1="0" y1="168" x2="420" y2="168" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <line x1="0" y1="188" x2="420" y2="188" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <text x="210" y="181" text-anchor="middle" fill="#93c5fd" font-size="7.5" font-style="italic" font-weight="500" font-family="Inter,sans-serif">Pause 10:10-10:30</text>
+                <!-- Row 4 -->
+                <rect x="0" y="188" width="420" height="30" fill="rgba(255,255,255,0.01)"/>
+                <text x="36" y="205" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter,sans-serif">4</text>
+                <text x="36" y="213" text-anchor="middle" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">10:35</text>
+                <rect x="58" y="191" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="89" y="207" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EB</text>
+                <rect x="130" y="191" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="161" y="207" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">EN</text>
+                <rect x="202" y="191" width="62" height="24" rx="6" fill="#1a2a50"/>
+                <text x="233" y="207" text-anchor="middle" fill="#e2e8f0" font-size="8" font-family="Inter,sans-serif">DE</text>
+                <rect x="274" y="191" width="62" height="24" rx="6" fill="rgba(255,255,255,0.03)"/>
+                <rect x="346" y="191" width="62" height="24" rx="6" fill="rgba(37,99,235,0.15)"/>
+                <!-- Legend -->
+                <circle cx="14" cy="310" r="4" fill="#3b82f6"/>
+                <text x="22" y="314" fill="#60a5fa" font-size="8" font-weight="600" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="62" cy="310" r="4" fill="#ef4444"/>
+                <text x="70" y="314" fill="#f87171" font-size="8" font-weight="600" font-family="Inter,sans-serif">Vertretung</text>
+                <circle cx="122" cy="310" r="4" fill="#22c55e"/>
+                <text x="130" y="314" fill="#86efac" font-size="8" font-weight="600" font-family="Inter,sans-serif">Jetzt</text>
+                <defs><linearGradient id="sg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs>
               </svg>
             </div>
           </div>
 
-          <!-- 2: Ausfall Popup -->
-          <div class="showcase-item">
-            <div class="showcase-label"><span class="showcase-dot" style="background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.6)"></span>Ausfall → Rotes Glow-Popup</div>
-            <div class="showcase-mockup">
-              <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
-                <rect width="300" height="190" rx="10" fill="#0f1729"/>
-                <rect width="300" height="190" rx="10" fill="rgba(0,0,0,0.45)"/>
-                <defs>
-                  <filter id="rg2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                </defs>
-                <!-- Red popup -->
-                <rect x="20" y="15" width="260" height="160" rx="12" fill="#7f1d1d" stroke="rgba(239,68,68,0.5)" stroke-width="1.5" filter="url(#rg2)"/>
-                <!-- Title -->
-                <rect x="20" y="15" width="260" height="34" rx="12" fill="rgba(0,0,0,0.25)"/>
-                <rect x="20" y="37" width="260" height="12" fill="rgba(0,0,0,0.25)"/>
-                <text x="36" y="36" fill="#fca5a5" font-size="7.5" font-family="Inter,sans-serif">1. Stunde</text>
-                <text x="82" y="36" fill="#fca5a5" font-size="8" font-family="Inter,sans-serif">—</text>
-                <rect x="96" y="24" width="46" height="18" rx="5" fill="rgba(239,68,68,0.3)" stroke="rgba(239,68,68,0.5)" stroke-width="1"/>
-                <text x="119" y="36" text-anchor="middle" fill="#fca5a5" font-size="8" font-weight="700" font-family="Inter,sans-serif">Ausfall</text>
-                <!-- AUSFALL text -->
-                <text x="150" y="112" text-anchor="middle" fill="#fca5a5" font-size="26" font-weight="900" letter-spacing="3" font-family="Inter,sans-serif">AUSFALL</text>
-                <!-- Schließen -->
-                <rect x="196" y="152" width="66" height="18" rx="7" fill="#2563eb"/>
-                <text x="229" y="164" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
-              </svg>
-            </div>
-          </div>
-
-          <!-- 3: Green current + blue pause -->
+          <!-- 2: Green current + blue pause -->
           <div class="showcase-item">
             <div class="showcase-label"><span class="showcase-dot" style="background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.6)"></span>Aktuelle Stunde grün + Pause hervorgehoben</div>
             <div class="showcase-mockup">
@@ -463,6 +499,120 @@
               </svg>
             </div>
           </div>
+
+          <!-- 3: Ausfall Popup -->
+          <div class="showcase-item">
+            <div class="showcase-label"><span class="showcase-dot" style="background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.6)"></span>Ausfall Popup</div>
+            <div class="showcase-mockup">
+              <svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <rect width="340" height="220" rx="10" fill="#0f1729"/>
+                <rect width="340" height="220" rx="10" fill="rgba(0,0,0,0.5)"/>
+                <defs>
+                  <filter id="rglow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <!-- Red popup – uniform color, no header bar -->
+                <rect x="20" y="20" width="300" height="180" rx="14" fill="#7f1d1d" stroke="rgba(239,68,68,0.55)" stroke-width="1.5" filter="url(#rglow)"/>
+                <!-- AUSFALL centered -->
+                <text x="170" y="118" text-anchor="middle" fill="#fca5a5" font-size="30" font-weight="900" letter-spacing="4" font-family="Inter,sans-serif">AUSFALL</text>
+                <!-- Schließen bottom right -->
+                <rect x="218" y="172" width="84" height="22" rx="8" fill="#2563eb"/>
+                <text x="260" y="186" text-anchor="middle" fill="#fff" font-size="9" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 4: Mobile view – exact from screenshot -->
+          <div class="showcase-item">
+            <div class="showcase-label"><span class="showcase-dot dot-blue"></span>Handy-Modus</div>
+            <div class="showcase-mockup">
+              <svg viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg" class="showcase-svg">
+                <!-- Phone frame -->
+                <rect width="240" height="460" rx="22" fill="#111"/>
+                <rect x="3" y="3" width="234" height="454" rx="20" fill="#0f1729" stroke="#1e293b" stroke-width="1"/>
+                <rect x="82" y="7" width="76" height="8" rx="4" fill="#111"/>
+                <!-- Header -->
+                <rect x="10" y="18" width="220" height="36" rx="8" fill="#162040" opacity="0.7"/>
+                <rect x="18" y="24" width="24" height="24" rx="6" fill="url(#sg2)"/>
+                <text x="30" y="39" text-anchor="middle" font-size="11" font-family="sans-serif">📅</text>
+                <text x="50" y="33" fill="#fff" font-size="9" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
+                <text x="50" y="43" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Klasse 10b</text>
+                <circle cx="148" cy="36" r="8" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" stroke-width="1"/>
+                <text x="148" y="40" text-anchor="middle" fill="#fcd34d" font-size="8" font-family="sans-serif">ⓘ</text>
+                <rect x="162" y="26" width="60" height="20" rx="10" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <text x="192" y="39" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">↺ Aktualisieren</text>
+                <!-- Day tabs with date -->
+                <rect x="10" y="60" width="220" height="28" rx="0" fill="#0f1729"/>
+                <rect x="10" y="60" width="40" height="28" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="30" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-weight="700" font-family="Inter,sans-serif">MO</text>
+                <text x="30" y="82" text-anchor="middle" fill="#475569" font-size="6" font-family="Inter,sans-serif">11</text>
+                <rect x="54" y="60" width="40" height="28" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="74" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-weight="700" font-family="Inter,sans-serif">DI</text>
+                <text x="74" y="82" text-anchor="middle" fill="#475569" font-size="6" font-family="Inter,sans-serif">12</text>
+                <rect x="98" y="60" width="40" height="28" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="118" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-weight="700" font-family="Inter,sans-serif">MI</text>
+                <text x="118" y="82" text-anchor="middle" fill="#475569" font-size="6" font-family="Inter,sans-serif">13</text>
+                <rect x="142" y="60" width="40" height="28" rx="6" fill="rgba(255,255,255,0.05)"/>
+                <text x="162" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-weight="700" font-family="Inter,sans-serif">DO</text>
+                <text x="162" y="82" text-anchor="middle" fill="#475569" font-size="6" font-family="Inter,sans-serif">14</text>
+                <rect x="186" y="60" width="44" height="28" rx="6" fill="#2563eb"/>
+                <text x="208" y="72" text-anchor="middle" fill="#fff" font-size="7" font-weight="700" font-family="Inter,sans-serif">FR</text>
+                <text x="208" y="82" text-anchor="middle" fill="rgba(255,255,255,0.85)" font-size="6" font-family="Inter,sans-serif">15</text>
+                <!-- Rows -->
+                <rect x="10" y="92" width="220" height="26" fill="#0f1729"/>
+                <text x="22" y="107" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">1</text>
+                <text x="22" y="115" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">07:45</text>
+                <rect x="46" y="95" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="109" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <rect x="10" y="118" width="220" height="26" fill="rgba(255,255,255,0.01)"/>
+                <text x="22" y="133" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">2</text>
+                <text x="22" y="141" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">08:40</text>
+                <rect x="46" y="121" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="135" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <rect x="10" y="144" width="220" height="26" fill="#0f1729"/>
+                <text x="22" y="159" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">3</text>
+                <text x="22" y="167" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">09:25</text>
+                <rect x="46" y="147" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="161" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <!-- Pause blue -->
+                <rect x="10" y="170" width="220" height="18" fill="rgba(37,99,235,0.1)"/>
+                <line x1="10" y1="170" x2="230" y2="170" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <line x1="10" y1="188" x2="230" y2="188" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <text x="120" y="182" text-anchor="middle" fill="#93c5fd" font-size="7" font-style="italic" font-weight="500" font-family="Inter,sans-serif">Pause 10:10-10:30</text>
+                <rect x="10" y="188" width="220" height="26" fill="rgba(255,255,255,0.01)"/>
+                <text x="22" y="203" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">4</text>
+                <text x="22" y="211" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">10:35</text>
+                <rect x="46" y="191" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="205" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <rect x="10" y="214" width="220" height="26" fill="#0f1729"/>
+                <text x="22" y="229" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">5</text>
+                <text x="22" y="237" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">11:30</text>
+                <rect x="46" y="217" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="231" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <!-- Pause 2 -->
+                <rect x="10" y="240" width="220" height="18" fill="rgba(37,99,235,0.1)"/>
+                <line x1="10" y1="240" x2="230" y2="240" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <line x1="10" y1="258" x2="230" y2="258" stroke="rgba(37,99,235,0.4)" stroke-width="2"/>
+                <text x="120" y="252" text-anchor="middle" fill="#93c5fd" font-size="7" font-style="italic" font-weight="500" font-family="Inter,sans-serif">Pause 12:15-12:45</text>
+                <rect x="10" y="258" width="220" height="26" fill="rgba(255,255,255,0.01)"/>
+                <text x="22" y="273" fill="#94a3b8" font-size="7" font-weight="700" font-family="Inter,sans-serif">6</text>
+                <text x="22" y="281" fill="#475569" font-size="5.5" font-family="Inter,sans-serif">12:45</text>
+                <rect x="46" y="261" width="176" height="20" rx="5" fill="#1a2a50"/>
+                <text x="134" y="275" text-anchor="middle" fill="#64748b" font-size="10" font-family="Inter,sans-serif">—</text>
+                <!-- Legend -->
+                <circle cx="18" cy="418" r="4" fill="#3b82f6"/>
+                <text x="26" y="422" fill="#60a5fa" font-size="8" font-weight="600" font-family="Inter,sans-serif">Heute</text>
+                <circle cx="68" cy="418" r="4" fill="#ef4444"/>
+                <text x="76" y="422" fill="#f87171" font-size="8" font-weight="600" font-family="Inter,sans-serif">Vertretung</text>
+                <circle cx="128" cy="418" r="4" fill="#22c55e"/>
+                <text x="136" y="422" fill="#86efac" font-size="8" font-weight="600" font-family="Inter,sans-serif">Jetzt</text>
+                <defs><linearGradient id="sg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+
+          
 
         </div>
       </div>
