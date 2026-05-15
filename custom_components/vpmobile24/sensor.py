@@ -24,15 +24,15 @@ SENSOR_NAMES = {
         "changes": "VpMobile24 Changes"
     },
     "de": {
-        "next_lesson": "VpMobile24 NÃ¤chste Stunde",
+        "next_lesson": "VpMobile24 Nächste Stunde",
         "week_schedule": "VpMobile24 Heutiger Stundenplan",
         "additional_info": "VpMobile24 Zusatzinfos", 
-        "changes": "VpMobile24 Ã„nderungen"
+        "changes": "VpMobile24 Änderungen"
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
-        "week_schedule": "VpMobile24 Emploi Aujourd'hui",
-        "additional_info": "VpMobile24 Infos SupplÃ©mentaires",
+        "week_schedule": "VpMobile24 Programme du jour",
+        "additional_info": "VpMobile24 Informations complémentaires",
         "changes": "VpMobile24 Changements"
     }
 }
@@ -61,19 +61,19 @@ STATE_MESSAGES = {
         "no_additional_info": "Keine Zusatzinfos",
         "additional_info": "Zusatzinfo",
         "additional_infos": "Zusatzinfos",
-        "no_changes": "Keine Ã„nderungen", 
-        "change": "Ã„nderung",
-        "changes": "Ã„nderungen"
+        "no_changes": "Keine Änderungen", 
+        "change": "Änderung",
+        "changes": "Änderungen"
     },
     "fr": {
-        "no_data": "Aucune donnÃ©e",
-        "no_lessons_today": "Plus de cours aujourd'hui",
-        "no_lessons": "Aucun cours aujourd'hui",
-        "lesson_today": "cours aujourd'hui", 
-        "lessons_today": "cours aujourd'hui",
-        "no_additional_info": "Aucune info supplÃ©mentaire",
-        "additional_info": "info supplÃ©mentaire",
-        "additional_infos": "infos supplÃ©mentaires",
+        "no_data": "Aucune donnée",
+        "no_lessons_today": "Plus d'heures aujourd'hui",
+        "no_lessons": "Pas de cours aujourd'hui.",
+        "lesson_today": "Horaires aujourd'hui", 
+        "lessons_today": "Horaires aujourd'hui",
+        "no_additional_info": "Aucune information supplémentaire",
+        "additional_info": "Informations Complémentaires",
+        "additional_infos": "Informations Complémentaires",
         "no_changes": "Aucun changement",
         "change": "changement", 
         "changes": "changements"
