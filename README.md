@@ -1,5 +1,11 @@
 # VpMobile24 Home Assistant Integration
 
+<p align="center">
+  <a href="#english">
+    <img src="https://img.shields.io/badge/⬇️_Jump_to_English-blue?style=for-the-badge" alt="English Button">
+  </a>
+</p>
+
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 ![Version](https://img.shields.io/badge/Version-2.4.2-blue.svg)
@@ -9,11 +15,13 @@
 
 <p align="center">
   <a href="https://maximilian-andrew-kluge.github.io/VpMobile24/website/">
-    <img src="https://img.shields.io/badge/🌐_Besuche_die_Website-blue?style=for-the-badge" alt="Website">
+    <img src="https://img.shields.io/badge/🌐_Visit_the_Website-blue?style=for-the-badge" alt="Website">
   </a>
 </p>
 
 ---
+
+## 🇩🇪 Deutsch
 
 ## 🚀 Installation über HACS (empfohlen)
 
@@ -25,8 +33,7 @@
 
 👉 **Beta-Version – aktiv in Entwicklung**
 
-Diese Integration befindet sich in aktiver Entwicklung.  
-Feedback, Fehlerberichte und Tests sind ausdrücklich erwünscht.
+Diese Integration befindet sich in aktiver Entwicklung. Feedback, Fehlerberichte und Tests sind ausdrücklich erwünscht.
 
 ---
 
@@ -44,13 +51,9 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ![Overview](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png)
 
----
-
 ### Lovelace Card
 
 ![Card](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png)
-
----
 
 ### Konfiguration
 
@@ -63,13 +66,13 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 ### Integration
 - 📅 Wochenübersicht (Mo–Fr)
 - 🔄 automatischer Datenabruf (alle 15 Minuten)
-- 👥 mehrere Klassen gleichzeitig möglich
+- 👥 mehrere Klassen möglich
 - 📊 strukturierte Tages- und Wochensensoren
-- ⚡ automatische Aktualisierung
+- ⚡ automatische Updates
 
 ### Lovelace Card
-- 🎨 visuelle Konfiguration (kein YAML erforderlich)
-- 📱 responsive Design (Mobile & Desktop)
+- 🎨 visuelle Konfiguration (kein YAML)
+- 📱 responsiv (Mobile & Desktop)
 - 🔥 heutiger Tag hervorgehoben
 - ⛔ Vertretungen farblich markiert
 - ⚙️ vollständig anpassbar
@@ -78,39 +81,33 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ## 📦 Installation
 
-### HACS (empfohlen)
+### HACS
 
 1. HACS öffnen
-2. Menü (⋮) → „Benutzerdefiniertes Repository“
+2. Menü (⋮) → Custom Repository
 3. Repository hinzufügen: https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-4. Kategorie: **Integration**
+4. Kategorie: Integration
 5. Installieren
-6. Home Assistant neu starten
+6. Neustart
 
----
+### Manuell
 
-### Manuelle Installation
-
-1. Repository herunterladen
+1. Repo herunterladen
 2. nach `/config/custom_components/vpmobile24/` kopieren
-3. Home Assistant neu starten
+3. Neustart
 
 ---
 
 ## ⚙️ Einrichtung
 
-1. Einstellungen → Geräte & Dienste
-2. „Integration hinzufügen“
-3. „VpMobile24“ auswählen
-4. Zugangsdaten eingeben:
-- Schul-ID
-- Benutzername
-- Passwort
-- Klasse
+- Einstellungen → Geräte & Dienste
+- Integration hinzufügen
+- VpMobile24 auswählen
+- Zugangsdaten eingeben (Schule, User, Passwort, Klasse)
 
 ---
 
-## 📊 Erstellte Sensoren
+## 📊 Sensoren
 
 - `sensor.vpmobile24_week_table`
 - `sensor.vpmobile24_monday`
@@ -121,6 +118,101 @@ Ziel ist es, Stundenpläne direkt in Home Assistant verfügbar zu machen und üb
 
 ---
 
-## 🧩 Lovelace Card
+---
 
-Die Card wird automatisch installiert und kann über Ressourcen eingebunden werden:
+<a name="english"></a>
+
+## 🇬🇧 English
+
+## 🚀 Installation via HACS (recommended)
+
+Follow the same steps as above using HACS.
+
+---
+
+## ⚠️ Status
+
+👉 **Beta version – actively in development**
+
+This integration is under active development. Feedback, bug reports, and testing are welcome.
+
+---
+
+## 📌 Description
+
+VpMobile24 is a Home Assistant integration for processing timetable data.
+
+The goal is to bring school timetables directly into Home Assistant and display them in a clear structured way.
+
+---
+
+## 📸 Screenshots
+
+### Overview
+
+![Overview](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png)
+
+### Lovelace Card
+
+![Card](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png)
+
+### Configuration
+
+![Config](https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png)
+
+---
+
+## ✨ Features
+
+### Integration
+- 📅 Weekly overview (Mon–Fri)
+- 🔄 automatic refresh (every 15 minutes)
+- 👥 multiple classes supported
+- 📊 structured sensors per day/week
+- ⚡ automatic updates
+
+### Lovelace Card
+- 🎨 visual configuration (no YAML)
+- 📱 responsive design
+- 🔥 highlights current day
+- ⛔ marks substitutions
+- ⚙️ fully customizable
+
+---
+
+## 📦 Installation
+
+### HACS
+
+1. Open HACS
+2. Go to Custom Repositories
+3. Add: https://github.com/Maximilian-Andrew-Kluge/VpMobile24
+4. Install Integration
+5. Restart Home Assistant
+
+### Manual
+
+1. Download repository
+2. Copy to `/config/custom_components/vpmobile24/`
+3. Restart Home Assistant
+
+---
+
+## ⚙️ Setup
+
+- Settings → Devices & Services
+- Add Integration
+- Select VpMobile24
+- Enter credentials (school, user, password, class)
+
+---
+
+## 📊 Sensors
+
+- `sensor.vpmobile24_week_table`
+- `sensor.vpmobile24_monday`
+- `sensor.vpmobile24_tuesday`
+- `sensor.vpmobile24_wednesday`
+- `sensor.vpmobile24_thursday`
+- `sensor.vpmobile24_friday`
+
