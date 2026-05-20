@@ -52,7 +52,7 @@ mehrere Klassen, vollständig anpassbare Lovelace Card. Kein YAML nötig.
 - [Features](#-features)
 - [Screenshots](#-screenshots)
 - [Installation](#-installation)
-- [Einrichtung](#️⃣-einrichtung)
+- [Einrichtung](#️-einrichtung)
 - [Sensoren](#-sensoren)
 - [Mitmachen](#-mitmachen)
 
