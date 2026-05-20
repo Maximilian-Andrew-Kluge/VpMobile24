@@ -251,7 +251,7 @@ multiple classes, fully customizable Lovelace Card. No YAML required.
 - [Features](#-features-1)
 - [Screenshots](#-screenshots-1)
 - [Installation](#-installation-1)
-- [Setup](#️⃣-setup)
+- [Setup](#️-setup)
 - [Sensors](#-sensors)
 - [Contributing](#-contributing)
 
