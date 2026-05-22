@@ -6,7 +6,7 @@
         "description": "Geben Sie Ihre VpMobile24 Zugangsdaten ein.",
         "data": {
           "school_id": "Schulnummer",
-          "username": "Nutzername",
+          "username": "Benutzername",
           "password": "Passwort",
           "class_name": "Klasse"
         },
@@ -18,34 +18,8 @@
         }
       },
       "subjects": {
-        "title": "Fächer für Klasse {class_name} auswählen",
+        "title": "Fächer auswählen",
         "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer."
-      },
-      "language": {
-        "title": "Sprache für Klasse {class_name} wählen",
-        "description": "Wählen Sie Ihre bevorzugte Sprache für die Integration.",
-        "data": {
-          "language": "Sprache"
-        }
-      }
-    },
-    "error": {
-      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte prüfen Sie Ihre Zugangsdaten.",
-      "unknown": "Ein unbekannter Fehler ist aufgetreten."
-    },
-    "abort": {
-      "already_configured": "Diese Schule ist bereits konfiguriert."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "VpMobile24 Optionen",
-        "description": "Ändern Sie die Einstellungen Ihrer VpMobile24 Integration.",
-        "data": {
-          "excluded_subjects": "Abzuwählende Fächer",
-          "language": "Sprache"
-        }
       }
     }
   },

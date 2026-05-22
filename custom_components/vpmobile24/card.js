@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.4.2
-console.info('%c VpMobile24-CARD %c v2.4.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.3
+console.info('%c VpMobile24-CARD %c v2.4.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -979,5 +979,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.2 loaded');
+console.log('✅ VpMobile24 Card v2.4.3 loaded');
 

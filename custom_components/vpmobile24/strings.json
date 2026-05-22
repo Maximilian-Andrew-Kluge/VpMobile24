@@ -18,23 +18,13 @@
         }
       },
       "subjects": {
-        "title": "Select subjects for class {class_name}",
+        "title": "Select subjects",
         "description": "Choose the subjects to display. Found: {subject_count} subjects."
-      },
-      "language": {
-        "title": "Choose language for class {class_name}",
-        "description": "Select your preferred language for the integration.",
-        "data": {
-          "language": "Language"
-        }
       }
     },
     "error": {
       "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
       "unknown": "An unknown error occurred."
-    },
-    "abort": {
-      "already_configured": "This school is already configured."
     }
   },
   "entity": {
