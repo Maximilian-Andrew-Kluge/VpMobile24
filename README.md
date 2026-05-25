@@ -15,7 +15,7 @@ mehrere Klassen, vollständig anpassbare Lovelace Card. Kein YAML nötig.
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Release)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Version](https://img.shields.io/badge/Version-2.4.2-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Version](https://img.shields.io/badge/Version-2.4.4-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Status](https://img.shields.io/badge/Status-Beta-orange?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
@@ -226,7 +226,7 @@ multiple classes, fully customizable Lovelace Card. No YAML required.
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Release)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Version](https://img.shields.io/badge/Version-2.4.2-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Version](https://img.shields.io/badge/Version-2.4.4-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Status](https://img.shields.io/badge/Status-Beta-orange?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
@@ -311,9 +311,9 @@ The goal: timetables should be available in Home Assistant without friction — 
   <td align="center"><b>Configuration</b></td>
 </tr>
 <tr>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="Overview" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" alt="Card" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png" alt="Config" /></td>
+  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Overview" /></td>
+  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Card" /></td>
+  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Config" /></td>
 </tr>
 </table>
 

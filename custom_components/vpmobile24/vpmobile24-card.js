@@ -1,21 +1,116 @@
-// VpMobile24 Card v2.4.3
-console.info('%c VpMobile24-CARD %c v2.4.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.4
+console.info('%c VpMobile24-CARD %c v2.4.4 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._config = {};
+    this._t = null; // language strings — set in _render(), used everywhere
+  }
+
+  // ── Language helper ──────────────────────────────────────────────────────
+  _buildTranslations() {
+    const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+    const lang = ['de','en','fr'].includes(haLang) ? haLang : 'de';
+    const _i = {
+      de:{ today:'Heute', sub:'Vertretung', now:'Jetzt', pause:'Pause',
+           cancel:'AUSFALL', close:'Schließen', period:'Stunde',
+           teacher:'Lehrer', room:'Raum', info:'Info',
+           cancelled:'Ausfall', substitution:'Vertretung',
+           noDetail:'Keine weiteren Details verfügbar.',
+           noInfo:(d)=>'Keine Zusatzinformationen für '+d+' verfügbar.',
+           genInfo:'📢 Allgemeine Informationen',
+           infoTitle:'ℹ️ Zusatzinformationen',
+           refresh:'↺ Aktualisieren',
+           classLabel:'Klasse',
+           noData:'Keine Wochendaten verfügbar',
+           entityNotFound:'Entity nicht gefunden',
+           days:['Mo','Di','Mi','Do','Fr'],
+           daysFull:['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'],
+           wdFull:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] },
+      en:{ today:'Today', sub:'Substitution', now:'Now', pause:'Break',
+           cancel:'CANCELLED', close:'Close', period:'Period',
+           teacher:'Teacher', room:'Room', info:'Info',
+           cancelled:'Cancelled', substitution:'Substitution',
+           noDetail:'No further details available.',
+           noInfo:(d)=>'No additional info for '+d+' available.',
+           genInfo:'📢 General Information',
+           infoTitle:'ℹ️ Additional Information',
+           refresh:'↺ Refresh',
+           classLabel:'Class',
+           noData:'No weekly data available',
+           entityNotFound:'Entity not found',
+           days:['Mo','Tu','We','Th','Fr'],
+           daysFull:['Monday','Tuesday','Wednesday','Thursday','Friday'],
+           wdFull:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] },
+      fr:{ today:'Aujourd\u0027hui', sub:'Remplacement', now:'Maintenant', pause:'Pause',
+           cancel:'ANNUL\u00c9', close:'Fermer', period:'Heure',
+           teacher:'Prof', room:'Salle', info:'Info',
+           cancelled:'Annul\u00e9', substitution:'Remplacement',
+           noDetail:'Aucun d\u00e9tail disponible.',
+           noInfo:(d)=>'Aucune info pour '+d+'.',
+           genInfo:'📢 Informations g\u00e9n\u00e9rales',
+           infoTitle:'ℹ️ Informations suppl\u00e9mentaires',
+           refresh:'↺ Actualiser',
+           classLabel:'Classe',
+           noData:'Aucune donn\u00e9e hebdomadaire disponible',
+           entityNotFound:'Entit\u00e9 introuvable',
+           days:['Lu','Ma','Me','Je','Ve'],
+           daysFull:['Lundi','Mardi','Mercredi','Jeudi','Vendredi'],
+           wdFull:['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'] }
+    };
+    this._t = _i[lang] || _i.de;
+    return this._t;
   }
 
   static getConfigForm() {
+    // Determine language from hass if available (accessed via DOM for static context)
+    const _hl = (hass) => {
+      try {
+        if (hass && hass.language) return hass.language.substring(0,2).toLowerCase();
+        const lang = document.querySelector('home-assistant')?._hass?.language
+          || document.querySelector('home-assistant')?.hass?.language
+          || navigator.language || 'de';
+        return lang.substring(0,2).toLowerCase();
+      } catch(e) { return 'de'; }
+    };
+
+    // Build translations inline so computeLabel/computeHelper always have correct language
+    const _cfgLabels = (hass) => {
+      const hl = _hl(hass);
+      const L = {
+        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
+      };
+      return (L[hl]||L.de);
+    };
+    const _cfgHelpers = (hass) => {
+      const hl = _hl(hass);
+      const H = {
+        de:{entity:"Wähle den sensor.vpmobile24_week_table Sensor",additional_info_entity:"Zusatzinfo-Sensor für ⓘ-Button",reload_entity:"Button-Entity zum Neuladen (z.B. button.vpmobile24_reload)",title:"Titel der Card",class_name:"Klassenname (z.B. 5a, 10b)",show_time:"Zeigt Uhrzeiten unter der Stundennummer",show_header:"Zeigt den Header mit Titel und Klassenname",highlight_today:"Hebt die heutige Spalte blau hervor",use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen"},
+        en:{entity:"Select the sensor.vpmobile24_week_table sensor",additional_info_entity:"Info sensor for ⓘ button",reload_entity:"Button entity for manual reload (e.g. button.vpmobile24_reload)",title:"Card title",class_name:"Class name (e.g. 5a, 10b)",show_time:"Show times below period number",show_header:"Show header with title and class name",highlight_today:"Highlight today column in blue",use_custom_times:"Enable to enter custom times"},
+        fr:{entity:"S\u00e9lectionner le capteur sensor.vpmobile24_week_table",additional_info_entity:"Capteur infos pour bouton info",reload_entity:"Entit\u00e9 bouton pour actualisation (ex. button.vpmobile24_reload)",title:"Titre de la carte",class_name:"Nom de classe (ex. 5a, 10b)",show_time:"Afficher les horaires sous le num\u00e9ro",show_header:"Afficher en-t\u00eate avec titre et classe",highlight_today:"Mettre en avant la colonne du jour",use_custom_times:"Activer pour saisir des horaires personnalis\u00e9s"}
+      };
+      return (H[hl]||H.de);
+    };
+
+    const _sectionTitles = {
+      de: { header_settings: 'Header-Einstellungen', time_settings: 'Uhrzeiten-Anpassung' },
+      en: { header_settings: 'Header Settings', time_settings: 'Time Settings' },
+      fr: { header_settings: 'Param\u00e8tres En-t\u00eate', time_settings: 'Personnalisation des Horaires' }
+    };
+    const hl0 = _hl(null);
+    const st = _sectionTitles[['de','en','fr'].includes(hl0) ? hl0 : 'de'];
+
     return {
       schema: [
         { name: "entity", required: true, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
         { name: "additional_info_entity", required: false, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
         { name: "reload_entity", required: false, selector: { entity: { domain: "button" } } },
         { name: "show_header", default: true, selector: { boolean: {} } },
-        { type: "expandable", name: "header_settings", title: "Header-Einstellungen", collapsed: false,
+        { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
             { name: "title", default: "Stundenplan", selector: { text: { type: "text" } } },
             { name: "class_name", default: "5a", selector: { text: { type: "text" } } }
@@ -24,7 +119,7 @@ class VpMobile24Card extends HTMLElement {
         { name: "highlight_today", default: true, selector: { boolean: {} } },
         { name: "show_time", default: true, selector: { boolean: {} } },
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
-        { type: "expandable", name: "time_settings", title: "Uhrzeiten-Anpassung", collapsed: true,
+        { type: "expandable", name: "time_settings", title: st.time_settings, collapsed: true,
           schema: [
             { name: "lesson_count", default: 8, selector: { number: { min: 1, max: 10, step: 1, mode: "box" } } },
             { name: "pause_count", default: 2, selector: { number: { min: 0, max: 5, step: 1, mode: "box" } } },
@@ -61,31 +156,8 @@ class VpMobile24Card extends HTMLElement {
           ]
         }
       ],
-      computeLabel: (s) => ({
-        entity:"Week Table Sensor", additional_info_entity:"Zusatzinfo Sensor",
-        reload_entity:"Neu laden Button", title:"Titel", class_name:"Klassenname",
-        show_time:"Uhrzeiten anzeigen", show_header:"Header anzeigen",
-        highlight_today:"Heutigen Tag hervorheben", use_custom_times:"Eigene Uhrzeiten verwenden",
-        lesson_count:"Anzahl der Stunden", pause_count:"Anzahl der Pausen",
-        time_1:"1. Stunde", time_2:"2. Stunde", time_3:"3. Stunde", time_4:"4. Stunde",
-        time_5:"5. Stunde", time_6:"6. Stunde", time_7:"7. Stunde", time_8:"8. Stunde",
-        time_9:"9. Stunde", time_10:"10. Stunde",
-        pause_1:"1. Pause - Zeit", pause_1_after:"1. Pause - Nach Stunde",
-        pause_2:"2. Pause - Zeit", pause_2_after:"2. Pause - Nach Stunde",
-        pause_3:"3. Pause - Zeit", pause_3_after:"3. Pause - Nach Stunde",
-        pause_4:"4. Pause - Zeit", pause_4_after:"4. Pause - Nach Stunde",
-        pause_5:"5. Pause - Zeit", pause_5_after:"5. Pause - Nach Stunde",
-      })[s.name],
-      computeHelper: (s) => ({
-        entity:"Wähle den sensor.vpmobile24_week_table Sensor",
-        additional_info_entity:"Zusatzinfo-Sensor für Ausrufezeichen-Anzeige",
-        reload_entity:"Button-Entity zum manuellen Neuladen (z.B. button.vpmobile24_reload)",
-        title:"Titel der Card", class_name:"Name der Klasse (z.B. 5a, 10b)",
-        show_time:"Zeigt Uhrzeiten unter der Stundennummer an",
-        show_header:"Zeigt den Header mit Titel und Klassenname",
-        highlight_today:"Hebt die heutige Spalte blau hervor",
-        use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen",
-      })[s.name],
+      computeLabel: (s, hass) => _cfgLabels(hass)[s.name],
+      computeHelper: (s, hass) => _cfgHelpers(hass)[s.name],
       computeVisible: () => true,
     };
   }
@@ -142,8 +214,9 @@ class VpMobile24Card extends HTMLElement {
     const content = this.shadowRoot.getElementById('info-popup-content');
     if (!popup || !overlay || !content) return;
 
+    const t = this._t || this._buildTranslations();
     const wdKeys = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-    const wdDE   = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const wdDE = t.wdFull;
     const todayIdx = new Date().getDay();
     const todayKey = wdKeys[todayIdx];
     const todayName = wdDE[todayIdx];
@@ -177,13 +250,13 @@ class VpMobile24Card extends HTMLElement {
 
     if (allg.length > 0) {
       html += '<div class="vp-info-section">'
-        + '<div class="vp-info-section-label">📢 Allgemeine Informationen</div>'
-        + allg.map(t => '<div class="vp-info-entry"><span>' + t + '</span></div>').join('')
+        + '<div class="vp-info-section-label">' + t.genInfo + '</div>'
+        + allg.map(a => '<div class="vp-info-entry"><span>' + a + '</span></div>').join('')
         + '</div>';
     }
 
     if (!html) {
-      html = '<div class="vp-info-none">Keine Zusatzinformationen für ' + todayName + ' verfügbar.</div>';
+      html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
     } else {
       html += '<div style="height:8px"></div>';
     }
@@ -223,6 +296,7 @@ class VpMobile24Card extends HTMLElement {
     const content = this.shadowRoot.getElementById('popup-content');
     if (!popup || !overlay || !title || !content) return;
 
+    const t = this._t || this._buildTranslations();
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
     const lehrer = (lesson && lesson.lehrer)  || '';
     const raum   = (lesson && lesson.raum)    || '';
@@ -235,12 +309,12 @@ class VpMobile24Card extends HTMLElement {
     // Title
     let badge = '';
     if (isActuallyCancelled) {
-      badge = '<span class="vp-detail-badge vp-detail-cancelled">Ausfall</span>';
+      badge = '<span class="vp-detail-badge vp-detail-cancelled">' + t.cancelled + '</span>';
     } else if (isVertretung) {
-      badge = '<span class="vp-detail-badge vp-detail-sub">Vertretung</span>';
+      badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
     }
     title.innerHTML =
-      '<span class="vp-detail-num">' + slotPeriod + '. Stunde</span>' +
+      '<span class="vp-detail-num">' + slotPeriod + '. ' + t.period + '</span>' +
       (isActuallyCancelled ? '<span class="vp-detail-fach" style="color:#94a3b8">—</span>' : '<span class="vp-detail-fach">' + fach + '</span>') +
       badge;
 
@@ -249,22 +323,22 @@ class VpMobile24Card extends HTMLElement {
     // Show period + time as first row (no Tag row)
     rows += '<div class="vp-detail-row">'
       + '<span class="vp-detail-icon">🕐</span>'
-      + '<span class="vp-detail-label">' + slotPeriod + '. Stunde</span>'
+      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
       + '<span class="vp-detail-val">' + (zeit || slotTime || '—') + '</span></div>';
 
     if (lehrer) rows += '<div class="vp-detail-row">'
       + '<span class="vp-detail-icon">👤</span>'
-      + '<span class="vp-detail-label">Lehrer</span>'
+      + '<span class="vp-detail-label">' + t.teacher + '</span>'
       + '<span class="vp-detail-val">' + lehrer + '</span></div>';
 
     if (raum) rows += '<div class="vp-detail-row">'
       + '<span class="vp-detail-icon">🚪</span>'
-      + '<span class="vp-detail-label">Raum</span>'
+      + '<span class="vp-detail-label">' + t.room + '</span>'
       + '<span class="vp-detail-val">' + raum + '</span></div>';
 
     if (info) rows += '<div class="vp-detail-row vp-detail-info-row">'
       + '<span class="vp-detail-icon">ℹ️</span>'
-      + '<span class="vp-detail-label">Info</span>'
+      + '<span class="vp-detail-label">' + t.info + '</span>'
       + '<span class="vp-detail-val">' + info + '</span></div>';
 
     if (isActuallyCancelled) {
@@ -272,14 +346,14 @@ class VpMobile24Card extends HTMLElement {
       // Build ausfall popup: no title bar, no lines, just red glow + AUSFALL
       title.innerHTML = '';
       title.style.display = 'none';
-      content.innerHTML = '<div class="vp-ausfall-block">AUSFALL</div>';
+      content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>';
       popup.classList.add('vp-popup-ausfall');
       popup.classList.remove('hidden');
       overlay.classList.remove('hidden');
       return;
     }
     if (!lehrer && !raum && !info) {
-      rows += '<div class="vp-detail-empty">Keine weiteren Details verfügbar.</div>';
+      rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
     }
 
     content.innerHTML = rows;
@@ -295,12 +369,13 @@ class VpMobile24Card extends HTMLElement {
     const weekTable = entity.attributes && entity.attributes.week_table;
     if (!weekTable) return;
 
+    const t = this._t || this._buildTranslations();
     const showTime       = this._config.show_time !== false;
     const highlightToday = this._config.highlight_today !== false;
     const useCustomTimes = this._config.use_custom_times === true;
-    const days    = ['Mo','Di','Mi','Do','Fr'];
+    const days = t.days;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
-    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const dayFullNames = t.daysFull;
     const todayDow = new Date().getDay();
     const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
     const slots = this._buildTimeSlots(useCustomTimes);
@@ -311,7 +386,7 @@ class VpMobile24Card extends HTMLElement {
     let bodyHtml = '';
     slots.forEach(slot => {
       if (slot.isPause) {
-        bodyHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">Pause ' + slot.time + '</div></td></tr>';
+        bodyHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">' + t.pause + ' ' + slot.time + '</div></td></tr>';
       } else {
         const numHtml = showTime
           ? '<div class="vp-snum">' + slot.period + '</div><div class="vp-stime">' + slot.time + '</div>'
@@ -322,16 +397,28 @@ class VpMobile24Card extends HTMLElement {
           const isToday = di === todayIdx;
           let cls = 'vp-tile';
           let text = '';
-          if (lesson && lesson.fach) {
+          const rawFach = lesson ? lesson.fach : undefined;
+          const isCancelled = lesson && (
+            rawFach === undefined || rawFach === null ||
+            rawFach === "---" || rawFach === "\u2014" || rawFach === "\u2013" ||
+            rawFach === "" || rawFach === "-" || rawFach === "\u00a0" ||
+            (typeof rawFach === "string" && rawFach.trim() === "") ||
+            (typeof rawFach === "string" && /^[-\u2014\u2013\s]+$/.test(rawFach))
+          );
+          const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
+          if (lesson && lesson.fach && !isCancelled) {
             text = lesson.fach;
-            if (lesson.ist_vertretung) cls += ' vp-sub';
+            if (isVertretung) cls += ' vp-sub';
             else if (isToday) cls += ' vp-today-tile';
             cls += ' vp-tile-clickable';
+          } else if (isCancelled) {
+            text = '—';
+            cls += ' vp-cancelled vp-tile-clickable';
           } else {
             cls += isToday ? ' vp-today-tile vp-empty' : ' vp-empty';
           }
-          const onclickAttr = (lesson && lesson.fach)
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\')"'
+          const onclickAttr = (lesson && (lesson.fach || isCancelled))
+            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
             : '';
           bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + '>' + text + '</div></td>';
         });
@@ -343,8 +430,9 @@ class VpMobile24Card extends HTMLElement {
 
   _switchMobDay(idx) {
     this._mobDayIdx = idx;  // persist selection across re-renders
+    const t = this._t || this._buildTranslations();
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
-    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const dayFullNames = t.daysFull;
     const showTime = this._config.show_time !== false;
     const useCustomTimes = this._config.use_custom_times === true;
     const entity = this._hass && this._hass.states[this._config.entity];
@@ -358,13 +446,25 @@ class VpMobile24Card extends HTMLElement {
     let rows = '';
     slots.forEach(slot => {
       if (slot.isPause) {
-        rows += '<div class="vp-mob-pause-row"><span>Pause ' + slot.time + '</span></div>';
+        rows += '<div class="vp-mob-pause-row"><span>' + t.pause + ' ' + slot.time + '</span></div>';
       } else {
         const lesson = sched[slot.lessonNumber];
         let rowCls = 'vp-mob-lesson';
         let subj = '';
         let isSub = false;
-        if (lesson && lesson.fach) {
+        // Detect cancellation
+        const rawFach = lesson ? lesson.fach : undefined;
+        const isCancelled = lesson && (
+          rawFach === undefined || rawFach === null ||
+          rawFach === "---" || rawFach === "\u2014" || rawFach === "\u2013" ||
+          rawFach === "" || rawFach === "-" || rawFach === "\u00a0" ||
+          (typeof rawFach === "string" && rawFach.trim() === "") ||
+          (typeof rawFach === "string" && /^[-\u2014\u2013\s]+$/.test(rawFach))
+        );
+        if (isCancelled) {
+          subj = '—';
+          rowCls += ' vp-mob-cancelled vp-mob-clickable';
+        } else if (lesson && lesson.fach) {
           subj = lesson.fach;
           isSub = !!lesson.ist_vertretung;
           if (isSub) rowCls += ' vp-mob-sub';
@@ -372,14 +472,19 @@ class VpMobile24Card extends HTMLElement {
         } else {
           rowCls += ' vp-mob-empty';
         }
-        const onclickAttr = (lesson && lesson.fach)
-          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\')"'
+        const onclickAttr = (lesson && (lesson.fach || isCancelled))
+          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
           : '';
         const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
           + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
-        const subjPart = subj
-          ? '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>'
-          : '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
+        let subjPart;
+        if (isCancelled) {
+          subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
+        } else if (subj) {
+          subjPart = '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
+        } else {
+          subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
+        }
         rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
       }
     });
@@ -438,15 +543,16 @@ class VpMobile24Card extends HTMLElement {
 
   _render() {
     if (!this._hass || !this._config) return;
+    const t = this._buildTranslations(); // also sets this._t
 
     const entity = this._hass.states[this._config.entity];
     if (!entity) {
-      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#ef4444">Entity nicht gefunden: ' + this._config.entity + '</div></ha-card>';
+      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#ef4444">' + t.entityNotFound + ': ' + this._config.entity + '</div></ha-card>';
       return;
     }
     const weekTable = entity.attributes && entity.attributes.week_table;
     if (!weekTable) {
-      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#94a3b8">Keine Wochendaten verfügbar</div></ha-card>';
+      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#94a3b8">' + t.noData + '</div></ha-card>';
       return;
     }
 
@@ -462,7 +568,7 @@ class VpMobile24Card extends HTMLElement {
     const mon = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
     const dateChip = wdn[now.getDay()] + ', ' + now.getDate() + '. ' + mon[now.getMonth()];
 
-    const days    = ['Mo','Di','Mi','Do','Fr'];
+    const days = t.days;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
     const todayDow = now.getDay();
     const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
@@ -523,13 +629,13 @@ class VpMobile24Card extends HTMLElement {
 
     slots.forEach(slot => {
       if (slot.isPause) {
-        tableHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">Pause ' + slot.time + '</div></td></tr>';
+        tableHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">' + t.pause + ' ' + slot.time + '</div></td></tr>';
       } else {
         const numHtml = showTime
           ? '<div class="vp-snum">' + slot.period + '</div><div class="vp-stime">' + slot.time + '</div>'
           : '<div class="vp-snum">' + slot.period + '</div>';
         tableHtml += '<tr><td class="vp-td-num">' + numHtml + '</td>';
-        const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+        const dayFullNames = t.daysFull;
         days.forEach((d, di) => {
           const lesson = (weekTable[dayKeys[di]] || {})[slot.lessonNumber];
           const isToday = di === todayIdx;
@@ -588,20 +694,32 @@ class VpMobile24Card extends HTMLElement {
     mobTabs += '</div>';
 
     // Build rows for a given day
-    const dayFullNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const dayFullNames = t.daysFull;
     const buildMobRows = (dayKey, dayIdx) => {
       const sched = weekTable[dayKey] || {};
       const dName = dayFullNames[dayIdx] || dayKey;
       let rows = '';
       slots.forEach(slot => {
         if (slot.isPause) {
-          rows += '<div class="vp-mob-pause-row"><span>Pause ' + slot.time + '</span></div>';
+          rows += '<div class="vp-mob-pause-row"><span>' + t.pause + ' ' + slot.time + '</span></div>';
         } else {
           const lesson = sched[slot.lessonNumber];
           let rowCls = 'vp-mob-lesson';
           let subj = '';
           let isSub = false;
-          if (lesson && lesson.fach) {
+          // Detect cancellation in mobile too
+          const rawFachMob = lesson ? lesson.fach : undefined;
+          const isCancelledMob = lesson && (
+            rawFachMob === undefined || rawFachMob === null ||
+            rawFachMob === "---" || rawFachMob === "\u2014" || rawFachMob === "\u2013" ||
+            rawFachMob === "" || rawFachMob === "-" || rawFachMob === "\u00a0" ||
+            (typeof rawFachMob === "string" && rawFachMob.trim() === "") ||
+            (typeof rawFachMob === "string" && /^[-\u2014\u2013\s]+$/.test(rawFachMob))
+          );
+          if (isCancelledMob) {
+            subj = '—';
+            rowCls += ' vp-mob-cancelled vp-mob-clickable';
+          } else if (lesson && lesson.fach) {
             subj = lesson.fach;
             isSub = !!lesson.ist_vertretung;
             if (isSub) rowCls += ' vp-mob-sub';
@@ -609,14 +727,19 @@ class VpMobile24Card extends HTMLElement {
           } else {
             rowCls += ' vp-mob-empty';
           }
-          const onclickAttr = (lesson && lesson.fach)
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\')"'
+          const onclickAttr = (lesson && (lesson.fach || isCancelledMob))
+            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelledMob + ')"'
             : '';
           const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
-          const subjPart = subj
-            ? '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>'
-            : '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
+          let subjPart;
+          if (isCancelledMob) {
+            subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
+          } else if (subj) {
+            subjPart = '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
+          } else {
+            subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
+          }
           rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
         }
       });
@@ -683,7 +806,7 @@ ha-card {
   transition: all .2s; line-height: 1.3;
 }
 .vp-pill-btn { cursor: pointer; }
-.vp-pill-btn:hover { background: rgba(255,255,255,0.13); color: #fff; border-color: rgba(255,255,255,0.25); }
+.vp-pill-btn:hover { background: rgba(255,255,255,0.11); color: #e2e8f0; border-color: rgba(255,255,255,0.22); }
 .vp-pill-info {
   background: rgba(245,158,11,0.1);
   border-color: rgba(245,158,11,0.3);
@@ -734,9 +857,9 @@ ha-card {
 }
 .vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
 .vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
-/* Cancelled lesson */
-.vp-tile.vp-cancelled { background: rgba(100,116,139,0.15) !important; color: #64748b !important; font-size: 1.1em; }
-.vp-today-col .vp-tile.vp-cancelled { background: #991b1b !important; color: #fca5a5 !important; }
+/* Cancelled lesson – always red, every column */
+.vp-tile.vp-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; font-size: 1.1em; }
+.vp-today-col .vp-tile.vp-cancelled { background: #991b1b !important; color: #fca5a5 !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.5); }
 .vp-today-pill {
   background: #2563eb; color: #fff; border-radius: 8px;
   padding: 4px 10px; font-weight: 700; font-size: .82em;
@@ -744,34 +867,6 @@ ha-card {
   flex-direction: column; align-items: center; gap: 1px;
 }
 .vp-today-date { font-size: 0.85em; font-weight: 500; opacity: 0.85; text-transform: none; letter-spacing: 0; }
-.vp-table td { padding: 3px 3px; text-align: center; vertical-align: middle; background: #0f1729; height: 52px; }
-.vp-td-num { width: 56px; min-width: 56px; padding: 4px 6px; }
-.vp-snum  { font-size: .88em; font-weight: 600; color: #94a3b8; line-height: 1.3; }
-.vp-stime { font-size: .68em; color: #475569; margin-top: 1px; white-space: nowrap; }
-/* TILES */
-.vp-tile {
-  background: #1a2a50; border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: #e2e8f0;
-  height: 46px; min-height: 46px;
-  display: flex; align-items: center;
-  justify-content: center; transition: background .15s;
-}
-.vp-tile.vp-empty { background: rgba(255,255,255,0.03); color: #475569; }
-.vp-today-col .vp-tile {
-  background: #1a2a50; border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: #e2e8f0;
-  height: 46px; min-height: 46px;
-  display: flex; align-items: center;
-  justify-content: center; transition: background .15s;
-}
-.vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
-.vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
-.vp-th-info { display: inline-flex; align-items: center; margin-left: 5px; vertical-align: middle; }
-.vp-today-pill {
-  background: #2563eb; color: #fff; border-radius: 8px;
-  padding: 5px 12px; font-weight: 700; font-size: .82em;
-  text-transform: uppercase; letter-spacing: .5px; display: inline-block;
-}
 /* PAUSE */
 .vp-pause-tr td { padding: 2px 0; background: #0f1729; }
 .vp-pause-cell {
@@ -821,6 +916,7 @@ ha-card {
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
 .vp-mob-sub   { background: rgba(127,29,29,.25); border-left: 3px solid #7f1d1d; }
+.vp-mob-cancelled { background: rgba(127,29,29,.25); border-left: 3px solid #ef4444; }
 .vp-mob-empty { opacity: .45; }
 .vp-mob-left  { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
 .vp-mob-num   { font-size: .9em; font-weight: 700; color: #94a3b8; line-height: 1.2; }
@@ -831,6 +927,7 @@ ha-card {
   padding: 8px 12px; text-align: center;
 }
 .vp-mob-subj-sub   { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
+.vp-mob-subj-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; }
 .vp-mob-subj-empty { background: rgba(255,255,255,.03) !important; color: #475569 !important; }
 /* Pause row */
 .vp-mob-pause-row {
@@ -944,19 +1041,19 @@ ha-card {
     <div class="vp-hdr-body">
       <div class="vp-hdr-row1">
         <span class="vp-hdr-title">${title}</span>
-        ${infoBtn ? '<button class="vp-pill vp-pill-info vp-pill-btn' + (infoBtnHasInfo ? ' has-info' : '') + '" onclick="this.getRootNode().host._showInfoPopup()" title="Zusatzinformationen">ⓘ</button>' : ''}
+        ${infoBtn ? '<button class="vp-pill vp-pill-info vp-pill-btn' + (infoBtnHasInfo ? ' has-info' : '') + '" onclick="this.getRootNode().host._showInfoPopup()" title="' + t.infoTitle + '">ⓘ</button>' : ''}
         <div class="vp-hdr-spacer"></div>
-        ${this._config.reload_entity ? '<button class="vp-pill vp-pill-btn" onclick="this.getRootNode().host._handleReload()">↺ Aktualisieren</button>' : ''}
+        ${this._config.reload_entity ? '<button class="vp-pill vp-pill-btn" onclick="this.getRootNode().host._handleReload()">' + t.refresh + '</button>' : ''}
       </div>
-      <span class="vp-hdr-sub">Klasse ${className}</span>
+      <span class="vp-hdr-sub">${t.classLabel} ${className}</span>
     </div>
   </div>
   <div class="vp-desktop">${tableHtml}</div>
   <div class="vp-mobile">${mobileHtml}</div>
   <div class="vp-legend">
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-t"></span><span class="vp-lt">Heute</span></div>
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-s"></span><span class="vp-ls">Vertretung</span></div>
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-c"></span><span class="vp-lc">Jetzt</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-t"></span><span class="vp-lt">${t.today}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-s"></span><span class="vp-ls">${t.sub}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-c"></span><span class="vp-lc">${t.now}</span></div>
   </div>
 </ha-card>
 <!-- Lesson detail popup -->
@@ -964,14 +1061,14 @@ ha-card {
 <div id="popup" class="vp-popup hidden">
   <div id="popup-title" class="vp-popup-title">Details</div>
   <div id="popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">Schließen</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button></div>
 </div>
 <!-- Info popup -->
 <div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
 <div id="info-popup" class="vp-popup hidden">
-  <div class="vp-info-popup-title">ℹ️ Zusatzinformationen</div>
+  <div class="vp-info-popup-title">${t.infoTitle}</div>
   <div id="info-popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">Schließen</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">${t.close}</button></div>
 </div>`;
   }
 }
@@ -979,5 +1076,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.3 loaded');
+console.log('✅ VpMobile24 Card v2.4.4 loaded');
 

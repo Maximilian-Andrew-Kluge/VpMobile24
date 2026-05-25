@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=f"VpMobile24 ({entry.data['school_id']})",
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.4.1",
+        sw_version="2.4.4",
     )
 
     # Re-copy card on every config entry setup (catches HACS updates)

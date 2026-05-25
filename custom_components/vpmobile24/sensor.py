@@ -123,7 +123,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.2",
+            "sw_version": "2.4.4",
         }
 
     @property
@@ -224,7 +224,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.2",
+            "sw_version": "2.4.4",
         }
 
     @property
@@ -390,6 +390,10 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                 # Wenn vorherige Stunde existiert und gleiche Fach hat
                 if prev_lesson and prev_lesson.get("subject"):
                     # Erstelle Doppelstunde basierend auf vorheriger Stunde
+                    # Nur wenn nächste Stunde das gleiche Fach hat (echte Doppelstunde)
+                    next_lesson_check = lessons_by_period.get(period + 1)
+                    if next_lesson_check and next_lesson_check.get("subject") != prev_lesson.get("subject"):
+                        continue  # Kein Fach-Match → keine Doppelstunde
                     double_lesson = prev_lesson.copy()
                     double_lesson["period"] = str(period)
                     
@@ -421,6 +425,10 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
                 
                 # Wenn nÃ¤chste Stunde existiert und gleiches Fach hat
                 elif next_lesson and next_lesson.get("subject"):
+                    # Nur wenn vorherige Stunde das gleiche Fach hat (echte Doppelstunde)
+                    prev_lesson_check = lessons_by_period.get(period - 1)
+                    if prev_lesson_check and prev_lesson_check.get("subject") != next_lesson.get("subject"):
+                        continue  # Kein Fach-Match → keine Doppelstunde
                     # Erstelle Doppelstunde basierend auf nÃ¤chster Stunde
                     double_lesson = next_lesson.copy()
                     double_lesson["period"] = str(period)
@@ -474,7 +482,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.2",
+            "sw_version": "2.4.4",
         }
 
     @property
@@ -586,7 +594,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.2",
+            "sw_version": "2.4.4",
         }
 
     @property
@@ -711,7 +719,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.2",
+            "sw_version": "2.4.4",
         }
 
     @property

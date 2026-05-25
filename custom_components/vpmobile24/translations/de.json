@@ -21,6 +21,25 @@
         "title": "Fächer auswählen",
         "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer."
       }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.",
+      "unknown": "Ein unbekannter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Diese Schule ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VpMobile24 Optionen",
+        "description": "Ändern Sie die Einstellungen Ihrer VpMobile24 Integration.",
+        "data": {
+          "excluded_subjects": "Ausgeschlossene Fächer",
+          "language": "Sprache"
+        }
+      }
     }
   },
   "entity": {

@@ -222,8 +222,6 @@ class Stundenplan24API:
             
             return schedule_data
             
-            return schedule_data
-            
         except ET.ParseError as e:
             _LOGGER.error("XML parsing error: %s", e)
             raise Exception(f"Invalid XML data: {e}")

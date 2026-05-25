@@ -21,22 +21,87 @@
         "title": "Sélectionner les matières",
         "description": "Choisissez les matières à afficher. Trouvé : {subject_count} matières."
       }
+    },
+    "error": {
+      "cannot_connect": "Connexion à VpMobile24 échouée. Veuillez vérifier vos identifiants.",
+      "unknown": "Une erreur inconnue s'est produite."
+    },
+    "abort": {
+      "already_configured": "Cette école est déjà configurée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options VpMobile24",
+        "description": "Modifiez les paramètres de votre intégration VpMobile24.",
+        "data": {
+          "excluded_subjects": "Matières exclues",
+          "language": "Langue"
+        }
+      }
     }
   },
   "entity": {
     "sensor": {
       "naechste_stunde": {
-        "name": "Prochain Cours"
+        "name": "Prochain cours"
       },
       "wochenstundenplan": {
-        "name": "Emploi du Temps"
+        "name": "Emploi du temps"
       },
       "zusatzinfos": {
-        "name": "Infos Supplémentaires"
+        "name": "Informations supplémentaires"
       },
       "aenderungen": {
         "name": "Changements"
       }
+    }
+  },
+  "card": {
+    "editor": {
+      "week_table_sensor": "Capteur d'emploi du temps",
+      "additional_info_sensor": "Capteur d'informations",
+      "reload_button": "Bouton de rechargement",
+      "show_header": "Afficher l'en-tête",
+      "highlight_today": "Mettre en évidence aujourd'hui",
+      "show_times": "Afficher les horaires",
+      "use_custom_times": "Utiliser des horaires personnalisés",
+      "header_settings": "Paramètres d'en-tête",
+      "time_settings": "Paramètres horaires",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "layout": "Disposition",
+      "visibility": "Visibilité",
+      "config": "Configuration",
+      "header_title": "Titre de l'en-tête",
+      "class_name": "Nom de la classe",
+      "show_current_lesson": "Afficher le cours actuel",
+      "show_breaks": "Afficher les pauses",
+      "show_weekdays": "Afficher les jours",
+      "show_lesson_numbers": "Afficher les numéros de cours",
+      "compact_mode": "Mode compact",
+      "theme": "Thème",
+      "custom_colors": "Couleurs personnalisées",
+      "border_radius": "Rayon des bordures",
+      "font_size": "Taille de police",
+      "lesson_height": "Hauteur des cours",
+      "today_color": "Couleur du jour actuel",
+      "current_lesson_color": "Couleur du cours actuel",
+      "break_color": "Couleur des pauses",
+      "header_color": "Couleur de l'en-tête",
+      "background_color": "Couleur d'arrière-plan",
+      "text_color": "Couleur du texte",
+      "enable_animations": "Activer les animations",
+      "enable_tooltips": "Activer les info-bulles",
+      "show_teacher": "Afficher l'enseignant",
+      "show_room": "Afficher la salle",
+      "show_subject_icons": "Afficher les icônes des matières",
+      "show_empty_lessons": "Afficher les cours vides",
+      "show_weekend": "Afficher le week-end",
+      "auto_refresh": "Actualisation automatique",
+      "refresh_interval": "Intervalle d'actualisation",
+      "preview": "Aperçu"
     }
   }
 }

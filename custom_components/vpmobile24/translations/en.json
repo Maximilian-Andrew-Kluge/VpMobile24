@@ -21,6 +21,25 @@
         "title": "Select subjects",
         "description": "Choose the subjects to display. Found: {subject_count} subjects."
       }
+    },
+    "error": {
+      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
+      "unknown": "An unknown error occurred."
+    },
+    "abort": {
+      "already_configured": "This school is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VpMobile24 Options",
+        "description": "Change the settings of your VpMobile24 integration.",
+        "data": {
+          "excluded_subjects": "Excluded subjects",
+          "language": "Language"
+        }
+      }
     }
   },
   "entity": {
@@ -37,6 +56,52 @@
       "aenderungen": {
         "name": "Changes"
       }
+    }
+  },
+  "card": {
+    "editor": {
+      "week_table_sensor": "Week Table Sensor",
+      "additional_info_sensor": "Additional Info Sensor",
+      "reload_button": "Reload Button",
+      "show_header": "Show Header",
+      "highlight_today": "Highlight Current Day",
+      "show_times": "Show Times",
+      "use_custom_times": "Use Custom Times",
+      "header_settings": "Header Settings",
+      "time_settings": "Time Settings",
+      "save": "Save",
+      "cancel": "Cancel",
+      "layout": "Layout",
+      "visibility": "Visibility",
+      "config": "Config",
+      "header_title": "Header Title",
+      "class_name": "Class Name",
+      "show_current_lesson": "Show Current Lesson",
+      "show_breaks": "Show Breaks",
+      "show_weekdays": "Show Weekdays",
+      "show_lesson_numbers": "Show Lesson Numbers",
+      "compact_mode": "Compact Mode",
+      "theme": "Theme",
+      "custom_colors": "Custom Colors",
+      "border_radius": "Border Radius",
+      "font_size": "Font Size",
+      "lesson_height": "Lesson Height",
+      "today_color": "Today Highlight Color",
+      "current_lesson_color": "Current Lesson Color",
+      "break_color": "Break Color",
+      "header_color": "Header Color",
+      "background_color": "Background Color",
+      "text_color": "Text Color",
+      "enable_animations": "Enable Animations",
+      "enable_tooltips": "Enable Tooltips",
+      "show_teacher": "Show Teacher",
+      "show_room": "Show Room",
+      "show_subject_icons": "Show Subject Icons",
+      "show_empty_lessons": "Show Empty Lessons",
+      "show_weekend": "Show Weekend",
+      "auto_refresh": "Auto Refresh",
+      "refresh_interval": "Refresh Interval",
+      "preview": "Preview"
     }
   }
 }

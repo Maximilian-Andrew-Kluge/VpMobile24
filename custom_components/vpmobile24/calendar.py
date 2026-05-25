@@ -49,7 +49,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "1.4.5",
+            "sw_version": "2.4.4",
         }
 
     @property

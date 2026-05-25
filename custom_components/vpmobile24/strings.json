@@ -25,6 +25,21 @@
     "error": {
       "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
       "unknown": "An unknown error occurred."
+    },
+    "abort": {
+      "already_configured": "This school is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VpMobile24 Options",
+        "description": "Change the settings of your VpMobile24 integration.",
+        "data": {
+          "excluded_subjects": "Excluded subjects",
+          "language": "Language"
+        }
+      }
     }
   },
   "entity": {
