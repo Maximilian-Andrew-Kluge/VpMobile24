@@ -166,7 +166,7 @@ Das Ziel: Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — a
 | `Klasse` | Klassenkennung (z.B. `10a`) |
 
 > [!TIP]
-> Mehrere Klassen können durch das erneute Hinzufügen der Integration mit anderen Zugangsdaten eingebunden werden.
+> Mehrere Klassen können durch das erneute Hinzufügen der Integration mit anderen oder gleichen Zugangsdaten eingebunden werden.
 
 <br />
 
@@ -365,7 +365,7 @@ The goal: timetables should be available in Home Assistant without friction — 
 | `Class` | Class identifier (e.g. `10a`) |
 
 > [!TIP]
-> Multiple classes can be added by repeating the integration setup with different credentials.
+> Multiple classes can be integrated by re-adding the integration using different—or identical—access credentials.
 
 <br />
 
