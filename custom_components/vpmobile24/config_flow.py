@@ -173,11 +173,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                         await self._api.async_close()
 
+                        class_name = user_input[CONF_CLASS_NAME]
+                        school_id = user_input[CONF_SCHOOL_ID]
+                        entry_title = f"VpMobile24 – {class_name} ({school_id})"
+                        await self.async_set_unique_id(
+                            f"{school_id}_{class_name}"
+                        )
+                        self._abort_if_unique_id_configured()
+
                         return self.async_create_entry(
-                            title=(
-                                f"VpMobile24 "
-                                f"({user_input[CONF_SCHOOL_ID]})"
-                            ),
+                            title=entry_title,
                             data=self._config_data,
                         )
 
@@ -220,11 +225,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_EXCLUDED_SUBJECTS
                 ] = excluded_subjects
 
+            class_name = self._config_data.get(CONF_CLASS_NAME, "")
+            school_id = self._config_data.get(CONF_SCHOOL_ID, "")
+            entry_title = f"VpMobile24 – {class_name} ({school_id})"
+
+            # Prevent duplicate entries for same school+class combination
+            await self.async_set_unique_id(f"{school_id}_{class_name}")
+            self._abort_if_unique_id_configured()
+
             return self.async_create_entry(
-                title=(
-                    f"VpMobile24 "
-                    f"({self._config_data[CONF_SCHOOL_ID]})"
-                ),
+                title=entry_title,
                 data=self._config_data,
             )
 

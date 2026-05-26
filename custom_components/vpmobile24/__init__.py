@@ -1,4 +1,4 @@
-"""The vpmobile24 integration."""
+﻿"""The vpmobile24 integration."""
 from __future__ import annotations
 
 import logging
@@ -40,13 +40,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Register device with icon
     device_registry = dr.async_get(hass)
+    class_name = entry.data.get("class_name", "")
+    school_id = entry.data["school_id"]
+    device_id = f"{school_id}_{class_name}" if class_name else school_id
+    device_name = f"VpMobile24 – {class_name} ({school_id})" if class_name else f"VpMobile24 ({school_id})"
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
-        identifiers={(DOMAIN, entry.data["school_id"])},
-        name=f"VpMobile24 ({entry.data['school_id']})",
+        identifiers={(DOMAIN, device_id)},
+        name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.4.4",
+        sw_version="2.4.5",
     )
 
     # Re-copy card on every config entry setup (catches HACS updates)

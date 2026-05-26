@@ -1,4 +1,4 @@
-"""Sensor platform fÃ¼r VpMobile24."""
+﻿"""Sensor platform fÃ¼r VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -19,19 +19,22 @@ _LOGGER = logging.getLogger(__name__)
 SENSOR_NAMES = {
     "en": {
         "next_lesson": "VpMobile24 Next Lesson",
-        "week_schedule": "VpMobile24 Today Schedule", 
+        "week_schedule": "VpMobile24 Today Schedule",
+        "week_table": "VpMobile24 Week Table",
         "additional_info": "VpMobile24 Additional Info",
         "changes": "VpMobile24 Changes"
     },
     "de": {
         "next_lesson": "VpMobile24 Nächste Stunde",
         "week_schedule": "VpMobile24 Heutiger Stundenplan",
-        "additional_info": "VpMobile24 Zusatzinfos", 
+        "week_table": "VpMobile24 Wochentabelle",
+        "additional_info": "VpMobile24 Zusatzinfos",
         "changes": "VpMobile24 Änderungen"
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
         "week_schedule": "VpMobile24 Programme du jour",
+        "week_table": "VpMobile24 Tableau Hebdomadaire",
         "additional_info": "VpMobile24 Informations complémentaires",
         "changes": "VpMobile24 Changements"
     }
@@ -89,8 +92,10 @@ async def async_setup_entry(
     """Richte VpMobile24 Sensoren ein."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
     
-    # Get language from config entry, default to English
-    language = config_entry.data.get("language", "en")
+    # Derive language from HA system language (e.g. "de", "de-DE", "fr", "en")
+    ha_lang = getattr(hass.config, "language", "en") or "en"
+    lang_short = ha_lang.split("-")[0].lower()
+    language = lang_short if lang_short in ("de", "en", "fr") else "en"
     
     sensors = [
         VpMobile24NextLessonSensor(coordinator, config_entry, language),
@@ -119,11 +124,11 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         """Return device information."""
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property
@@ -220,11 +225,11 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         """Return device information."""
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property
@@ -470,7 +475,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self._config_entry = config_entry
         self._language = language
-        self._attr_name = "VpMobile24 Week Table"
+        self._attr_name = SENSOR_NAMES[language]["week_table"]
         self._attr_unique_id = f"{config_entry.entry_id}_week_table"
         self._attr_icon = "mdi:table"
 
@@ -478,11 +483,11 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         """Return device information."""
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property
@@ -590,11 +595,11 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
     @property
     def device_info(self):
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property
@@ -715,11 +720,11 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         """Return device information."""
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property

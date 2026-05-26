@@ -27,7 +27,7 @@
       "unknown": "An unknown error occurred."
     },
     "abort": {
-      "already_configured": "This school is already configured."
+      "already_configured": "This class is already configured for this school."
     }
   },
   "options": {

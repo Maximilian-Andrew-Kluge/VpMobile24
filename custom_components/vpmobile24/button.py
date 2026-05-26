@@ -1,4 +1,4 @@
-"""Button platform für VpMobile24."""
+﻿"""Button platform für VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -13,6 +13,12 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+BUTTON_NAMES = {
+    "de": "VpMobile24 Daten neu laden",
+    "en": "VpMobile24 Reload Data",
+    "fr": "VpMobile24 Actualiser les données",
+}
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -21,22 +27,26 @@ async def async_setup_entry(
 ) -> None:
     """Richte VpMobile24 Button ein."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
-    
+
+    ha_lang = getattr(hass.config, "language", "en") or "en"
+    lang_short = ha_lang.split("-")[0].lower()
+    language = lang_short if lang_short in ("de", "en", "fr") else "en"
+
     buttons = [
-        VpMobile24ReloadButton(coordinator, config_entry),
+        VpMobile24ReloadButton(coordinator, config_entry, language),
     ]
-    
+
     async_add_entities(buttons)
 
 
 class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
     """Button zum manuellen Neuladen der Daten."""
 
-    def __init__(self, coordinator, config_entry) -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         """Initialisiere den Button."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Daten neu laden"
+        self._attr_name = BUTTON_NAMES.get(language, BUTTON_NAMES["en"])
         self._attr_unique_id = f"{config_entry.entry_id}_reload"
         self._attr_icon = "mdi:refresh"
 
@@ -44,11 +54,11 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
     def device_info(self):
         """Return device information."""
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     async def async_press(self) -> None:

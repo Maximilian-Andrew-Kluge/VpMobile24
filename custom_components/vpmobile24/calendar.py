@@ -1,4 +1,4 @@
-"""Calendar platform for vpmobile24."""
+﻿"""Calendar platform for vpmobile24."""
 from __future__ import annotations
 
 from datetime import datetime, date, timedelta
@@ -14,6 +14,13 @@ from homeassistant.util import dt as dt_util
 from .const import DOMAIN
 
 
+CALENDAR_NAMES = {
+    "de": "VpMobile24 Wochenkalender",
+    "en": "VpMobile24 Week Calendar",
+    "fr": "VpMobile24 Calendrier Hebdomadaire",
+}
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -21,22 +28,26 @@ async def async_setup_entry(
 ) -> None:
     """Set up the calendar platform."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
-    
+
+    ha_lang = getattr(hass.config, "language", "en") or "en"
+    lang_short = ha_lang.split("-")[0].lower()
+    language = lang_short if lang_short in ("de", "en", "fr") else "en"
+
     entities = [
-        VpMobile24WeekCalendar(coordinator, config_entry),
+        VpMobile24WeekCalendar(coordinator, config_entry, language),
     ]
-    
+
     async_add_entities(entities)
 
 
 class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
     """Calendar entity for weekly schedule."""
 
-    def __init__(self, coordinator, config_entry):
+    def __init__(self, coordinator, config_entry, language: str = "en"):
         """Initialize the calendar."""
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._attr_name = "VpMobile24 Week Calendar"
+        self._attr_name = CALENDAR_NAMES.get(language, CALENDAR_NAMES["en"])
         self._attr_unique_id = f"{config_entry.entry_id}_week_calendar"
         self._attr_icon = "mdi:calendar-week"
 
@@ -45,11 +56,11 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         """Return device information."""
         from .const import DOMAIN
         return {
-            "identifiers": {(DOMAIN, self._config_entry.data["school_id"])},
-            "name": f"VpMobile24 ({self._config_entry.data['school_id']})",
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.4",
+            "sw_version": "2.4.5",
         }
 
     @property

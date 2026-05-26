@@ -27,7 +27,7 @@
       "unknown": "Ein unbekannter Fehler ist aufgetreten."
     },
     "abort": {
-      "already_configured": "Diese Schule ist bereits konfiguriert."
+      "already_configured": "Diese Klasse ist für diese Schule bereits konfiguriert."
     }
   },
   "options": {
