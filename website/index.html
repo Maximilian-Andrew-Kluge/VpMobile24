@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -15,7 +15,7 @@
       try {
         const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases/latest');
         const d = await r.json();
-        const tag = d.tag_name || 'v2.4.5';
+        const tag = d.tag_name || 'v2.4.5.2';
         const pre = d.prerelease;
         const label = pre ? 'Beta' : 'Stable';
         const cls   = pre ? 'ver-beta' : 'ver-stable';
@@ -84,7 +84,7 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag gh-version">v2.4.5</span>
+          <span class="version-tag gh-version">v2.4.5.2</span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -815,7 +815,7 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Mehrere Klassen mit gleichen Zugangsdaten einrichten</summary>
             <div class="faq-body">
-              <p>Ab v2.4.5 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
+              <p>Ab v2.4.5.2 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
               <ol>
                 <li>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</strong></li>
                 <li>Wähle erneut <strong>VpMobile24</strong> und gib dieselben Zugangsdaten ein</li>
@@ -832,7 +832,7 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Ausfallstunden werden grau statt rot angezeigt</summary>
             <div class="faq-body">
-              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.5</strong> aktualisiert ist.</p>
+              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.5.2</strong> aktualisiert ist.</p>
             </div>
           </details>
 
@@ -869,7 +869,7 @@ use_custom_times: false</code></pre>
             <span>💬</span> Discord Community
           </a>
         </div>
-        <div class="version-badge">Version <span class="gh-version-full">v2.4.5 <span class="ver-label ver-stable">Stable</span></span></div>
+        <div class="version-badge">Version <span class="gh-version-full">v2.4.5.2 <span class="ver-label ver-stable">Stable</span></span></div>
       </div>
     </section>
 
