@@ -128,7 +128,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.5.2",
+            "sw_version": "2.4.6",
         }
 
     @property
@@ -229,7 +229,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.5.2",
+            "sw_version": "2.4.6",
         }
 
     @property
@@ -487,7 +487,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.5.2",
+            "sw_version": "2.4.6",
         }
 
     @property
@@ -599,7 +599,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.5.2",
+            "sw_version": "2.4.6",
         }
 
     @property
@@ -724,7 +724,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.5.2",
+            "sw_version": "2.4.6",
         }
 
     @property
