@@ -1,4 +1,4 @@
-"""Calendar platform for vpmobile24."""
+﻿"""Calendar platform for vpmobile24."""
 from __future__ import annotations
 
 from datetime import datetime, date, timedelta
@@ -33,13 +33,17 @@ async def async_setup_entry(
     lang_short = ha_lang.split("-")[0].lower()
     language = lang_short if lang_short in ("de", "en", "fr") else "en"
 
-    async_add_entities([VpMobile24WeekCalendar(coordinator, config_entry, language)])
+    entities = [
+        VpMobile24WeekCalendar(coordinator, config_entry, language),
+    ]
+
+    async_add_entities(entities)
 
 
 class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
     """Calendar entity for weekly schedule."""
 
-    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en"):
         """Initialize the calendar."""
         super().__init__(coordinator)
         self._config_entry = config_entry
@@ -48,29 +52,30 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         self._attr_icon = "mdi:calendar-week"
 
     @property
-    def device_info(self) -> dict:
+    def device_info(self):
         """Return device information."""
-        school_id = self._config_entry.data["school_id"]
-        class_name = self._config_entry.data.get("class_name", "")
+        from .const import DOMAIN
         return {
-            "identifiers": {(DOMAIN, f"{school_id}_{class_name}")},
-            "name": (
-                f"VpMobile24 \u2013 {class_name} ({school_id})"
-                if class_name
-                else f"VpMobile24 ({school_id})"
-            ),
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.8",
+            "sw_version": "2.4.7",
         }
 
     @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
+        events = self._get_week_events()
+        if not events:
+            return None
+        
+        # Find next event
         now = dt_util.now()
-        for event in self._get_week_events():
+        for event in events:
             if event.start_datetime_local > now:
                 return event
+        
         return None
 
     async def async_get_events(
@@ -87,113 +92,133 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         today = date.today()
         start_of_week = today - timedelta(days=today.weekday())  # Monday
         end_of_week = start_of_week + timedelta(days=6)  # Sunday
+        
+        # Get timezone-aware datetimes
+        tz = dt_util.get_default_time_zone()
+        start_datetime = datetime.combine(start_of_week, datetime.min.time()).replace(tzinfo=tz)
+        end_datetime = datetime.combine(end_of_week, datetime.max.time()).replace(tzinfo=tz)
+        
+        return self._get_events_in_range(start_datetime, end_datetime)
 
-        start_dt = dt_util.as_local(datetime.combine(start_of_week, datetime.min.time()))
-        end_dt = dt_util.as_local(datetime.combine(end_of_week, datetime.max.time()))
-
-        return self._get_events_in_range(start_dt, end_dt)
-
-    def _get_events_in_range(
-        self, start_date: datetime, end_date: datetime
-    ) -> list[CalendarEvent]:
+    def _get_events_in_range(self, start_date: datetime, end_date: datetime) -> list[CalendarEvent]:
         """Get events within a date range."""
+        events = []
+        
         if not self.coordinator.data:
-            return []
-
-        events: list[CalendarEvent] = []
+            return events
+        
+        # Get lessons for each day in the range
         current_date = start_date.date()
         end_date_only = end_date.date()
-
+        
         while current_date <= end_date_only:
-            if current_date.weekday() < 5:  # Mon–Fri only
-                events.extend(self._get_events_for_date(current_date))
+            # Skip weekends
+            if current_date.weekday() < 5:  # Monday = 0, Friday = 4
+                day_events = self._get_events_for_date(current_date)
+                events.extend(day_events)
+            
             current_date += timedelta(days=1)
-
+        
+        # Sort events by start time
         events.sort(key=lambda x: x.start_datetime_local)
+        
         return events
 
     def _get_events_for_date(self, target_date: date) -> list[CalendarEvent]:
         """Get events for a specific date."""
+        events = []
+        
         if not self.coordinator.data:
-            return []
-
-        target_str = target_date.isoformat()
-        events: list[CalendarEvent] = []
-
-        for lesson in self.coordinator.data.get("week_lessons", []):
-            if lesson.get("date") == target_str:
-                ev = self._lesson_to_event(lesson, target_date, is_change=False)
-                if ev:
-                    events.append(ev)
-
-        for change in self.coordinator.data.get("week_changes", []):
-            if change.get("date") == target_str:
-                ev = self._lesson_to_event(change, target_date, is_change=True)
-                if ev:
-                    events.append(ev)
-
+            return events
+        
+        # Use week data from coordinator
+        week_lessons = self.coordinator.data.get("week_lessons", [])
+        week_changes = self.coordinator.data.get("week_changes", [])
+        
+        # Filter lessons for the target date
+        target_date_str = target_date.isoformat()
+        
+        # Process regular lessons for this date
+        for lesson in week_lessons:
+            lesson_date = lesson.get("date", "")
+            if lesson_date == target_date_str:
+                event = self._create_event_from_lesson(lesson, target_date)
+                if event:
+                    events.append(event)
+        
+        # Process changes for this date
+        for change in week_changes:
+            change_date = change.get("date", "")
+            if change_date == target_date_str:
+                event = self._create_event_from_lesson(change, target_date, is_change=True)
+                if event:
+                    events.append(event)
+        
         return events
 
-    def _lesson_to_event(
-        self, lesson: dict, target_date: date, is_change: bool = False
-    ) -> CalendarEvent | None:
-        """Create a CalendarEvent from a lesson dict."""
+    def _create_event_from_lesson(self, lesson: dict, target_date: date, is_change: bool = False) -> CalendarEvent | None:
+        """Create a calendar event from a lesson."""
         try:
             time_start = lesson.get("time_start", "")
             time_end = lesson.get("time_end", "")
             subject = lesson.get("subject", "")
-
-            if not time_start or not subject:
-                return None
-
-            # Parse start time
-            start_hour, start_minute = map(int, time_start.split(":"))
-            start_dt = dt_util.as_local(
-                datetime.combine(
-                    target_date,
-                    datetime.min.time().replace(hour=start_hour, minute=start_minute),
-                )
-            )
-
-            # Parse end time (fall back to +45 min)
-            if time_end:
-                end_hour, end_minute = map(int, time_end.split(":"))
-                end_dt = dt_util.as_local(
-                    datetime.combine(
-                        target_date,
-                        datetime.min.time().replace(hour=end_hour, minute=end_minute),
-                    )
-                )
-            else:
-                end_dt = start_dt + timedelta(minutes=45)
-
-            summary = f"\U0001f504 {subject}" if is_change else subject
-
-            parts: list[str] = []
             teacher = lesson.get("teacher", "")
             room = lesson.get("room", "")
             period = lesson.get("period", "")
             info = lesson.get("info", "")
-            if teacher:
-                parts.append(f"Lehrer: {teacher}")
-            if room:
-                parts.append(f"Raum: {room}")
-            if period:
-                parts.append(f"Stunde: {period}")
-            if info:
-                parts.append(f"Info: {info}")
+            
+            if not time_start or not subject:
+                return None
+            
+            # Get Home Assistant timezone
+            tz = dt_util.get_default_time_zone()
+            
+            # Parse times
+            start_hour, start_minute = map(int, time_start.split(":"))
+            start_datetime = datetime.combine(
+                target_date, 
+                datetime.min.time().replace(hour=start_hour, minute=start_minute)
+            ).replace(tzinfo=tz)
+            
+            if time_end:
+                end_hour, end_minute = map(int, time_end.split(":"))
+                end_datetime = datetime.combine(
+                    target_date, 
+                    datetime.min.time().replace(hour=end_hour, minute=end_minute)
+                ).replace(tzinfo=tz)
+            else:
+                # Default to 45 minutes if no end time
+                end_datetime = start_datetime + timedelta(minutes=45)
+            
+            # Create summary
+            summary = subject
             if is_change:
-                parts.append("\u26a0\ufe0f Vertretung/\u00c4nderung")
-
+                summary = f"🔄 {subject}"
+            
+            # Create description
+            description_parts = []
+            if teacher:
+                description_parts.append(f"Lehrer: {teacher}")
+            if room:
+                description_parts.append(f"Raum: {room}")
+            if period:
+                description_parts.append(f"Stunde: {period}")
+            if info:
+                description_parts.append(f"Info: {info}")
+            if is_change:
+                description_parts.append("⚠️ Vertretung/Änderung")
+            
+            description = "\n".join(description_parts)
+            
             return CalendarEvent(
-                start=start_dt,
-                end=end_dt,
+                start=start_datetime,
+                end=end_datetime,
                 summary=summary,
-                description="\n".join(parts),
+                description=description,
                 location=room,
             )
-
-        except (ValueError, TypeError):
+            
+        except (ValueError, TypeError) as e:
             return None
 
     @property
@@ -201,8 +226,11 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         """Return additional state attributes."""
         if not self.coordinator.data:
             return {}
+        
+        week_events = self._get_week_events()
+        
         return {
-            "total_events_this_week": len(self._get_week_events()),
+            "total_events_this_week": len(week_events),
             "date": self.coordinator.data.get("date"),
             "timestamp": self.coordinator.data.get("timestamp"),
             "class": self.coordinator.class_name,

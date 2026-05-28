@@ -1,4 +1,4 @@
-"""Button platform for VpMobile24."""
+﻿"""Button platform für VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -13,10 +13,10 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-BUTTON_NAMES: dict[str, str] = {
+BUTTON_NAMES = {
     "de": "VpMobile24 Daten neu laden",
     "en": "VpMobile24 Reload Data",
-    "fr": "VpMobile24 Actualiser les donn\u00e9es",
+    "fr": "VpMobile24 Actualiser les données",
 }
 
 
@@ -25,21 +25,25 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up VpMobile24 button."""
+    """Richte VpMobile24 Button ein."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
 
     ha_lang = getattr(hass.config, "language", "en") or "en"
-    lang = ha_lang.split("-")[0].lower()
-    if lang not in ("de", "en", "fr"):
-        lang = "en"
+    lang_short = ha_lang.split("-")[0].lower()
+    language = lang_short if lang_short in ("de", "en", "fr") else "en"
 
-    async_add_entities([VpMobile24ReloadButton(coordinator, config_entry, lang)])
+    buttons = [
+        VpMobile24ReloadButton(coordinator, config_entry, language),
+    ]
+
+    async_add_entities(buttons)
 
 
 class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
-    """Button to manually trigger a data refresh."""
+    """Button zum manuellen Neuladen der Daten."""
 
-    def __init__(self, coordinator, config_entry: ConfigEntry, language: str = "en") -> None:
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        """Initialisiere den Button."""
         super().__init__(coordinator)
         self._config_entry = config_entry
         self._attr_name = BUTTON_NAMES.get(language, BUTTON_NAMES["en"])
@@ -47,22 +51,17 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
         self._attr_icon = "mdi:refresh"
 
     @property
-    def device_info(self) -> dict:
-        school_id  = self._config_entry.data["school_id"]
-        class_name = self._config_entry.data.get("class_name", "")
+    def device_info(self):
+        """Return device information."""
         return {
-            "identifiers": {(DOMAIN, f"{school_id}_{class_name}")},
-            "name": (
-                f"VpMobile24 \u2013 {class_name} ({school_id})"
-                if class_name
-                else f"VpMobile24 ({school_id})"
-            ),
+            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
+            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.8",
+            "sw_version": "2.4.7",
         }
 
     async def async_press(self) -> None:
-        """Handle button press — trigger coordinator refresh."""
-        _LOGGER.info("VpMobile24 manual reload triggered")
+        """Handle the button press."""
+        _LOGGER.info("Manual reload button pressed")
         await self.coordinator.async_request_refresh()

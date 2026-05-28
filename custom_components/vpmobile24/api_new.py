@@ -1,18 +1,17 @@
-﻿"""API client for stundenplan24.de."""
+"""API client for stundenplan24.de."""
 from __future__ import annotations
 
+import asyncio
 import logging
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, time, timedelta
 from typing import Any
+import re
 import xml.etree.ElementTree as ET
 
 import aiohttp
 from aiohttp import BasicAuth
 
 _LOGGER = logging.getLogger(__name__)
-
-# Subjects that represent an empty / cancelled slot in the XML
-_EMPTY_SUBJECTS = {"", " ", "\u2014", "---", "-"}
 
 
 class Stundenplan24API:
@@ -43,114 +42,118 @@ class Stundenplan24API:
         try:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
+            
+            # Test access to the mobile schedule page
             test_url = f"{self.base_url}/{self.school_id}/mobil/plankl.html"
-            async with session.get(test_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
+            
+            async with session.get(test_url, auth=auth, timeout=10) as response:
                 return response.status == 200
+                
         except Exception as ex:
             _LOGGER.error("Error testing connection: %s", ex)
             return False
 
     async def async_get_classes(self) -> list[str]:
         """Get list of available classes."""
-        session = await self.async_get_session()
-        auth = BasicAuth(self.username, self.password)
-        classes_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
-        async with session.get(classes_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
-            if response.status == 200:
-                xml_content = await response.text()
-                root = ET.fromstring(xml_content)
-                classes = []
-                for kl in root.findall(".//Kl"):
-                    kurz = kl.find("Kurz")
-                    if kurz is not None and kurz.text:
-                        classes.append(kurz.text)
-                return classes
-            raise Exception(f"HTTP {response.status}")
-
-    async def async_get_schedule(
-        self,
-        target_date: date | None = None,
-        class_name: str | None = None,
-    ) -> dict[str, Any]:
-        """Get schedule data from stundenplan24.
-
-        Raises an exception on failure so callers can decide how to handle it.
-        404 responses (weekend / holiday) are logged at DEBUG level only.
-        """
-        if target_date is None:
-            target_date = date.today()
-
-        session = await self.async_get_session()
-        auth = BasicAuth(self.username, self.password)
-        date_str = target_date.strftime("%Y%m%d")
-        xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
-
         try:
-            async with session.get(
-                xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=15)
-            ) as response:
+            session = await self.async_get_session()
+            auth = BasicAuth(self.username, self.password)
+            
+            classes_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
+            
+            async with session.get(classes_url, auth=auth, timeout=10) as response:
+                if response.status == 200:
+                    xml_content = await response.text()
+                    root = ET.fromstring(xml_content)
+                    
+                    classes = []
+                    for kl in root.findall('.//Kl'):
+                        kurz = kl.find('Kurz')
+                        if kurz is not None and kurz.text:
+                            classes.append(kurz.text)
+                    
+                    return classes
+                else:
+                    raise Exception(f"HTTP {response.status}")
+                    
+        except Exception as ex:
+            _LOGGER.error("Error fetching classes: %s", ex)
+            raise
+
+    async def async_get_schedule(self, target_date: date | None = None, class_name: str | None = None) -> dict[str, Any]:
+        """Get schedule data from stundenplan24."""
+        try:
+            session = await self.async_get_session()
+            auth = BasicAuth(self.username, self.password)
+            
+            if target_date is None:
+                target_date = date.today()
+            
+            # Format date as YYYYMMDD for the XML file
+            date_str = target_date.strftime('%Y%m%d')
+            xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
+            
+            async with session.get(xml_url, auth=auth, timeout=15) as response:
                 if response.status == 200:
                     xml_content = await response.text()
                     return self._parse_xml_schedule(xml_content, target_date, class_name)
-                # Non-200 → raise so the coordinator can handle it
-                raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
-
+                else:
+                    raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
+                
         except Exception as ex:
-            ex_str = str(ex)
-            if "404" in ex_str:
-                # Weekend / holiday — completely normal, no noise in the log
-                _LOGGER.debug(
-                    "Schedule not available for %s (404 – weekend/holiday)", target_date
-                )
-            else:
-                _LOGGER.error("Error fetching schedule: %s", ex)
+            _LOGGER.error("Error fetching schedule: %s", ex)
             raise
 
-    async def async_get_multi_day_schedule(
-        self,
-        start_date: date | None = None,
-        days: int = 2,
-        class_name: str | None = None,
-    ) -> dict[str, Any]:
-        """Get schedule data for multiple days (school days Mon–Fri only)."""
+    async def async_get_multi_day_schedule(self, start_date: date | None = None, days: int = 2, class_name: str | None = None) -> dict[str, Any]:
+        """Get schedule data for multiple days (only school days Mon-Fri)."""
         if start_date is None:
             start_date = date.today()
-
-        all_lessons: list = []
-        all_changes: list = []
-        all_additional_info: list = []
+        
+        all_lessons = []
+        all_changes = []
+        all_additional_info = []
         latest_timestamp = ""
-
+        
         current_date = start_date
         days_loaded = 0
-        max_attempts = days * 2
+        max_attempts = days * 2  # Safety limit to avoid infinite loops
         attempts = 0
-
+        
         while days_loaded < days and attempts < max_attempts:
             attempts += 1
-            if current_date.weekday() >= 5:  # Saturday / Sunday
+            
+            # Skip weekends (Saturday = 5, Sunday = 6)
+            if current_date.weekday() >= 5:
                 current_date += timedelta(days=1)
                 continue
-
+            
             try:
                 day_data = await self.async_get_schedule(current_date, class_name)
+                
+                # Add date info to each lesson and change
                 for lesson in day_data.get("lessons", []):
                     lesson["date"] = current_date.isoformat()
                     lesson["day_name"] = current_date.strftime("%A")
                     all_lessons.append(lesson)
+                
                 for change in day_data.get("changes", []):
                     change["date"] = current_date.isoformat()
                     change["day_name"] = current_date.strftime("%A")
                     all_changes.append(change)
+                
+                # Collect additional info (only from first successful day to avoid duplicates)
                 if days_loaded == 0:
                     all_additional_info = day_data.get("additional_info", [])
                     latest_timestamp = day_data.get("timestamp", "")
+                
                 days_loaded += 1
+                
             except Exception as ex:
-                _LOGGER.debug("Could not fetch schedule for %s: %s", current_date, ex)
-
+                _LOGGER.debug(f"Could not fetch schedule for {current_date} (school day): {ex}")
+                # Continue to next day even if this one fails
+            
             current_date += timedelta(days=1)
-
+        
         return {
             "date": start_date.isoformat(),
             "lessons": all_lessons,
@@ -158,80 +161,78 @@ class Stundenplan24API:
             "additional_info": all_additional_info,
             "last_updated": datetime.now().isoformat(),
             "timestamp": latest_timestamp,
-            "days_loaded": days,
+            "days_loaded": days
         }
 
-    # ------------------------------------------------------------------
-    # XML parsing
-    # ------------------------------------------------------------------
-
-    def _parse_xml_schedule(
-        self,
-        xml_content: str,
-        target_date: date,
-        class_name: str | None = None,
-    ) -> dict[str, Any]:
+    def _parse_xml_schedule(self, xml_content: str, target_date: date, class_name: str | None = None) -> dict[str, Any]:
         """Parse XML schedule data."""
         try:
             root = ET.fromstring(xml_content)
+            
+            schedule_data = {
+                "date": target_date.isoformat(),
+                "lessons": [],
+                "changes": [],
+                "additional_info": [],
+                "last_updated": datetime.now().isoformat(),
+                "timestamp": "",
+                "classes": []
+            }
+            
+            # Get timestamp
+            zeitstempel = root.find('.//zeitstempel')
+            if zeitstempel is not None and zeitstempel.text:
+                schedule_data["timestamp"] = zeitstempel.text
+            
+            # Parse ZusatzInfo
+            zusatz_info = root.find('.//ZusatzInfo')
+            if zusatz_info is not None:
+                for zi_zeile in zusatz_info.findall('ZiZeile'):
+                    if zi_zeile.text and zi_zeile.text.strip():
+                        schedule_data["additional_info"].append({
+                            "text": zi_zeile.text.strip(),
+                            "type": "general_info"
+                        })
+            
+            # Get all classes or filter by specific class
+            classes_to_process = []
+            for kl in root.findall('.//Kl'):
+                kurz = kl.find('Kurz')
+                if kurz is not None and kurz.text:
+                    if class_name is None or kurz.text == class_name:
+                        classes_to_process.append((kurz.text, kl))
+                        schedule_data["classes"].append(kurz.text)
+            
+            # Process each class
+            for class_short, kl_element in classes_to_process:
+                # Get lessons for this class
+                pl_element = kl_element.find('Pl')
+                if pl_element is not None:
+                    for std in pl_element.findall('Std'):
+                        lesson = self._parse_lesson(std, class_short)
+                        if lesson:
+                            if lesson.get("is_change", False):
+                                schedule_data["changes"].append(lesson)
+                            else:
+                                schedule_data["lessons"].append(lesson)
+            
+            # Sort lessons by time and class
+            schedule_data["lessons"] = self._sort_lessons(schedule_data["lessons"])
+            schedule_data["changes"] = self._sort_lessons(schedule_data["changes"])
+            
+            return schedule_data
+            
         except ET.ParseError as e:
             _LOGGER.error("XML parsing error: %s", e)
-            raise Exception(f"Invalid XML data: {e}") from e
+            raise Exception(f"Invalid XML data: {e}")
+        except Exception as e:
+            _LOGGER.error("Error parsing schedule: %s", e)
+            raise
 
-        schedule_data: dict[str, Any] = {
-            "date": target_date.isoformat(),
-            "lessons": [],
-            "changes": [],
-            "additional_info": [],
-            "last_updated": datetime.now().isoformat(),
-            "timestamp": "",
-            "classes": [],
-        }
-
-        # Timestamp
-        zeitstempel = root.find(".//zeitstempel")
-        if zeitstempel is not None and zeitstempel.text:
-            schedule_data["timestamp"] = zeitstempel.text
-
-        # General additional info
-        zusatz_info = root.find(".//ZusatzInfo")
-        if zusatz_info is not None:
-            for zi_zeile in zusatz_info.findall("ZiZeile"):
-                if zi_zeile.text and zi_zeile.text.strip():
-                    schedule_data["additional_info"].append(
-                        {"text": zi_zeile.text.strip(), "type": "general_info"}
-                    )
-
-        # Classes to process
-        classes_to_process = []
-        for kl in root.findall(".//Kl"):
-            kurz = kl.find("Kurz")
-            if kurz is not None and kurz.text:
-                if class_name is None or kurz.text == class_name:
-                    classes_to_process.append((kurz.text, kl))
-                    schedule_data["classes"].append(kurz.text)
-
-        for class_short, kl_element in classes_to_process:
-            pl_element = kl_element.find("Pl")
-            if pl_element is not None:
-                for std in pl_element.findall("Std"):
-                    lesson = self._parse_lesson(std, class_short)
-                    if lesson:
-                        if lesson.get("is_change", False):
-                            schedule_data["changes"].append(lesson)
-                        else:
-                            schedule_data["lessons"].append(lesson)
-
-        schedule_data["lessons"] = self._sort_lessons(schedule_data["lessons"])
-        schedule_data["changes"] = self._sort_lessons(schedule_data["changes"])
-        return schedule_data
-
-    def _parse_lesson(
-        self, std_element: ET.Element, class_name: str
-    ) -> dict[str, Any] | None:
+    def _parse_lesson(self, std_element: ET.Element, class_name: str) -> dict[str, Any] | None:
         """Parse a single lesson from XML."""
         try:
-            lesson: dict[str, Any] = {
+            lesson = {
                 "class": class_name,
                 "period": "",
                 "time_start": "",
@@ -241,88 +242,115 @@ class Stundenplan24API:
                 "room": "",
                 "course": "",
                 "info": "",
-                "is_change": False,
+                "is_change": False
             }
-
-            st = std_element.find("St")
+            
+            # Period (Stunde)
+            st = std_element.find('St')
             if st is not None and st.text:
                 lesson["period"] = st.text
-
-            beginn = std_element.find("Beginn")
-            ende = std_element.find("Ende")
+            
+            # Time
+            beginn = std_element.find('Beginn')
+            ende = std_element.find('Ende')
             if beginn is not None and beginn.text:
                 lesson["time_start"] = beginn.text
             if ende is not None and ende.text:
                 lesson["time_end"] = ende.text
-
-            fa = std_element.find("Fa")
+            
+            # Subject (Fach)
+            fa = std_element.find('Fa')
             if fa is not None and fa.text:
                 lesson["subject"] = fa.text
-                if fa.get("FaAe") == "FaGeaendert":
+                
+                # Check for subject changes
+                fa_ae = fa.get('FaAe')
+                if fa_ae == 'FaGeaendert':
                     lesson["is_change"] = True
-
-            le = std_element.find("Le")
+            
+            # Teacher (Lehrer)
+            le = std_element.find('Le')
             if le is not None and le.text:
                 lesson["teacher"] = le.text
-                if le.get("LeAe") == "LeGeaendert":
+                
+                # Check for teacher changes
+                le_ae = le.get('LeAe')
+                if le_ae == 'LeGeaendert':
                     lesson["is_change"] = True
-
-            ra = std_element.find("Ra")
+            
+            # Room (Raum)
+            ra = std_element.find('Ra')
             if ra is not None and ra.text:
                 lesson["room"] = ra.text
-                if ra.get("RaAe") == "RaGeaendert":
+                
+                # Check for room changes
+                ra_ae = ra.get('RaAe')
+                if ra_ae == 'RaGeaendert':
                     lesson["is_change"] = True
-
-            ku2 = std_element.find("Ku2")
+            
+            # Course (Kurs)
+            ku2 = std_element.find('Ku2')
             if ku2 is not None and ku2.text:
                 lesson["course"] = ku2.text
-
-            info = std_element.find("If")
+            
+            # Info
+            info = std_element.find('If')
             if info is not None and info.text:
                 lesson["info"] = info.text
-                lesson["is_change"] = True
-
+                # Info usually indicates changes
+                if lesson["info"]:
+                    lesson["is_change"] = True
+            
+            # Create time display
             if lesson["time_start"] and lesson["time_end"]:
                 lesson["time"] = f"{lesson['time_start']}-{lesson['time_end']}"
             elif lesson["time_start"]:
                 lesson["time"] = lesson["time_start"]
             else:
                 lesson["time"] = f"{lesson['period']}. Stunde"
-
+            
+            # Only return if we have meaningful data
             if lesson["period"] or lesson["subject"]:
                 return lesson
+            
             return None
-
+            
         except Exception as e:
             _LOGGER.error("Error parsing lesson: %s", e)
             return None
 
     def _sort_lessons(self, lessons: list[dict]) -> list[dict]:
-        """Sort lessons by period, class, then start time."""
-        def sort_key(lesson: dict):
+        """Sort lessons by time and class."""
+        def sort_key(lesson):
+            # First by period number
             try:
                 period = int(lesson.get("period", "0"))
             except (ValueError, TypeError):
                 period = 999
+            
+            # Then by class name
             class_name = lesson.get("class", "")
+            
+            # Then by time
             time_start = lesson.get("time_start", "")
             try:
                 if time_start and ":" in time_start:
-                    h, m = map(int, time_start.split(":"))
-                    time_sort = h * 60 + m
+                    hour, minute = map(int, time_start.split(":"))
+                    time_sort = hour * 60 + minute
                 else:
                     time_sort = 999
             except (ValueError, TypeError):
                 time_sort = 999
+            
             return (period, class_name, time_sort)
-
+        
         try:
             return sorted(lessons, key=sort_key)
         except Exception:
-            return lessons
+            return lessons  # Return unsorted if sorting fails
 
     async def async_close(self) -> None:
-        """Close the aiohttp session."""
+        """Close the session."""
         if self.session:
             await self.session.close()
             self.session = None

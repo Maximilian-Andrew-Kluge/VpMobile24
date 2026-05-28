@@ -34,7 +34,7 @@
     "step": {
       "init": {
         "title": "Paramètres VpMobile24",
-        "description": "Classe actuelle : **{current_class}**\n\nVoulez-vous ajuster uniquement les matières, ou aussi changer de classe ?",
+        "description": "Classe actuelle : **{current_class}**\n\nAjuster les matières uniquement ou aussi changer de classe ?",
         "data": {
           "change_class": "Changer de classe"
         }

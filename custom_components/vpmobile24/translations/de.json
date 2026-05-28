@@ -34,14 +34,14 @@
     "step": {
       "init": {
         "title": "VpMobile24 Einstellungen",
-        "description": "Aktuelle Klasse: **{current_class}**\n\nMöchten Sie nur die Fächer anpassen, oder auch die Klasse wechseln?",
+        "description": "Aktuelle Klasse: **{current_class}**\n\nNur Fächer anpassen oder auch Klasse wechseln?",
         "data": {
           "change_class": "Klasse wechseln"
         }
       },
       "change_class": {
         "title": "Klasse ändern",
-        "description": "Geben Sie die neue Klasse ein. Die Fächerliste wird danach neu geladen.",
+        "description": "Neue Klasse eingeben. Die Fächerliste wird danach neu geladen.",
         "data": {
           "class_name": "Klasse"
         }
