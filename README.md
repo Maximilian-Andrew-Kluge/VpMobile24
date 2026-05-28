@@ -1,50 +1,37 @@
-﻿<div align="center">
+<div align="center">
 
-<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Banner.png" alt="VpMobile24 Logo"/>
+<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
-<br />
+<br/>
+<br/>
 
-# VpMobile24
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![Version](https://img.shields.io/badge/Version-2.4.7-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
+[![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
-### Home Assistant Integration für Stundenpläne
+<br/>
 
-Verbinde dein Schulportal mit Home Assistant — automatisch aktualisiert,<br/>
-mehrere Klassen, vollständig anpassbare Lovelace Card. Kein YAML nötig.
+[**📦 Via HACS installieren**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**🌐 Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**💬 Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**🐛 Bug melden**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
 
-<br />
-
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Release)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Version](https://img.shields.io/badge/Version-2.4.6-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Beta-orange?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
-[![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
-
-<br />
-
-[📦 Via HACS installieren](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;·&nbsp;
-[🌐 Website](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;·&nbsp;
-[💬 Discord](https://discord.gg/57uvCeRw43) &nbsp;·&nbsp;
-[🐛 Bug melden](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
-
-<br />
-
----
+<br/>
 
 **[🇩🇪 Deutsch](#-deutsch)** &nbsp;|&nbsp; **[🇬🇧 English](#-english)**
 
----
-
 </div>
 
-<br />
+---
 
 ## 🇩🇪 Deutsch
 
 > [!WARNING]
-> **Beta-Version** — aktiv in Entwicklung. Feedback, Fehlerberichte und Ideen sind jederzeit willkommen — gerne als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
+> **Beta-Version** — aktiv in Entwicklung. Feedback und Fehlerberichte sind jederzeit willkommen — als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
 
-<br />
+<br/>
 
 ### Inhaltsverzeichnis
 
@@ -53,20 +40,21 @@ mehrere Klassen, vollständig anpassbare Lovelace Card. Kein YAML nötig.
 - [Screenshots](#-screenshots)
 - [Installation](#-installation)
 - [Einrichtung](#️-einrichtung)
+- [Lovelace Card](#-lovelace-card)
 - [Sensoren](#-sensoren)
 - [Mitmachen](#-mitmachen)
 
-<br />
+<br/>
 
 ---
 
 ### 📌 Beschreibung
 
-**VpMobile24** ist eine Home Assistant Custom Integration, die Stundenplandaten direkt in dein Smart Home bringt.
+**VpMobile24** ist eine Home Assistant Custom Integration, die Stundenplandaten von [Stundenplan24.de](https://www.stundenplan24.de) direkt in dein Smart Home bringt.
 
-Das Ziel: Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als strukturierte Sensoren, die du in Automationen, Dashboards und Benachrichtigungen nutzen kannst. Die mitgelieferte Lovelace Card macht alles sofort nutzbar, ohne eine Zeile YAML.
+Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als strukturierte Sensoren für Automationen, Dashboards und Benachrichtigungen. Die mitgelieferte Lovelace Card macht alles sofort nutzbar, ohne eine Zeile YAML.
 
-<br />
+<br/>
 
 ---
 
@@ -74,176 +62,223 @@ Das Ziel: Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — a
 
 <table>
 <tr>
-<td width="50%">
+<td valign="top" width="50%">
 
-**Integration**
+#### 🔌 Integration
 
-- 📅 Wochenübersicht (Mo–Fr)
-- 🔄 Automatischer Datenabruf alle 15 Minuten
-- 👥 Mehrere Klassen gleichzeitig unterstützt
-- 📊 Strukturierte Tages- und Wochensensoren
-- ⚡ Automatische Updates via HACS
+| | |
+|---|---|
+| 📅 | Wochenübersicht Mo–Fr |
+| 🔄 | Automatischer Datenabruf alle 15 Min. |
+| 👥 | Mehrere Klassen mit gleichen Zugangsdaten |
+| 🌍 | Vollständig mehrsprachig (DE / EN / FR) |
+| 📊 | Strukturierte Tages- und Wochensensoren |
+| ⚡ | Automatische Updates via HACS |
 
 </td>
-<td width="50%">
+<td valign="top" width="50%">
 
-**Lovelace Card**
+#### 🃏 Lovelace Card
 
-- 🎨 Visuelle Konfiguration (kein YAML)
-- 📱 Responsives Design für Mobile & Desktop
-- 🔥 Heutiger Tag wird hervorgehoben
-- ⛔ Vertretungen farblich markiert
-- ⚙️ Vollständig anpassbar
+| | |
+|---|---|
+| 🎨 | Navy Dark Design — unabhängig vom HA-Theme |
+| 📱 | Responsiv: Desktop-Tabelle & Handy-Modus |
+| 🟢 | Aktuelle Stunde grün hervorgehoben |
+| 🔴 | Ausfallstunden immer rot (alle Spalten) |
+| 🖱️ | Klick-Popup mit Lehrer, Raum & Uhrzeit |
+| ⓘ | Zusatzinfos pro Tag per Button |
+| ⏰ | Eigene Uhrzeiten konfigurierbar |
 
 </td>
 </tr>
 </table>
 
-<br />
+<br/>
 
 ---
 
-### 📸 Screenshots
+### Screenshots
 
 <table>
 <tr>
-  <td align="center"><b>Übersicht</b></td>
-  <td align="center"><b>Lovelace Card</b></td>
-  <td align="center"><b>Konfiguration</b></td>
-</tr>
-<tr>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="Overview" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" alt="Card" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png" alt="Config" /></td>
+  <td align="center" width="33%">
+    <b>Wochenübersicht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="Wochenübersicht" width="100%"/>
+  </td>
+  <td align="center" width="33%">
+    <b>Lovelace Card</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" alt="Lovelace Card" width="100%"/>
+  </td>
+  <td align="center" width="33%">
+    <b>Konfiguration</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png" alt="Konfiguration" width="100%"/>
+  </td>
 </tr>
 </table>
 
-<br />
+<br/>
 
 ---
 
 ### 📦 Installation
 
-#### Via HACS (empfohlen)
+#### ⭐ Via HACS (empfohlen)
 
-[![HACS installieren](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge">
+  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="In HACS öffnen"/>
+</a>
 
 1. **HACS öffnen** — in Home Assistant zu HACS navigieren
-2. **Custom Repository hinzufügen** — Menü (⋮) → Custom Repositories
-3. **URL eingeben:**
+2. **Custom Repository hinzufügen** — Menü `⋮` → Benutzerdefinierte Repositories
+3. **URL eingeben** und Kategorie `Integration` wählen:
    ```
    https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-   Kategorie: `Integration`
 4. **Installieren** — Integration suchen und installieren
-5. **Neu starten** — Home Assistant neu starten
+5. **Home Assistant neu starten**
 
-#### Manuelle Installation
+#### 📦 Installation
 
-1. Repository als ZIP herunterladen oder klonen:
+1. Repository klonen oder als ZIP herunterladen:
    ```bash
    git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-2. Inhalt von `custom_components/vpmobile24/` nach `/config/custom_components/vpmobile24/` kopieren
+2. Ordner `custom_components/vpmobile24/` nach `/config/custom_components/vpmobile24/` kopieren
 3. Home Assistant neu starten
 
-<br />
+<br/>
 
 ---
 
 ### ⚙️ Einrichtung
 
-1. **Einstellungen** → **Geräte & Dienste**
-2. Unten rechts auf **Integration hinzufügen** klicken
-3. **VpMobile24** suchen und auswählen
-4. Zugangsdaten eingeben:
+**Einstellungen → Geräte & Dienste → Integration hinzufügen → VpMobile24**
 
-| Feld | Beschreibung |
-|------|--------------|
-| `Schule` | Schulkennung im VpMobile24-Portal |
-| `Benutzername` | Dein Anmeldename |
-| `Passwort` | Dein Passwort |
-| `Klasse` | Klassenkennung (z.B. `10a`) |
+| Feld | Beschreibung | Beispiel |
+|------|--------------|---------|
+| `Schulnummer` | ID aus der Stundenplan24-URL | `10001329` |
+| `Benutzername` | Dein Anmeldename | `schueler` |
+| `Passwort` | Dein Passwort | `••••••••` |
+| `Klasse` | Klassenkennung | `10a` |
 
 > [!TIP]
-> Mehrere Klassen können durch das erneute Hinzufügen der Integration mit anderen oder gleichen Zugangsdaten eingebunden werden.
+> **Mehrere Klassen** lassen sich durch erneutes Hinzufügen der Integration einrichten — auch mit denselben Zugangsdaten. Jede Klasse erhält ein eigenes Gerät mit eigenen Sensoren (`VpMobile24 – 10a (12345)`).
 
-<br />
+<br/>
+
+---
+
+### 🃏 Lovelace Card
+
+Die Card wird beim HA-Start automatisch nach `/config/www/vpmobile24/` kopiert.
+
+**Schritt 1 — Ressource registrieren:**
+
+Einstellungen → Dashboards → `⋮` → Ressourcen → `+ Hinzufügen`
+
+| Feld | Wert |
+|------|------|
+| URL | `/local/vpmobile24/vpmobile24-card.js` |
+| Ressourcentyp | JavaScript-Modul |
+
+**Schritt 2 — Card hinzufügen:**
+
+Dashboard bearbeiten → `+ Karte hinzufügen` → **VpMobile24 Card** suchen
+
+Oder direkt per YAML:
+
+```yaml
+type: custom:vpmobile24-card
+entity: sensor.vpmobile24_week_table
+additional_info_entity: sensor.vpmobile24_zusatzinfos
+reload_entity: button.vpmobile24_daten_neu_laden
+show_header: true
+header_settings:
+  title: Stundenplan
+  class_name: 10b
+highlight_today: true
+show_time: true
+```
+
+> [!NOTE]
+> Die Sprache der Card wird automatisch aus der HA-Systemsprache erkannt (DE / EN / FR). Keine manuelle Einstellung nötig.
+
+<br/>
 
 ---
 
 ### 📊 Sensoren
 
-Nach der Einrichtung werden folgende Sensoren automatisch erstellt:
+Nach der Einrichtung werden folgende Entitäten automatisch erstellt:
 
-| Sensor | Beschreibung |
-|--------|--------------|
-| `sensor.vpmobile24_week_table` | Vollständige Wochenübersicht |
-| `sensor.vpmobile24_monday` | Stundenplan Montag |
-| `sensor.vpmobile24_tuesday` | Stundenplan Dienstag |
-| `sensor.vpmobile24_wednesday` | Stundenplan Mittwoch |
-| `sensor.vpmobile24_thursday` | Stundenplan Donnerstag |
-| `sensor.vpmobile24_friday` | Stundenplan Freitag |
+| Entität | Beschreibung |
+|---------|--------------|
+| `sensor.vpmobile24_week_table` | Vollständige Wochenübersicht — wird von der Card verwendet |
+| `sensor.vpmobile24_naechste_stunde` | Nächste Unterrichtsstunde heute |
+| `sensor.vpmobile24_wochenstundenplan` | Heutiger Stundenplan mit allen Stunden |
+| `sensor.vpmobile24_zusatzinfos` | Zusatzinformationen und Hinweise pro Tag |
+| `sensor.vpmobile24_aenderungen` | Aktuelle Vertretungen und Änderungen |
+| `calendar.vpmobile24_wochenkalender` | Wochenkalender für die HA-Kalender-Ansicht |
+| `button.vpmobile24_daten_neu_laden` | Manuelles Neuladen der Stundenplandaten |
+
+> [!NOTE]
+> Bei mehreren Klassen werden die Entitäts-IDs mit der Klasse ergänzt. Die genauen IDs findest du unter **Einstellungen → Geräte & Dienste → VpMobile24**.
 
 Alle Sensoren werden automatisch alle **15 Minuten** aktualisiert.
 
-<br />
+<br/>
 
 ---
 
 ### 🤝 Mitmachen
 
-Contributions sind herzlich willkommen! So kannst du beitragen:
+Contributions sind herzlich willkommen!
 
-- 🐛 **Bug gefunden?** → [Issue erstellen](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
-- 💡 **Idee?** → [Diskussion starten](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions)
-- 🔧 **Code beitragen** → Fork → Branch → Pull Request
-- 💬 **Community** → [Discord beitreten](https://discord.gg/57uvCeRw43)
+| | |
+|---|---|
+| 🐛 **Bug gefunden?** | [Issue erstellen](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new) |
+| 💡 **Idee?** | [Diskussion starten](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions) |
+| 🔧 **Code beitragen** | Fork → Branch → Pull Request |
+| 💬 **Community** | [Discord beitreten](https://discord.gg/57uvCeRw43) |
 
-<br />
+<br/>
 
 ---
 
-<br />
-<br />
+<br/>
+<br/>
 
 ## 🇬🇧 English
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Discord%20Banner/Banner%20Neu%20dark%20en.png" alt="VpMobile24 Logo"/>
+<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/EN%20Banner.png" alt="VpMobile24" width="100%"/>
 
-<br />
+<br/>
+<br/>
 
-# VpMobile24
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![Version](https://img.shields.io/badge/Version-2.4.7-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
+[![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
-### Home Assistant Integration for Timetables
+<br/>
 
-Connect your school portal to Home Assistant — automatically updated,<br/>
-multiple classes, fully customizable Lovelace Card. No YAML required.
-
-<br />
-
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Release)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Version](https://img.shields.io/badge/Version-2.4.6-blue?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Beta-orange?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
-[![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
-
-[📦 Install via HACS](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;·&nbsp;
-[🌐 Website](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;·&nbsp;
-[💬 Discord](https://discord.gg/57uvCeRw43) &nbsp;·&nbsp;
-[🐛 Report a bug](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
+[**📦 Install via HACS**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**🌐 Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**💬 Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;·&nbsp;&nbsp;
+[**🐛 Report a bug**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
 
 </div>
 
-<br />
+<br/>
 
 > [!WARNING]
-> **Beta version** — actively in development. Feedback, bug reports, and ideas are always welcome — open a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or join [Discord](https://discord.gg/57uvCeRw43).
+> **Beta version** — actively in development. Feedback and bug reports are always welcome — open a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or join [Discord](https://discord.gg/57uvCeRw43).
 
-<br />
+<br/>
 
 ### Table of contents
 
@@ -251,21 +286,22 @@ multiple classes, fully customizable Lovelace Card. No YAML required.
 - [Features](#-features-1)
 - [Screenshots](#-screenshots-1)
 - [Installation](#-installation-1)
-- [Setup](#️-setup)
-- [Sensors](#-sensors)
-- [Contributing](#-contributing)
+- [Setup](#️-setup-1)
+- [Lovelace Card](#-lovelace-card-1)
+- [Sensors](#-sensors-1)
+- [Contributing](#-contributing-1)
 
-<br />
+<br/>
 
 ---
 
 ### 📌 Description
 
-**VpMobile24** is a Home Assistant custom integration that brings school timetable data directly into your smart home.
+**VpMobile24** is a Home Assistant custom integration that brings school timetable data from [Stundenplan24.de](https://www.stundenplan24.de) directly into your smart home.
 
-The goal: timetables should be available in Home Assistant without friction — as structured sensors you can use in automations, dashboards, and notifications. The included Lovelace card makes everything usable immediately, without writing a single line of YAML.
+Timetables should be available in Home Assistant without friction — as structured sensors for automations, dashboards, and notifications. The included Lovelace card makes everything usable immediately, without writing a single line of YAML.
 
-<br />
+<br/>
 
 ---
 
@@ -273,120 +309,172 @@ The goal: timetables should be available in Home Assistant without friction — 
 
 <table>
 <tr>
-<td width="50%">
+<td valign="top" width="50%">
 
-**Integration**
+#### 🔌 Integration
 
-- 📅 Weekly overview (Mon–Fri)
-- 🔄 Automatic data refresh every 15 minutes
-- 👥 Multiple classes supported simultaneously
-- 📊 Structured daily and weekly sensors
-- ⚡ Automatic updates via HACS
+| | |
+|---|---|
+| 📅 | Weekly overview Mon–Fri |
+| 🔄 | Automatic data refresh every 15 min. |
+| 👥 | Multiple classes with same credentials |
+| 🌍 | Fully multilingual (DE / EN / FR) |
+| 📊 | Structured daily and weekly sensors |
+| ⚡ | Automatic updates via HACS |
 
 </td>
-<td width="50%">
+<td valign="top" width="50%">
 
-**Lovelace Card**
+#### 🃏 Lovelace Card
 
-- 🎨 Visual configuration (no YAML)
-- 📱 Responsive design for mobile & desktop
-- 🔥 Current day highlighted
-- ⛔ Substitutions marked with color
-- ⚙️ Fully customizable
+| | |
+|---|---|
+| 🎨 | Navy dark design — independent of HA theme |
+| 📱 | Responsive: desktop table & mobile mode |
+| 🟢 | Current lesson highlighted in green |
+| 🔴 | Cancelled lessons always red (all columns) |
+| 🖱️ | Click popup with teacher, room & time |
+| ⓘ | Daily additional info via button |
+| ⏰ | Custom period times configurable |
 
 </td>
 </tr>
 </table>
 
-<br />
+<br/>
 
 ---
 
-### 📸 Screenshots
+### Screenshots
 
 <table>
 <tr>
-  <td align="center"><b>Overview</b></td>
-  <td align="center"><b>Lovelace Card</b></td>
-  <td align="center"><b>Configuration</b></td>
-</tr>
-<tr>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Overview" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Card" /></td>
-  <td><img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Config" /></td>
+  <td align="center" width="33%">
+    <b>Weekly Overview</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Weekly Overview" width="100%"/>
+  </td>
+  <td align="center" width="33%">
+    <b>Lovelace Card</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Lovelace Card" width="100%"/>
+  </td>
+  <td align="center" width="33%">
+    <b>Configuration</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Configuration" width="100%"/>
+  </td>
 </tr>
 </table>
 
-<br />
+<br/>
 
 ---
 
 ### 📦 Installation
 
-#### Via HACS (recommended)
+#### ⭐ Via HACS (recommended)
 
-[![Install via HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
+<a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge">
+  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open in HACS"/>
+</a>
 
 1. **Open HACS** — navigate to HACS in Home Assistant
-2. **Add custom repository** — menu (⋮) → Custom Repositories
-3. **Enter URL:**
+2. **Add custom repository** — menu `⋮` → Custom Repositories
+3. **Enter URL** and select category `Integration`:
    ```
    https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-   Category: `Integration`
 4. **Install** — find the integration and install it
-5. **Restart** — restart Home Assistant
+5. **Restart Home Assistant**
 
-#### Manual installation
+#### 🔧 Manual installation
 
-1. Download the repository as ZIP or clone it:
+1. Clone or download the repository as ZIP:
    ```bash
    git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-2. Copy the contents of `custom_components/vpmobile24/` to `/config/custom_components/vpmobile24/`
+2. Copy `custom_components/vpmobile24/` to `/config/custom_components/vpmobile24/`
 3. Restart Home Assistant
 
-<br />
+<br/>
 
 ---
 
 ### ⚙️ Setup
 
-1. **Settings** → **Devices & Services**
-2. Click **Add Integration** in the bottom right
-3. Search for **VpMobile24** and select it
-4. Enter your credentials:
+**Settings → Devices & Services → Add Integration → VpMobile24**
 
-| Field | Description |
-|-------|-------------|
-| `School` | School identifier in the VpMobile24 portal |
-| `Username` | Your login name |
-| `Password` | Your password |
-| `Class` | Class identifier (e.g. `10a`) |
+| Field | Description | Example |
+|-------|-------------|---------|
+| `School ID` | ID from the Stundenplan24 URL | `10001329` |
+| `Username` | Your login name | `student` |
+| `Password` | Your password | `••••••••` |
+| `Class` | Class identifier | `10a` |
 
 > [!TIP]
-> Multiple classes can be integrated by re-adding the integration using different—or identical—access credentials.
+> **Multiple classes** can be added by re-adding the integration — even with the same credentials. Each class gets its own device with its own sensors (`VpMobile24 – 10a (12345)`).
 
-<br />
+<br/>
+
+---
+
+### 🃏 Lovelace Card
+
+The card is automatically copied to `/config/www/vpmobile24/` on every HA start.
+
+**Step 1 — Register resource:**
+
+Settings → Dashboards → `⋮` → Resources → `+ Add`
+
+| Field | Value |
+|-------|-------|
+| URL | `/local/vpmobile24/vpmobile24-card.js` |
+| Resource type | JavaScript module |
+
+**Step 2 — Add card:**
+
+Edit dashboard → `+ Add card` → search for **VpMobile24 Card**
+
+Or directly via YAML:
+
+```yaml
+type: custom:vpmobile24-card
+entity: sensor.vpmobile24_week_table
+additional_info_entity: sensor.vpmobile24_zusatzinfos
+reload_entity: button.vpmobile24_daten_neu_laden
+show_header: true
+header_settings:
+  title: Timetable
+  class_name: 10b
+highlight_today: true
+show_time: true
+```
+
+> [!NOTE]
+> The card language is automatically detected from your HA system language (DE / EN / FR). No manual configuration needed.
+
+<br/>
 
 ---
 
 ### 📊 Sensors
 
-After setup, the following sensors are created automatically:
+After setup, the following entities are created automatically:
 
-| Sensor | Description |
+| Entity | Description |
 |--------|-------------|
-| `sensor.vpmobile24_week_table` | Full weekly timetable |
-| `sensor.vpmobile24_monday` | Monday timetable |
-| `sensor.vpmobile24_tuesday` | Tuesday timetable |
-| `sensor.vpmobile24_wednesday` | Wednesday timetable |
-| `sensor.vpmobile24_thursday` | Thursday timetable |
-| `sensor.vpmobile24_friday` | Friday timetable |
+| `sensor.vpmobile24_week_table` | Full weekly timetable — used by the card |
+| `sensor.vpmobile24_naechste_stunde` | Next lesson today |
+| `sensor.vpmobile24_wochenstundenplan` | Today's full schedule |
+| `sensor.vpmobile24_zusatzinfos` | Additional info and notices per day |
+| `sensor.vpmobile24_aenderungen` | Current substitutions and changes |
+| `calendar.vpmobile24_wochenkalender` | Weekly calendar for HA calendar view |
+| `button.vpmobile24_daten_neu_laden` | Manual data reload |
+
+> [!NOTE]
+> With multiple classes, entity IDs are suffixed with the class name. Find the exact IDs under **Settings → Devices & Services → VpMobile24**.
 
 All sensors refresh automatically every **15 minutes**.
 
-<br />
+<br/>
 
 ---
 
@@ -394,22 +482,25 @@ All sensors refresh automatically every **15 minutes**.
 
 Contributions of all kinds are welcome!
 
-- 🐛 **Found a bug?** → [Open an issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
-- 💡 **Have an idea?** → [Start a discussion](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions)
-- 🔧 **Want to code?** → Fork → branch → pull request
-- 💬 **Community** → [Join Discord](https://discord.gg/57uvCeRw43)
+| | |
+|---|---|
+| 🐛 **Found a bug?** | [Open an issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new) |
+| 💡 **Have an idea?** | [Start a discussion](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions) |
+| 🔧 **Want to code?** | Fork → branch → pull request |
+| 💬 **Community** | [Join Discord](https://discord.gg/57uvCeRw43) |
 
-<br />
+<br/>
 
 ---
 
 <div align="center">
 
-<br />
+<br/>
 
 Made with ❤️ by [Maximilian-Andrew Kluge](https://github.com/Maximilian-Andrew-Kluge)
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/stargazers)
+[![MIT License](https://img.shields.io/badge/License-MIT-22c55e.svg?style=flat-square)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square&color=f59e0b)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/stargazers)
+[![GitHub Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Latest)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
 </div>

@@ -1,5 +1,5 @@
-﻿// VpMobile24 Card v2.4.6
-console.info('%c VpMobile24-CARD %c v2.4.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+﻿// VpMobile24 Card v2.4.7
+console.info('%c VpMobile24-CARD %c v2.4.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -435,6 +435,7 @@ class VpMobile24Card extends HTMLElement {
     const dayFullNames = t.daysFull;
     const showTime = this._config.show_time !== false;
     const useCustomTimes = this._config.use_custom_times === true;
+    const highlightToday = this._config.highlight_today !== false;
     const entity = this._hass && this._hass.states[this._config.entity];
     const weekTable = entity && entity.attributes && entity.attributes.week_table;
     if (!weekTable) return;
@@ -442,6 +443,28 @@ class VpMobile24Card extends HTMLElement {
     const slots = this._buildTimeSlots(useCustomTimes);
     const sched = weekTable[dayKeys[idx]] || {};
     const dName = dayFullNames[idx];
+
+    // Calculate current lesson number (only relevant when viewing today)
+    const now = new Date();
+    const todayDow = now.getDay();
+    const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
+    const isViewingToday = idx === todayIdx;
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    let currentLessonNum = -1;
+    if (isViewingToday) {
+      slots.forEach(slot => {
+        if (!slot.isPause && slot.time) {
+          const parts = slot.time.split('-');
+          if (parts.length === 2) {
+            const [sh, sm] = parts[0].split(':').map(Number);
+            const [eh, em] = parts[1].split(':').map(Number);
+            const start = sh * 60 + sm;
+            const end   = eh * 60 + em;
+            if (nowMins >= start && nowMins <= end) currentLessonNum = slot.lessonNumber;
+          }
+        }
+      });
+    }
 
     let rows = '';
     slots.forEach(slot => {
@@ -461,13 +484,16 @@ class VpMobile24Card extends HTMLElement {
           (typeof rawFach === "string" && rawFach.trim() === "") ||
           (typeof rawFach === "string" && /^[-\u2014\u2013\s]+$/.test(rawFach))
         );
+        // Current lesson highlight
+        const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         if (isCancelled) {
           subj = '—';
           rowCls += ' vp-mob-cancelled vp-mob-clickable';
         } else if (lesson && lesson.fach) {
           subj = lesson.fach;
           isSub = !!lesson.ist_vertretung;
-          if (isSub) rowCls += ' vp-mob-sub';
+          if (isCurrent) rowCls += ' vp-mob-current';
+          else if (isSub) rowCls += ' vp-mob-sub';
           rowCls += ' vp-mob-clickable';
         } else {
           rowCls += ' vp-mob-empty';
@@ -475,13 +501,13 @@ class VpMobile24Card extends HTMLElement {
         const onclickAttr = (lesson && (lesson.fach || isCancelled))
           ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
           : '';
-        const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
+        const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
           + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
         let subjPart;
         if (isCancelled) {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
         } else if (subj) {
-          subjPart = '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
+          subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
         }
@@ -698,6 +724,8 @@ class VpMobile24Card extends HTMLElement {
     const buildMobRows = (dayKey, dayIdx) => {
       const sched = weekTable[dayKey] || {};
       const dName = dayFullNames[dayIdx] || dayKey;
+      // Only highlight current lesson when viewing today's tab
+      const isViewingToday = dayIdx === todayIdx;
       let rows = '';
       slots.forEach(slot => {
         if (slot.isPause) {
@@ -716,13 +744,16 @@ class VpMobile24Card extends HTMLElement {
             (typeof rawFachMob === "string" && rawFachMob.trim() === "") ||
             (typeof rawFachMob === "string" && /^[-\u2014\u2013\s]+$/.test(rawFachMob))
           );
+          // Current lesson highlight (green) — only on today's tab, not cancelled
+          const isCurrent = isViewingToday && !isCancelledMob && slot.lessonNumber === currentLessonNum;
           if (isCancelledMob) {
             subj = '—';
             rowCls += ' vp-mob-cancelled vp-mob-clickable';
           } else if (lesson && lesson.fach) {
             subj = lesson.fach;
             isSub = !!lesson.ist_vertretung;
-            if (isSub) rowCls += ' vp-mob-sub';
+            if (isCurrent) rowCls += ' vp-mob-current';
+            else if (isSub) rowCls += ' vp-mob-sub';
             rowCls += ' vp-mob-clickable';
           } else {
             rowCls += ' vp-mob-empty';
@@ -730,13 +761,13 @@ class VpMobile24Card extends HTMLElement {
           const onclickAttr = (lesson && (lesson.fach || isCancelledMob))
             ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelledMob + ')"'
             : '';
-          const numPart = '<div class="vp-mob-left"><span class="vp-mob-num">' + slot.period + '</span>'
+          const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
           let subjPart;
           if (isCancelledMob) {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
           } else if (subj) {
-            subjPart = '<div class="vp-mob-subj' + (isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
+            subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
           } else {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
           }
@@ -917,8 +948,11 @@ ha-card {
 .vp-mob-lesson:last-child { border-bottom: none; }
 .vp-mob-sub   { background: rgba(127,29,29,.25); border-left: 3px solid #7f1d1d; }
 .vp-mob-cancelled { background: rgba(127,29,29,.25); border-left: 3px solid #ef4444; }
+.vp-mob-current { background: rgba(20,83,45,.35); border-left: 3px solid #22c55e; }
 .vp-mob-empty { opacity: .45; }
 .vp-mob-left  { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
+.vp-mob-left-current .vp-mob-num  { color: #86efac !important; }
+.vp-mob-left-current .vp-mob-time { color: #4ade80 !important; }
 .vp-mob-num   { font-size: .9em; font-weight: 700; color: #94a3b8; line-height: 1.2; }
 .vp-mob-time  { font-size: .62em; color: #475569; margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj  {
@@ -928,6 +962,7 @@ ha-card {
 }
 .vp-mob-subj-sub   { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
 .vp-mob-subj-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; }
+.vp-mob-subj-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
 .vp-mob-subj-empty { background: rgba(255,255,255,.03) !important; color: #475569 !important; }
 /* Pause row */
 .vp-mob-pause-row {
@@ -1076,5 +1111,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.6 loaded');
+console.log('✅ VpMobile24 Card v2.4.7 loaded');
 
