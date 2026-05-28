@@ -2,7 +2,8 @@
 
 DOMAIN = "vpmobile24"
 
-# Configuration keys
+# Configuration keys — use same string values as homeassistant.const
+# so entry.data keys are consistent everywhere.
 CONF_SCHOOL_ID = "school_id"
 CONF_USERNAME = "username"
 CONF_PASSWORD = "password"

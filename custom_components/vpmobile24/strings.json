@@ -33,13 +33,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "VpMobile24 Options",
-        "description": "Change the settings of your VpMobile24 integration.",
+        "title": "VpMobile24 Settings",
+        "description": "Current class: **{current_class}**\n\nDo you want to adjust subjects only, or also change the class?",
         "data": {
-          "excluded_subjects": "Excluded subjects",
-          "language": "Language"
+          "change_class": "Change class"
         }
+      },
+      "change_class": {
+        "title": "Change class",
+        "description": "Enter the new class name. The subject list will be reloaded afterwards.",
+        "data": {
+          "class_name": "Class"
+        }
+      },
+      "subjects": {
+        "title": "Select subjects",
+        "description": "Choose the subjects to display. Found: {subject_count} subjects.\n\nUnchecked subjects will be hidden."
       }
+    },
+    "error": {
+      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials."
     }
   },
   "entity": {
