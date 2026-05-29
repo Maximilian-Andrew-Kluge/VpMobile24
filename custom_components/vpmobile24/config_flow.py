@@ -292,10 +292,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1 — choose: adjust subjects only, or also change the class."""
+        """Step 1 — choose: change subjects or change class."""
         if user_input is not None:
-            if user_input.get("change_class", False):
+            action = user_input.get("action", "subjects")
+            if action == "class":
                 return await self.async_step_change_class()
+            # action == "subjects": keep current class, load subjects
             self._new_class_name = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
                 or self._config_entry.data.get(CONF_CLASS_NAME, "")
@@ -309,7 +311,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
-                {vol.Optional("change_class", default=False): bool}
+                {
+                    vol.Required("action", default="subjects"): vol.In(
+                        ["subjects", "class"]
+                    )
+                }
             ),
             description_placeholders={"current_class": current_class},
         )

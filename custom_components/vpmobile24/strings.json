@@ -34,9 +34,12 @@
     "step": {
       "init": {
         "title": "VpMobile24 Settings",
-        "description": "Current class: **{current_class}**\n\nAdjust subjects only, or also change the class?",
+        "description": "Current class: **{current_class}**\n\nWhat would you like to change?",
         "data": {
-          "change_class": "Change class"
+          "action": "Action"
+        },
+        "data_description": {
+          "action": "Choose whether to change subjects or the class"
         }
       },
       "change_class": {
