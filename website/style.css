@@ -1048,6 +1048,43 @@ kbd {
 .version-tag.ver-stable { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #86efac; }
 .version-tag.ver-beta   { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.3); color: #fcd34d; }
 
+/* Version pills in CTA */
+.version-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.ver-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.ver-pill-stable {
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.3);
+  color: #86efac;
+}
+
+.ver-pill-stable strong { color: #4ade80; font-weight: 700; }
+
+.ver-pill-beta {
+  background: rgba(245,158,11,0.1);
+  border-color: rgba(245,158,11,0.3);
+  color: #fcd34d;
+}
+
+.ver-pill-beta strong { color: #fbbf24; font-weight: 700; }
+
 /* ===== FEATURED OPTION CARD ===== */
 .option-card-featured {
   border-color: rgba(255,140,0,0.35) !important;

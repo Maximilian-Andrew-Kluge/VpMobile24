@@ -9,29 +9,62 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- GitHub latest release version fetched at runtime -->
+  <!-- GitHub release versions fetched at runtime -->
   <script defer>
-    async function loadGithubVersion() {
+    async function loadGithubVersions() {
       try {
-        const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases/latest');
-        const d = await r.json();
-        const tag = d.tag_name || 'v2.4.8';
-        const pre = d.prerelease;
-        const label = pre ? 'Beta' : 'Stable';
-        const cls   = pre ? 'ver-beta' : 'ver-stable';
-        document.querySelectorAll('.gh-version').forEach(el => {
-          el.textContent = tag;
-        });
-        document.querySelectorAll('.gh-version-full').forEach(el => {
-          el.innerHTML = tag + ' <span class="ver-label ' + cls + '">' + label + '</span>';
-        });
-        document.querySelectorAll('.version-tag').forEach(el => {
-          el.textContent = tag;
-          el.className = 'version-tag ' + cls;
-        });
+        // Fetch all releases to find latest stable AND latest beta
+        const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases?per_page=10');
+        const releases = await r.json();
+
+        let stable = null;
+        let beta = null;
+
+        for (const rel of releases) {
+          if (!stable && !rel.prerelease) stable = rel;
+          if (!beta && rel.prerelease) beta = rel;
+          if (stable && beta) break;
+        }
+
+        // Fallback if no separate beta found: latest release is both
+        if (!stable && !beta && releases.length > 0) stable = releases[0];
+
+        // Update stable version elements
+        if (stable) {
+          document.querySelectorAll('.gh-version-stable').forEach(el => {
+            el.textContent = stable.tag_name;
+          });
+          document.querySelectorAll('.version-tag').forEach(el => {
+            el.textContent = stable.tag_name;
+            el.className = 'version-tag ver-stable';
+          });
+        }
+
+        // Update beta version elements
+        if (beta) {
+          document.querySelectorAll('.gh-version-beta').forEach(el => {
+            el.textContent = beta.tag_name;
+          });
+          // Show the beta version block
+          document.querySelectorAll('.version-beta-block').forEach(el => {
+            el.style.display = 'inline-flex';
+          });
+        }
+
+        // Legacy: single version display (latest of any type)
+        const latest = releases[0];
+        if (latest) {
+          const cls = latest.prerelease ? 'ver-beta' : 'ver-stable';
+          document.querySelectorAll('.gh-version').forEach(el => {
+            el.textContent = latest.tag_name;
+          });
+          document.querySelectorAll('.gh-version-full').forEach(el => {
+            el.innerHTML = latest.tag_name + ' <span class="ver-label ' + cls + '">' + (latest.prerelease ? 'Beta' : 'Stable') + '</span>';
+          });
+        }
       } catch(e) { /* keep fallback text */ }
     }
-    document.addEventListener('DOMContentLoaded', loadGithubVersion);
+    document.addEventListener('DOMContentLoaded', loadGithubVersions);
   </script>
 </head>
 <body>
@@ -84,7 +117,10 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag gh-version">v2.4.8</span>
+          <span class="version-tag ver-stable gh-version-stable">v2.4.8</span>
+          <span class="version-beta-block" style="display:none;">
+            <span class="version-tag ver-beta gh-version-beta">Beta</span>
+          </span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -873,7 +909,14 @@ use_custom_times: false</code></pre>
             <span>💬</span> Discord Community
           </a>
         </div>
-        <div class="version-badge">Version <span class="gh-version-full">v2.4.7 <span class="ver-label ver-stable">Stable</span></span></div>
+        <div class="version-badge">
+          <span class="ver-pill ver-pill-stable">
+            🟢 Stable: <strong class="gh-version-stable">v2.4.8</strong>
+          </span>
+          <span class="version-beta-block ver-pill ver-pill-beta" style="display:none;">
+            🟡 Beta: <strong class="gh-version-beta">–</strong>
+          </span>
+        </div>
       </div>
     </section>
 
