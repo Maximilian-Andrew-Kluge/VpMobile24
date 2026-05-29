@@ -91,7 +91,11 @@ class Stundenplan24API:
                 raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
 
         except Exception as ex:
-            _LOGGER.error("Error fetching schedule: %s", ex)
+            ex_str = str(ex)
+            if "404" in ex_str:
+                _LOGGER.debug("Schedule not available for %s (404 - weekend/holiday)", target_date)
+            else:
+                _LOGGER.error("Error fetching schedule: %s", ex)
             raise
 
     def _parse_xml_schedule(

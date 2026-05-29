@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, DEFAULT_BASE_URL
+from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, DEFAULT_BASE_URL
 from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
