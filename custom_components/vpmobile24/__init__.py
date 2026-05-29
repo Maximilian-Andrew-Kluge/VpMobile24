@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import logging
+import shutil
 from datetime import timedelta
+from pathlib import Path
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -16,6 +18,26 @@ from .api_new import Stundenplan24API
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
+
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js"
+
+
+def _copy_card_to_www(hass: HomeAssistant) -> str | None:
+    """Copy the card JS to www/vpmobile24/. Returns the destination path or None."""
+    try:
+        src = Path(__file__).parent / "vpmobile24-card.js"
+        if not src.exists():
+            _LOGGER.error("VpMobile24: card source not found: %s", src)
+            return None
+        dst_dir = Path(hass.config.path("www")) / "vpmobile24"
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        dst = dst_dir / "vpmobile24-card.js"
+        shutil.copy2(str(src), str(dst))
+        _LOGGER.info("VpMobile24: card copied to %s", dst)
+        return str(dst)
+    except Exception as err:
+        _LOGGER.error("VpMobile24: failed to copy card: %s", err)
+        return None
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vpmobile24 from a config entry."""
@@ -38,12 +60,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    # Register device with icon
+    # Register device — always use the effective class (options override data)
     device_registry = dr.async_get(hass)
-    class_name = entry.data.get("class_name", "")
     school_id = entry.data["school_id"]
-    device_id = f"{school_id}_{class_name}" if class_name else school_id
-    device_name = f"VpMobile24 \u2013 {class_name} ({school_id})" if class_name else f"VpMobile24 ({school_id})"
+    effective_class = entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name", "")
+    device_id = f"{school_id}_{effective_class}" if effective_class else school_id
+    device_name = (
+        f"VpMobile24 \u2013 {effective_class} ({school_id})"
+        if effective_class
+        else f"VpMobile24 ({school_id})"
+    )
+
+    # Remove any stale devices for this config entry that have a different identifier
+    # (happens when class was changed via options flow)
+    for dev in list(device_registry.devices.values()):
+        if entry.entry_id in dev.config_entries:
+            if (DOMAIN, device_id) not in dev.identifiers:
+                _LOGGER.info(
+                    "VpMobile24: removing stale device %s (old class)", dev.name
+                )
+                device_registry.async_remove_device(dev.id)
+
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, device_id)},
@@ -60,6 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coord = hass.data[DOMAIN][entry.entry_id]
         class_changed = coord.class_name != new_class
         if class_changed:
+            old_class = coord.class_name  # save before overwriting
             coord.class_name = new_class
             coord._week_data_cache = {}
             coord._current_week_monday = None
@@ -77,7 +115,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             device = device_registry.async_get_device(identifiers={(DOMAIN, device_id)})
             if not device:
                 # Old device with old class name — find and update it
-                old_class = coord.class_name if not class_changed else entry.data.get("class_name", "")
                 old_device_id = f"{school_id}_{old_class}" if old_class else school_id
                 device = device_registry.async_get_device(identifiers={(DOMAIN, old_device_id)})
             if device:
@@ -92,20 +129,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
-    # Re-copy card on every config entry setup (catches HACS updates)
-    try:
-        from pathlib import Path
-        import shutil
-
-        card_source = Path(__file__).parent / "vpmobile24-card.js"
-        if card_source.exists():
-            www_dir = Path(hass.config.path("www")) / "vpmobile24"
-            www_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(str(card_source), str(www_dir / "vpmobile24-card.js"))
-            shutil.copy2(str(card_source), str(www_dir / "card.js"))
-            _LOGGER.info("VpMobile24 card refreshed in www folder (vpmobile24-card.js + card.js)")
-    except Exception as copy_err:
-        _LOGGER.warning(f"Could not refresh card file: {copy_err}")
+    # Copy card to www on every setup (ensures file is always up to date)
+    await hass.async_add_executor_job(_copy_card_to_www, hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -114,59 +139,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the vpmobile24 component."""
-    try:
-        from pathlib import Path
-        import shutil
-        import time
-
-        integration_dir = Path(__file__).parent
-        card_source = integration_dir / "vpmobile24-card.js"
-
-        if not card_source.exists():
-            _LOGGER.error(f"Card file not found at {card_source}")
-            return True
-
-        www_dir = Path(hass.config.path("www")) / "vpmobile24"
-        www_dir.mkdir(parents=True, exist_ok=True)
-        www_card = www_dir / "vpmobile24-card.js"
-        shutil.copy2(str(card_source), str(www_card))
-        shutil.copy2(str(card_source), str(www_dir / "card.js"))
-        _LOGGER.info(f"VpMobile24 card copied to {www_card} (and card.js)")
-
-        version = str(int(time.time()))
-        new_url = f"/local/vpmobile24/vpmobile24-card.js?v={version}"
-
-        try:
-            from homeassistant.components.lovelace import _get_lovelace_data  # noqa: F401
-        except ImportError:
-            pass
-
-        try:
-            lovelace = hass.data.get("lovelace")
-            if lovelace and hasattr(lovelace, "resources"):
-                resources = lovelace.resources
-                await resources.async_load()
-                existing = resources.async_items()
-                old_id = None
-                for item in existing:
-                    url = item.get("url", "")
-                    if "vpmobile24-card.js" in url or "/vpmobile24/card.js" in url:
-                        old_id = item.get("id")
-                        break
-                if old_id is not None:
-                    await resources.async_update_item(old_id, {"res_type": "module", "url": new_url})
-                    _LOGGER.info(f"VpMobile24 resource URL updated to {new_url}")
-                else:
-                    await resources.async_create_item({"res_type": "module", "url": new_url})
-                    _LOGGER.info(f"VpMobile24 resource registered: {new_url}")
-            else:
-                _LOGGER.info(f"Lovelace resource store not available yet. Please set resource URL to: {new_url}")
-        except Exception as res_err:
-            _LOGGER.warning(f"Could not auto-update Lovelace resource URL: {res_err}. Manually set resource to: {new_url}")
-
-    except Exception as e:
-        _LOGGER.error(f"Could not setup custom card: {e}", exc_info=True)
-
+    await hass.async_add_executor_job(_copy_card_to_www, hass)
     return True
 
 
@@ -271,7 +244,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     }
                     _LOGGER.debug(f"Cached {date_str}: {len(day_data.get('lessons', []))} lessons, {len(day_data.get('additional_info', []))} additional_info")
                 except Exception as ex:
-                    _LOGGER.warning(f"Could not fetch schedule for {target_date}: {ex}")
+                    ex_str = str(ex)
+                    if "404" in ex_str:
+                        _LOGGER.debug("No schedule for %s (404 - weekend/holiday)", target_date)
+                    else:
+                        _LOGGER.warning("Could not fetch schedule for %s: %s", target_date, ex)
                     continue
 
             # ----------------------------------------------------------------

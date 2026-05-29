@@ -1,6 +1,7 @@
 """API client for stundenplan24.de."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, date, timedelta
 from typing import Any
@@ -28,11 +29,15 @@ class Stundenplan24API:
         self.password = password
         self.base_url = base_url
         self.session: aiohttp.ClientSession | None = None
+        self._session_lock: asyncio.Lock | None = None
 
     async def async_get_session(self) -> aiohttp.ClientSession:
-        """Get or create aiohttp session."""
-        if self.session is None:
-            self.session = aiohttp.ClientSession()
+        """Get or create aiohttp session (concurrency-safe)."""
+        if self._session_lock is None:
+            self._session_lock = asyncio.Lock()
+        async with self._session_lock:
+            if self.session is None:
+                self.session = aiohttp.ClientSession()
         return self.session
 
     async def async_test_connection(self) -> bool:
@@ -41,7 +46,7 @@ class Stundenplan24API:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
             test_url = f"{self.base_url}/{self.school_id}/mobil/plankl.html"
-            async with session.get(test_url, auth=auth, timeout=10) as response:
+            async with session.get(test_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
                 return response.status == 200
         except Exception as ex:
             _LOGGER.error("Error testing connection: %s", ex)
@@ -53,7 +58,7 @@ class Stundenplan24API:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
             classes_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
-            async with session.get(classes_url, auth=auth, timeout=10) as response:
+            async with session.get(classes_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
                 if response.status == 200:
                     xml_content = await response.text()
                     root = ET.fromstring(xml_content)
@@ -84,7 +89,7 @@ class Stundenplan24API:
             date_str = target_date.strftime("%Y%m%d")
             xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
 
-            async with session.get(xml_url, auth=auth, timeout=15) as response:
+            async with session.get(xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=15)) as response:
                 if response.status == 200:
                     xml_content = await response.text()
                     return self._parse_xml_schedule(xml_content, target_date, class_name)
@@ -95,7 +100,7 @@ class Stundenplan24API:
             if "404" in ex_str:
                 _LOGGER.debug("Schedule not available for %s (404 - weekend/holiday)", target_date)
             else:
-                _LOGGER.error("Error fetching schedule: %s", ex)
+                _LOGGER.debug("Error fetching schedule for %s: %s", target_date, ex)
             raise
 
     def _parse_xml_schedule(

@@ -1,6 +1,7 @@
 """Config flow for vpmobile24 integration."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 from datetime import date, timedelta
@@ -67,107 +68,39 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     self._config_data.update(user_input)
 
                     try:
-                        all_subjects = set()
+                        all_subjects: set[str] = set()
                         today = date.today()
+                        dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
 
-                        for i in range(-7, 21):
+                        async def _fetch_subjects_for_date(check_date: date) -> set[str]:
+                            found: set[str] = set()
                             try:
-                                check_date = (
-                                    today + timedelta(days=i)
+                                schedule_data = await self._api.async_get_schedule(
+                                    target_date=check_date,
+                                    class_name=user_input[CONF_CLASS_NAME],
                                 )
-
-                                schedule_data = (
-                                    await self._api.async_get_schedule(
-                                        target_date=check_date,
-                                        class_name=user_input[
-                                            CONF_CLASS_NAME
-                                        ],
-                                    )
-                                )
-
-                                for lesson in schedule_data.get(
-                                    "lessons",
-                                    [],
-                                ):
+                                for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
+                                    subject = (entry.get("subject") or "").strip()
                                     if (
-                                        lesson.get("subject")
-                                        and lesson["subject"].strip()
+                                        subject
+                                        and not subject.startswith("KPL")
+                                        and not subject.startswith("---")
+                                        and not subject.startswith("Pause")
+                                        and not subject.startswith("Mittagspause")
+                                        and not subject.lower().startswith("frei")
+                                        and 2 <= len(subject) <= 10
                                     ):
-                                        subject = (
-                                            lesson["subject"].strip()
-                                        )
-
-                                        if (
-                                            subject
-                                            and not subject.startswith(
-                                                "KPL"
-                                            )
-                                            and not subject.startswith(
-                                                "---"
-                                            )
-                                            and not subject.startswith(
-                                                "Pause"
-                                            )
-                                            and not subject.startswith(
-                                                "Mittagspause"
-                                            )
-                                            and not subject.lower().startswith(
-                                                "frei"
-                                            )
-                                            and len(subject) >= 2
-                                            and len(subject) <= 10
-                                        ):
-                                            all_subjects.add(subject)
-
-                                for change in schedule_data.get(
-                                    "changes",
-                                    [],
-                                ):
-                                    if (
-                                        change.get("subject")
-                                        and change["subject"].strip()
-                                    ):
-                                        subject = (
-                                            change["subject"].strip()
-                                        )
-
-                                        if (
-                                            subject
-                                            and not subject.startswith(
-                                                "KPL"
-                                            )
-                                            and not subject.startswith(
-                                                "---"
-                                            )
-                                            and not subject.startswith(
-                                                "Pause"
-                                            )
-                                            and not subject.startswith(
-                                                "Mittagspause"
-                                            )
-                                            and not subject.lower().startswith(
-                                                "frei"
-                                            )
-                                            and len(subject) >= 2
-                                            and len(subject) <= 10
-                                        ):
-                                            all_subjects.add(subject)
-
+                                        found.add(subject)
                             except Exception as err:
-                                _LOGGER.debug(
-                                    "Could not fetch schedule "
-                                    "for %s: %s",
-                                    check_date,
-                                    err,
-                                )
-                                continue
+                                _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
+                            return found
 
-                        self._available_subjects = sorted(
-                            list(all_subjects)
-                        )
+                        results = await asyncio.gather(*[_fetch_subjects_for_date(d) for d in dates_to_check])
+                        for s in results:
+                            all_subjects.update(s)
 
+                        self._available_subjects = sorted(list(all_subjects))
                         await self._api.async_close()
-
                         return await self.async_step_subjects()
 
                     except Exception as err:
@@ -288,29 +221,42 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._config_entry = config_entry
         self._available_subjects: list[str] = []
         self._new_class_name: str = ""
+        self._change_subjects: bool = False
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1 — choose: change subjects or change class."""
+        """Step 1 — choose: change subjects and/or change class."""
         if user_input is not None:
-            if user_input.get("change_class", False):
+            change_class = user_input.get("change_class", False)
+            change_subjects = user_input.get("change_subjects", False)
+
+            if not change_class and not change_subjects:
+                # Nothing selected — close the flow without changes
+                return self.async_create_entry(title="", data={})
+
+            if change_class:
+                # Need to enter new class name first
+                self._change_subjects = change_subjects
                 return await self.async_step_change_class()
-            # Keep current class, just change subjects
+
+            # Only change subjects, keep current class
             self._new_class_name = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
                 or self._config_entry.data.get(CONF_CLASS_NAME, "")
             )
             return await self._load_subjects_and_show()
+
         current_class = (
             self._config_entry.options.get(CONF_CLASS_NAME)
             or self._config_entry.data.get(CONF_CLASS_NAME, "")
         )
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
-                {vol.Optional("change_class", default=False): bool}
-            ),
+            data_schema=vol.Schema({
+                vol.Optional("change_subjects", default=False): bool,
+                vol.Optional("change_class", default=False): bool,
+            }),
             description_placeholders={"current_class": current_class},
         )
     async def async_step_change_class(
@@ -319,7 +265,27 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Step 1b — enter a new class name."""
         if user_input is not None:
             self._new_class_name = user_input.get(CONF_CLASS_NAME, "").strip()
-            return await self._load_subjects_and_show()
+            if self._change_subjects:
+                # Also changing subjects — load subject list
+                return await self._load_subjects_and_show()
+            # Only class change — save immediately, keep existing excluded subjects
+            school_id = self._config_entry.data.get(CONF_SCHOOL_ID, "")
+            new_title = (
+                f"VpMobile24 \u2013 {self._new_class_name} ({school_id})"
+                if self._new_class_name
+                else f"VpMobile24 ({school_id})"
+            )
+            current_excluded = self._config_entry.options.get(
+                CONF_EXCLUDED_SUBJECTS,
+                self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
+            )
+            return self.async_create_entry(
+                title=new_title,
+                data={
+                    CONF_CLASS_NAME: self._new_class_name,
+                    CONF_EXCLUDED_SUBJECTS: current_excluded,
+                },
+            )
 
         current_class = (
             self._config_entry.options.get(CONF_CLASS_NAME)
@@ -345,16 +311,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             )
             all_subjects: set[str] = set()
             today = date.today()
-            for i in range(-7, 21):
+            dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
+
+            async def _fetch(check_date: date) -> set[str]:
+                found: set[str] = set()
                 try:
-                    check_date = today + timedelta(days=i)
                     schedule_data = await api.async_get_schedule(
                         target_date=check_date,
                         class_name=self._new_class_name,
                     )
                     for entry in (
-                        schedule_data.get("lessons", [])
-                        + schedule_data.get("changes", [])
+                        schedule_data.get("lessons", []) + schedule_data.get("changes", [])
                     ):
                         subject = (entry.get("subject") or "").strip()
                         if (
@@ -366,9 +333,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                             and not subject.lower().startswith("frei")
                             and 2 <= len(subject) <= 10
                         ):
-                            all_subjects.add(subject)
+                            found.add(subject)
                 except Exception:
-                    continue
+                    pass
+                return found
+
+            results = await asyncio.gather(*[_fetch(d) for d in dates_to_check])
+            for s in results:
+                all_subjects.update(s)
+
             self._available_subjects = sorted(list(all_subjects))
             await api.async_close()
         except Exception as err:

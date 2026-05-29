@@ -53,9 +53,17 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
     @property
     def device_info(self):
         """Return device information."""
+        school_id = self._config_entry.data["school_id"]
+        class_name = self._config_entry.options.get("class_name") or self._config_entry.data.get("class_name", "")
+        device_id = f"{school_id}_{class_name}" if class_name else school_id
+        name = (
+            f"VpMobile24 \u2013 {class_name} ({school_id})"
+            if class_name
+            else f"VpMobile24 ({school_id})"
+        )
         return {
-            "identifiers": {(DOMAIN, "{}_{}".format(self._config_entry.data["school_id"], self._config_entry.data.get("class_name", "")))},
-            "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
+            "identifiers": {(DOMAIN, device_id)},
+            "name": name,
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
             "sw_version": "2.4.8",

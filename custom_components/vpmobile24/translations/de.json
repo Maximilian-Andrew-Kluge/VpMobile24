@@ -34,8 +34,9 @@
     "step": {
       "init": {
         "title": "VpMobile24 Einstellungen",
-        "description": "Aktuelle Klasse: **{current_class}**\n\nNur Fächer anpassen oder auch Klasse wechseln?",
+        "description": "Aktuelle Klasse: **{current_class}**\n\nWas möchten Sie ändern?",
         "data": {
+          "change_subjects": "Fächer wechseln",
           "change_class": "Klasse wechseln"
         }
       },
@@ -62,6 +63,9 @@
       },
       "wochenstundenplan": {
         "name": "Wochenstundenplan"
+      },
+      "week_table": {
+        "name": "Wochentabelle"
       },
       "zusatzinfos": {
         "name": "Zusatzinfos"

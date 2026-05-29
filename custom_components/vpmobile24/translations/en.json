@@ -34,8 +34,9 @@
     "step": {
       "init": {
         "title": "VpMobile24 Settings",
-        "description": "Current class: **{current_class}**\n\nAdjust subjects only, or also change the class?",
+        "description": "Current class: **{current_class}**\n\nWhat would you like to change?",
         "data": {
+          "change_subjects": "Change subjects",
           "change_class": "Change class"
         }
       },
@@ -62,6 +63,9 @@
       },
       "wochenstundenplan": {
         "name": "Week Schedule"
+      },
+      "week_table": {
+        "name": "Week Table"
       },
       "zusatzinfos": {
         "name": "Additional Info"

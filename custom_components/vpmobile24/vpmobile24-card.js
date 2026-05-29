@@ -1,5 +1,5 @@
-﻿// VpMobile24 Card v2.4.7
-console.info('%c VpMobile24-CARD %c v2.4.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.8
+console.info('%c VpMobile24-CARD %c v2.4.8 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -484,14 +484,13 @@ class VpMobile24Card extends HTMLElement {
           (typeof rawFach === "string" && rawFach.trim() === "") ||
           (typeof rawFach === "string" && /^[-\u2014\u2013\s]+$/.test(rawFach))
         );
-        // Current lesson highlight
-        const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         if (isCancelled) {
           subj = '—';
           rowCls += ' vp-mob-cancelled vp-mob-clickable';
         } else if (lesson && lesson.fach) {
           subj = lesson.fach;
           isSub = !!lesson.ist_vertretung;
+          const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
           if (isCurrent) rowCls += ' vp-mob-current';
           else if (isSub) rowCls += ' vp-mob-sub';
           rowCls += ' vp-mob-clickable';
@@ -501,6 +500,7 @@ class VpMobile24Card extends HTMLElement {
         const onclickAttr = (lesson && (lesson.fach || isCancelled))
           ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
           : '';
+        const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
           + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
         let subjPart;
@@ -1111,5 +1111,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.7 loaded');
+console.log('✅ VpMobile24 Card v2.4.8 loaded');
 
