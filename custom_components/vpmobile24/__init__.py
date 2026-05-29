@@ -58,12 +58,35 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         new_class = entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name")
         new_excluded = entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, []))
         coord = hass.data[DOMAIN][entry.entry_id]
-        if coord.class_name != new_class:
+        class_changed = coord.class_name != new_class
+        if class_changed:
             coord.class_name = new_class
             coord._week_data_cache = {}
             coord._current_week_monday = None
             coord._week_data = None
             _LOGGER.info("VpMobile24: class changed to %s, cache cleared", new_class)
+
+            # Update entry title
+            school_id = entry.data["school_id"]
+            new_title = f"VpMobile24 \u2013 {new_class} ({school_id})" if new_class else f"VpMobile24 ({school_id})"
+            hass.config_entries.async_update_entry(entry, title=new_title)
+
+            # Update device name
+            device_registry = dr.async_get(hass)
+            device_id = f"{school_id}_{new_class}" if new_class else school_id
+            device = device_registry.async_get_device(identifiers={(DOMAIN, device_id)})
+            if not device:
+                # Old device with old class name — find and update it
+                old_class = coord.class_name if not class_changed else entry.data.get("class_name", "")
+                old_device_id = f"{school_id}_{old_class}" if old_class else school_id
+                device = device_registry.async_get_device(identifiers={(DOMAIN, old_device_id)})
+            if device:
+                device_registry.async_update_device(
+                    device.id,
+                    name=new_title,
+                    new_identifiers={(DOMAIN, device_id)},
+                )
+
         coord.excluded_subjects = new_excluded
         await coord.async_request_refresh()
 

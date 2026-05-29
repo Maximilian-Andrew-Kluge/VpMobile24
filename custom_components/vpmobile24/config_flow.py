@@ -404,8 +404,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 s for s in self._available_subjects
                 if not user_input.get(s, True)
             ]
+            # Build new title if class changed
+            old_class = (
+                self._config_entry.options.get(CONF_CLASS_NAME)
+                or self._config_entry.data.get(CONF_CLASS_NAME, "")
+            )
+            school_id = self._config_entry.data.get(CONF_SCHOOL_ID, "")
+            new_title = (
+                f"VpMobile24 \u2013 {self._new_class_name} ({school_id})"
+                if self._new_class_name != old_class and self._new_class_name
+                else ""
+            )
             return self.async_create_entry(
-                title="",
+                title=new_title,
                 data={
                     CONF_CLASS_NAME: self._new_class_name,
                     CONF_EXCLUDED_SUBJECTS: excluded,
