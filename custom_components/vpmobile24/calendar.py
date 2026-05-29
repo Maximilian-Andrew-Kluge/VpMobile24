@@ -1,4 +1,4 @@
-﻿"""Calendar platform for vpmobile24."""
+"""Calendar platform for vpmobile24."""
 from __future__ import annotations
 
 from datetime import datetime, date, timedelta
@@ -60,7 +60,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.7",
+            "sw_version": "2.4.8",
         }
 
     @property

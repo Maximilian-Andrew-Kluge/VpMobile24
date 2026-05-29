@@ -1,4 +1,4 @@
-﻿"""Button platform für VpMobile24."""
+"""Button platform für VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -58,7 +58,7 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
             "name": "VpMobile24 \u2013 {} ({})".format(self._config_entry.data.get("class_name",""), self._config_entry.data["school_id"]) if self._config_entry.data.get("class_name") else "VpMobile24 ({})".format(self._config_entry.data["school_id"]),
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.7",
+            "sw_version": "2.4.8",
         }
 
     async def async_press(self) -> None:
