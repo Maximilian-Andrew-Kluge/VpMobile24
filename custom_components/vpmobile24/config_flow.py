@@ -28,6 +28,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @staticmethod
+    def async_get_options_flow(config_entry):
+        """Return the options flow handler."""
+        return OptionsFlowHandler(config_entry)
+
     def __init__(self):
         """Initialize config flow."""
         self._api = None
@@ -271,5 +276,157 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 "subject_count": str(
                     len(self._available_subjects)
                 ),
+            },
+        )
+
+
+class OptionsFlowHandler(config_entries.OptionsFlow):
+    """Options flow — change class and/or excluded subjects after initial setup."""
+
+    def __init__(self, config_entry) -> None:
+        """Initialize."""
+        self._config_entry = config_entry
+        self._available_subjects: list[str] = []
+        self._new_class_name: str = ""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step 1 — choose: adjust subjects only, or also change the class."""
+        if user_input is not None:
+            if user_input.get("change_class", False):
+                return await self.async_step_change_class()
+            self._new_class_name = (
+                self._config_entry.options.get(CONF_CLASS_NAME)
+                or self._config_entry.data.get(CONF_CLASS_NAME, "")
+            )
+            return await self._load_subjects_and_show()
+
+        current_class = (
+            self._config_entry.options.get(CONF_CLASS_NAME)
+            or self._config_entry.data.get(CONF_CLASS_NAME, "")
+        )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {vol.Optional("change_class", default=False): bool}
+            ),
+            description_placeholders={"current_class": current_class},
+        )
+
+    async def async_step_change_class(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step 1b — enter a new class name."""
+        if user_input is not None:
+            self._new_class_name = user_input.get(CONF_CLASS_NAME, "").strip()
+            return await self._load_subjects_and_show()
+
+        current_class = (
+            self._config_entry.options.get(CONF_CLASS_NAME)
+            or self._config_entry.data.get(CONF_CLASS_NAME, "")
+        )
+        return self.async_show_form(
+            step_id="change_class",
+            data_schema=vol.Schema(
+                {vol.Required(CONF_CLASS_NAME, default=current_class): str}
+            ),
+            errors={},
+        )
+
+    async def _load_subjects_and_show(self) -> FlowResult:
+        """Fetch subjects for the selected class, then show subject step."""
+        api = None
+        try:
+            api = Stundenplan24API(
+                school_id=self._config_entry.data[CONF_SCHOOL_ID],
+                username=self._config_entry.data[CONF_USERNAME],
+                password=self._config_entry.data[CONF_PASSWORD],
+                base_url=DEFAULT_BASE_URL,
+            )
+            all_subjects: set[str] = set()
+            today = date.today()
+            for i in range(-7, 21):
+                try:
+                    check_date = today + timedelta(days=i)
+                    schedule_data = await api.async_get_schedule(
+                        target_date=check_date,
+                        class_name=self._new_class_name,
+                    )
+                    for entry in (
+                        schedule_data.get("lessons", [])
+                        + schedule_data.get("changes", [])
+                    ):
+                        subject = (entry.get("subject") or "").strip()
+                        if (
+                            subject
+                            and not subject.startswith("KPL")
+                            and not subject.startswith("---")
+                            and not subject.startswith("Pause")
+                            and not subject.startswith("Mittagspause")
+                            and not subject.lower().startswith("frei")
+                            and 2 <= len(subject) <= 10
+                        ):
+                            all_subjects.add(subject)
+                except Exception:
+                    continue
+            self._available_subjects = sorted(list(all_subjects))
+            await api.async_close()
+        except Exception as err:
+            _LOGGER.error("Options flow: error fetching subjects: %s", err)
+            if api:
+                await api.async_close()
+            current_class = (
+                self._config_entry.options.get(CONF_CLASS_NAME)
+                or self._config_entry.data.get(CONF_CLASS_NAME, "")
+            )
+            return self.async_show_form(
+                step_id="change_class",
+                data_schema=vol.Schema(
+                    {vol.Required(CONF_CLASS_NAME, default=current_class): str}
+                ),
+                errors={"base": "cannot_connect"},
+            )
+        return await self.async_step_subjects()
+
+    async def async_step_subjects(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step 2 — choose which subjects to include (uncheck = exclude)."""
+        if user_input is not None:
+            excluded = [
+                s for s in self._available_subjects
+                if not user_input.get(s, True)
+            ]
+            return self.async_create_entry(
+                title="",
+                data={
+                    CONF_CLASS_NAME: self._new_class_name,
+                    CONF_EXCLUDED_SUBJECTS: excluded,
+                },
+            )
+
+        if not self._available_subjects:
+            return self.async_show_form(
+                step_id="subjects",
+                data_schema=vol.Schema(
+                    {vol.Optional("continue", default=True): bool}
+                ),
+                description_placeholders={"subject_count": "0"},
+            )
+
+        current_excluded = self._config_entry.options.get(
+            CONF_EXCLUDED_SUBJECTS,
+            self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
+        )
+        schema_dict = {
+            vol.Optional(s, default=(s not in current_excluded)): bool
+            for s in self._available_subjects
+        }
+        return self.async_show_form(
+            step_id="subjects",
+            data_schema=vol.Schema(schema_dict),
+            description_placeholders={
+                "subject_count": str(len(self._available_subjects))
             },
         )

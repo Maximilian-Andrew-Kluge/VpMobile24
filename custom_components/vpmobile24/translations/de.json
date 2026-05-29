@@ -33,13 +33,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "VpMobile24 Optionen",
-        "description": "Ändern Sie die Einstellungen Ihrer VpMobile24 Integration.",
+        "title": "VpMobile24 Einstellungen",
+        "description": "Aktuelle Klasse: **{current_class}**\n\nNur Fächer anpassen oder auch Klasse wechseln?",
         "data": {
-          "excluded_subjects": "Ausgeschlossene Fächer",
-          "language": "Sprache"
+          "change_class": "Klasse wechseln"
         }
+      },
+      "change_class": {
+        "title": "Klasse ändern",
+        "description": "Neue Klasse eingeben. Die Fächerliste wird danach neu geladen.",
+        "data": {
+          "class_name": "Klasse"
+        }
+      },
+      "subjects": {
+        "title": "Fächer auswählen",
+        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer.\n\nDeaktivierte Fächer werden ausgeblendet."
       }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten."
     }
   },
   "entity": {

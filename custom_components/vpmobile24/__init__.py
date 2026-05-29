@@ -31,8 +31,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = VpMobile24DataUpdateCoordinator(
         hass,
         api,
-        entry.data.get("class_name"),
-        entry.data.get(CONF_EXCLUDED_SUBJECTS, [])
+        entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name"),
+        entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, []))
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -52,6 +52,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         model="Stundenplan Integration",
         sw_version="2.4.8",
     )
+
+    # Options update listener — apply new class/subjects immediately without HA restart
+    async def _async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
+        new_class = entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name")
+        new_excluded = entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, []))
+        coord = hass.data[DOMAIN][entry.entry_id]
+        if coord.class_name != new_class:
+            coord.class_name = new_class
+            coord._week_data_cache = {}
+            coord._current_week_monday = None
+            coord._week_data = None
+            _LOGGER.info("VpMobile24: class changed to %s, cache cleared", new_class)
+        coord.excluded_subjects = new_excluded
+        await coord.async_request_refresh()
+
+    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
     # Re-copy card on every config entry setup (catches HACS updates)
     try:

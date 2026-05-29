@@ -33,13 +33,26 @@
   "options": {
     "step": {
       "init": {
-        "title": "Options VpMobile24",
-        "description": "Modifiez les paramètres de votre intégration VpMobile24.",
+        "title": "Paramètres VpMobile24",
+        "description": "Classe actuelle : **{current_class}**\n\nAjuster les matières uniquement ou aussi changer de classe ?",
         "data": {
-          "excluded_subjects": "Matières exclues",
-          "language": "Langue"
+          "change_class": "Changer de classe"
         }
+      },
+      "change_class": {
+        "title": "Changer de classe",
+        "description": "Entrez le nouveau nom de classe. La liste des matières sera rechargée ensuite.",
+        "data": {
+          "class_name": "Classe"
+        }
+      },
+      "subjects": {
+        "title": "Sélectionner les matières",
+        "description": "Choisissez les matières à afficher. Trouvé : {subject_count} matières.\n\nLes matières décochées seront masquées."
       }
+    },
+    "error": {
+      "cannot_connect": "Connexion à VpMobile24 échouée. Veuillez vérifier vos identifiants."
     }
   },
   "entity": {
