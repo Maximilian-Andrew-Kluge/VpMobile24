@@ -132,6 +132,8 @@ dmypy.json
 debug_*.py
 test_*.py
 *_test.py
+fix_*.py
+patch_*.py
 api_test_result.json
 basic_auth_result.html
 found_mobdaten_hashjsk.txt
@@ -141,6 +143,10 @@ js_js_*.js
 explore_data_files.py
 get_xml_data.py
 TROUBLESHOOTING.md
+
+# Local version archives (not for distribution)
+v2.4.*/
+v2.*/
 
 # IDE files
 .vscode/
