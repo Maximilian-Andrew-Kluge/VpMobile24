@@ -37,9 +37,6 @@
         "description": "Classe actuelle : **{current_class}**\n\nQue souhaitez-vous modifier ?",
         "data": {
           "action": "Action"
-        },
-        "data_description": {
-          "action": "Choisissez si vous souhaitez modifier les matières ou la classe"
         }
       },
       "change_class": {

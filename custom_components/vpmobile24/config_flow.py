@@ -10,6 +10,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.components.selector import SelectSelector, SelectSelectorConfig, SelectOptionDict
 
 from .api_new import Stundenplan24API
 from .const import (
@@ -312,14 +313,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Required("action", default="subjects"): vol.In(
-                        ["subjects", "class"]
+                    vol.Required("action", default="subjects"): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                SelectOptionDict(value="subjects", label="Fächer ändern"),
+                                SelectOptionDict(value="class", label="Klasse wechseln"),
+                            ],
+                            translation_key="action",
+                        )
                     )
                 }
             ),
             description_placeholders={"current_class": current_class},
         )
-
     async def async_step_change_class(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:

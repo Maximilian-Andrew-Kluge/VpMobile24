@@ -37,9 +37,6 @@
         "description": "Current class: **{current_class}**\n\nWhat would you like to change?",
         "data": {
           "action": "Action"
-        },
-        "data_description": {
-          "action": "Choose whether to change subjects or the class"
         }
       },
       "change_class": {
