@@ -11,12 +11,6 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.data_entry_flow import FlowResult
 
-try:
-    from homeassistant.components.selector import SelectSelector, SelectSelectorConfig, SelectOptionDict
-    _HAS_SELECTOR = True
-except ImportError:
-    _HAS_SELECTOR = False
-
 from .api_new import Stundenplan24API
 from .const import (
     CONF_SCHOOL_ID,
@@ -300,36 +294,22 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step 1 — choose: change subjects or change class."""
         if user_input is not None:
-            action = user_input.get("action", "subjects")
-            if action == "class":
+            if user_input.get("change_class", False):
                 return await self.async_step_change_class()
-            # action == "subjects": keep current class, load subjects
+            # Keep current class, just change subjects
             self._new_class_name = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
                 or self._config_entry.data.get(CONF_CLASS_NAME, "")
             )
             return await self._load_subjects_and_show()
-
         current_class = (
             self._config_entry.options.get(CONF_CLASS_NAME)
             or self._config_entry.data.get(CONF_CLASS_NAME, "")
         )
-        if _HAS_SELECTOR:
-            action_field = SelectSelector(
-                SelectSelectorConfig(
-                    options=[
-                        SelectOptionDict(value="subjects", label="F\u00e4cher \u00e4ndern"),
-                        SelectOptionDict(value="class", label="Klasse wechseln"),
-                    ],
-                )
-            )
-        else:
-            action_field = vol.In(["subjects", "class"])
-
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
-                {vol.Required("action", default="subjects"): action_field}
+                {vol.Optional("change_class", default=False): bool}
             ),
             description_placeholders={"current_class": current_class},
         )
