@@ -13,7 +13,6 @@
   <script defer>
     async function loadGithubVersions() {
       try {
-        // Fetch all releases to find latest stable AND latest beta
         const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases?per_page=10');
         const releases = await r.json();
 
@@ -26,10 +25,7 @@
           if (stable && beta) break;
         }
 
-        // Fallback if no separate beta found: latest release is both
-        if (!stable && !beta && releases.length > 0) stable = releases[0];
-
-        // Update stable version elements
+        // Update stable version
         if (stable) {
           document.querySelectorAll('.gh-version-stable').forEach(el => {
             el.textContent = stable.tag_name;
@@ -40,26 +36,24 @@
           });
         }
 
-        // Update beta version elements
-        if (beta) {
+        // Only show beta block if a beta release exists AND it's different from stable
+        if (beta && (!stable || beta.tag_name !== stable.tag_name)) {
           document.querySelectorAll('.gh-version-beta').forEach(el => {
             el.textContent = beta.tag_name;
           });
-          // Show the beta version block
           document.querySelectorAll('.version-beta-block').forEach(el => {
-            el.style.display = 'inline-flex';
+            el.style.cssText = 'display:inline-flex !important;';
           });
         }
 
-        // Legacy: single version display (latest of any type)
-        const latest = releases[0];
+        // Legacy single-version elements
+        const latest = stable || releases[0];
         if (latest) {
-          const cls = latest.prerelease ? 'ver-beta' : 'ver-stable';
           document.querySelectorAll('.gh-version').forEach(el => {
             el.textContent = latest.tag_name;
           });
           document.querySelectorAll('.gh-version-full').forEach(el => {
-            el.innerHTML = latest.tag_name + ' <span class="ver-label ' + cls + '">' + (latest.prerelease ? 'Beta' : 'Stable') + '</span>';
+            el.innerHTML = latest.tag_name;
           });
         }
       } catch(e) { /* keep fallback text */ }
@@ -117,10 +111,12 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag ver-stable gh-version-stable">v2.4.8</span>
-          <span class="version-beta-block" style="display:none;">
-            <span class="version-tag ver-beta gh-version-beta">Beta</span>
-          </span>
+          <div class="hero-version-row">
+            <span class="version-tag ver-stable gh-version-stable">v2.4.8</span>
+            <span class="version-beta-block" style="display:none !important;">
+              <span class="version-tag ver-beta gh-version-beta">Beta</span>
+            </span>
+          </div>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -913,7 +909,7 @@ use_custom_times: false</code></pre>
           <span class="ver-pill ver-pill-stable">
             🟢 Stable: <strong class="gh-version-stable">v2.4.8</strong>
           </span>
-          <span class="version-beta-block ver-pill ver-pill-beta" style="display:none;">
+          <span class="version-beta-block ver-pill ver-pill-beta" style="display:none !important;">
             🟡 Beta: <strong class="gh-version-beta">–</strong>
           </span>
         </div>

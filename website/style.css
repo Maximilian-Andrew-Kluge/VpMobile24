@@ -113,8 +113,15 @@ kbd {
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 6px;
-  margin-left: 12px;
   letter-spacing: 0.5px;
+}
+
+.hero-version-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 12px;
+  vertical-align: middle;
 }
 
 .accent { color: var(--accent); }
