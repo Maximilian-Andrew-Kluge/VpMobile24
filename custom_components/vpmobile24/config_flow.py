@@ -9,7 +9,6 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 
 from .api_new import Stundenplan24API
@@ -23,248 +22,254 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-_SUBJECT_BLOCKLIST = {"KPL", "---", "Pause", "Mittagspause"}
-
-
-def _is_valid_subject(subject: str) -> bool:
-    s = subject.strip()
-    if not s or len(s) < 2 or len(s) > 10:
-        return False
-    if s.lower().startswith("frei"):
-        return False
-    for blocked in _SUBJECT_BLOCKLIST:
-        if s.startswith(blocked):
-            return False
-    return True
-
-
-async def _fetch_subjects(api: Stundenplan24API, class_name: str) -> list[str]:
-    all_subjects: set[str] = set()
-    today = date.today()
-    for i in range(-7, 22):
-        try:
-            check_date = today + timedelta(days=i)
-            schedule_data = await api.async_get_schedule(
-                target_date=check_date,
-                class_name=class_name,
-            )
-            for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
-                subject = (entry.get("subject") or "").strip()
-                if _is_valid_subject(subject):
-                    all_subjects.add(subject)
-        except Exception:
-            continue
-    return sorted(all_subjects)
-
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for vpmobile24."""
 
     VERSION = 1
 
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        """Return the options flow handler."""
-        return OptionsFlowHandler(config_entry)
-
     def __init__(self):
+        """Initialize config flow."""
         self._api = None
         self._config_data = {}
         self._available_subjects = []
 
     async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
+        """Handle credentials step."""
+
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            api = None
             try:
-                api = Stundenplan24API(
+                self._api = Stundenplan24API(
                     school_id=user_input[CONF_SCHOOL_ID],
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
                     base_url=DEFAULT_BASE_URL,
                 )
 
-                if not await api.async_test_connection():
+                connection_ok = (
+                    await self._api.async_test_connection()
+                )
+
+                if not connection_ok:
                     errors["base"] = "cannot_connect"
+
                 else:
                     self._config_data.update(user_input)
+
                     try:
-                        self._available_subjects = await _fetch_subjects(
-                            api, user_input[CONF_CLASS_NAME]
+                        all_subjects = set()
+                        today = date.today()
+
+                        for i in range(-7, 21):
+                            try:
+                                check_date = (
+                                    today + timedelta(days=i)
+                                )
+
+                                schedule_data = (
+                                    await self._api.async_get_schedule(
+                                        target_date=check_date,
+                                        class_name=user_input[
+                                            CONF_CLASS_NAME
+                                        ],
+                                    )
+                                )
+
+                                for lesson in schedule_data.get(
+                                    "lessons",
+                                    [],
+                                ):
+                                    if (
+                                        lesson.get("subject")
+                                        and lesson["subject"].strip()
+                                    ):
+                                        subject = (
+                                            lesson["subject"].strip()
+                                        )
+
+                                        if (
+                                            subject
+                                            and not subject.startswith(
+                                                "KPL"
+                                            )
+                                            and not subject.startswith(
+                                                "---"
+                                            )
+                                            and not subject.startswith(
+                                                "Pause"
+                                            )
+                                            and not subject.startswith(
+                                                "Mittagspause"
+                                            )
+                                            and not subject.lower().startswith(
+                                                "frei"
+                                            )
+                                            and len(subject) >= 2
+                                            and len(subject) <= 10
+                                        ):
+                                            all_subjects.add(subject)
+
+                                for change in schedule_data.get(
+                                    "changes",
+                                    [],
+                                ):
+                                    if (
+                                        change.get("subject")
+                                        and change["subject"].strip()
+                                    ):
+                                        subject = (
+                                            change["subject"].strip()
+                                        )
+
+                                        if (
+                                            subject
+                                            and not subject.startswith(
+                                                "KPL"
+                                            )
+                                            and not subject.startswith(
+                                                "---"
+                                            )
+                                            and not subject.startswith(
+                                                "Pause"
+                                            )
+                                            and not subject.startswith(
+                                                "Mittagspause"
+                                            )
+                                            and not subject.lower().startswith(
+                                                "frei"
+                                            )
+                                            and len(subject) >= 2
+                                            and len(subject) <= 10
+                                        ):
+                                            all_subjects.add(subject)
+
+                            except Exception as err:
+                                _LOGGER.debug(
+                                    "Could not fetch schedule "
+                                    "for %s: %s",
+                                    check_date,
+                                    err,
+                                )
+                                continue
+
+                        self._available_subjects = sorted(
+                            list(all_subjects)
                         )
-                        await api.async_close()
+
+                        await self._api.async_close()
+
                         return await self.async_step_subjects()
+
                     except Exception as err:
-                        _LOGGER.error("Error fetching subjects: %s", err)
-                        await api.async_close()
+                        _LOGGER.error(
+                            "Error fetching subjects: %s",
+                            err,
+                        )
+
+                        await self._api.async_close()
+
                         class_name = user_input[CONF_CLASS_NAME]
                         school_id = user_input[CONF_SCHOOL_ID]
-                        await self.async_set_unique_id(f"{school_id}_{class_name}")
+                        entry_title = f"VpMobile24 – {class_name} ({school_id})"
+                        await self.async_set_unique_id(
+                            f"{school_id}_{class_name}"
+                        )
                         self._abort_if_unique_id_configured()
+
                         return self.async_create_entry(
-                            title=f"VpMobile24 \u2013 {class_name} ({school_id})",
+                            title=entry_title,
                             data=self._config_data,
                         )
+
             except Exception:
-                _LOGGER.exception("Unexpected exception in config flow")
+                _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
-                if api:
-                    await api.async_close()
+
+            finally:
+                if self._api:
+                    await self._api.async_close()
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_SCHOOL_ID): str,
-                vol.Required(CONF_USERNAME): str,
-                vol.Required(CONF_PASSWORD): str,
-                vol.Required(CONF_CLASS_NAME): str,
-            }),
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_SCHOOL_ID): str,
+                    vol.Required(CONF_USERNAME): str,
+                    vol.Required(CONF_PASSWORD): str,
+                    vol.Required(CONF_CLASS_NAME): str,
+                }
+            ),
             errors=errors,
         )
 
     async def async_step_subjects(
-        self, user_input: dict[str, Any] | None = None
+        self,
+        user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
+        """Handle subject selection."""
+
         if user_input is not None:
-            excluded = [s for s in self._available_subjects if not user_input.get(s, True)]
-            if excluded:
-                self._config_data[CONF_EXCLUDED_SUBJECTS] = excluded
+            excluded_subjects = []
+
+            for subject in self._available_subjects:
+                if not user_input.get(subject, True):
+                    excluded_subjects.append(subject)
+
+            if excluded_subjects:
+                self._config_data[
+                    CONF_EXCLUDED_SUBJECTS
+                ] = excluded_subjects
 
             class_name = self._config_data.get(CONF_CLASS_NAME, "")
             school_id = self._config_data.get(CONF_SCHOOL_ID, "")
+            entry_title = f"VpMobile24 – {class_name} ({school_id})"
+
+            # Prevent duplicate entries for same school+class combination
             await self.async_set_unique_id(f"{school_id}_{class_name}")
             self._abort_if_unique_id_configured()
+
             return self.async_create_entry(
-                title=f"VpMobile24 \u2013 {class_name} ({school_id})",
+                title=entry_title,
                 data=self._config_data,
             )
 
         if not self._available_subjects:
             return self.async_show_form(
                 step_id="subjects",
-                data_schema=vol.Schema({vol.Optional("continue", default=True): bool}),
-                description_placeholders={"subject_count": "0"},
-            )
-
-        schema_dict = {vol.Optional(s, default=True): bool for s in self._available_subjects}
-        return self.async_show_form(
-            step_id="subjects",
-            data_schema=vol.Schema(schema_dict),
-            description_placeholders={"subject_count": str(len(self._available_subjects))},
-        )
-
-
-class OptionsFlowHandler(config_entries.OptionsFlow):
-    """Options flow — change class and/or excluded subjects after initial setup."""
-
-    def __init__(self, config_entry) -> None:
-        self._config_entry = config_entry
-        self._available_subjects: list[str] = []
-        self._new_class_name: str = ""
-
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Step 1 — choose: adjust subjects only, or also change the class."""
-        if user_input is not None:
-            if user_input.get("change_class", False):
-                return await self.async_step_change_class()
-            self._new_class_name = (
-                self._config_entry.options.get(CONF_CLASS_NAME)
-                or self._config_entry.data.get(CONF_CLASS_NAME, "")
-            )
-            return await self._load_subjects_and_show()
-
-        current_class = (
-            self._config_entry.options.get(CONF_CLASS_NAME)
-            or self._config_entry.data.get(CONF_CLASS_NAME, "")
-        )
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({vol.Optional("change_class", default=False): bool}),
-            description_placeholders={"current_class": current_class},
-        )
-
-    async def async_step_change_class(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Step 1b — enter a new class name."""
-        if user_input is not None:
-            self._new_class_name = user_input.get(CONF_CLASS_NAME, "").strip()
-            return await self._load_subjects_and_show()
-
-        current_class = (
-            self._config_entry.options.get(CONF_CLASS_NAME)
-            or self._config_entry.data.get(CONF_CLASS_NAME, "")
-        )
-        return self.async_show_form(
-            step_id="change_class",
-            data_schema=vol.Schema({vol.Required(CONF_CLASS_NAME, default=current_class): str}),
-            errors={},
-        )
-
-    async def _load_subjects_and_show(self) -> FlowResult:
-        """Fetch subjects then show subject step."""
-        api = None
-        try:
-            api = Stundenplan24API(
-                school_id=self._config_entry.data[CONF_SCHOOL_ID],
-                username=self._config_entry.data[CONF_USERNAME],
-                password=self._config_entry.data[CONF_PASSWORD],
-                base_url=DEFAULT_BASE_URL,
-            )
-            self._available_subjects = await _fetch_subjects(api, self._new_class_name)
-            await api.async_close()
-        except Exception as err:
-            _LOGGER.error("Options flow: error fetching subjects: %s", err)
-            if api:
-                await api.async_close()
-            current_class = (
-                self._config_entry.options.get(CONF_CLASS_NAME)
-                or self._config_entry.data.get(CONF_CLASS_NAME, "")
-            )
-            return self.async_show_form(
-                step_id="change_class",
-                data_schema=vol.Schema({vol.Required(CONF_CLASS_NAME, default=current_class): str}),
-                errors={"base": "cannot_connect"},
-            )
-        return await self.async_step_subjects()
-
-    async def async_step_subjects(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
-        """Step 2 — choose which subjects to include."""
-        if user_input is not None:
-            excluded = [s for s in self._available_subjects if not user_input.get(s, True)]
-            return self.async_create_entry(
-                title="",
-                data={
-                    CONF_CLASS_NAME: self._new_class_name,
-                    CONF_EXCLUDED_SUBJECTS: excluded,
+                data_schema=vol.Schema(
+                    {
+                        vol.Optional(
+                            "continue",
+                            default=True,
+                        ): bool
+                    }
+                ),
+                description_placeholders={
+                    "subject_count": "0",
                 },
             )
 
-        if not self._available_subjects:
-            return self.async_show_form(
-                step_id="subjects",
-                data_schema=vol.Schema({vol.Optional("continue", default=True): bool}),
-                description_placeholders={"subject_count": "0"},
-            )
+        schema_dict = {}
 
-        current_excluded = self._config_entry.options.get(
-            CONF_EXCLUDED_SUBJECTS,
-            self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
-        )
-        schema_dict = {
-            vol.Optional(s, default=(s not in current_excluded)): bool
-            for s in self._available_subjects
-        }
+        for subject in self._available_subjects:
+            schema_dict[
+                vol.Optional(
+                    subject,
+                    default=True,
+                )
+            ] = bool
+
         return self.async_show_form(
             step_id="subjects",
             data_schema=vol.Schema(schema_dict),
-            description_placeholders={"subject_count": str(len(self._available_subjects))},
+            description_placeholders={
+                "subject_count": str(
+                    len(self._available_subjects)
+                ),
+            },
         )
