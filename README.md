@@ -6,7 +6,7 @@
 <br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Version-2.4.7-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Version](https://img.shields.io/badge/Version-2.4.8-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
@@ -17,10 +17,6 @@
 [**🌐 Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;·&nbsp;&nbsp;
 [**💬 Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;·&nbsp;&nbsp;
 [**🐛 Bug melden**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
-
-<br/>
-
-**[🇩🇪 Deutsch](#-deutsch)** &nbsp;|&nbsp; **[🇬🇧 English](#-english)**
 
 </div>
 
@@ -74,6 +70,7 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 | 🌍 | Vollständig mehrsprachig (DE / EN / FR) |
 | 📊 | Strukturierte Tages- und Wochensensoren |
 | ⚡ | Automatische Updates via HACS |
+| 🔧 | Klasse & Fächer nachträglich änderbar |
 
 </td>
 <td valign="top" width="50%">
@@ -164,6 +161,9 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 
 > [!TIP]
 > **Mehrere Klassen** lassen sich durch erneutes Hinzufügen der Integration einrichten — auch mit denselben Zugangsdaten. Jede Klasse erhält ein eigenes Gerät mit eigenen Sensoren (`VpMobile24 – 10a (12345)`).
+
+> [!TIP]
+> **Klasse oder Fächer nachträglich ändern:** Einstellungen → Geräte & Dienste → VpMobile24 → ⚙️ Konfigurieren. Dort kannst du unabhängig voneinander **Fächer wechseln** (Auswahl anpassen) oder **Klasse wechseln** (neue Klasse eingeben, Fächerliste wird neu geladen).
 
 <br/>
 
@@ -259,7 +259,7 @@ Contributions sind herzlich willkommen!
 <br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Version-2.4.7-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Version](https://img.shields.io/badge/Version-2.4.8-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
@@ -321,6 +321,7 @@ Timetables should be available in Home Assistant without friction — as structu
 | 🌍 | Fully multilingual (DE / EN / FR) |
 | 📊 | Structured daily and weekly sensors |
 | ⚡ | Automatic updates via HACS |
+| 🔧 | Change class & subjects after setup |
 
 </td>
 <td valign="top" width="50%">
@@ -411,6 +412,9 @@ Timetables should be available in Home Assistant without friction — as structu
 
 > [!TIP]
 > **Multiple classes** can be added by re-adding the integration — even with the same credentials. Each class gets its own device with its own sensors (`VpMobile24 – 10a (12345)`).
+
+> [!TIP]
+> **Change class or subjects after setup:** Settings → Devices & Services → VpMobile24 → ⚙️ Configure. You can independently **change subjects** (adjust selection) or **change class** (enter new class, subject list reloads automatically).
 
 <br/>
 

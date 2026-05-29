@@ -15,7 +15,7 @@
       try {
         const r = await fetch('https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases/latest');
         const d = await r.json();
-        const tag = d.tag_name || 'v2.4.7';
+        const tag = d.tag_name || 'v2.4.8';
         const pre = d.prerelease;
         const label = pre ? 'Beta' : 'Stable';
         const cls   = pre ? 'ver-beta' : 'ver-stable';
@@ -84,7 +84,7 @@
             </svg>
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
-          <span class="version-tag gh-version">v2.4.7</span>
+          <span class="version-tag gh-version">v2.4.8</span>
         </div>
         <div class="hero-badge">Home Assistant Integration</div>
         <p class="hero-sub">Dein Stundenplan. Immer aktuell. Direkt in Home Assistant.</p>
@@ -436,6 +436,10 @@
               <div class="feat-item">
                 <span class="feat-dot" style="background:#fcd34d"></span>
                 <div><strong>Fächer ausschließen</strong> – unerwünschte Fächer beim Setup herausfiltern</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#a78bfa"></span>
+                <div><strong>Klasse &amp; Fächer ändern</strong> – nachträglich per ⚙️ Konfigurieren, unabhängig voneinander</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#94a3b8"></span>
