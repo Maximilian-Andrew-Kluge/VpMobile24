@@ -87,8 +87,8 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
-        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",compact_mode:"Kompakt-Modus",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",compact_mode:"Compact Mode",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
         fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
       return (L[hl]||L.de);
@@ -126,6 +126,7 @@ class VpMobile24Card extends HTMLElement {
         { name: "highlight_today", default: true, selector: { boolean: {} } },
         { name: "show_time", default: true, selector: { boolean: {} } },
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
+        { name: "compact_mode", default: false, selector: { boolean: {} } },
         { type: "expandable", name: "time_settings", title: st.time_settings, collapsed: true,
           schema: [
             { name: "lesson_count", default: 8, selector: { number: { min: 1, max: 10, step: 1, mode: "box" } } },
@@ -188,7 +189,13 @@ class VpMobile24Card extends HTMLElement {
 
   _switchWeek(offset) {
     this._weekOffset = offset;
-    this._mobDayIdx = 0; // reset to Monday when switching weeks
+    if (offset === 0) {
+      // Returning to current week: jump to today's tab
+      const todayDow = new Date().getDay();
+      this._mobDayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : 0;
+    } else {
+      this._mobDayIdx = 0; // next week: start at Monday
+    }
     this._render();
   }
 
@@ -605,6 +612,7 @@ class VpMobile24Card extends HTMLElement {
     const showTime      = this._config.show_time !== false;
     const highlightToday = this._config.highlight_today !== false;
     const useCustomTimes = this._config.use_custom_times === true;
+    const compactMode   = this._config.compact_mode === true;
     const weekOffset    = this._weekOffset || 0;
 
     // Pick correct week table
@@ -1087,6 +1095,16 @@ ha-card {
 /* Current lesson highlight (green glow) */
 .vp-tile.vp-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
 .vp-today-col .vp-tile.vp-current { background: #166534 !important; color: #bbf7d0 !important; box-shadow: 0 0 0 2px #4ade80; }
+/* Compact mode */
+.vp-compact .vp-table td { height: 36px; padding: 2px 2px; }
+.vp-compact .vp-tile { height: 30px; min-height: 30px; font-size: .78em; padding: 0 3px; }
+.vp-compact .vp-today-col .vp-tile { height: 30px; min-height: 30px; }
+.vp-compact .vp-snum { font-size: .78em; }
+.vp-compact .vp-stime { font-size: .58em; }
+.vp-compact .vp-mob-lesson { padding: 5px 10px; }
+.vp-compact .vp-mob-subj { padding: 5px 8px; font-size: .85em; }
+.vp-compact .vp-mob-num { font-size: .8em; }
+.vp-compact .vp-mob-time { font-size: .58em; }
 /* Today pill with date below */
 .vp-today-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; background: #2563eb; color: #fff; border-radius: 8px; padding: 4px 12px; font-weight: 700; font-size: .82em; text-transform: uppercase; letter-spacing: .5px; }
 .vp-today-date { font-size: .82em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
@@ -1094,7 +1112,7 @@ ha-card {
 .vp-th-day { display: block; font-size: .78em; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #475569; }
 .vp-th-date { display: block; font-size: .82em; font-weight: 600; color: #334155; margin-top: 1px; }
 </style>
-<ha-card>
+<ha-card class="${compactMode ? 'vp-compact' : ''}">
   <div class="vp-hdr">
     <div class="vp-hdr-icon">📅</div>
     <div class="vp-hdr-body">

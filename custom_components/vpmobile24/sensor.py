@@ -22,6 +22,7 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Week Table",
         "additional_info": "VpMobile24 Additional Info",
         "changes": "VpMobile24 Changes",
+        "next_free_period": "VpMobile24 Next Free Period",
     },
     "de": {
         "next_lesson": "VpMobile24 Nächste Stunde",
@@ -29,6 +30,7 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Wochentabelle",
         "additional_info": "VpMobile24 Zusatzinfos",
         "changes": "VpMobile24 Änderungen",
+        "next_free_period": "VpMobile24 Nächste freie Stunde",
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
@@ -36,6 +38,7 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Tableau Hebdomadaire",
         "additional_info": "VpMobile24 Informations complémentaires",
         "changes": "VpMobile24 Changements",
+        "next_free_period": "VpMobile24 Prochaine heure libre",
     },
 }
 
@@ -100,6 +103,7 @@ async def async_setup_entry(
         VpMobile24WeekTableSensor(coordinator, config_entry, language),
         VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
         VpMobile24ChangesSensor(coordinator, config_entry, language),
+        VpMobile24NextFreePeriodSensor(coordinator, config_entry, language),
     ])
 
 
@@ -617,3 +621,82 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
             "datum": self.coordinator.data.get("date", ""),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
         }
+
+
+class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
+    """Sensor für die nächste freie Stunde heute."""
+
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["next_free_period"]
+        self._attr_unique_id = f"{config_entry.entry_id}_naechste_freie_stunde"
+        self._attr_icon = "mdi:clock-check-outline"
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
+
+    @property
+    def state(self) -> str | None:
+        result = self._get_next_free()
+        if not result:
+            return STATE_MESSAGES[self._language]["no_data"]
+        return result["state"]
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        result = self._get_next_free()
+        if not result:
+            return {}
+        return result["attrs"]
+
+    def _get_next_free(self) -> dict | None:
+        """Find the next free/cancelled period today that is still in the future."""
+        if not self.coordinator.data:
+            return None
+        today = datetime.now().date().isoformat()
+        now = datetime.now()
+
+        # Build a dict of period -> lesson for today
+        today_lessons: dict[int, dict] = {}
+        for lesson in self.coordinator.data.get("lessons", []):
+            if lesson.get("date") == today:
+                p = lesson.get("period", "")
+                if str(p).isdigit():
+                    today_lessons[int(p)] = lesson
+
+        # Walk periods 1–10, find first future free/cancelled slot
+        for period in range(1, 11):
+            lesson = today_lessons.get(period)
+            if lesson is None:
+                continue  # no entry at all — not a known free period
+            subj = lesson.get("subject", "").strip()
+            is_cancelled = not subj or subj in ["\u2014", "---", "", "-", " "]
+            if not is_cancelled:
+                continue
+            # Check if it's still in the future
+            ts = lesson.get("time_start", "")
+            if ts and ":" in ts:
+                try:
+                    h, m = map(int, ts.split(":"))
+                    lesson_dt = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                    if lesson_dt <= now:
+                        continue  # already past
+                except (ValueError, TypeError):
+                    pass
+            time_str = lesson.get("time", "")
+            state = f"{period}. Stunde"
+            if time_str:
+                state += f" ({time_str})"
+            return {
+                "state": state,
+                "attrs": {
+                    "stunde": period,
+                    "zeit": time_str,
+                    "datum": today,
+                    "info": lesson.get("info", ""),
+                },
+            }
+        return {"state": "Keine freie Stunde heute", "attrs": {"datum": today}}
