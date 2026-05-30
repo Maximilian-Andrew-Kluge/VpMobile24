@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.4.8
-console.info('%c VpMobile24-CARD %c v2.4.8 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.9
+console.info('%c VpMobile24-CARD %c v2.4.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -597,9 +597,11 @@ class VpMobile24Card extends HTMLElement {
     }
 
     const title         = (this._config.header_settings && this._config.header_settings.title)     || this._config.title     || 'Stundenplan';
-    // Auto class name: config -> sensor attribute -> fallback
-    const className     = (this._config.header_settings && this._config.header_settings.class_name) || this._config.class_name
-                          || (entity.attributes && entity.attributes.class) || '';
+    // Auto class name: if config has no class_name or still has the default '5a',
+    // prefer the class from the sensor attribute
+    const cfgClass = (this._config.header_settings && this._config.header_settings.class_name) || this._config.class_name || '';
+    const sensorClass = (entity.attributes && entity.attributes.class) || '';
+    const className = (cfgClass && cfgClass !== '5a') ? cfgClass : (sensorClass || cfgClass);
     const showHeader    = this._config.show_header !== false;
     const showTime      = this._config.show_time !== false;
     const highlightToday = this._config.highlight_today !== false;
@@ -1138,5 +1140,5 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
-console.log('✅ VpMobile24 Card v2.4.8 loaded');
+console.log('✅ VpMobile24 Card v2.4.9 loaded');
 
