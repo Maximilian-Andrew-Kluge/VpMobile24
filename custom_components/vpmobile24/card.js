@@ -389,8 +389,11 @@ class VpMobile24Card extends HTMLElement {
     if (!this._hass || !this._config) return;
     const entity = this._hass.states[this._config.entity];
     if (!entity) return;
-    const weekTable = entity.attributes && entity.attributes.week_table;
-    if (!weekTable) return;
+    const weekOffset = this._weekOffset || 0;
+    const weekTable = weekOffset === 1
+      ? (entity.attributes && entity.attributes.next_week_table)
+      : (entity.attributes && entity.attributes.week_table);
+    if (!weekTable) { this._render(); return; }
 
     const t = this._t || this._buildTranslations();
     const showTime       = this._config.show_time !== false;
@@ -460,7 +463,10 @@ class VpMobile24Card extends HTMLElement {
     const useCustomTimes = this._config.use_custom_times === true;
     const highlightToday = this._config.highlight_today !== false;
     const entity = this._hass && this._hass.states[this._config.entity];
-    const weekTable = entity && entity.attributes && entity.attributes.week_table;
+    const weekOffset = this._weekOffset || 0;
+    const weekTable = weekOffset === 1
+      ? (entity && entity.attributes && entity.attributes.next_week_table)
+      : (entity && entity.attributes && entity.attributes.week_table);
     if (!weekTable) return;
 
     const slots = this._buildTimeSlots(useCustomTimes);
@@ -619,8 +625,18 @@ class VpMobile24Card extends HTMLElement {
 
     // Pick correct week table
     const weekTable = weekOffset === 1
-      ? (entity.attributes && entity.attributes.next_week_table) || {}
+      ? (entity.attributes && entity.attributes.next_week_table) || null
       : entity.attributes.week_table;
+
+    // If next week data not yet available, show loading state
+    if (weekOffset === 1 && !weekTable) {
+      this.shadowRoot.innerHTML = `<ha-card class="${compactMode ? 'vp-compact' : ''}"><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
+        <div style="font-size:1.5em;margin-bottom:12px">⏳</div>
+        <div style="font-weight:600;color:#e2e8f0;margin-bottom:6px">${t.nextWeek}</div>
+        <div style="font-size:.85em">Daten werden geladen…</div>
+      </div></ha-card>`;
+      return;
+    }
 
     const now = new Date();
     const days = t.days;
