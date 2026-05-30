@@ -385,8 +385,29 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         week_lessons = self.coordinator.data.get("week_lessons", [])
         week_changes = self.coordinator.data.get("week_changes", [])
         all_lessons = week_lessons + week_changes
+
+        # Build next week table from coordinator cache
+        from datetime import date, timedelta
+        today = date.today()
+        days_to_monday = today.weekday()
+        next_monday = today - timedelta(days=days_to_monday) + timedelta(weeks=1)
+        next_week_dates = {
+            (next_monday + timedelta(days=i)).isoformat()
+            for i in range(5)
+        }
+        cache = getattr(self.coordinator, "_week_data_cache", {})
+        next_week_lessons = []
+        for date_str, day_data in cache.items():
+            if date_str in next_week_dates:
+                for lesson in day_data.get("lessons", []) + day_data.get("changes", []):
+                    lesson_copy = lesson.copy()
+                    lesson_copy["date"] = date_str
+                    next_week_lessons.append(lesson_copy)
+
         return {
             "week_table": self._create_week_table(all_lessons),
+            "next_week_table": self._create_week_table(next_week_lessons),
+            "class": getattr(self.coordinator, "class_name", ""),
             "total_lessons": len(all_lessons),
             "week_lessons_count": len(week_lessons),
             "week_changes_count": len(week_changes),
