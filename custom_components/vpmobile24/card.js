@@ -590,8 +590,7 @@ class VpMobile24Card extends HTMLElement {
       this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#ef4444">' + t.entityNotFound + ': ' + this._config.entity + '</div></ha-card>';
       return;
     }
-    const weekTable = entity.attributes && entity.attributes.week_table;
-    if (!weekTable) {
+    if (!entity.attributes || !entity.attributes.week_table) {
       this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#94a3b8">' + t.noData + '</div></ha-card>';
       return;
     }
