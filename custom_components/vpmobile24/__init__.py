@@ -19,7 +19,17 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
+# The canonical URL for the card resource
 CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js"
+
+# All known URL patterns that belong to this card (old or alternative paths)
+_CARD_URL_PATTERNS = [
+    "vpmobile24-card.js",
+    "/vpmobile24/card.js",
+    "/local/vpmobile24/card.js",
+    "/hacsfiles/vpmobile24/",
+    "/local/community/vpmobile24/",
+]
 
 
 def _copy_card_to_www(hass: HomeAssistant) -> str | None:
@@ -38,6 +48,70 @@ def _copy_card_to_www(hass: HomeAssistant) -> str | None:
     except Exception as err:
         _LOGGER.error("VpMobile24: failed to copy card: %s", err)
         return None
+
+
+async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
+    """Ensure the card is registered as a Lovelace resource with the correct URL.
+
+    - If a resource with the correct URL already exists: do nothing.
+    - If a resource with an old/wrong URL exists: update it to the correct URL.
+    - If no resource exists at all: create one.
+    """
+    try:
+        lovelace = hass.data.get("lovelace")
+        if not lovelace or not hasattr(lovelace, "resources"):
+            _LOGGER.debug("VpMobile24: Lovelace resource store not available yet")
+            return
+
+        resources = lovelace.resources
+        try:
+            await resources.async_load()
+        except Exception:
+            pass
+
+        existing = resources.async_items()
+
+        # Find any existing resource that belongs to this card
+        correct_id = None   # ID of a resource already at the correct URL
+        wrong_id = None     # ID of a resource at a wrong/old URL
+
+        for item in existing:
+            url = item.get("url", "")
+            if url == CARD_URL_WWW:
+                correct_id = item.get("id")
+                break  # already correct, nothing to do
+            for pattern in _CARD_URL_PATTERNS:
+                if pattern in url:
+                    wrong_id = item.get("id")
+                    _LOGGER.info(
+                        "VpMobile24: found card resource with wrong URL '%s', will update to '%s'",
+                        url, CARD_URL_WWW,
+                    )
+                    break
+
+        if correct_id is not None:
+            _LOGGER.debug("VpMobile24: card resource already correct (%s)", CARD_URL_WWW)
+            return
+
+        if wrong_id is not None:
+            # Update existing wrong entry to correct URL
+            await resources.async_update_item(
+                wrong_id, {"res_type": "module", "url": CARD_URL_WWW}
+            )
+            _LOGGER.info("VpMobile24: card resource updated to %s", CARD_URL_WWW)
+        else:
+            # No entry found at all — create one
+            await resources.async_create_item(
+                {"res_type": "module", "url": CARD_URL_WWW}
+            )
+            _LOGGER.info("VpMobile24: card resource registered: %s", CARD_URL_WWW)
+
+    except Exception as err:
+        _LOGGER.warning(
+            "VpMobile24: could not register Lovelace resource: %s. "
+            "Please add manually: %s (JavaScript module)",
+            err, CARD_URL_WWW,
+        )
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vpmobile24 from a config entry."""
@@ -131,6 +205,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Copy card to www on every setup (ensures file is always up to date)
     await hass.async_add_executor_job(_copy_card_to_www, hass)
+    # Register / fix the Lovelace resource URL
+    await _async_register_lovelace_resource(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -140,6 +216,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the vpmobile24 component."""
     await hass.async_add_executor_job(_copy_card_to_www, hass)
+    # Register / fix the Lovelace resource URL (fires after HA is ready)
+    async def _register_after_start(_event=None) -> None:
+        await _async_register_lovelace_resource(hass)
+    hass.bus.async_listen_once("homeassistant_started", _register_after_start)
     return True
 
 
