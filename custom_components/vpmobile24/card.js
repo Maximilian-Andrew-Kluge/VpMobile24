@@ -225,6 +225,8 @@ class VpMobile24Card extends HTMLElement {
 
   _showInfoPopup() {
     if (!this._config.additional_info_entity) return;
+    // Don't show info popup when viewing next week — infos are for current week only
+    if ((this._weekOffset || 0) !== 0) return;
     this._infoPopupOpen = true;
     this._renderInfoPopupContent();
   }
@@ -1118,7 +1120,7 @@ ha-card {
     <div class="vp-hdr-body">
       <div class="vp-hdr-row1">
         <span class="vp-hdr-title">${title}</span>
-        ${infoBtn ? '<button class="vp-pill vp-pill-info vp-pill-btn' + (infoBtnHasInfo ? ' has-info' : '') + '" onclick="this.getRootNode().host._showInfoPopup()" title="' + t.infoTitle + '">ⓘ</button>' : ''}
+        ${infoBtn && weekOffset === 0 ? '<button class="vp-pill vp-pill-info vp-pill-btn' + (infoBtnHasInfo ? ' has-info' : '') + '" onclick="this.getRootNode().host._showInfoPopup()" title="' + t.infoTitle + '">ⓘ</button>' : ''}
         <div class="vp-hdr-spacer"></div>
         ${weekOffset === 0
           ? '<button class="vp-pill vp-pill-btn vp-pill-week" onclick="this.getRootNode().host._switchWeek(1)">' + t.nextWeek + '</button>'
