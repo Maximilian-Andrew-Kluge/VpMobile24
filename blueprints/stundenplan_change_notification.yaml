@@ -33,19 +33,24 @@ blueprint:
 
     custom_title:
       name: Eigener Titel (optional)
+      description: Wird nur angezeigt wenn Standard deaktiviert ist
       default: "📚 Stundenplanänderung"
       selector:
         text:
+      enabled: false
 
     custom_message:
       name: Eigene Nachricht (optional)
+      description: Wird nur angezeigt wenn Standard deaktiviert ist
       default: ""
       selector:
         text:
           multiline: true
+      enabled: false
 
     actions:
       name: Zusätzliche Aktionen (optional)
+      description: Wird zusätzlich ausgeführt wenn sich der Stundenplan ändert
       default: []
       selector:
         action: {}
@@ -58,38 +63,42 @@ trigger:
 
 variables:
   use_default: !input use_default_message
-  custom_title_var: !input custom_title
-  custom_message_var: !input custom_message
-  lesson_change: >
+  title_input: !input custom_title
+  message_input: !input custom_message
+
+  lesson_text: >
     {% set lesson = state_attr(trigger.entity_id, 'lesson') %}
     {% set subject = state_attr(trigger.entity_id, 'subject') %}
     {% set change = state_attr(trigger.entity_id, 'change') %}
 
-    {% if lesson %}
+    {% if lesson and subject and change %}
       {{ lesson }}. Stunde {{ subject }} {{ change }}
     {% else %}
       Es gibt Änderungen im Stundenplan.
     {% endif %}
 
 action:
-  - repeat:
-      for_each: !input notify_devices
-      sequence:
-        - device_id: "{{ repeat.item }}"
-          domain: mobile_app
-          type: notify
-          title: >
-            {% if use_default %}
-              📚 Stundenplanänderung
-            {% else %}
-              {{ custom_title_var }}
-            {% endif %}
-          message: >
-            {% if use_default %}
-              {{ lesson_change }}
-            {% else %}
-              {{ custom_message_var }}
-            {% endif %}
+  - if:
+      - condition: template
+        value_template: "{{ use_default }}"
+    then:
+      - repeat:
+          for_each: !input notify_devices
+          sequence:
+            - device_id: "{{ repeat.item }}"
+              domain: mobile_app
+              type: notify
+              title: "📚 Stundenplanänderung"
+              message: "{{ lesson_text }}"
+    else:
+      - repeat:
+          for_each: !input notify_devices
+          sequence:
+            - device_id: "{{ repeat.item }}"
+              domain: mobile_app
+              type: notify
+              title: "{{ title_input }}"
+              message: "{{ message_input }}"
 
   - choose: []
     default: !input actions
