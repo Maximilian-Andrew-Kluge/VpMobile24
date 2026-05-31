@@ -1,7 +1,8 @@
 blueprint:
   name: VpMobile24 – Stundenplanänderung Benachrichtigung
   description: >
-    Benachrichtigt automatisch bei Änderungen im Stundenplan.
+    Benachrichtigt automatisch, wenn sich der Stundenplan aktualisiert –
+    z. B. bei Vertretung, Ausfall, Raumänderung oder Lehrerwechsel.
 
   domain: automation
   source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/automation/vpmobile24/stundenplan_change_notification.yaml
@@ -15,24 +16,41 @@ blueprint:
           domain: sensor
 
     notify_device:
-      name: Benachrichtigungsgerät
+      name: Hauptgerät für Benachrichtigung
       description: Gerät das benachrichtigt werden soll
       selector:
         device:
           filter:
             integration: mobile_app
 
-    title:
-      name: Titel der Benachrichtigung
+    additional_notify_devices:
+      name: Weitere Geräte (optional)
+      description: Weitere Geräte die ebenfalls benachrichtigt werden sollen
+      default: []
+      selector:
+        device:
+          multiple: true
+          filter:
+            integration: mobile_app
+
+    notification_title:
+      name: Titel
       default: "📚 Stundenplanänderung"
       selector:
         text:
 
-    message:
+    notification_message:
       name: Nachricht
       default: "Es gibt Änderungen im Stundenplan."
       selector:
         text:
+
+    actions:
+      name: Zusätzliche Aktionen (optional)
+      description: Wird zusätzlich bei Änderungen ausgeführt
+      default: []
+      selector:
+        action: {}
 
 mode: single
 
@@ -47,9 +65,26 @@ condition:
          and trigger.to_state is not none
          and trigger.from_state.state != trigger.to_state.state }}
 
+variables:
+  title: !input notification_title
+  message: !input notification_message
+  extra_actions: !input actions
+
 action:
   - device_id: !input notify_device
     domain: mobile_app
     type: notify
-    title: !input title
-    message: !input message
+    title: "{{ title }}"
+    message: "{{ message }}"
+
+  - repeat:
+      for_each: !input additional_notify_devices
+      sequence:
+        - device_id: "{{ repeat.item }}"
+          domain: mobile_app
+          type: notify
+          title: "{{ title }}"
+          message: "{{ message }}"
+
+  - choose: []
+    default: !input actions
