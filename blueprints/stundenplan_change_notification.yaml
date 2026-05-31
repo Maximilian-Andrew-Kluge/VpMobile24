@@ -3,6 +3,12 @@ blueprint:
   description: >
     Benachrichtigt automatisch bei Änderungen im Stundenplan.
 
+    💡 Standard-Benachrichtigung:
+    Beispiel: „3. Stunde Mathematik fällt aus.“
+
+    Wenn „Standard-Benachrichtigung verwenden“ deaktiviert ist,
+    können eigener Titel und eigene Nachricht verwendet werden.
+
   domain: automation
   source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/stundenplan_change_notification.yaml
 
@@ -26,19 +32,22 @@ blueprint:
     use_default_message:
       name: Standard-Benachrichtigung verwenden
       description: >
-        Wenn aktiviert, wird automatisch die betroffene Stunde in der Nachricht angezeigt.
+        Wenn aktiviert, wird automatisch z. B.
+        „3. Stunde Mathematik fällt aus“ versendet.
       default: true
       selector:
         boolean:
 
     custom_title:
       name: Eigener Titel (optional)
+      description: Wird nur verwendet wenn Standard deaktiviert ist
       default: "📚 Stundenplanänderung"
       selector:
         text:
 
     custom_message:
       name: Eigene Nachricht (optional)
+      description: Wird nur verwendet wenn Standard deaktiviert ist
       default: ""
       selector:
         text:
@@ -46,6 +55,7 @@ blueprint:
 
     actions:
       name: Zusätzliche Aktionen (optional)
+      description: Wird zusätzlich ausgeführt wenn sich der Stundenplan ändert
       default: []
       selector:
         action: {}
