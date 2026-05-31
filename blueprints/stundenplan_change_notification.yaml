@@ -4,6 +4,7 @@ blueprint:
     Benachrichtigt automatisch bei Änderungen im Stundenplan.
 
   domain: automation
+  source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/stundenplan_change_notification.yaml
 
   input:
     timetable_sensor:
@@ -13,18 +14,18 @@ blueprint:
         entity:
           domain: sensor
 
-    notify_devices:
-      name: Benachrichtigungsgeräte
-      description: Wähle ein oder mehrere Geräte für Push-Benachrichtigungen
+    notify_target:
+      name: Benachrichtigungsdienst
+      description: >
+        Wähle den Benachrichtigungsdienst aus
+        (z. B. Handy, Tablet oder Gruppenbenachrichtigung)
       selector:
-        device:
-          multiple: true
-          filter:
-            integration: mobile_app
+        entity:
+          domain: notify
 
     use_default_message:
       name: Standard-Benachrichtigung verwenden
-      description: Nutzt den Standardtext für Stundenplanänderungen
+      description: Automatische Standardmeldung verwenden
       default: true
       selector:
         boolean:
@@ -46,40 +47,40 @@ blueprint:
 
     actions:
       name: Zusätzliche Aktionen (optional)
+      description: Weitere Aktionen bei Änderung
       default: []
       selector:
         action: {}
-
-mode: single
 
 trigger:
   - platform: state
     entity_id: !input timetable_sensor
 
 variables:
+  notify_service: !input notify_target
   use_default: !input use_default_message
   title_input: !input custom_title
   message_input: !input custom_message
 
 action:
-  - repeat:
-      for_each: !input notify_devices
-      sequence:
-        - domain: mobile_app
-          type: notify
-          device_id: "{{ repeat.item }}"
-          title: >
-            {% if use_default %}
-              📚 Stundenplanänderung
-            {% else %}
-              {{ title_input }}
-            {% endif %}
-          message: >
-            {% if use_default %}
-              Es gibt Änderungen im Stundenplan.
-            {% else %}
-              {{ message_input }}
-            {% endif %}
+  - action: notify.send_message
+    target:
+      entity_id: !input notify_target
+    data:
+      title: >
+        {% if use_default %}
+          📚 Stundenplanänderung
+        {% else %}
+          {{ title_input }}
+        {% endif %}
+      message: >
+        {% if use_default %}
+          Es gibt Änderungen im Stundenplan.
+        {% else %}
+          {{ message_input }}
+        {% endif %}
 
   - choose: []
     default: !input actions
+
+mode: single
