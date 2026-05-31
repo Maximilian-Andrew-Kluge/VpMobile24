@@ -204,11 +204,15 @@ class VpMobile24Card extends HTMLElement {
     if (this._config) {
       const anyPopupOpen = this._popupOpen || this._infoPopupOpen;
       if (anyPopupOpen) {
-        // Only update table content, keep popups alive
-        this._updateTableOnly();
-        // If info popup is open, refresh its content with latest data
-        if (this._infoPopupOpen) {
-          this._renderInfoPopupContent();
+        // When viewing next week, always do a full re-render to avoid
+        // showing current week data behind the popup
+        if ((this._weekOffset || 0) !== 0) {
+          this._render();
+        } else {
+          this._updateTableOnly();
+          if (this._infoPopupOpen) {
+            this._renderInfoPopupContent();
+          }
         }
       } else {
         this._render();
@@ -562,6 +566,24 @@ class VpMobile24Card extends HTMLElement {
       pause_1:'10:10-10:30', pause_1_after:3,
       pause_2:'12:15-12:45', pause_2_after:5,
     };
+
+    // Auto-populate times from XML sensor data when not using custom times
+    if (!useCustomTimes && this._hass && this._config.entity) {
+      const entity = this._hass.states[this._config.entity];
+      const weekTable = entity && entity.attributes && entity.attributes.week_table;
+      if (weekTable) {
+        const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
+        for (let p = 1; p <= 10; p++) {
+          for (const day of dayKeys) {
+            const lesson = weekTable[day] && weekTable[day][String(p)];
+            if (lesson && lesson.zeit && lesson.zeit.includes('-')) {
+              defaults['time_' + p] = lesson.zeit;
+              break;
+            }
+          }
+        }
+      }
+    }
 
     // HA stores grid sub-schemas as nested objects: pause_1_config: { pause_1: "...", pause_1_after: 3 }
     // We need to read from both the nested config object AND the flat top-level keys

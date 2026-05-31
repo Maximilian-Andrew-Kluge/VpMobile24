@@ -23,6 +23,7 @@ SENSOR_NAMES = {
         "additional_info": "VpMobile24 Additional Info",
         "changes": "VpMobile24 Changes",
         "next_free_period": "VpMobile24 Next Free Period",
+        "current_lesson": "VpMobile24 Current Lesson",
     },
     "de": {
         "next_lesson": "VpMobile24 Nächste Stunde",
@@ -31,6 +32,7 @@ SENSOR_NAMES = {
         "additional_info": "VpMobile24 Zusatzinfos",
         "changes": "VpMobile24 Änderungen",
         "next_free_period": "VpMobile24 Nächste freie Stunde",
+        "current_lesson": "VpMobile24 Aktueller Unterricht",
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
@@ -39,6 +41,7 @@ SENSOR_NAMES = {
         "additional_info": "VpMobile24 Informations complémentaires",
         "changes": "VpMobile24 Changements",
         "next_free_period": "VpMobile24 Prochaine heure libre",
+        "current_lesson": "VpMobile24 Cours actuel",
     },
 }
 
@@ -104,6 +107,7 @@ async def async_setup_entry(
         VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
         VpMobile24ChangesSensor(coordinator, config_entry, language),
         VpMobile24NextFreePeriodSensor(coordinator, config_entry, language),
+        VpMobile24CurrentLessonSensor(coordinator, config_entry, language),
     ])
 
 
@@ -700,3 +704,76 @@ class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
                 },
             }
         return {"state": "Keine freie Stunde heute", "attrs": {"datum": today}}
+
+
+class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
+    """Sensor für den aktuell laufenden Unterricht."""
+
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = SENSOR_NAMES[language]["current_lesson"]
+        self._attr_unique_id = f"{config_entry.entry_id}_aktueller_unterricht"
+        self._attr_icon = "mdi:school"
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
+
+    @property
+    def state(self) -> str | None:
+        lesson = self._get_current_lesson()
+        if not lesson:
+            return STATE_MESSAGES[self._language]["no_data"]
+        subj = lesson.get("subject", "")
+        if not subj or subj.strip() in ["\u2014", "---", "", "-"]:
+            return "Ausfall"
+        return subj
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        lesson = self._get_current_lesson()
+        if not lesson:
+            return {"status": "Kein laufender Unterricht"}
+        subj = lesson.get("subject", "")
+        is_cancelled = not subj or subj.strip() in ["\u2014", "---", "", "-"]
+        return {
+            "fach": subj,
+            "zeit": lesson.get("time", ""),
+            "zeit_start": lesson.get("time_start", ""),
+            "zeit_ende": lesson.get("time_end", ""),
+            "lehrer": lesson.get("teacher", ""),
+            "raum": lesson.get("room", ""),
+            "stunde": lesson.get("period", ""),
+            "ist_ausfall": is_cancelled,
+            "ist_vertretung": lesson.get("is_change", False) and not is_cancelled,
+            "zusatzinfo": lesson.get("info", ""),
+            "datum": lesson.get("date", ""),
+        }
+
+    def _get_current_lesson(self) -> dict[str, Any] | None:
+        """Find the lesson currently running right now."""
+        if not self.coordinator.data:
+            return None
+        today = datetime.now().date().isoformat()
+        now = datetime.now()
+        now_mins = now.hour * 60 + now.minute
+
+        for lesson in self.coordinator.data.get("lessons", []):
+            if lesson.get("date") != today:
+                continue
+            ts = lesson.get("time_start", "")
+            te = lesson.get("time_end", "")
+            if not ts or not te or ":" not in ts or ":" not in te:
+                continue
+            try:
+                sh, sm = map(int, ts.split(":"))
+                eh, em = map(int, te.split(":"))
+                start = sh * 60 + sm
+                end = eh * 60 + em
+                if start <= now_mins <= end:
+                    return lesson
+            except (ValueError, TypeError):
+                continue
+        return None
