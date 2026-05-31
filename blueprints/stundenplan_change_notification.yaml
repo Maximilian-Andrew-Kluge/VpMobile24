@@ -1,22 +1,21 @@
 blueprint:
   name: VpMobile24 – Stundenplanänderung Benachrichtigung
   description: >
-    Benachrichtigt automatisch bei Änderungen im Stundenplan
-    wie Vertretung, Ausfall oder Raumwechsel.
+    Benachrichtigt automatisch bei Änderungen im Stundenplan.
 
   domain: automation
 
   input:
     timetable_sensor:
       name: Stundenplan Sensor
-      description: Wähle den Sensor deiner VpMobile24 Integration
+      description: Wähle den Stundenplan Sensor deiner VpMobile24 Integration
       selector:
         entity:
           domain: sensor
 
     notify_devices:
       name: Benachrichtigungsgeräte
-      description: Wähle ein oder mehrere Geräte für die Benachrichtigung
+      description: Wähle ein oder mehrere Geräte für Push-Benachrichtigungen
       selector:
         device:
           multiple: true
@@ -25,7 +24,7 @@ blueprint:
 
     use_default_message:
       name: Standard-Benachrichtigung verwenden
-      description: Verwendet automatisch den Standardtext
+      description: Nutzt den Standardtext für Stundenplanänderungen
       default: true
       selector:
         boolean:
@@ -47,7 +46,6 @@ blueprint:
 
     actions:
       name: Zusätzliche Aktionen (optional)
-      description: Weitere Aktionen zusätzlich ausführen
       default: []
       selector:
         action: {}
@@ -67,22 +65,21 @@ action:
   - repeat:
       for_each: !input notify_devices
       sequence:
-        - service: notify.mobile_app
-          data:
-            target:
-              - "{{ device_attr(repeat.item, 'name') }}"
-            title: >
-              {% if use_default %}
-                📚 Stundenplanänderung
-              {% else %}
-                {{ title_input }}
-              {% endif %}
-            message: >
-              {% if use_default %}
-                Es gibt Änderungen im Stundenplan.
-              {% else %}
-                {{ message_input }}
-              {% endif %}
+        - domain: mobile_app
+          type: notify
+          device_id: "{{ repeat.item }}"
+          title: >
+            {% if use_default %}
+              📚 Stundenplanänderung
+            {% else %}
+              {{ title_input }}
+            {% endif %}
+          message: >
+            {% if use_default %}
+              Es gibt Änderungen im Stundenplan.
+            {% else %}
+              {{ message_input }}
+            {% endif %}
 
   - choose: []
     default: !input actions
