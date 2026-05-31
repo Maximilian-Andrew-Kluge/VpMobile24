@@ -26,7 +26,7 @@ blueprint:
     use_default_message:
       name: Standard-Benachrichtigung verwenden
       description: >
-        Wenn aktiviert, wird automatisch die betroffene Stunde in der Nachricht angezeigt.
+        Zeigt automatisch die betroffene Stunde in der Nachricht an.
       default: true
       selector:
         boolean:
@@ -61,17 +61,6 @@ variables:
   title_input: !input custom_title
   message_input: !input custom_message
 
-  lesson_text: >
-    {% set lesson = state_attr(trigger.entity_id, 'lesson') %}
-    {% set subject = state_attr(trigger.entity_id, 'subject') %}
-    {% set change = state_attr(trigger.entity_id, 'change') %}
-
-    {% if lesson and subject and change %}
-      {{ lesson }}. Stunde {{ subject }} {{ change }}
-    {% else %}
-      Es gibt Änderungen im Stundenplan.
-    {% endif %}
-
 action:
   - repeat:
       for_each: !input notify_devices
@@ -87,7 +76,7 @@ action:
             {% endif %}
           message: >
             {% if use_default %}
-              {{ lesson_text }}
+              Es gibt Änderungen im Stundenplan.
             {% else %}
               {{ message_input }}
             {% endif %}
