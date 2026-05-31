@@ -4,7 +4,7 @@ blueprint:
     Benachrichtigt automatisch bei Änderungen im Stundenplan.
 
   domain: automation
-  source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/automation/vpmobile24/stundenplan_change_notification.yaml
+  source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/stundenplan_change_notification.yaml
 
   input:
     timetable_sensor:
@@ -33,24 +33,19 @@ blueprint:
 
     custom_title:
       name: Eigener Titel (optional)
-      description: Wird nur angezeigt wenn Standard deaktiviert ist
       default: "📚 Stundenplanänderung"
       selector:
         text:
-      enabled: false
 
     custom_message:
       name: Eigene Nachricht (optional)
-      description: Wird nur angezeigt wenn Standard deaktiviert ist
       default: ""
       selector:
         text:
           multiline: true
-      enabled: false
 
     actions:
       name: Zusätzliche Aktionen (optional)
-      description: Wird zusätzlich ausgeführt wenn sich der Stundenplan ändert
       default: []
       selector:
         action: {}
@@ -78,27 +73,24 @@ variables:
     {% endif %}
 
 action:
-  - if:
-      - condition: template
-        value_template: "{{ use_default }}"
-    then:
-      - repeat:
-          for_each: !input notify_devices
-          sequence:
-            - device_id: "{{ repeat.item }}"
-              domain: mobile_app
-              type: notify
-              title: "📚 Stundenplanänderung"
-              message: "{{ lesson_text }}"
-    else:
-      - repeat:
-          for_each: !input notify_devices
-          sequence:
-            - device_id: "{{ repeat.item }}"
-              domain: mobile_app
-              type: notify
-              title: "{{ title_input }}"
-              message: "{{ message_input }}"
+  - repeat:
+      for_each: !input notify_devices
+      sequence:
+        - device_id: "{{ repeat.item }}"
+          domain: mobile_app
+          type: notify
+          title: >
+            {% if use_default %}
+              📚 Stundenplanänderung
+            {% else %}
+              {{ title_input }}
+            {% endif %}
+          message: >
+            {% if use_default %}
+              {{ lesson_text }}
+            {% else %}
+              {{ message_input }}
+            {% endif %}
 
   - choose: []
     default: !input actions
