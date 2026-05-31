@@ -5,21 +5,18 @@ blueprint:
 
     Unterstützt unter anderem:
 
-    • Unterrichtsausfall  
-    • Vertretungsunterricht  
-    • Raumänderungen  
-    • Lehrerwechsel  
-    • Aktualisierungen im Wochenplan  
+    • Unterrichtsausfall
+    • Vertretungsunterricht
+    • Raumänderungen
+    • Lehrerwechsel
+    • Aktualisierungen im Wochenplan
 
-    Die Benachrichtigung zeigt – sofern verfügbar – direkt die betroffenen Änderungen an.
+    Die Benachrichtigung zeigt – sofern verfügbar – direkt die Änderungen an.
 
     Beispiel:
 
     📚 Stundenplanänderung
-
-    3. Stunde Mathematik entfällt  
-    Raumwechsel zu B204  
-    Vertretung bei Frau Müller
+    3. Stunde Mathematik entfällt
 
   domain: automation
   source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/stundenplan_change_notification.yaml
@@ -28,8 +25,7 @@ blueprint:
     timetable_sensor:
       name: Stundenplan Sensor
       description: >
-        Wähle den Stundenplan-Sensor deiner VpMobile24 Integration aus,
-        der auf Änderungen überwacht werden soll.
+        Wähle den Stundenplan-Sensor deiner VpMobile24 Integration aus.
       selector:
         entity:
           domain: sensor
@@ -37,8 +33,8 @@ blueprint:
     notify_target:
       name: Benachrichtigungsdienst
       description: >
-        Wähle aus, wohin die Benachrichtigung gesendet werden soll.
-        Zum Beispiel Smartphone, Tablet oder eine Gruppenbenachrichtigung.
+        Wähle aus, wohin die Benachrichtigung gesendet werden soll
+        (z. B. Smartphone, Tablet oder Gruppenbenachrichtigung).
       selector:
         entity:
           domain: notify
@@ -46,8 +42,7 @@ blueprint:
     use_default_message:
       name: Standard-Benachrichtigung verwenden
       description: >
-        Verwendet automatisch einen Standardtext mit den erkannten Änderungen
-        aus dem Stundenplan.
+        Verwendet automatisch den Standardtext mit den Änderungen aus dem Stundenplan.
       default: true
       selector:
         boolean:
@@ -56,7 +51,7 @@ blueprint:
       name: Eigener Titel (optional)
       description: >
         Eigener Titel für die Benachrichtigung.
-        Wird verwendet, wenn die Standard-Benachrichtigung deaktiviert ist.
+        Wird nur verwendet wenn Standard deaktiviert ist.
       default: "📚 Stundenplanänderung"
       selector:
         text:
@@ -65,7 +60,7 @@ blueprint:
       name: Eigene Nachricht (optional)
       description: >
         Eigener Nachrichtentext.
-        Wird verwendet, wenn die Standard-Benachrichtigung deaktiviert ist.
+        Wird nur verwendet wenn Standard deaktiviert ist.
       default: ""
       selector:
         text:
@@ -74,8 +69,7 @@ blueprint:
     actions:
       name: Zusätzliche Aktionen (optional)
       description: >
-        Weitere Aktionen, die zusätzlich bei einer Änderung ausgeführt werden sollen.
-        Zum Beispiel Licht schalten, Alexa-Ansage oder Dashboard-Benachrichtigung.
+        Weitere Aktionen, die zusätzlich bei Änderungen ausgeführt werden sollen.
       default: []
       selector:
         action: {}
@@ -90,11 +84,15 @@ variables:
   message_input: !input custom_message
 
   detected_changes: >
-    {% set changes = state_attr(trigger.entity_id, 'changes') %}
-    {% if changes %}
-      {{ changes }}
+    {% if trigger.to_state %}
+      {% set changes = state_attr(trigger.to_state.entity_id, 'changes') %}
+      {% if changes %}
+        {{ changes }}
+      {% else %}
+        {{ trigger.to_state.state }}
+      {% endif %}
     {% else %}
-      {{ trigger.to_state.state }}
+      Es gibt Änderungen im Stundenplan.
     {% endif %}
 
 action:
