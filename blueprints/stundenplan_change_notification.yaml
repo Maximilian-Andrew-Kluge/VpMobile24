@@ -1,13 +1,15 @@
 blueprint:
   name: VpMobile24 – Stundenplanänderung Benachrichtigung
   description: >
-    Benachrichtigt automatisch bei Änderungen im Stundenplan.
+    Benachrichtigt automatisch bei Änderungen im Stundenplan wie
+    Vertretung, Unterrichtsausfall oder Raumänderung.
 
   domain: automation
 
   input:
     timetable_sensor:
       name: Stundenplan Sensor
+      description: Sensor deiner VpMobile24 Integration
       selector:
         entity:
           domain: sensor
@@ -15,26 +17,31 @@ blueprint:
     notify_services:
       name: Benachrichtigungsdienste
       description: >
-        z. B. notify.mobile_app_dein_handy oder mehrere auswählen
+        Notify-Service(s) eintragen, getrennt mit Komma.
+
+        Beispiel:
+        notify.mobile_app_sm_a556b,
+      default: "notify.mobile_app_sm_a556b"
       selector:
-        entity:
-          domain: notify
-          multiple: true
+        text:
 
     use_default_message:
       name: Standard-Benachrichtigung verwenden
+      description: Automatischen Standardtext verwenden
       default: true
       selector:
         boolean:
 
     custom_title:
       name: Eigener Titel (optional)
+      description: Nur aktiv wenn Standard deaktiviert ist
       default: "📚 Stundenplanänderung"
       selector:
         text:
 
     custom_message:
       name: Eigene Nachricht (optional)
+      description: Nur aktiv wenn Standard deaktiviert ist
       default: ""
       selector:
         text:
@@ -42,6 +49,7 @@ blueprint:
 
     actions:
       name: Zusätzliche Aktionen (optional)
+      description: Weitere Aktionen bei Änderung
       default: []
       selector:
         action: {}
@@ -53,13 +61,14 @@ trigger:
     entity_id: !input timetable_sensor
 
 variables:
+  notify_list: !input notify_services
   use_default: !input use_default_message
   title_input: !input custom_title
   message_input: !input custom_message
 
 action:
   - repeat:
-      for_each: !input notify_services
+      for_each: "{{ notify_list.split(',') | map('trim') | list }}"
       sequence:
         - service: "{{ repeat.item }}"
           data:
