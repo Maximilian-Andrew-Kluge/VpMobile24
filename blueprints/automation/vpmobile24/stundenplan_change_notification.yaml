@@ -1,8 +1,7 @@
 blueprint:
   name: VpMobile24 – Stundenplanänderung Benachrichtigung
   description: >
-    Benachrichtigt automatisch, wenn sich der Stundenplan aktualisiert –
-    z. B. bei Vertretung, Ausfall, Raumänderung oder Lehrerwechsel.
+    Benachrichtigt automatisch bei Änderungen im Stundenplan.
 
   domain: automation
   source_url: https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/blueprints/automation/vpmobile24/stundenplan_change_notification.yaml
@@ -15,39 +14,38 @@ blueprint:
         entity:
           domain: sensor
 
-    notify_device:
-      name: Hauptgerät für Benachrichtigung
-      description: Gerät das benachrichtigt werden soll
-      selector:
-        device:
-          filter:
-            integration: mobile_app
-
-    additional_notify_devices:
-      name: Weitere Geräte (optional)
-      description: Weitere Geräte die ebenfalls benachrichtigt werden sollen
-      default: []
+    notify_devices:
+      name: Benachrichtigungsgeräte
+      description: Geräte die benachrichtigt werden sollen
       selector:
         device:
           multiple: true
           filter:
             integration: mobile_app
 
-    notification_title:
-      name: Titel
+    use_default_message:
+      name: Standard-Benachrichtigung verwenden
+      description: >
+        Wenn aktiviert, wird automatisch die betroffene Stunde in der Nachricht angezeigt.
+      default: true
+      selector:
+        boolean:
+
+    custom_title:
+      name: Eigener Titel (optional)
       default: "📚 Stundenplanänderung"
       selector:
         text:
 
-    notification_message:
-      name: Nachricht
-      default: "Es gibt Änderungen im Stundenplan."
+    custom_message:
+      name: Eigene Nachricht (optional)
+      default: ""
       selector:
         text:
+          multiline: true
 
     actions:
       name: Zusätzliche Aktionen (optional)
-      description: Wird zusätzlich bei Änderungen ausgeführt
       default: []
       selector:
         action: {}
@@ -58,33 +56,40 @@ trigger:
   - platform: state
     entity_id: !input timetable_sensor
 
-condition:
-  - condition: template
-    value_template: >
-      {{ trigger.from_state is not none
-         and trigger.to_state is not none
-         and trigger.from_state.state != trigger.to_state.state }}
-
 variables:
-  title: !input notification_title
-  message: !input notification_message
-  extra_actions: !input actions
+  use_default: !input use_default_message
+  custom_title_var: !input custom_title
+  custom_message_var: !input custom_message
+  lesson_change: >
+    {% set lesson = state_attr(trigger.entity_id, 'lesson') %}
+    {% set subject = state_attr(trigger.entity_id, 'subject') %}
+    {% set change = state_attr(trigger.entity_id, 'change') %}
+
+    {% if lesson %}
+      {{ lesson }}. Stunde {{ subject }} {{ change }}
+    {% else %}
+      Es gibt Änderungen im Stundenplan.
+    {% endif %}
 
 action:
-  - device_id: !input notify_device
-    domain: mobile_app
-    type: notify
-    title: "{{ title }}"
-    message: "{{ message }}"
-
   - repeat:
-      for_each: !input additional_notify_devices
+      for_each: !input notify_devices
       sequence:
         - device_id: "{{ repeat.item }}"
           domain: mobile_app
           type: notify
-          title: "{{ title }}"
-          message: "{{ message }}"
+          title: >
+            {% if use_default %}
+              📚 Stundenplanänderung
+            {% else %}
+              {{ custom_title_var }}
+            {% endif %}
+          message: >
+            {% if use_default %}
+              {{ lesson_change }}
+            {% else %}
+              {{ custom_message_var }}
+            {% endif %}
 
   - choose: []
     default: !input actions
