@@ -1,47 +1,45 @@
 blueprint:
   name: VpMobile24 – Stundenplanänderung Benachrichtigung
   description: >
-    Benachrichtigt automatisch bei Änderungen im Stundenplan wie
-    Vertretung, Unterrichtsausfall oder Raumänderung.
+    Benachrichtigt automatisch bei Änderungen im Stundenplan
+    wie Vertretung, Ausfall oder Raumwechsel.
 
   domain: automation
 
   input:
     timetable_sensor:
       name: Stundenplan Sensor
-      description: Sensor deiner VpMobile24 Integration
+      description: Wähle den Sensor deiner VpMobile24 Integration
       selector:
         entity:
           domain: sensor
 
-    notify_services:
-      name: Benachrichtigungsdienste
-      description: >
-        Notify-Service(s) eintragen, getrennt mit Komma.
-
-        Beispiel:
-        notify.mobile_app_sm_a556b,
-      default: "notify.mobile_app_sm_a556b"
+    notify_devices:
+      name: Benachrichtigungsgeräte
+      description: Wähle ein oder mehrere Geräte für die Benachrichtigung
       selector:
-        text:
+        device:
+          multiple: true
+          filter:
+            integration: mobile_app
 
     use_default_message:
       name: Standard-Benachrichtigung verwenden
-      description: Automatischen Standardtext verwenden
+      description: Verwendet automatisch den Standardtext
       default: true
       selector:
         boolean:
 
     custom_title:
       name: Eigener Titel (optional)
-      description: Nur aktiv wenn Standard deaktiviert ist
+      description: Wird nur verwendet wenn Standard deaktiviert ist
       default: "📚 Stundenplanänderung"
       selector:
         text:
 
     custom_message:
       name: Eigene Nachricht (optional)
-      description: Nur aktiv wenn Standard deaktiviert ist
+      description: Wird nur verwendet wenn Standard deaktiviert ist
       default: ""
       selector:
         text:
@@ -49,7 +47,7 @@ blueprint:
 
     actions:
       name: Zusätzliche Aktionen (optional)
-      description: Weitere Aktionen bei Änderung
+      description: Weitere Aktionen zusätzlich ausführen
       default: []
       selector:
         action: {}
@@ -61,17 +59,18 @@ trigger:
     entity_id: !input timetable_sensor
 
 variables:
-  notify_list: !input notify_services
   use_default: !input use_default_message
   title_input: !input custom_title
   message_input: !input custom_message
 
 action:
   - repeat:
-      for_each: "{{ notify_list.split(',') | map('trim') | list }}"
+      for_each: !input notify_devices
       sequence:
-        - service: "{{ repeat.item }}"
+        - service: notify.mobile_app
           data:
+            target:
+              - "{{ device_attr(repeat.item, 'name') }}"
             title: >
               {% if use_default %}
                 📚 Stundenplanänderung
