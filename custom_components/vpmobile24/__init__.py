@@ -243,7 +243,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
-        self._last_notified_changes: set = set()
         super().__init__(
             hass,
             _LOGGER,
@@ -470,37 +469,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             today_changes = [c for c in all_changes if c.get("date") == today_str]
 
             _LOGGER.debug(f"Today's data extracted: {len(today_lessons)} lessons, {len(today_changes)} changes")
-
-            # ── Feature 2: Push notification on new changes/cancellations ──
-            try:
-                cancelled_today = [
-                    l for l in today_lessons
-                    if not l.get("subject") or l.get("subject", "").strip() in ["\u2014", "---", "", "-"]
-                ]
-                substitutions_today = [l for l in today_lessons if l.get("is_change")]
-                change_keys = frozenset(
-                    (l.get("period", ""), l.get("subject", ""), l.get("is_change", False))
-                    for l in today_lessons + today_changes
-                )
-                if change_keys and change_keys != self._last_notified_changes:
-                    self._last_notified_changes = change_keys
-                    n_cancel = len(cancelled_today)
-                    n_sub = len(substitutions_today) + len(today_changes)
-                    if n_cancel > 0 or n_sub > 0:
-                        parts = []
-                        if n_cancel:
-                            parts.append(f"{n_cancel} Ausfall{'e' if n_cancel > 1 else ''}")
-                        if n_sub:
-                            parts.append(f"{n_sub} Vertretung{'en' if n_sub > 1 else ''}")
-                        msg = "Stundenplan\u00e4nderung heute: " + ", ".join(parts)
-                        await self.hass.services.async_call(
-                            "persistent_notification", "create",
-                            {"message": msg, "title": "VpMobile24", "notification_id": "vpmobile24_changes"},
-                            blocking=False,
-                        )
-                        _LOGGER.info("VpMobile24: notification sent: %s", msg)
-            except Exception as notify_err:
-                _LOGGER.debug("VpMobile24: notification failed: %s", notify_err)
 
             if not all_lessons and not all_changes:
                 _LOGGER.info("No schedule data available (possibly school holidays)")
