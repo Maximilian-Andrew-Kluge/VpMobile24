@@ -63,6 +63,15 @@ blueprint:
           step: 5
           unit_of_measurement: Min.
 
+variables:
+  changes_sensor: !input changes_sensor
+  next_lesson_sensor: !input next_lesson_sensor
+  notify_device: !input notify_device
+  enable_change_notification: !input enable_change_notification
+  enable_morning_reminder: !input enable_morning_reminder
+  enable_countdown_reminder: !input enable_countdown_reminder
+  countdown_minutes: !input countdown_minutes
+
 trigger:
   - platform: state
     entity_id: !input changes_sensor
@@ -72,9 +81,9 @@ trigger:
     id: morning_reminder
   - platform: template
     value_template: >
-      {% set sensor = states[input.next_lesson_sensor] %}
-      {% set countdown = sensor.attributes.get('countdown_minuten', -1) %}
-      {{ countdown == input.countdown_minutes | int }}
+      {% set sensor = states[next_lesson_sensor] %}
+      {% set countdown = sensor.attributes.get('countdown_minuten', -1) | int %}
+      {{ countdown == countdown_minutes | int and countdown > 0 }}
     id: countdown_reminder
 
 condition: []
@@ -86,30 +95,30 @@ action:
           - condition: trigger
             id: changes_updated
           - condition: template
-            value_template: "{{ input.enable_change_notification }}"
+            value_template: "{{ enable_change_notification }}"
           - condition: template
             value_template: >
-              {% set s = states[input.changes_sensor] %}
-              {{ s.attributes.get('gesamt_aenderungen', 0) | int > 0 }}
+              {{ states[changes_sensor].attributes.get('gesamt_aenderungen', 0) | int > 0 }}
         sequence:
-          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
-            data:
-              title: "📅 Stundenplanänderung"
-              message: >
-                {% set s = states[input.changes_sensor] %}
-                {% set n_ausfall = s.attributes.get('anzahl_aenderungen', 0) %}
-                {% set n_vert = s.attributes.get('anzahl_vertretungen', 0) %}
-                {% set parts = [] %}
-                {% if n_ausfall > 0 %}{% set parts = parts + [n_ausfall ~ ' Ausfall' ~ ('e' if n_ausfall > 1 else '')] %}{% endif %}
-                {% if n_vert > 0 %}{% set parts = parts + [n_vert ~ ' Vertretung' ~ ('en' if n_vert > 1 else '')] %}{% endif %}
-                Heute: {{ parts | join(', ') }}
+          - device_id: !input notify_device
+            domain: mobile_app
+            type: notify
+            title: "📅 Stundenplanänderung"
+            message: >
+              {% set s = states[changes_sensor] %}
+              {% set n_ausfall = s.attributes.get('anzahl_aenderungen', 0) | int %}
+              {% set n_vert = s.attributes.get('anzahl_vertretungen', 0) | int %}
+              {% set parts = [] %}
+              {% if n_ausfall > 0 %}{% set parts = parts + [n_ausfall ~ ' Ausfall' ~ ('e' if n_ausfall > 1 else '')] %}{% endif %}
+              {% if n_vert > 0 %}{% set parts = parts + [n_vert ~ ' Vertretung' ~ ('en' if n_vert > 1 else '')] %}{% endif %}
+              Heute: {{ parts | join(', ') }}
 
       # ── Morgen-Erinnerung ───────────────────────────────────────────────
       - conditions:
           - condition: trigger
             id: morning_reminder
           - condition: template
-            value_template: "{{ input.enable_morning_reminder }}"
+            value_template: "{{ enable_morning_reminder }}"
           - condition: time
             weekday:
               - mon
@@ -118,35 +127,33 @@ action:
               - thu
               - fri
         sequence:
-          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
-            data:
-              title: "🏫 Guten Morgen – Schulbeginn"
-              message: >
-                {% set s = states[input.next_lesson_sensor] %}
-                {% if s.state not in ['Keine Daten', 'No data', 'Keine weiteren Stunden heute'] %}
-                  Nächste Stunde: {{ s.state }}
-                  {% if s.attributes.get('countdown_text') %}
-                  ({{ s.attributes.countdown_text }})
-                  {% endif %}
-                {% else %}
-                  Heute keine Stunden.
-                {% endif %}
+          - device_id: !input notify_device
+            domain: mobile_app
+            type: notify
+            title: "🏫 Guten Morgen – Schulbeginn"
+            message: >
+              {% set s = states[next_lesson_sensor] %}
+              {% if s.state not in ['Keine Daten', 'No data', 'Keine weiteren Stunden heute'] %}
+                Nächste Stunde: {{ s.state }}
+                {% if s.attributes.get('countdown_text') %}({{ s.attributes.countdown_text }}){% endif %}
+              {% else %}
+                Heute keine Stunden.
+              {% endif %}
 
       # ── Countdown-Erinnerung ────────────────────────────────────────────
       - conditions:
           - condition: trigger
             id: countdown_reminder
           - condition: template
-            value_template: "{{ input.enable_countdown_reminder }}"
+            value_template: "{{ enable_countdown_reminder }}"
         sequence:
-          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
-            data:
-              title: "⏰ Bald Schulbeginn"
-              message: >
-                {% set s = states[input.next_lesson_sensor] %}
-                In {{ input.countdown_minutes }} Minuten: {{ s.state }}
-                {% if s.attributes.get('raum') %}
-                (Raum: {{ s.attributes.raum }})
-                {% endif %}
+          - device_id: !input notify_device
+            domain: mobile_app
+            type: notify
+            title: "⏰ Bald Schulbeginn"
+            message: >
+              {% set s = states[next_lesson_sensor] %}
+              In {{ countdown_minutes }} Minuten: {{ s.state }}
+              {% if s.attributes.get('raum') %}(Raum: {{ s.attributes.raum }}){% endif %}
 
 mode: single
