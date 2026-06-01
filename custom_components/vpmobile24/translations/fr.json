@@ -7,14 +7,19 @@
         "data": {
           "school_id": "ID de l'école",
           "username": "Nom d'utilisateur",
-          "password": "Mot de passe",
-          "class_name": "Classe"
+          "password": "Mot de passe"
         },
         "data_description": {
           "school_id": "L'ID de l'école depuis l'URL VpMobile24",
           "username": "Votre nom d'utilisateur pour VpMobile24",
-          "password": "Votre mot de passe pour VpMobile24",
-          "class_name": "La classe (ex. 5a)"
+          "password": "Votre mot de passe pour VpMobile24"
+        }
+      },
+      "class": {
+        "title": "Sélectionner la classe",
+        "description": "Choisissez votre classe dans la liste.",
+        "data": {
+          "class_name": "Classe"
         }
       },
       "subjects": {

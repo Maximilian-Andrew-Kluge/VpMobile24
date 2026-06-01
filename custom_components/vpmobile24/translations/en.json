@@ -7,14 +7,19 @@
         "data": {
           "school_id": "School ID",
           "username": "Username",
-          "password": "Password",
-          "class_name": "Class"
+          "password": "Password"
         },
         "data_description": {
           "school_id": "The school ID from the VpMobile24 URL",
           "username": "Your username for VpMobile24",
-          "password": "Your password for VpMobile24",
-          "class_name": "The class (e.g. 5a)"
+          "password": "Your password for VpMobile24"
+        }
+      },
+      "class": {
+        "title": "Select class",
+        "description": "Choose your class from the list.",
+        "data": {
+          "class_name": "Class"
         }
       },
       "subjects": {

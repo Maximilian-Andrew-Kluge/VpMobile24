@@ -126,7 +126,6 @@ class VpMobile24Card extends HTMLElement {
         { name: "highlight_today", default: true, selector: { boolean: {} } },
         { name: "show_time", default: true, selector: { boolean: {} } },
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
-        { name: "compact_mode", default: false, selector: { boolean: {} } },
         { type: "expandable", name: "time_settings", title: st.time_settings, collapsed: true,
           schema: [
             { name: "lesson_count", default: 8, selector: { number: { min: 1, max: 10, step: 1, mode: "box" } } },
@@ -642,7 +641,6 @@ class VpMobile24Card extends HTMLElement {
     const showTime      = this._config.show_time !== false;
     const highlightToday = this._config.highlight_today !== false;
     const useCustomTimes = this._config.use_custom_times === true;
-    const compactMode   = this._config.compact_mode === true;
     const weekOffset    = this._weekOffset || 0;
 
     // Pick correct week table
@@ -652,7 +650,7 @@ class VpMobile24Card extends HTMLElement {
 
     // If next week data not yet available, show loading state
     if (weekOffset === 1 && !weekTable) {
-      this.shadowRoot.innerHTML = `<ha-card class="${compactMode ? 'vp-compact' : ''}"><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
         <div style="font-size:1.5em;margin-bottom:12px">⏳</div>
         <div style="font-weight:600;color:#e2e8f0;margin-bottom:6px">${t.nextWeek}</div>
         <div style="font-size:.85em">Daten werden geladen…</div>
@@ -1152,7 +1150,7 @@ ha-card {
 .vp-th-day { display: block; font-size: .78em; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #475569; }
 .vp-th-date { display: block; font-size: .82em; font-weight: 600; color: #334155; margin-top: 1px; }
 </style>
-<ha-card class="${compactMode ? 'vp-compact' : ''}">
+<ha-card>
   <div class="vp-hdr">
     <div class="vp-hdr-icon">📅</div>
     <div class="vp-hdr-body">
@@ -1197,5 +1195,130 @@ ha-card {
 customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
+
+// ── VpMobile24 Current Lesson Card ────────────────────────────────────────
+class VpMobile24CurrentCard extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._config = {};
+  }
+
+  static getStubConfig() {
+    return { entity: 'sensor.vpmobile24_aktueller_unterricht' };
+  }
+
+  static getConfigForm() {
+    return {
+      schema: [
+        { name: 'entity', required: true, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'title', default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
+      ],
+      computeLabel: (s) => ({ entity: 'Sensor', title: 'Titel' })[s.name] || s.name,
+    };
+  }
+
+  setConfig(config) {
+    if (!config || !config.entity) throw new Error('Entity erforderlich');
+    this._config = config;
+    if (this._hass) this._render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    if (this._config) this._render();
+  }
+
+  getCardSize() { return 2; }
+
+  _render() {
+    if (!this._hass || !this._config) return;
+    const entity = this._hass.states[this._config.entity];
+    const title = this._config.title || 'Aktueller Unterricht';
+
+    if (!entity) {
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:#ef4444;font-family:-apple-system,sans-serif">Entity nicht gefunden: ${this._config.entity}</div></ha-card>`;
+      return;
+    }
+
+    const state = entity.state || '';
+    const attr = entity.attributes || {};
+    const fach = attr.fach || state;
+    const zeit = attr.zeit || '';
+    const lehrer = attr.lehrer || '';
+    const raum = attr.raum || '';
+    const stunde = attr.stunde || '';
+    const isAusfall = attr.ist_ausfall || false;
+    const isSub = attr.ist_vertretung || false;
+    const info = attr.zusatzinfo || '';
+    const noLesson = state === 'Keine Daten' || state === 'No data' || !fach;
+
+    const color = isAusfall ? '#ef4444' : isSub ? '#f97316' : '#3b82f6';
+    const bgColor = isAusfall ? 'rgba(239,68,68,0.12)' : isSub ? 'rgba(249,115,22,0.12)' : 'rgba(59,130,246,0.12)';
+    const icon = isAusfall ? '❌' : isSub ? '🔄' : '📚';
+    const label = isAusfall ? 'AUSFALL' : isSub ? 'Vertretung' : (stunde ? stunde + '. Stunde' : '');
+
+    this.shadowRoot.innerHTML = `
+<style>
+:host { display: block; }
+ha-card {
+  background: #0f1729 !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #e2e8f0 !important;
+}
+.vp-cur {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: ${bgColor};
+  border-left: 4px solid ${color};
+}
+.vp-cur-icon { font-size: 1.8em; flex-shrink: 0; }
+.vp-cur-body { flex: 1; min-width: 0; }
+.vp-cur-title { font-size: .72em; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: #64748b; margin-bottom: 3px; }
+.vp-cur-fach { font-size: 1.4em; font-weight: 800; color: ${noLesson ? '#475569' : '#fff'}; line-height: 1.2; }
+.vp-cur-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+.vp-cur-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .72em; font-weight: 600; color: #94a3b8;
+  background: rgba(255,255,255,0.06); border-radius: 6px; padding: 2px 8px;
+}
+.vp-cur-badge {
+  display: inline-block; font-size: .68em; font-weight: 700;
+  padding: 2px 8px; border-radius: 5px; margin-left: 6px;
+  background: ${isAusfall ? 'rgba(239,68,68,.2)' : 'rgba(249,115,22,.2)'};
+  color: ${isAusfall ? '#fca5a5' : '#fdba74'};
+  border: 1px solid ${isAusfall ? 'rgba(239,68,68,.3)' : 'rgba(249,115,22,.3)'};
+}
+.vp-cur-info { font-size: .75em; color: #f59e0b; margin-top: 4px; }
+.vp-cur-empty { padding: 16px 18px; color: #475569; font-size: .88em; font-style: italic; }
+</style>
+<ha-card>
+  ${noLesson
+    ? `<div class="vp-cur-empty">🕐 ${title}: Kein laufender Unterricht</div>`
+    : `<div class="vp-cur">
+        <div class="vp-cur-icon">${icon}</div>
+        <div class="vp-cur-body">
+          <div class="vp-cur-title">${title}${label ? ' &nbsp;·&nbsp; ' + label : ''}</div>
+          <div class="vp-cur-fach">${isAusfall ? 'AUSFALL' : fach}${(isAusfall || isSub) ? '<span class="vp-cur-badge">' + (isAusfall ? 'Ausfall' : 'Vertretung') + '</span>' : ''}</div>
+          <div class="vp-cur-meta">
+            ${zeit ? '<span class="vp-cur-chip">🕐 ' + zeit + '</span>' : ''}
+            ${lehrer ? '<span class="vp-cur-chip">👤 ' + lehrer + '</span>' : ''}
+            ${raum ? '<span class="vp-cur-chip">🚪 ' + raum + '</span>' : ''}
+          </div>
+          ${info ? '<div class="vp-cur-info">ℹ️ ' + info + '</div>' : ''}
+        </div>
+      </div>`
+  }
+</ha-card>`;
+  }
+}
+
+customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
+window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
 console.log('✅ VpMobile24 Card v2.4.9b loaded');
 

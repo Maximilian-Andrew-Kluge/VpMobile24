@@ -39,13 +39,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._api = None
         self._config_data = {}
         self._available_subjects = []
+        self._available_classes = []
 
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Handle credentials step."""
-
+        """Step 1 — credentials + school ID (no class yet)."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -56,92 +56,103 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     password=user_input[CONF_PASSWORD],
                     base_url=DEFAULT_BASE_URL,
                 )
-
-                connection_ok = (
-                    await self._api.async_test_connection()
-                )
-
+                connection_ok = await self._api.async_test_connection()
                 if not connection_ok:
                     errors["base"] = "cannot_connect"
-
                 else:
                     self._config_data.update(user_input)
-
+                    # Try to load class list from XML
                     try:
-                        all_subjects: set[str] = set()
-                        today = date.today()
-                        dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
-
-                        async def _fetch_subjects_for_date(check_date: date) -> set[str]:
-                            found: set[str] = set()
-                            try:
-                                schedule_data = await self._api.async_get_schedule(
-                                    target_date=check_date,
-                                    class_name=user_input[CONF_CLASS_NAME],
-                                )
-                                for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
-                                    subject = (entry.get("subject") or "").strip()
-                                    if (
-                                        subject
-                                        and not subject.startswith("KPL")
-                                        and not subject.startswith("---")
-                                        and not subject.startswith("Pause")
-                                        and not subject.startswith("Mittagspause")
-                                        and not subject.lower().startswith("frei")
-                                        and 2 <= len(subject) <= 10
-                                    ):
-                                        found.add(subject)
-                            except Exception as err:
-                                _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
-                            return found
-
-                        results = await asyncio.gather(*[_fetch_subjects_for_date(d) for d in dates_to_check])
-                        for s in results:
-                            all_subjects.update(s)
-
-                        self._available_subjects = sorted(list(all_subjects))
-                        await self._api.async_close()
-                        return await self.async_step_subjects()
-
-                    except Exception as err:
-                        _LOGGER.error(
-                            "Error fetching subjects: %s",
-                            err,
-                        )
-
-                        await self._api.async_close()
-
-                        class_name = user_input[CONF_CLASS_NAME]
-                        school_id = user_input[CONF_SCHOOL_ID]
-                        entry_title = f"VpMobile24 – {class_name} ({school_id})"
-                        await self.async_set_unique_id(
-                            f"{school_id}_{class_name}"
-                        )
-                        self._abort_if_unique_id_configured()
-
-                        return self.async_create_entry(
-                            title=entry_title,
-                            data=self._config_data,
-                        )
-
+                        self._available_classes = await self._api.async_get_classes()
+                    except Exception:
+                        self._available_classes = []
+                    return await self.async_step_class()
             except Exception:
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
-
             finally:
-                if self._api:
+                if self._api and errors:
                     await self._api.async_close()
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_SCHOOL_ID): str,
-                    vol.Required(CONF_USERNAME): str,
-                    vol.Required(CONF_PASSWORD): str,
-                    vol.Required(CONF_CLASS_NAME): str,
-                }
-            ),
+            data_schema=vol.Schema({
+                vol.Required(CONF_SCHOOL_ID): str,
+                vol.Required(CONF_USERNAME): str,
+                vol.Required(CONF_PASSWORD): str,
+            }),
+            errors=errors,
+        )
+
+    async def async_step_class(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step 2 — select class (dropdown if available, text input as fallback)."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            class_name = user_input.get(CONF_CLASS_NAME, "").strip()
+            if not class_name:
+                errors[CONF_CLASS_NAME] = "cannot_connect"
+            else:
+                self._config_data[CONF_CLASS_NAME] = class_name
+                try:
+                    all_subjects: set[str] = set()
+                    today = date.today()
+                    dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
+
+                    async def _fetch_subjects_for_date(check_date: date) -> set[str]:
+                        found: set[str] = set()
+                        try:
+                            schedule_data = await self._api.async_get_schedule(
+                                target_date=check_date,
+                                class_name=class_name,
+                            )
+                            for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
+                                subject = (entry.get("subject") or "").strip()
+                                if (
+                                    subject
+                                    and not subject.startswith("KPL")
+                                    and not subject.startswith("---")
+                                    and not subject.startswith("Pause")
+                                    and not subject.startswith("Mittagspause")
+                                    and not subject.lower().startswith("frei")
+                                    and 2 <= len(subject) <= 10
+                                ):
+                                    found.add(subject)
+                        except Exception as err:
+                            _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
+                        return found
+
+                    results = await asyncio.gather(*[_fetch_subjects_for_date(d) for d in dates_to_check])
+                    for s in results:
+                        all_subjects.update(s)
+                    self._available_subjects = sorted(list(all_subjects))
+                    await self._api.async_close()
+                    return await self.async_step_subjects()
+                except Exception as err:
+                    _LOGGER.error("Error fetching subjects: %s", err)
+                    await self._api.async_close()
+                    school_id = self._config_data.get(CONF_SCHOOL_ID, "")
+                    entry_title = f"VpMobile24 \u2013 {class_name} ({school_id})"
+                    await self.async_set_unique_id(f"{school_id}_{class_name}")
+                    self._abort_if_unique_id_configured()
+                    return self.async_create_entry(title=entry_title, data=self._config_data)
+
+        # Build schema: dropdown if classes available, text input otherwise
+        if self._available_classes:
+            class_schema = vol.Schema({
+                vol.Required(CONF_CLASS_NAME): vol.In(self._available_classes),
+            })
+        else:
+            class_schema = vol.Schema({
+                vol.Required(CONF_CLASS_NAME): str,
+            })
+
+        return self.async_show_form(
+            step_id="class",
+            data_schema=class_schema,
             errors=errors,
         )
 
