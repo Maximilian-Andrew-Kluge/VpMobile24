@@ -233,6 +233,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         self._available_subjects: list[str] = []
         self._new_class_name: str = ""
         self._change_subjects: bool = False
+        self._available_classes: list[str] = []
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -273,13 +274,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_change_class(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1b — enter a new class name."""
+        """Step 1b — enter or select a new class name."""
         if user_input is not None:
             self._new_class_name = user_input.get(CONF_CLASS_NAME, "").strip()
             if self._change_subjects:
-                # Also changing subjects — load subject list
                 return await self._load_subjects_and_show()
-            # Only class change — save immediately, keep existing excluded subjects
             school_id = self._config_entry.data.get(CONF_SCHOOL_ID, "")
             new_title = (
                 f"VpMobile24 \u2013 {self._new_class_name} ({school_id})"
@@ -298,15 +297,39 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 },
             )
 
+        # Load available classes from XML if not already loaded
+        if not self._available_classes:
+            try:
+                from .api_new import Stundenplan24API
+                from .const import DEFAULT_BASE_URL
+                api = Stundenplan24API(
+                    school_id=self._config_entry.data[CONF_SCHOOL_ID],
+                    username=self._config_entry.data[CONF_USERNAME],
+                    password=self._config_entry.data[CONF_PASSWORD],
+                    base_url=DEFAULT_BASE_URL,
+                )
+                self._available_classes = await api.async_get_classes()
+                await api.async_close()
+            except Exception:
+                self._available_classes = []
+
         current_class = (
             self._config_entry.options.get(CONF_CLASS_NAME)
             or self._config_entry.data.get(CONF_CLASS_NAME, "")
         )
+
+        if self._available_classes:
+            schema = vol.Schema({
+                vol.Required(CONF_CLASS_NAME, default=current_class): vol.In(self._available_classes)
+            })
+        else:
+            schema = vol.Schema({
+                vol.Required(CONF_CLASS_NAME, default=current_class): str
+            })
+
         return self.async_show_form(
             step_id="change_class",
-            data_schema=vol.Schema(
-                {vol.Required(CONF_CLASS_NAME, default=current_class): str}
-            ),
+            data_schema=schema,
             errors={},
         )
 
