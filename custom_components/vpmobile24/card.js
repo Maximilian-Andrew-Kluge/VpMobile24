@@ -125,9 +125,9 @@ class VpMobile24Card extends HTMLElement {
         },
         { name: "highlight_today", default: true, selector: { boolean: {} } },
         { name: "show_time", default: true, selector: { boolean: {} } },
-        { name: "theme", default: "auto", selector: { select: { options: [
-          { value: "auto", label: "Auto (HA Theme)" },
+        { name: "theme", default: "navy", selector: { select: { mode: "dropdown", options: [
           { value: "navy", label: "Navy Dark" },
+          { value: "auto", label: "Auto (HA Theme)" },
           { value: "light", label: "Hell" }
         ] } } },
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
@@ -176,7 +176,7 @@ class VpMobile24Card extends HTMLElement {
 
   static getStubConfig() {
     return { entity:'sensor.vpmobile24_week_table', show_header:true, show_time:true,
-      highlight_today:true, use_custom_times:false,
+      highlight_today:true, use_custom_times:false, theme:'navy',
       header_settings:{ title:'Stundenplan', class_name:'5a' } };
   }
 
@@ -649,7 +649,7 @@ class VpMobile24Card extends HTMLElement {
     const weekOffset    = this._weekOffset || 0;
 
     // Theme: navy (default), light, or auto (use HA CSS vars)
-    const theme = this._config.theme || 'auto';
+    const theme = this._config.theme || 'navy';
     const T = {
       navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)', td:'#0f1729' },
       light: { bg:'#ffffff', bg2:'#f1f5f9', text:'#1e293b', text2:'#475569', text3:'#94a3b8', border:'rgba(0,0,0,0.1)', td:'#ffffff' },
