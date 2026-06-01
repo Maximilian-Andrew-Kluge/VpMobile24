@@ -22,7 +22,6 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Week Table",
         "additional_info": "VpMobile24 Additional Info",
         "changes": "VpMobile24 Changes",
-        "next_free_period": "VpMobile24 Next Free Period",
         "current_lesson": "VpMobile24 Current Lesson",
     },
     "de": {
@@ -31,7 +30,6 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Wochentabelle",
         "additional_info": "VpMobile24 Zusatzinfos",
         "changes": "VpMobile24 Änderungen",
-        "next_free_period": "VpMobile24 Nächste freie Stunde",
         "current_lesson": "VpMobile24 Aktueller Unterricht",
     },
     "fr": {
@@ -40,7 +38,6 @@ SENSOR_NAMES = {
         "week_table": "VpMobile24 Tableau Hebdomadaire",
         "additional_info": "VpMobile24 Informations complémentaires",
         "changes": "VpMobile24 Changements",
-        "next_free_period": "VpMobile24 Prochaine heure libre",
         "current_lesson": "VpMobile24 Cours actuel",
     },
 }
@@ -106,7 +103,6 @@ async def async_setup_entry(
         VpMobile24WeekTableSensor(coordinator, config_entry, language),
         VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
         VpMobile24ChangesSensor(coordinator, config_entry, language),
-        VpMobile24NextFreePeriodSensor(coordinator, config_entry, language),
         VpMobile24CurrentLessonSensor(coordinator, config_entry, language),
     ])
 

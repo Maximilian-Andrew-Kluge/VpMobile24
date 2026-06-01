@@ -17,7 +17,7 @@ from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON, Platform.BINARY_SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
 # The canonical URL for the card resource
 CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js"
