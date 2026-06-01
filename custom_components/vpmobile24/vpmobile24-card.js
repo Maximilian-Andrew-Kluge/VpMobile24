@@ -665,7 +665,8 @@ class VpMobile24Card extends HTMLElement {
     const weekOffset    = this._weekOffset || 0;
 
     // Theme: navy (default), light, or any HA theme name
-    const theme = this._config.theme || 'navy';
+    // Fallback to navy if empty, null, undefined, or HA's own 'default' theme
+    const theme = (this._config.theme && this._config.theme !== 'default') ? this._config.theme : 'navy';
     // Built-in themes
     const T = {
       navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)', tileNormal:'#1a2a50', tileCancelled:'#7f1d1d', tileSub:'#7f1d1d', tileToday:'#1a2a50', tileCurrent:'#14532d', useThemeColors:false },
