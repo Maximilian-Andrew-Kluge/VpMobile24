@@ -68,7 +68,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             "name": name,
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.8",
+            "sw_version": "2.4.9",
         }
 
     @property

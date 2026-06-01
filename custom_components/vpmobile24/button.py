@@ -66,7 +66,7 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
             "name": name,
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.8",
+            "sw_version": "2.4.9",
         }
 
     async def async_press(self) -> None:

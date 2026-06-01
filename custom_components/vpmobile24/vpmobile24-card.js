@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.4.9b
-console.info('%c VpMobile24-CARD %c v2.4.9b ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.4.9
+console.info('%c VpMobile24-CARD %c v2.4.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 class VpMobile24Card extends HTMLElement {
   constructor() {
@@ -994,7 +994,7 @@ ha-card {
   display: flex; align-items: center;
   justify-content: center; transition: background .15s;
 }
-.vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
+.vp-today-col .vp-tile.vp-empty { background: rgba(255,255,255,0.03); color: rgba(255,255,255,.2); border: 1px solid rgba(37,99,235,.3); }
 .vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
 /* Cancelled lesson – always red, every column */
 .vp-tile.vp-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; font-size: 1.1em; }
@@ -1448,5 +1448,5 @@ ha-card { background: #0f1729 !important; border-radius: 14px !important; overfl
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Vergleichsansicht mehrerer Klassen', preview:true });
-console.log('✅ VpMobile24 Card v2.4.9b loaded');
+console.log('✅ VpMobile24 Card v2.4.9 loaded');
 
