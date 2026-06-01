@@ -148,8 +148,7 @@ class VpMobile24Card extends HTMLElement {
           schema: [
             { name: "highlight_today", default: true, selector: { boolean: {} } },
             { name: "show_time", default: true, selector: { boolean: {} } },
-            { name: "theme", default: "navy", selector: { select: { mode: "dropdown", options: _getThemeOptions(null) } } },
-          ]
+            { name: "theme", default: "navy", selector: { select: { mode: "dropdown", options: _getThemeOptions(null) } } },          ]
         },
 
         // ── Uhrzeiten ─────────────────────────────────────────────────────
@@ -192,11 +191,11 @@ class VpMobile24Card extends HTMLElement {
         }
       ],
       computeLabel: (s, hass) => {
-        // For theme field, rebuild options with live hass themes
-        if (s.name === 'theme' && hass) {
+        // Rebuild theme options with live hass themes list
+        if (s.name === 'theme' && hass && hass.themes && hass.themes.themes) {
           s.selector = { select: { mode: 'dropdown', options: _getThemeOptions(hass) } };
         }
-        return _cfgLabels(hass)[s.name];
+        return _cfgLabels(hass)[s.name] || s.name;
       },
       computeHelper: (s, hass) => _cfgHelpers(hass)[s.name],
       computeVisible: () => true,
@@ -235,6 +234,13 @@ class VpMobile24Card extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this._config) {
+      // Auto-switch to next week on weekends (Saturday=6, Sunday=0)
+      const dow = new Date().getDay();
+      const isWeekend = dow === 0 || dow === 6;
+      if (isWeekend && (this._weekOffset === 0 || this._weekOffset === undefined)) {
+        this._weekOffset = 1;
+        this._mobDayIdx = 0;
+      }
       const anyPopupOpen = this._popupOpen || this._infoPopupOpen;
       if (anyPopupOpen) {
         // When viewing next week, always do a full re-render to avoid
