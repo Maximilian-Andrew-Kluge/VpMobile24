@@ -87,8 +87,8 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",theme:"Theme",display_settings:"Anzeige-Einstellungen",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
-        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",theme:"Theme",display_settings:"Display Settings",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
         fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
       return (L[hl]||L.de);
@@ -104,15 +104,12 @@ class VpMobile24Card extends HTMLElement {
     };
 
     const _sectionTitles = {
-      de: { header_settings: 'Header-Einstellungen', display_settings: 'Anzeige', time_settings: 'Uhrzeiten-Anpassung' },
-      en: { header_settings: 'Header Settings', display_settings: 'Display', time_settings: 'Time Settings' },
-      fr: { header_settings: 'Param\u00e8tres En-t\u00eate', display_settings: 'Affichage', time_settings: 'Personnalisation des Horaires' }
+      de: { header_settings: 'Header-Einstellungen', time_settings: 'Uhrzeiten-Anpassung' },
+      en: { header_settings: 'Header Settings', time_settings: 'Time Settings' },
+      fr: { header_settings: 'Param\u00e8tres En-t\u00eate', time_settings: 'Personnalisation des Horaires' }
     };
     const hl0 = _hl(null);
     const st = _sectionTitles[['de','en','fr'].includes(hl0) ? hl0 : 'de'];
-
-    // Theme field uses native HA theme selector — shows all installed HA themes automatically
-    const themeSchema = { name: 'theme', default: 'navy', selector: { theme: {} } };
 
     return {
       schema: [
@@ -131,12 +128,8 @@ class VpMobile24Card extends HTMLElement {
         },
 
         // ── Anzeige ───────────────────────────────────────────────────────
-        { type: "expandable", name: "display_settings", title: st.display_settings, collapsed: false,
-          schema: [
-            { name: "highlight_today", default: true, selector: { boolean: {} } },
-            { name: "show_time", default: true, selector: { boolean: {} } },
-            themeSchema,          ]
-        },
+        { name: "highlight_today", default: true, selector: { boolean: {} } },
+        { name: "show_time", default: true, selector: { boolean: {} } },
 
         // ── Uhrzeiten ─────────────────────────────────────────────────────
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
@@ -664,65 +657,6 @@ class VpMobile24Card extends HTMLElement {
     const useCustomTimes = this._config.use_custom_times === true;
     const weekOffset    = this._weekOffset || 0;
 
-    // Theme: navy (default), light, or any HA theme name
-    // The HA theme selector returns "" when nothing is selected — always fall back to navy
-    const theme = (this._config.theme && this._config.theme.trim() !== '' && this._config.theme !== 'default') ? this._config.theme : 'navy';
-    // Built-in themes
-    const T = {
-      navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)', tileNormal:'#1a2a50', tileCancelled:'#7f1d1d', tileSub:'#7f1d1d', tileToday:'#1a2a50', tileCurrent:'#14532d', useThemeColors:false },
-      light: { bg:'#ffffff', bg2:'#f1f5f9', text:'#1e293b', text2:'#475569', text3:'#94a3b8', border:'rgba(0,0,0,0.1)', tileNormal:'#e2e8f0', tileCancelled:'#fecaca', tileSub:'#fed7aa', tileToday:'#dbeafe', tileCurrent:'#bbf7d0', useThemeColors:false },
-    };
-    let tv;
-    if (T[theme]) {
-      tv = T[theme];
-      // Clear any previously applied HA theme CSS vars from the host
-      const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
-      if (hostStyle) hostStyle.cssText = '';
-    } else {
-      // HA theme — inject theme CSS vars into shadow host so they work inside shadow DOM
-      tv = {
-        bg:     'var(--ha-card-background, var(--card-background-color, #1c1c1c))',
-        bg2:    'var(--secondary-background-color, #2a2a2a)',
-        text:   'var(--primary-text-color, #e2e8f0)',
-        text2:  'var(--secondary-text-color, #94a3b8)',
-        text3:  'var(--disabled-text-color, #475569)',
-        border: 'var(--divider-color, rgba(255,255,255,0.1))',
-        tileNormal:    'var(--secondary-background-color, #2a2a2a)',
-        tileCancelled: 'var(--error-color, #ef4444)',
-        tileSub:       'var(--warning-color, #f97316)',
-        tileToday:     'var(--primary-color, #3b82f6)',
-        tileCurrent:   'var(--success-color, #22c55e)',
-        useThemeColors: true,
-      };
-      // Copy ALL theme CSS vars from the HA theme definition into the shadow host
-      // This makes them available inside the shadow DOM
-      const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
-      if (hostStyle) {
-        // First: apply vars from the theme definition object
-        if (this._hass && this._hass.themes && this._hass.themes.themes && this._hass.themes.themes[theme]) {
-          const themeVars = this._hass.themes.themes[theme];
-          Object.entries(themeVars).forEach(([k, v]) => {
-            hostStyle.setProperty('--' + k, v);
-          });
-        }
-        // Second: also copy computed CSS vars from the document root (catches inherited vars)
-        try {
-          const docStyle = getComputedStyle(document.documentElement);
-          const keyVars = [
-            'ha-card-background','card-background-color','primary-color',
-            'primary-text-color','secondary-text-color','disabled-text-color',
-            'secondary-background-color','divider-color','error-color',
-            'warning-color','success-color','ha-card-border-radius',
-            'primary-background-color','accent-color'
-          ];
-          keyVars.forEach(k => {
-            const val = docStyle.getPropertyValue('--' + k).trim();
-            if (val) hostStyle.setProperty('--' + k, val);
-          });
-        } catch(e) {}
-      }
-    }
-
     // Pick correct week table
     const weekTable = weekOffset === 1
       ? (entity.attributes && entity.attributes.next_week_table) || null
@@ -929,34 +863,22 @@ class VpMobile24Card extends HTMLElement {
 <style>
 :host {
   display: block;
-  --vp-bg: ${tv.bg};
-  --vp-bg2: ${tv.bg2};
-  --vp-text: ${tv.text};
-  --vp-text2: ${tv.text2};
-  --vp-text3: ${tv.text3};
-  --vp-border: ${tv.border};
-  --vp-tile: ${tv.tileNormal};
-  --vp-tile-cancelled: ${tv.tileCancelled};
-  --vp-tile-sub: ${tv.tileSub};
-  --vp-tile-today: ${tv.tileToday};
-  --vp-tile-current: ${tv.tileCurrent};
-  --vp-tile-opacity: ${tv.useThemeColors ? '0.15' : '1'};
 }
 ha-card {
-  background: var(--vp-bg) !important;
+  background: #0f1729 !important;
   border-radius: var(--ha-card-border-radius, 14px) !important;
   overflow: hidden;
   box-shadow: 0 6px 32px rgba(0,0,0,0.55) !important;
-  border: 1px solid var(--vp-border) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
   font-family: var(--paper-font-body1_-_font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  color: var(--vp-text) !important;
+  color: #e2e8f0 !important;
 }
 /* HEADER */
 .vp-hdr {
   display: ${showHeader ? 'flex' : 'none'};
   align-items: center; gap: 10px;
   padding: 12px 14px 10px;
-  background: var(--vp-bg);
+  background: #0f1729;
   flex-wrap: nowrap; min-width: 0;
 }
 .vp-hdr-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -972,11 +894,11 @@ ha-card {
 .vp-hdr-top { display: flex; align-items: center; gap: 6px; }
 .vp-hdr-title {
   font-size: 1.15em; font-weight: 700;
-  color: var(--vp-text);
+  color: #fff;
   line-height: 1.2; white-space: nowrap;
   overflow: hidden; text-overflow: ellipsis;
 }
-.vp-hdr-sub { font-size: 0.8em; color: var(--vp-text2); white-space: nowrap; }
+.vp-hdr-sub { font-size: 0.8em; color: #94a3b8; white-space: nowrap; }
 .vp-hdr-sep { color: #334155; font-size: 0.9em; flex-shrink: 0; }
 .vp-hdr-spacer { flex: 1; min-width: 8px; }
 @media (max-width: 600px) {
@@ -1025,38 +947,35 @@ ha-card {
 .vp-table { width: 100%; border-collapse: separate; border-spacing: 0; padding: 0 12px 12px; }
 .vp-table th {
   padding: 8px 4px; text-align: center;
-  color: var(--vp-text3);
+  color: #475569;
   font-size: 0.78em; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .5px; border-bottom: 1px solid var(--vp-border);
-  background: var(--vp-bg); line-height: 1.2;
+  letter-spacing: .5px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: #0f1729; line-height: 1.2;
 }
 .vp-th-day { display: block; }
-.vp-th-date { display: block; font-size: 0.85em; color: var(--vp-text3); font-weight: 500; text-transform: none; letter-spacing: 0; }
+.vp-th-date { display: block; font-size: 0.85em; color: #475569; font-weight: 500; text-transform: none; letter-spacing: 0; }
 .vp-th-num { width: 56px; min-width: 56px; }
-.vp-table td { padding: 3px 3px; text-align: center; vertical-align: middle; background: var(--vp-bg); height: 52px; }
+.vp-table td { padding: 3px 3px; text-align: center; vertical-align: middle; background: #0f1729; height: 52px; }
 .vp-td-num { width: 56px; min-width: 56px; padding: 4px 6px; }
-.vp-snum  { font-size: .88em; font-weight: 600; color: var(--vp-text2); line-height: 1.3; }
-.vp-stime { font-size: .68em; color: var(--vp-text3); margin-top: 1px; white-space: nowrap; }
+.vp-snum  { font-size: .88em; font-weight: 600; color: #94a3b8; line-height: 1.3; }
+.vp-stime { font-size: .68em; color: #475569; margin-top: 1px; white-space: nowrap; }
 /* TILES */
 .vp-tile {
-  background: var(--vp-tile); border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: var(--vp-text);
+  background: #1a2a50; border-radius: 8px; padding: 0 5px;
+  font-size: .88em; font-weight: 500; color: #e2e8f0;
   height: 46px; min-height: 46px;
   display: flex; align-items: center;
   justify-content: center; transition: background .15s;
 }
-.vp-tile.vp-empty { background: rgba(128,128,128,0.08); color: var(--vp-text3); }
+.vp-tile.vp-empty { background: rgba(255,255,255,0.03); color: #475569; }
 .vp-today-col .vp-tile {
-  background: var(--vp-tile); border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: var(--vp-text);
+  background: #1a2a50; border-radius: 8px; padding: 0 5px;
+  font-size: .88em; font-weight: 500; color: #e2e8f0;
   height: 46px; min-height: 46px;
   display: flex; align-items: center;
   justify-content: center; transition: background .15s;
 }
-.vp-today-col .vp-tile.vp-empty { background: color-mix(in srgb, var(--vp-tile-today) 20%, transparent); color: var(--vp-text3); }
-.vp-tile.vp-sub { background: color-mix(in srgb, var(--vp-tile-sub) calc(var(--vp-tile-opacity) * 100%), transparent) !important; color: var(--vp-text) !important; font-weight: 600; }
-.vp-tile.vp-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) calc(var(--vp-tile-opacity) * 100%), transparent) !important; color: var(--vp-text) !important; font-weight: 700; font-size: 1.1em; }
-.vp-today-col .vp-tile.vp-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) calc(var(--vp-tile-opacity) * 120%), transparent) !important; }
+.vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
 .vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
 /* Cancelled lesson – always red, every column */
 .vp-tile.vp-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; font-size: 1.1em; }
@@ -1078,7 +997,7 @@ ha-card {
   letter-spacing: 0.3px;
 }
 /* LEGEND */
-.vp-legend { display: flex; gap: 18px; padding: 8px 20px 16px; font-size: .82em; background: var(--vp-bg); }
+.vp-legend { display: flex; gap: 18px; padding: 8px 20px 16px; font-size: .82em; background: #0f1729; }
 .vp-legend-item { display: flex; align-items: center; gap: 6px; }
 .vp-ldot { width: 8px; height: 8px; border-radius: 50%; }
 .vp-ldot-t { background: #3b82f6; }
@@ -1094,7 +1013,7 @@ ha-card {
 /* Day tabs */
 .vp-mob-tabs {
   display: flex; gap: 4px; padding: 10px 12px 6px;
-  background: var(--vp-bg);
+  background: #0f1729;
 }
 .vp-mob-tab {
   flex: 1; border: none; border-radius: 8px;
@@ -1115,9 +1034,9 @@ ha-card {
   padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.05);
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
-.vp-mob-sub   { background: color-mix(in srgb, var(--vp-tile-sub) 25%, transparent); border-left: 3px solid var(--vp-tile-sub); }
-.vp-mob-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) 25%, transparent); border-left: 3px solid var(--vp-tile-cancelled); }
-.vp-mob-current { background: color-mix(in srgb, var(--vp-tile-current) 35%, transparent); border-left: 3px solid var(--vp-tile-current); }
+.vp-mob-sub   { background: rgba(127,29,29,.25); border-left: 3px solid #7f1d1d; }
+.vp-mob-cancelled { background: rgba(127,29,29,.25); border-left: 3px solid #ef4444; }
+.vp-mob-current { background: rgba(20,83,45,.35); border-left: 3px solid #22c55e; }
 .vp-mob-empty { opacity: .45; }
 .vp-mob-left  { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
 .vp-mob-left-current .vp-mob-num  { color: #86efac !important; }
@@ -1125,13 +1044,13 @@ ha-card {
 .vp-mob-num   { font-size: .9em; font-weight: 700; color: #94a3b8; line-height: 1.2; }
 .vp-mob-time  { font-size: .62em; color: #475569; margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj  {
-  flex: 1; font-size: .95em; font-weight: 500; color: var(--vp-text);
-  background: var(--vp-bg2); border-radius: 8px;
+  flex: 1; font-size: .95em; font-weight: 500; color: #e2e8f0;
+  background: #1a2a50; border-radius: 8px;
   padding: 8px 12px; text-align: center;
 }
-.vp-mob-subj-sub   { background: var(--vp-tile-sub) !important; color: var(--vp-text) !important; font-weight: 600; }
-.vp-mob-subj-cancelled { background: var(--vp-tile-cancelled) !important; color: var(--vp-text) !important; font-weight: 700; }
-.vp-mob-subj-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; font-weight: 700; box-shadow: 0 0 0 2px var(--vp-tile-current); }
+.vp-mob-subj-sub   { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
+.vp-mob-subj-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; }
+.vp-mob-subj-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
 .vp-mob-subj-empty { background: rgba(255,255,255,.03) !important; color: #475569 !important; }
 /* Pause row */
 .vp-mob-pause-row {
@@ -1154,7 +1073,7 @@ ha-card {
   flex-direction: column !important;
   min-height: 220px;
 }
-.vp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--vp-bg); border-radius: 14px; box-shadow: 0 12px 48px rgba(0,0,0,.7); padding: 0; max-width: 380px; width: 92%; z-index: 1000; border: 1px solid var(--vp-border); color: var(--vp-text); overflow: hidden; }
+.vp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #162040; border-radius: 14px; box-shadow: 0 12px 48px rgba(0,0,0,.7); padding: 0; max-width: 380px; width: 92%; z-index: 1000; border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; overflow: hidden; }
 .vp-popup-title { font-size: 1em; font-weight: 700; color: #fff; padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .vp-detail-num { font-size: .78em; font-weight: 600; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 5px; }
 .vp-detail-fach { font-size: 1.1em; font-weight: 800; color: #fff; }
@@ -1230,8 +1149,8 @@ ha-card {
   text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
 }
 /* Current lesson highlight (green glow) */
-.vp-tile.vp-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; font-weight: 700; box-shadow: 0 0 0 2px var(--vp-tile-current); }
-.vp-today-col .vp-tile.vp-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; box-shadow: 0 0 0 2px var(--vp-tile-current); }
+.vp-tile.vp-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
+.vp-today-col .vp-tile.vp-current { background: #166534 !important; color: #bbf7d0 !important; box-shadow: 0 0 0 2px #4ade80; }
 /* Today pill with date below */
 .vp-today-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; background: #2563eb; color: #fff; border-radius: 8px; padding: 4px 12px; font-weight: 700; font-size: .82em; text-transform: uppercase; letter-spacing: .5px; }
 .vp-today-date { font-size: .82em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
