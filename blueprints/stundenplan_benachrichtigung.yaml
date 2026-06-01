@@ -134,10 +134,20 @@ action:
               {% set s = states[changes_sensor] %}
               {% set n_ausfall = s.attributes.get('anzahl_aenderungen', 0) | int %}
               {% set n_vert = s.attributes.get('anzahl_vertretungen', 0) | int %}
+              {% set aenderungen = s.attributes.get('alle_aenderungen', []) %}
               {% set parts = [] %}
               {% if n_ausfall > 0 %}{% set parts = parts + [n_ausfall ~ ' Ausfall' ~ ('e' if n_ausfall > 1 else '')] %}{% endif %}
               {% if n_vert > 0 %}{% set parts = parts + [n_vert ~ ' Vertretung' ~ ('en' if n_vert > 1 else '')] %}{% endif %}
               Heute: {{ parts | join(', ') }}
+              {% if aenderungen %}
+
+              {% for a in aenderungen[:5] %}
+              • {{ a.get('stunde', '?') }}. Std. {{ a.get('fach', '') }}{% if a.get('typ') == 'Vertretung' %} (Vertretung{% if a.get('lehrer') %}: {{ a.get('lehrer') }}{% endif %}){% elif a.get('typ') == 'Änderung' %} (Ausfall){% endif %}{% if a.get('zeit') %} – {{ a.get('zeit') }}{% endif %}
+              {% endfor %}
+              {% if aenderungen | length > 5 %}
+              … und {{ (aenderungen | length) - 5 }} weitere
+              {% endif %}
+              {% endif %}
 
       # ── Morgen-Erinnerung ───────────────────────────────────────────────
       - conditions:
