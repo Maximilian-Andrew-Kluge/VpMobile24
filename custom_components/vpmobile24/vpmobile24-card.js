@@ -111,21 +111,8 @@ class VpMobile24Card extends HTMLElement {
     const hl0 = _hl(null);
     const st = _sectionTitles[['de','en','fr'].includes(hl0) ? hl0 : 'de'];
 
-    // Build theme options: Navy Dark + Hell + all installed HA themes
-    const _getThemeOptions = (hass) => {
-      const opts = [
-        { value: 'navy', label: 'Navy Dark (Standard)' },
-        { value: 'light', label: 'Hell' },
-      ];
-      try {
-        if (hass && hass.themes && hass.themes.themes) {
-          Object.keys(hass.themes.themes).sort().forEach(name => {
-            opts.push({ value: name, label: name });
-          });
-        }
-      } catch(e) {}
-      return opts;
-    };
+    // Theme field uses native HA theme selector — shows all installed HA themes automatically
+    const themeSchema = { name: 'theme', default: 'navy', selector: { theme: {} } };
 
     return {
       schema: [
@@ -148,7 +135,7 @@ class VpMobile24Card extends HTMLElement {
           schema: [
             { name: "highlight_today", default: true, selector: { boolean: {} } },
             { name: "show_time", default: true, selector: { boolean: {} } },
-            { name: "theme", default: "navy", selector: { select: { mode: "dropdown", options: _getThemeOptions(null) } } },          ]
+            themeSchema,          ]
         },
 
         // ── Uhrzeiten ─────────────────────────────────────────────────────
@@ -190,13 +177,7 @@ class VpMobile24Card extends HTMLElement {
           ]
         }
       ],
-      computeLabel: (s, hass) => {
-        // Rebuild theme options with live hass themes list
-        if (s.name === 'theme' && hass && hass.themes && hass.themes.themes) {
-          s.selector = { select: { mode: 'dropdown', options: _getThemeOptions(hass) } };
-        }
-        return _cfgLabels(hass)[s.name] || s.name;
-      },
+      computeLabel: (s, hass) => _cfgLabels(hass)[s.name] || s.name,
       computeHelper: (s, hass) => _cfgHelpers(hass)[s.name],
       computeVisible: () => true,
     };
