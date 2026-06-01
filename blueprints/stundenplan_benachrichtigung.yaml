@@ -8,6 +8,13 @@ blueprint:
   homeassistant:
     min_version: "2023.1.0"
   input:
+    week_table_sensor:
+      name: Wochentabellen-Sensor
+      description: "Der VpMobile24 Wochentabellen-Sensor (sensor.vpmobile24_week_table) – wird für den Klassennamen verwendet"
+      selector:
+        entity:
+          integration: vpmobile24
+          domain: sensor
     changes_sensor:
       name: Änderungen-Sensor
       description: "Der VpMobile24 Änderungen-Sensor (sensor.vpmobile24_aenderungen)"
@@ -64,13 +71,16 @@ blueprint:
           unit_of_measurement: Min.
 
 variables:
+  week_table_sensor: !input week_table_sensor
   changes_sensor: !input changes_sensor
   next_lesson_sensor: !input next_lesson_sensor
-  notify_device: !input notify_device
   enable_change_notification: !input enable_change_notification
   enable_morning_reminder: !input enable_morning_reminder
   enable_countdown_reminder: !input enable_countdown_reminder
   countdown_minutes: !input countdown_minutes
+  # Klassenname aus dem Wochentabellen-Sensor
+  klasse: >
+    {{ states[week_table_sensor].attributes.get('class', '') }}
 
 trigger:
   - platform: state
@@ -103,7 +113,8 @@ action:
           - device_id: !input notify_device
             domain: mobile_app
             type: notify
-            title: "📅 Stundenplanänderung"
+            title: >
+              📅 Stundenplanänderung{% if klasse %} – Klasse {{ klasse }}{% endif %}
             message: >
               {% set s = states[changes_sensor] %}
               {% set n_ausfall = s.attributes.get('anzahl_aenderungen', 0) | int %}
@@ -130,12 +141,13 @@ action:
           - device_id: !input notify_device
             domain: mobile_app
             type: notify
-            title: "🏫 Guten Morgen – Schulbeginn"
+            title: >
+              🏫 Guten Morgen{% if klasse %} – Klasse {{ klasse }}{% endif %}
             message: >
               {% set s = states[next_lesson_sensor] %}
               {% if s.state not in ['Keine Daten', 'No data', 'Keine weiteren Stunden heute'] %}
                 Nächste Stunde: {{ s.state }}
-                {% if s.attributes.get('countdown_text') %}({{ s.attributes.countdown_text }}){% endif %}
+                {% if s.attributes.get('countdown_text') %} ({{ s.attributes.countdown_text }}){% endif %}
               {% else %}
                 Heute keine Stunden.
               {% endif %}
@@ -150,10 +162,11 @@ action:
           - device_id: !input notify_device
             domain: mobile_app
             type: notify
-            title: "⏰ Bald Schulbeginn"
+            title: >
+              ⏰ Bald Schulbeginn{% if klasse %} – Klasse {{ klasse }}{% endif %}
             message: >
               {% set s = states[next_lesson_sensor] %}
               In {{ countdown_minutes }} Minuten: {{ s.state }}
-              {% if s.attributes.get('raum') %}(Raum: {{ s.attributes.raum }}){% endif %}
+              {% if s.attributes.get('raum') %} (Raum: {{ s.attributes.raum }}){% endif %}
 
 mode: single
