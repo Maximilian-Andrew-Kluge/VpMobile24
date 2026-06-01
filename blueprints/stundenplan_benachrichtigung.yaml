@@ -139,15 +139,19 @@ action:
               {% if n_ausfall > 0 %}{% set parts = parts + [n_ausfall ~ ' Ausfall' ~ ('e' if n_ausfall > 1 else '')] %}{% endif %}
               {% if n_vert > 0 %}{% set parts = parts + [n_vert ~ ' Vertretung' ~ ('en' if n_vert > 1 else '')] %}{% endif %}
               Heute: {{ parts | join(', ') }}
-              {% if aenderungen %}
-
-              {% for a in aenderungen[:5] %}
-              • {{ a.get('stunde', '?') }}. Std. {{ a.get('fach', '') }}{% if a.get('typ') == 'Vertretung' %} (Vertretung{% if a.get('lehrer') %}: {{ a.get('lehrer') }}{% endif %}){% elif a.get('typ') == 'Änderung' %} (Ausfall){% endif %}{% if a.get('zeit') %} – {{ a.get('zeit') }}{% endif %}
-              {% endfor %}
-              {% if aenderungen | length > 5 %}
+              {%- if aenderungen %}
+              {%- for a in aenderungen[:5] %}
+              {%- set std = a.get('stunde', '?') %}
+              {%- set fach = a.get('fach', '?') %}
+              {%- set typ = a.get('typ', '') %}
+              {%- set zeit = a.get('zeit', '') %}
+              {%- set lehrer = a.get('lehrer', '') %}
+              • {{ std }}. Std. {{ fach }}{% if typ == 'Vertretung' %} → Vertretung{% if lehrer %} ({{ lehrer }}){% endif %}{% else %} → Ausfall{% endif %}{% if zeit %} ({{ zeit }}){% endif %}
+              {%- endfor %}
+              {%- if aenderungen | length > 5 %}
               … und {{ (aenderungen | length) - 5 }} weitere
-              {% endif %}
-              {% endif %}
+              {%- endif %}
+              {%- endif %}
 
       # ── Morgen-Erinnerung ───────────────────────────────────────────────
       - conditions:
