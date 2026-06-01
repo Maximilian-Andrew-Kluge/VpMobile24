@@ -437,8 +437,6 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "week_lessons_count": len(week_lessons),
             "week_changes_count": len(week_changes),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
-            "ist_ferienwoche": len(all_lessons) == 0,
-            "ist_naechste_woche_ferienwoche": len(next_week_lessons) == 0,
         }
 
     def _create_week_table(self, all_lessons: list) -> dict:

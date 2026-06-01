@@ -691,17 +691,6 @@ class VpMobile24Card extends HTMLElement {
       return;
     }
 
-    // Ferien-Erkennung: wenn alle Kacheln leer sind
-    const isFerienWoche = entity.attributes && entity.attributes[weekOffset === 1 ? 'ist_naechste_woche_ferienwoche' : 'ist_ferienwoche'];
-    if (isFerienWoche) {
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:40px 20px;text-align:center;font-family:-apple-system,sans-serif">
-        <div style="font-size:2.5em;margin-bottom:12px">🏖️</div>
-        <div style="font-size:1.2em;font-weight:700;color:#e2e8f0;margin-bottom:6px">Ferien</div>
-        <div style="font-size:.85em;color:#94a3b8">${weekOffset === 1 ? 'Nächste Woche sind Ferien' : 'Diese Woche sind Ferien'}</div>
-      </div></ha-card>`;
-      return;
-    }
-
     const now = new Date();
     const days = t.days;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
