@@ -87,7 +87,7 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
         en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
         fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
@@ -104,67 +104,86 @@ class VpMobile24Card extends HTMLElement {
     };
 
     const _sectionTitles = {
-      de: { header_settings: 'Header-Einstellungen', time_settings: 'Uhrzeiten-Anpassung' },
-      en: { header_settings: 'Header Settings', time_settings: 'Time Settings' },
-      fr: { header_settings: 'Param\u00e8tres En-t\u00eate', time_settings: 'Personnalisation des Horaires' }
+      de: {
+        sensors:         '📡 Sensoren',
+        header_settings: '🎨 Header & Anzeige',
+        time_settings:   '⏰ Uhrzeiten-Anpassung',
+      },
+      en: {
+        sensors:         '📡 Sensors',
+        header_settings: '🎨 Header & Display',
+        time_settings:   '⏰ Time Settings',
+      },
+      fr: {
+        sensors:         '📡 Capteurs',
+        header_settings: '🎨 En-t\u00eate & Affichage',
+        time_settings:   '⏰ Personnalisation des Horaires',
+      },
     };
     const hl0 = _hl(null);
     const st = _sectionTitles[['de','en','fr'].includes(hl0) ? hl0 : 'de'];
 
     return {
       schema: [
-        // ── Sensoren ──────────────────────────────────────────────────────
-        { name: "entity", required: true, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
-        { name: "additional_info_entity", required: false, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
-        { name: "reload_entity", required: false, selector: { entity: { domain: "button" } } },
+        // ── Pflicht-Sensor ────────────────────────────────────────────────
+        { name: "entity", required: true,
+          selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
 
-        // ── Header ────────────────────────────────────────────────────────
-        { name: "show_header", default: true, selector: { boolean: {} } },
-        { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
+        // ── Optionale Sensoren (eingeklappt) ──────────────────────────────
+        { type: "expandable", name: "sensors", title: st.sensors, collapsed: true,
           schema: [
-            { name: "title", default: "Stundenplan", selector: { text: { type: "text" } } },
-            { name: "class_name", default: "", selector: { text: { type: "text" } } }
+            { name: "additional_info_entity", required: false,
+              selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
+            { name: "reload_entity", required: false,
+              selector: { entity: { domain: "button" } } },
           ]
         },
 
-        // ── Anzeige ───────────────────────────────────────────────────────
-        { name: "highlight_today", default: true, selector: { boolean: {} } },
-        { name: "show_time", default: true, selector: { boolean: {} } },
+        // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
+        { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
+          schema: [
+            { name: "show_header",     default: true,  selector: { boolean: {} } },
+            { name: "title",           default: "Stundenplan", selector: { text: { type: "text" } } },
+            { name: "class_name",      default: "",    selector: { text: { type: "text" } } },
+            { name: "highlight_today", default: true,  selector: { boolean: {} } },
+            { name: "show_time",       default: true,  selector: { boolean: {} } },
+          ]
+        },
 
-        // ── Uhrzeiten ─────────────────────────────────────────────────────
+        // ── Uhrzeiten (eingeklappt) ───────────────────────────────────────
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
         { type: "expandable", name: "time_settings", title: st.time_settings, collapsed: true,
           schema: [
             { name: "lesson_count", default: 8, selector: { number: { min: 1, max: 10, step: 1, mode: "box" } } },
-            { name: "pause_count", default: 2, selector: { number: { min: 0, max: 5, step: 1, mode: "box" } } },
-            { name: "time_1", default: "07:45-08:30", selector: { text: { type: "text" } } },
-            { name: "time_2", default: "08:40-09:25", selector: { text: { type: "text" } } },
-            { name: "time_3", default: "09:25-10:10", selector: { text: { type: "text" } } },
-            { name: "time_4", default: "10:35-11:20", selector: { text: { type: "text" } } },
-            { name: "time_5", default: "11:30-12:15", selector: { text: { type: "text" } } },
-            { name: "time_6", default: "12:45-13:30", selector: { text: { type: "text" } } },
-            { name: "time_7", default: "13:40-14:25", selector: { text: { type: "text" } } },
-            { name: "time_8", default: "14:35-15:20", selector: { text: { type: "text" } } },
-            { name: "time_9", default: "15:00-15:45", selector: { text: { type: "text" } } },
+            { name: "pause_count",  default: 2, selector: { number: { min: 0, max: 5,  step: 1, mode: "box" } } },
+            { name: "time_1",  default: "07:45-08:30", selector: { text: { type: "text" } } },
+            { name: "time_2",  default: "08:40-09:25", selector: { text: { type: "text" } } },
+            { name: "time_3",  default: "09:25-10:10", selector: { text: { type: "text" } } },
+            { name: "time_4",  default: "10:35-11:20", selector: { text: { type: "text" } } },
+            { name: "time_5",  default: "11:30-12:15", selector: { text: { type: "text" } } },
+            { name: "time_6",  default: "12:45-13:30", selector: { text: { type: "text" } } },
+            { name: "time_7",  default: "13:40-14:25", selector: { text: { type: "text" } } },
+            { name: "time_8",  default: "14:35-15:20", selector: { text: { type: "text" } } },
+            { name: "time_9",  default: "15:00-15:45", selector: { text: { type: "text" } } },
             { name: "time_10", default: "15:50-16:35", selector: { text: { type: "text" } } },
             { type: "grid", name: "pause_1_config", schema: [
-              { name: "pause_1", default: "10:10-10:30", selector: { text: { type: "text" } } },
+              { name: "pause_1",       default: "10:10-10:30", selector: { text: { type: "text" } } },
               { name: "pause_1_after", default: 3, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_2_config", schema: [
-              { name: "pause_2", default: "12:15-12:45", selector: { text: { type: "text" } } },
+              { name: "pause_2",       default: "12:15-12:45", selector: { text: { type: "text" } } },
               { name: "pause_2_after", default: 5, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_3_config", schema: [
-              { name: "pause_3", default: "13:15-13:20", selector: { text: { type: "text" } } },
+              { name: "pause_3",       default: "13:15-13:20", selector: { text: { type: "text" } } },
               { name: "pause_3_after", default: 6, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_4_config", schema: [
-              { name: "pause_4", default: "14:55-15:00", selector: { text: { type: "text" } } },
+              { name: "pause_4",       default: "14:55-15:00", selector: { text: { type: "text" } } },
               { name: "pause_4_after", default: 8, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_5_config", schema: [
-              { name: "pause_5", default: "16:35-16:40", selector: { text: { type: "text" } } },
+              { name: "pause_5",       default: "16:35-16:40", selector: { text: { type: "text" } } },
               { name: "pause_5_after", default: 10, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]}
           ]
