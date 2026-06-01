@@ -665,8 +665,8 @@ class VpMobile24Card extends HTMLElement {
     const weekOffset    = this._weekOffset || 0;
 
     // Theme: navy (default), light, or any HA theme name
-    // Fallback to navy if empty, null, undefined, or HA's own 'default' theme
-    const theme = (this._config.theme && this._config.theme !== 'default') ? this._config.theme : 'navy';
+    // The HA theme selector returns "" when nothing is selected — always fall back to navy
+    const theme = (this._config.theme && this._config.theme.trim() !== '' && this._config.theme !== 'default') ? this._config.theme : 'navy';
     // Built-in themes
     const T = {
       navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)', tileNormal:'#1a2a50', tileCancelled:'#7f1d1d', tileSub:'#7f1d1d', tileToday:'#1a2a50', tileCurrent:'#14532d', useThemeColors:false },
@@ -675,8 +675,11 @@ class VpMobile24Card extends HTMLElement {
     let tv;
     if (T[theme]) {
       tv = T[theme];
+      // Clear any previously applied HA theme CSS vars from the host
+      const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
+      if (hostStyle) hostStyle.cssText = '';
     } else {
-      // HA theme — use CSS vars for everything, tiles adapt to theme
+      // HA theme — inject theme CSS vars into shadow host so they work inside shadow DOM
       tv = {
         bg:     'var(--ha-card-background, var(--card-background-color, #1c1c1c))',
         bg2:    'var(--secondary-background-color, #2a2a2a)',
@@ -691,15 +694,32 @@ class VpMobile24Card extends HTMLElement {
         tileCurrent:   'var(--success-color, #22c55e)',
         useThemeColors: true,
       };
-      // Apply HA theme CSS vars to shadow host
-      if (this._hass && this._hass.themes && this._hass.themes.themes && this._hass.themes.themes[theme]) {
-        const themeVars = this._hass.themes.themes[theme];
-        const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
-        if (hostStyle) {
+      // Copy ALL theme CSS vars from the HA theme definition into the shadow host
+      // This makes them available inside the shadow DOM
+      const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
+      if (hostStyle) {
+        // First: apply vars from the theme definition object
+        if (this._hass && this._hass.themes && this._hass.themes.themes && this._hass.themes.themes[theme]) {
+          const themeVars = this._hass.themes.themes[theme];
           Object.entries(themeVars).forEach(([k, v]) => {
             hostStyle.setProperty('--' + k, v);
           });
         }
+        // Second: also copy computed CSS vars from the document root (catches inherited vars)
+        try {
+          const docStyle = getComputedStyle(document.documentElement);
+          const keyVars = [
+            'ha-card-background','card-background-color','primary-color',
+            'primary-text-color','secondary-text-color','disabled-text-color',
+            'secondary-background-color','divider-color','error-color',
+            'warning-color','success-color','ha-card-border-radius',
+            'primary-background-color','accent-color'
+          ];
+          keyVars.forEach(k => {
+            const val = docStyle.getPropertyValue('--' + k).trim();
+            if (val) hostStyle.setProperty('--' + k, val);
+          });
+        } catch(e) {}
       }
     }
 
