@@ -677,35 +677,39 @@ class VpMobile24Card extends HTMLElement {
     const useCustomTimes = this._config.use_custom_times === true;
     const weekOffset    = this._weekOffset || 0;
 
-    // Theme: navy (default), or any HA theme name
+    // Theme: navy (default), light, or any HA theme name
     const theme = this._config.theme || 'navy';
     // Built-in themes
     const T = {
-      navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)' },
-      light: { bg:'#ffffff', bg2:'#f1f5f9', text:'#1e293b', text2:'#475569', text3:'#94a3b8', border:'rgba(0,0,0,0.1)' },
+      navy:  { bg:'#0f1729', bg2:'#1a2a50', text:'#e2e8f0', text2:'#94a3b8', text3:'#475569', border:'rgba(255,255,255,0.08)', tileNormal:'#1a2a50', tileCancelled:'#7f1d1d', tileSub:'#7f1d1d', tileToday:'#1a2a50', tileCurrent:'#14532d', useThemeColors:false },
+      light: { bg:'#ffffff', bg2:'#f1f5f9', text:'#1e293b', text2:'#475569', text3:'#94a3b8', border:'rgba(0,0,0,0.1)', tileNormal:'#e2e8f0', tileCancelled:'#fecaca', tileSub:'#fed7aa', tileToday:'#dbeafe', tileCurrent:'#bbf7d0', useThemeColors:false },
     };
     let tv;
     if (T[theme]) {
       tv = T[theme];
     } else {
-      // HA theme selected — read CSS variables from the HA theme
-      // Apply the theme to the host element so CSS vars are available,
-      // then use them as fallbacks
+      // HA theme — use CSS vars for everything, tiles adapt to theme
       tv = {
-        bg:     'var(--ha-card-background, var(--card-background-color, #0f1729))',
-        bg2:    'var(--secondary-background-color, #1a2a50)',
+        bg:     'var(--ha-card-background, var(--card-background-color, #1c1c1c))',
+        bg2:    'var(--secondary-background-color, #2a2a2a)',
         text:   'var(--primary-text-color, #e2e8f0)',
         text2:  'var(--secondary-text-color, #94a3b8)',
         text3:  'var(--disabled-text-color, #475569)',
-        border: 'var(--divider-color, rgba(255,255,255,0.08))',
+        border: 'var(--divider-color, rgba(255,255,255,0.1))',
+        tileNormal:    'var(--secondary-background-color, #2a2a2a)',
+        tileCancelled: 'var(--error-color, #ef4444)',
+        tileSub:       'var(--warning-color, #f97316)',
+        tileToday:     'var(--primary-color, #3b82f6)',
+        tileCurrent:   'var(--success-color, #22c55e)',
+        useThemeColors: true,
       };
-      // Apply the HA theme to the shadow root host
+      // Apply HA theme CSS vars to shadow host
       if (this._hass && this._hass.themes && this._hass.themes.themes && this._hass.themes.themes[theme]) {
         const themeVars = this._hass.themes.themes[theme];
-        const style = this.shadowRoot.host ? this.shadowRoot.host.style : null;
-        if (style) {
+        const hostStyle = this.shadowRoot.host ? this.shadowRoot.host.style : null;
+        if (hostStyle) {
           Object.entries(themeVars).forEach(([k, v]) => {
-            style.setProperty('--' + k, v);
+            hostStyle.setProperty('--' + k, v);
           });
         }
       }
@@ -923,6 +927,12 @@ class VpMobile24Card extends HTMLElement {
   --vp-text2: ${tv.text2};
   --vp-text3: ${tv.text3};
   --vp-border: ${tv.border};
+  --vp-tile: ${tv.tileNormal};
+  --vp-tile-cancelled: ${tv.tileCancelled};
+  --vp-tile-sub: ${tv.tileSub};
+  --vp-tile-today: ${tv.tileToday};
+  --vp-tile-current: ${tv.tileCurrent};
+  --vp-tile-opacity: ${tv.useThemeColors ? '0.15' : '1'};
 }
 ha-card {
   background: var(--vp-bg) !important;
@@ -1021,26 +1031,28 @@ ha-card {
 .vp-stime { font-size: .68em; color: var(--vp-text3); margin-top: 1px; white-space: nowrap; }
 /* TILES */
 .vp-tile {
-  background: var(--vp-bg2); border-radius: 8px; padding: 0 5px;
+  background: var(--vp-tile); border-radius: 8px; padding: 0 5px;
   font-size: .88em; font-weight: 500; color: var(--vp-text);
   height: 46px; min-height: 46px;
   display: flex; align-items: center;
   justify-content: center; transition: background .15s;
 }
-.vp-tile.vp-empty { background: rgba(255,255,255,0.03); color: var(--vp-text3); }
+.vp-tile.vp-empty { background: rgba(128,128,128,0.08); color: var(--vp-text3); }
 .vp-today-col .vp-tile {
-  background: var(--vp-bg2); border-radius: 8px; padding: 0 5px;
+  background: var(--vp-tile); border-radius: 8px; padding: 0 5px;
   font-size: .88em; font-weight: 500; color: var(--vp-text);
   height: 46px; min-height: 46px;
   display: flex; align-items: center;
   justify-content: center; transition: background .15s;
 }
-.vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
+.vp-today-col .vp-tile.vp-empty { background: color-mix(in srgb, var(--vp-tile-today) 20%, transparent); color: var(--vp-text3); }
+.vp-tile.vp-sub { background: color-mix(in srgb, var(--vp-tile-sub) calc(var(--vp-tile-opacity) * 100%), transparent) !important; color: var(--vp-text) !important; font-weight: 600; }
+.vp-tile.vp-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) calc(var(--vp-tile-opacity) * 100%), transparent) !important; color: var(--vp-text) !important; font-weight: 700; font-size: 1.1em; }
+.vp-today-col .vp-tile.vp-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) calc(var(--vp-tile-opacity) * 120%), transparent) !important; }
 .vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
 /* Cancelled lesson – always red, every column */
 .vp-tile.vp-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; font-size: 1.1em; }
-.vp-today-col .vp-tile.vp-cancelled { background: #991b1b !important; color: #fca5a5 !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.5); }
-.vp-today-pill {
+.vp-today-col .vp-tile.vp-cancelled { background: #991b1b !important; color: #fca5a5 !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.5); }.vp-today-pill {
   background: #2563eb; color: #fff; border-radius: 8px;
   padding: 4px 10px; font-weight: 700; font-size: .82em;
   text-transform: uppercase; letter-spacing: .5px; display: inline-flex;
@@ -1095,9 +1107,9 @@ ha-card {
   padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.05);
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
-.vp-mob-sub   { background: rgba(127,29,29,.25); border-left: 3px solid #7f1d1d; }
-.vp-mob-cancelled { background: rgba(127,29,29,.25); border-left: 3px solid #ef4444; }
-.vp-mob-current { background: rgba(20,83,45,.35); border-left: 3px solid #22c55e; }
+.vp-mob-sub   { background: color-mix(in srgb, var(--vp-tile-sub) 25%, transparent); border-left: 3px solid var(--vp-tile-sub); }
+.vp-mob-cancelled { background: color-mix(in srgb, var(--vp-tile-cancelled) 25%, transparent); border-left: 3px solid var(--vp-tile-cancelled); }
+.vp-mob-current { background: color-mix(in srgb, var(--vp-tile-current) 35%, transparent); border-left: 3px solid var(--vp-tile-current); }
 .vp-mob-empty { opacity: .45; }
 .vp-mob-left  { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
 .vp-mob-left-current .vp-mob-num  { color: #86efac !important; }
@@ -1109,9 +1121,9 @@ ha-card {
   background: var(--vp-bg2); border-radius: 8px;
   padding: 8px 12px; text-align: center;
 }
-.vp-mob-subj-sub   { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
-.vp-mob-subj-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; }
-.vp-mob-subj-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
+.vp-mob-subj-sub   { background: var(--vp-tile-sub) !important; color: var(--vp-text) !important; font-weight: 600; }
+.vp-mob-subj-cancelled { background: var(--vp-tile-cancelled) !important; color: var(--vp-text) !important; font-weight: 700; }
+.vp-mob-subj-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; font-weight: 700; box-shadow: 0 0 0 2px var(--vp-tile-current); }
 .vp-mob-subj-empty { background: rgba(255,255,255,.03) !important; color: #475569 !important; }
 /* Pause row */
 .vp-mob-pause-row {
@@ -1210,8 +1222,8 @@ ha-card {
   text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
 }
 /* Current lesson highlight (green glow) */
-.vp-tile.vp-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
-.vp-today-col .vp-tile.vp-current { background: #166534 !important; color: #bbf7d0 !important; box-shadow: 0 0 0 2px #4ade80; }
+.vp-tile.vp-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; font-weight: 700; box-shadow: 0 0 0 2px var(--vp-tile-current); }
+.vp-today-col .vp-tile.vp-current { background: var(--vp-tile-current) !important; color: var(--vp-text) !important; box-shadow: 0 0 0 2px var(--vp-tile-current); }
 /* Today pill with date below */
 .vp-today-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; background: #2563eb; color: #fff; border-radius: 8px; padding: 4px 12px; font-weight: 700; font-size: .82em; text-transform: uppercase; letter-spacing: .5px; }
 .vp-today-date { font-size: .82em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
