@@ -691,6 +691,17 @@ class VpMobile24Card extends HTMLElement {
       return;
     }
 
+    // Ferien-Erkennung: wenn alle Kacheln leer sind
+    const isFerienWoche = entity.attributes && entity.attributes[weekOffset === 1 ? 'ist_naechste_woche_ferienwoche' : 'ist_ferienwoche'];
+    if (isFerienWoche) {
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:40px 20px;text-align:center;font-family:-apple-system,sans-serif">
+        <div style="font-size:2.5em;margin-bottom:12px">🏖️</div>
+        <div style="font-size:1.2em;font-weight:700;color:#e2e8f0;margin-bottom:6px">Ferien</div>
+        <div style="font-size:.85em;color:#94a3b8">${weekOffset === 1 ? 'Nächste Woche sind Ferien' : 'Diese Woche sind Ferien'}</div>
+      </div></ha-card>`;
+      return;
+    }
+
     const now = new Date();
     const days = t.days;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
@@ -1347,5 +1358,106 @@ ha-card {
 
 customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
 window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
+
+// ── VpMobile24 Multi-Class Card ───────────────────────────────────────────
+class VpMobile24MultiCard extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._config = {};
+  }
+
+  static getStubConfig() {
+    return { entities: ['sensor.vpmobile24_week_table'], title: 'Stundenplan Übersicht' };
+  }
+
+  static getConfigForm() {
+    return {
+      schema: [
+        { name: 'title', default: 'Stundenplan Übersicht', selector: { text: { type: 'text' } } },
+        { name: 'entities', required: true, selector: { entity: { multiple: true, filter: [{ integration: 'vpmobile24' }] } } },
+      ],
+      computeLabel: (s) => ({ title: 'Titel', entities: 'Wochentabellen-Sensoren (mehrere Klassen)' })[s.name] || s.name,
+    };
+  }
+
+  setConfig(config) {
+    if (!config || !config.entities || !config.entities.length) throw new Error('Mindestens eine Entity erforderlich');
+    this._config = config;
+    if (this._hass) this._render();
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    if (this._config) this._render();
+  }
+
+  getCardSize() { return 4; }
+
+  _render() {
+    if (!this._hass || !this._config) return;
+    const entities = Array.isArray(this._config.entities) ? this._config.entities : [this._config.entities];
+    const title = this._config.title || 'Stundenplan Übersicht';
+    const now = new Date();
+    const todayDow = now.getDay();
+    const todayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
+    const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
+    const days = ['Mo','Di','Mi','Do','Fr'];
+
+    let rows = '';
+    for (const entityId of entities) {
+      const entity = this._hass.states[entityId];
+      if (!entity) continue;
+      const weekTable = entity.attributes && entity.attributes.week_table;
+      const className = (entity.attributes && entity.attributes.class) || entityId;
+      const isFerienWoche = entity.attributes && entity.attributes.ist_ferienwoche;
+
+      if (isFerienWoche) {
+        rows += `<tr><td class="mc-class">${className}</td><td colspan="5" style="text-align:center;color:#94a3b8;font-style:italic;padding:10px">🏖️ Ferien</td></tr>`;
+        continue;
+      }
+      if (!weekTable) continue;
+
+      rows += `<tr><td class="mc-class">${className}</td>`;
+      dayKeys.forEach((day, di) => {
+        const isToday = di === todayIdx;
+        const slot = weekTable[day] && weekTable[day]['1']; // show period 1 as preview
+        const fach = slot ? slot.fach : '';
+        const isCancelled = !fach || fach === '—' || fach === '---';
+        const isSub = slot && slot.ist_vertretung && !isCancelled;
+        let bg = isToday ? 'rgba(37,99,235,.25)' : 'rgba(255,255,255,.04)';
+        let color = '#e2e8f0';
+        if (isCancelled && slot) { bg = 'rgba(127,29,29,.4)'; color = '#fca5a5'; }
+        else if (isSub) { bg = 'rgba(127,29,29,.3)'; color = '#fca5a5'; }
+        rows += `<td style="background:${bg};color:${color};border-radius:6px;padding:6px 4px;text-align:center;font-size:.8em;font-weight:600">${isCancelled && slot ? '—' : (fach || '')}</td>`;
+      });
+      rows += '</tr>';
+    }
+
+    this.shadowRoot.innerHTML = `
+<style>
+:host { display: block; }
+ha-card { background: #0f1729 !important; border-radius: 14px !important; overflow: hidden; border: 1px solid rgba(255,255,255,0.08) !important; font-family: -apple-system,sans-serif; color: #e2e8f0 !important; }
+.mc-hdr { padding: 12px 16px 8px; font-size: .9em; font-weight: 700; color: #fff; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 8px; }
+.mc-table { width: 100%; border-collapse: separate; border-spacing: 3px; padding: 8px 12px 12px; }
+.mc-table th { font-size: .72em; font-weight: 600; text-transform: uppercase; color: #475569; padding: 4px; text-align: center; }
+.mc-class { font-size: .82em; font-weight: 700; color: #94a3b8; padding: 4px 8px 4px 4px; white-space: nowrap; }
+.mc-today-hdr { color: #3b82f6; font-weight: 800; }
+</style>
+<ha-card>
+  <div class="mc-hdr">📅 ${title}</div>
+  <table class="mc-table">
+    <thead><tr>
+      <th></th>
+      ${days.map((d, i) => `<th class="${i === todayIdx ? 'mc-today-hdr' : ''}">${d}</th>`).join('')}
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+</ha-card>`;
+  }
+}
+
+customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
+window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Vergleichsansicht mehrerer Klassen', preview:true });
 console.log('✅ VpMobile24 Card v2.4.9b loaded');
 

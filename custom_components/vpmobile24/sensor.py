@@ -158,7 +158,19 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
         lesson = self._get_next_lesson()
         if not lesson:
             return {"status": STATE_MESSAGES[self._language]["no_lessons_today"]}
-        return {
+        # Calculate countdown
+        countdown_min = None
+        time_start = lesson.get("time_start", "")
+        if time_start and ":" in time_start:
+            try:
+                now = datetime.now()
+                h, m = map(int, time_start.split(":"))
+                lesson_dt = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                diff = int((lesson_dt - now).total_seconds() / 60)
+                countdown_min = max(0, diff)
+            except (ValueError, TypeError):
+                pass
+        attrs = {
             "fach": lesson.get("subject", ""),
             "zeit": lesson.get("time", ""),
             "datum": lesson.get("date", ""),
@@ -169,6 +181,15 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "zusatzinfo": lesson.get("info", ""),
             "ist_vertretung": lesson.get("is_change", False),
         }
+        if countdown_min is not None:
+            attrs["countdown_minuten"] = countdown_min
+            if countdown_min < 60:
+                attrs["countdown_text"] = f"in {countdown_min} Min."
+            else:
+                h = countdown_min // 60
+                m = countdown_min % 60
+                attrs["countdown_text"] = f"in {h}h {m}min" if m else f"in {h}h"
+        return attrs
 
     def _get_next_lesson(self) -> dict[str, Any] | None:
         if not self.coordinator.data:
@@ -416,6 +437,8 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             "week_lessons_count": len(week_lessons),
             "week_changes_count": len(week_changes),
             "letzte_aktualisierung": self.coordinator.data.get("timestamp", ""),
+            "ist_ferienwoche": len(all_lessons) == 0,
+            "ist_naechste_woche_ferienwoche": len(next_week_lessons) == 0,
         }
 
     def _create_week_table(self, all_lessons: list) -> dict:
