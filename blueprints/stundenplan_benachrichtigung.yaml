@@ -22,12 +22,12 @@ blueprint:
         entity:
           integration: vpmobile24
           domain: sensor
-    notify_service:
-      name: Benachrichtigungs-Service
-      description: "Welcher Service soll für Benachrichtigungen verwendet werden?"
-      default: notify.notify
+    notify_device:
+      name: Benachrichtigungs-Gerät
+      description: "Gerät das die Benachrichtigungen empfangen soll (muss die HA Companion App haben)"
       selector:
-        text:
+        device:
+          integration: mobile_app
     morning_time:
       name: Morgen-Erinnerung Uhrzeit
       description: "Wann soll die tägliche Schulbeginn-Erinnerung gesendet werden?"
@@ -92,7 +92,7 @@ action:
               {% set s = states[input.changes_sensor] %}
               {{ s.attributes.get('gesamt_aenderungen', 0) | int > 0 }}
         sequence:
-          - service: !input notify_service
+          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
             data:
               title: "📅 Stundenplanänderung"
               message: >
@@ -118,7 +118,7 @@ action:
               - thu
               - fri
         sequence:
-          - service: !input notify_service
+          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
             data:
               title: "🏫 Guten Morgen – Schulbeginn"
               message: >
@@ -139,7 +139,7 @@ action:
           - condition: template
             value_template: "{{ input.enable_countdown_reminder }}"
         sequence:
-          - service: !input notify_service
+          - service: notify.mobile_app_{{ device_attr(input.notify_device, 'name') | lower | replace(' ', '_') }}
             data:
               title: "⏰ Bald Schulbeginn"
               message: >

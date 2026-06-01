@@ -140,9 +140,9 @@ class VpMobile24Card extends HTMLElement {
         },
 
         // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
+        { name: "show_header", default: true, selector: { boolean: {} } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
-            { name: "show_header",     default: true,  selector: { boolean: {} } },
             { name: "title",           default: "Stundenplan", selector: { text: { type: "text" } } },
             { name: "class_name",      default: "",    selector: { text: { type: "text" } } },
             { name: "highlight_today", default: true,  selector: { boolean: {} } },
