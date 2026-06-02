@@ -207,6 +207,24 @@ highlight_today: true
 show_time: true
 ```
 
+> [!TIP]
+> **Widget „Aktueller Unterricht"** — zeigt die gerade laufende Stunde kompakt an. Hinzufügen per YAML:
+> ```yaml
+> type: custom:vpmobile24-current-card
+> entity: sensor.vpmobile24_aktueller_unterricht
+> title: Aktueller Unterricht
+> ```
+
+> [!TIP]
+> **Mehrere Klassen Card** — vergleicht mehrere Klassen auf einen Blick:
+> ```yaml
+> type: custom:vpmobile24-multi-card
+> title: Stundenplan Übersicht
+> entities:
+>   - sensor.vpmobile24_week_table_10a
+>   - sensor.vpmobile24_week_table_10b
+> ```
+
 > [!NOTE]
 > Die Sprache der Card wird automatisch aus der HA-Systemsprache erkannt (DE / EN / FR). Keine manuelle Einstellung nötig.
 
