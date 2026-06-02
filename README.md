@@ -64,13 +64,16 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 
 | | |
 |---|---|
-| 📅 | Wochenübersicht Mo–Fr |
+| 📅 | Wochenübersicht Mo–Fr + nächste Woche |
 | 🔄 | Automatischer Datenabruf alle 15 Min. |
 | 👥 | Mehrere Klassen mit gleichen Zugangsdaten |
 | 🌍 | Vollständig mehrsprachig (DE / EN / FR) |
 | 📊 | Strukturierte Tages- und Wochensensoren |
 | ⚡ | Automatische Updates via HACS |
 | 🔧 | Klasse & Fächer nachträglich änderbar |
+| 📋 | Klassenauswahl automatisch aus XML |
+| ⏱️ | Countdown bis zur nächsten Stunde |
+| 🏫 | Sensor „Aktueller Unterricht" |
 
 </td>
 <td valign="top" width="50%">
@@ -86,6 +89,9 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 | 🖱️ | Klick-Popup mit Lehrer, Raum & Uhrzeit |
 | ⓘ | Zusatzinfos pro Tag per Button |
 | ⏰ | Eigene Uhrzeiten konfigurierbar |
+| 📆 | Nächste Woche anzeigen (Button) |
+| 🏫 | Widget „Aktueller Unterricht" |
+| 👥 | Mehrere Klassen in einer Card |
 
 </td>
 </tr>
@@ -215,7 +221,8 @@ Nach der Einrichtung werden folgende Entitäten automatisch erstellt:
 | Entität | Beschreibung |
 |---------|--------------|
 | `sensor.vpmobile24_week_table` | Vollständige Wochenübersicht — wird von der Card verwendet |
-| `sensor.vpmobile24_naechste_stunde` | Nächste Unterrichtsstunde heute |
+| `sensor.vpmobile24_naechste_stunde` | Nächste Unterrichtsstunde heute + Countdown |
+| `sensor.vpmobile24_aktueller_unterricht` | Gerade laufende Stunde mit Fach, Lehrer & Raum |
 | `sensor.vpmobile24_wochenstundenplan` | Heutiger Stundenplan mit allen Stunden |
 | `sensor.vpmobile24_zusatzinfos` | Zusatzinformationen und Hinweise pro Tag |
 | `sensor.vpmobile24_aenderungen` | Aktuelle Vertretungen und Änderungen |
@@ -315,13 +322,16 @@ Timetables should be available in Home Assistant without friction — as structu
 
 | | |
 |---|---|
-| 📅 | Weekly overview Mon–Fri |
+| 📅 | Weekly overview Mon–Fri + next week |
 | 🔄 | Automatic data refresh every 15 min. |
 | 👥 | Multiple classes with same credentials |
 | 🌍 | Fully multilingual (DE / EN / FR) |
 | 📊 | Structured daily and weekly sensors |
 | ⚡ | Automatic updates via HACS |
 | 🔧 | Change class & subjects after setup |
+| 📋 | Class selection auto-loaded from XML |
+| ⏱️ | Countdown to next lesson |
+| 🏫 | "Current Lesson" sensor |
 
 </td>
 <td valign="top" width="50%">
@@ -337,6 +347,9 @@ Timetables should be available in Home Assistant without friction — as structu
 | 🖱️ | Click popup with teacher, room & time |
 | ⓘ | Daily additional info via button |
 | ⏰ | Custom period times configurable |
+| 📆 | Next week view (button) |
+| 🏫 | "Current Lesson" widget card |
+| 👥 | Multi-class comparison card |
 
 </td>
 </tr>
@@ -466,7 +479,8 @@ After setup, the following entities are created automatically:
 | Entity | Description |
 |--------|-------------|
 | `sensor.vpmobile24_week_table` | Full weekly timetable — used by the card |
-| `sensor.vpmobile24_naechste_stunde` | Next lesson today |
+| `sensor.vpmobile24_naechste_stunde` | Next lesson today + countdown |
+| `sensor.vpmobile24_aktueller_unterricht` | Currently running lesson with subject, teacher & room |
 | `sensor.vpmobile24_wochenstundenplan` | Today's full schedule |
 | `sensor.vpmobile24_zusatzinfos` | Additional info and notices per day |
 | `sensor.vpmobile24_aenderungen` | Current substitutions and changes |

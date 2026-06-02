@@ -100,7 +100,7 @@
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
           <div class="hero-version-row">
-            <span class="version-tag ver-stable gh-version-stable">v2.4.8</span>
+            <span class="version-tag ver-stable gh-version-stable">v2.4.9</span>
             <span class="version-beta-block" style="display:none !important;">
               <span class="version-tag ver-beta gh-version-beta">Beta</span>
             </span>
@@ -395,6 +395,18 @@
                 <span class="feat-dot" style="background:#fcd34d"></span>
                 <div><strong>ⓘ Zusatzinfos</strong> – pulsierender Button, zeigt Tagesinfos per Klick</div>
               </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#60a5fa"></span>
+                <div><strong>Nächste Woche</strong> – Button zum Anzeigen der nächsten Woche, am WE automatisch</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#4ade80"></span>
+                <div><strong>Aktueller Unterricht Widget</strong> – zeigt die laufende Stunde als kompakte Card</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#a78bfa"></span>
+                <div><strong>Mehrere Klassen</strong> – Vergleichsansicht für mehrere Klassen in einer Card</div>
+              </div>
             </div>
           </div>
 
@@ -460,6 +472,14 @@
               <div class="feat-item">
                 <span class="feat-dot" style="background:#a78bfa"></span>
                 <div><strong>Klasse &amp; Fächer ändern</strong> – nachträglich per ⚙️ Konfigurieren, unabhängig voneinander</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#34d399"></span>
+                <div><strong>Klassenauswahl aus XML</strong> – beim Setup automatisch alle Klassen der Schule laden</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#f59e0b"></span>
+                <div><strong>Countdown bis nächste Stunde</strong> – Sensor zeigt „in 23 Min." für Automationen</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#94a3b8"></span>
@@ -839,7 +859,7 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Mehrere Klassen mit gleichen Zugangsdaten einrichten</summary>
             <div class="faq-body">
-              <p>Ab v2.4.7 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
+              <p>Ab v2.4.9 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
               <ol>
                 <li>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</strong></li>
                 <li>Wähle erneut <strong>VpMobile24</strong> und gib dieselben Zugangsdaten ein</li>
@@ -856,7 +876,7 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Ausfallstunden werden grau statt rot angezeigt</summary>
             <div class="faq-body">
-              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.7</strong> aktualisiert ist.</p>
+              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.9</strong> aktualisiert ist.</p>
             </div>
           </details>
 
@@ -895,7 +915,7 @@ use_custom_times: false</code></pre>
         </div>
         <div class="version-badge">
           <span class="ver-pill ver-pill-stable">
-            🟢 Stable: <strong class="gh-version-stable">v2.4.8</strong>
+            🟢 Stable: <strong class="gh-version-stable">v2.4.9</strong>
           </span>
           <span class="version-beta-block ver-pill ver-pill-beta" style="display:none !important;">
             🟡 Beta: <strong class="gh-version-beta">–</strong>
