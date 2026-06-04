@@ -1348,7 +1348,7 @@ ha-card {
 customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
 window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
 
-// ── VpMobile24 Multi-Class Card ───────────────────────────────────────────
+// ── VpMobile24 Multi-Class Card (v2) ─────────────────────────────────────
 class VpMobile24MultiCard extends HTMLElement {
   constructor() {
     super();
@@ -1357,7 +1357,7 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entities: ['sensor.vpmobile24_week_table'], title: 'Stundenplan Übersicht' };
+    return { entities: ['sensor.vpmobile24_week_table'], title: 'Stundenplan Übersicht', show_all_periods: false };
   }
 
   static getConfigForm() {
@@ -1365,8 +1365,13 @@ class VpMobile24MultiCard extends HTMLElement {
       schema: [
         { name: 'title', default: 'Stundenplan Übersicht', selector: { text: { type: 'text' } } },
         { name: 'entities', required: true, selector: { entity: { multiple: true, filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'show_all_periods', default: false, selector: { boolean: {} } },
       ],
-      computeLabel: (s) => ({ title: 'Titel', entities: 'Wochentabellen-Sensoren (mehrere Klassen)' })[s.name] || s.name,
+      computeLabel: (s) => ({
+        title: 'Titel',
+        entities: 'Wochentabellen-Sensoren (mehrere Klassen)',
+        show_all_periods: 'Alle Stunden anzeigen',
+      })[s.name] || s.name,
     };
   }
 
@@ -1376,17 +1381,18 @@ class VpMobile24MultiCard extends HTMLElement {
     if (this._hass) this._render();
   }
 
-  set hass(hass) {
-    this._hass = hass;
-    if (this._config) this._render();
-  }
+  set hass(hass) { this._hass = hass; if (this._config) this._render(); }
+  getCardSize() { return 3; }
 
-  getCardSize() { return 4; }
+  _cancel(fach) {
+    return !fach || fach === '—' || fach === '---' || fach === '-' || (typeof fach === 'string' && fach.trim() === '');
+  }
 
   _render() {
     if (!this._hass || !this._config) return;
     const entities = Array.isArray(this._config.entities) ? this._config.entities : [this._config.entities];
     const title = this._config.title || 'Stundenplan Übersicht';
+    const showAll = this._config.show_all_periods === true;
     const now = new Date();
     const todayDow = now.getDay();
     const todayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
@@ -1396,49 +1402,78 @@ class VpMobile24MultiCard extends HTMLElement {
     let rows = '';
     for (const entityId of entities) {
       const entity = this._hass.states[entityId];
-      if (!entity) continue;
+      if (!entity) { rows += `<tr><td class="mc-class" colspan="6" style="color:#ef4444;font-size:.75em">⚠ ${entityId}</td></tr>`; continue; }
       const weekTable = entity.attributes && entity.attributes.week_table;
-      const className = (entity.attributes && entity.attributes.class) || entityId;
-      const isFerienWoche = entity.attributes && entity.attributes.ist_ferienwoche;
-
-      if (isFerienWoche) {
-        rows += `<tr><td class="mc-class">${className}</td><td colspan="5" style="text-align:center;color:#94a3b8;font-style:italic;padding:10px">🏖️ Ferien</td></tr>`;
-        continue;
-      }
+      const className = (entity.attributes && entity.attributes.class) || entityId.replace(/.*vpmobile24_week_table_?/,'') || entityId;
       if (!weekTable) continue;
 
-      rows += `<tr><td class="mc-class">${className}</td>`;
-      dayKeys.forEach((day, di) => {
-        const isToday = di === todayIdx;
-        const slot = weekTable[day] && weekTable[day]['1']; // show period 1 as preview
-        const fach = slot ? slot.fach : '';
-        const isCancelled = !fach || fach === '—' || fach === '---';
-        const isSub = slot && slot.ist_vertretung && !isCancelled;
-        let bg = isToday ? 'rgba(37,99,235,.25)' : 'rgba(255,255,255,.04)';
-        let color = '#e2e8f0';
-        if (isCancelled && slot) { bg = 'rgba(127,29,29,.4)'; color = '#fca5a5'; }
-        else if (isSub) { bg = 'rgba(127,29,29,.3)'; color = '#fca5a5'; }
-        rows += `<td style="background:${bg};color:${color};border-radius:6px;padding:6px 4px;text-align:center;font-size:.8em;font-weight:600">${isCancelled && slot ? '—' : (fach || '')}</td>`;
-      });
-      rows += '</tr>';
+      if (showAll) {
+        const periods = ['1','2','3','4','5','6','7','8','9','10'];
+        let first = true;
+        for (const p of periods) {
+          const hasSomething = dayKeys.some(dk => weekTable[dk] && weekTable[dk][p] && weekTable[dk][p].fach);
+          if (!hasSomething) continue;
+          rows += '<tr>';
+          rows += `<td class="mc-class${first ? '' : ' mc-cont'}">${first ? className : ''}</td>`;
+          rows += `<td class="mc-period">${p}</td>`;
+          dayKeys.forEach((day, di) => {
+            const isToday = di === todayIdx;
+            const slot = weekTable[day] && weekTable[day][p];
+            const fach = slot ? slot.fach : '';
+            const cancelled = this._cancel(fach);
+            const isSub = slot && slot.ist_vertretung && !cancelled;
+            let cls = 'mc-cell' + (isToday ? ' mc-today' : '') + (cancelled && slot ? ' mc-cancel' : isSub ? ' mc-sub' : '');
+            rows += `<td class="${cls}">${cancelled && slot ? '—' : (fach || '')}</td>`;
+          });
+          rows += '</tr>';
+          first = false;
+        }
+        rows += `<tr><td colspan="7" class="mc-div"></td></tr>`;
+      } else {
+        // Summary: show today's lesson count + next lesson preview
+        rows += '<tr>';
+        rows += `<td class="mc-class">${className}</td>`;
+        dayKeys.forEach((day, di) => {
+          const isToday = di === todayIdx;
+          const allSlots = weekTable[day] ? Object.values(weekTable[day]).filter(Boolean) : [];
+          const lessons = allSlots.filter(s => s.fach && !this._cancel(s.fach));
+          const cancelled = allSlots.filter(s => this._cancel(s.fach));
+          let text = lessons.length > 0 ? lessons.length + ' Std.' : '–';
+          let cls = 'mc-cell mc-summary' + (isToday ? ' mc-today' : '');
+          if (lessons.length === 0 && cancelled.length > 0) { cls += ' mc-cancel'; text = '—'; }
+          else if (cancelled.length > 0) cls += ' mc-warn';
+          const tip = lessons.slice(0,3).map(s=>s.fach).join(', ');
+          rows += `<td class="${cls}" title="${tip}">${text}</td>`;
+        });
+        rows += '</tr>';
+      }
     }
 
     this.shadowRoot.innerHTML = `
 <style>
-:host { display: block; }
-ha-card { background: #0f1729 !important; border-radius: 14px !important; overflow: hidden; border: 1px solid rgba(255,255,255,0.08) !important; font-family: -apple-system,sans-serif; color: #e2e8f0 !important; }
-.mc-hdr { padding: 12px 16px 8px; font-size: .9em; font-weight: 700; color: #fff; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 8px; }
-.mc-table { width: 100%; border-collapse: separate; border-spacing: 3px; padding: 8px 12px 12px; }
-.mc-table th { font-size: .72em; font-weight: 600; text-transform: uppercase; color: #475569; padding: 4px; text-align: center; }
-.mc-class { font-size: .82em; font-weight: 700; color: #94a3b8; padding: 4px 8px 4px 4px; white-space: nowrap; }
-.mc-today-hdr { color: #3b82f6; font-weight: 800; }
+:host{display:block}
+ha-card{background:#0f1729!important;border-radius:14px!important;overflow:hidden;border:1px solid rgba(255,255,255,.08)!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e2e8f0!important}
+.mc-hdr{padding:12px 16px 10px;font-size:.9em;font-weight:700;color:#fff;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+.mc-table{width:100%;border-collapse:separate;border-spacing:3px;padding:8px 10px 12px}
+.mc-table thead th{font-size:.7em;font-weight:700;text-transform:uppercase;color:#475569;padding:4px 2px;text-align:center;letter-spacing:.5px}
+.mc-today-hdr{color:#60a5fa!important}
+.mc-class{font-size:.82em;font-weight:700;color:#e2e8f0;padding:6px 8px 6px 2px;white-space:nowrap;min-width:36px}
+.mc-cont{color:transparent}
+.mc-period{font-size:.68em;font-weight:600;color:#475569;padding:3px 2px;text-align:center;min-width:16px}
+.mc-cell{background:rgba(255,255,255,.04);border-radius:6px;padding:6px 3px;text-align:center;font-size:.78em;font-weight:600;color:#e2e8f0;min-width:28px}
+.mc-summary{font-size:.82em;min-width:40px}
+.mc-today{background:rgba(37,99,235,.2)!important;color:#93c5fd!important}
+.mc-cancel{background:rgba(127,29,29,.4)!important;color:#fca5a5!important}
+.mc-sub{background:rgba(127,29,29,.25)!important;color:#fdba74!important}
+.mc-warn{box-shadow:inset 0 0 0 1px rgba(239,68,68,.3)}
+.mc-div{height:3px;padding:0}
 </style>
 <ha-card>
   <div class="mc-hdr">📅 ${title}</div>
   <table class="mc-table">
     <thead><tr>
-      <th></th>
-      ${days.map((d, i) => `<th class="${i === todayIdx ? 'mc-today-hdr' : ''}">${d}</th>`).join('')}
+      <th></th>${showAll ? '<th style="color:#475569;font-size:.6em">#</th>' : ''}
+      ${days.map((d,i)=>`<th class="${i===todayIdx?'mc-today-hdr':''}">${d}</th>`).join('')}
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>
@@ -1449,4 +1484,3 @@ ha-card { background: #0f1729 !important; border-radius: 14px !important; overfl
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Vergleichsansicht mehrerer Klassen', preview:true });
 console.log('✅ VpMobile24 Card v2.4.9 loaded');
-

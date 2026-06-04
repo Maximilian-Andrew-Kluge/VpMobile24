@@ -1,4 +1,4 @@
-﻿<div align="center">
+﻿﻿<div align="center">
 
 <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
@@ -20,7 +20,28 @@
 
 </div>
 
+<br/>
+
 ---
+
+<br/>
+
+> [!IMPORTANT]
+> 🎉 **VpMobile24 v2.4.9 ist da!**
+>
+> ### Neue Features in v2.4.9
+>
+> - 📅 **Nächste Woche** — Button zum Vorschauen der nächsten Woche, am Wochenende automatisch
+> - 🏫 **Sensor & Widget „Aktueller Unterricht"** — zeigt die gerade laufende Stunde
+> - 👥 **Mehrere Klassen Card** — Vergleichsansicht mehrerer Klassen in einer Card
+> - ⏱️ **Countdown** — Sensor zeigt „in 23 Min." bis zur nächsten Stunde
+> - 📋 **Klassenauswahl aus XML** — beim Setup automatisch alle Klassen laden
+> - 🔧 **Fächer & Klasse ändern** — unabhängig voneinander per ⚙️ Konfigurieren
+> - ⚡ **Paralleler Datenabruf** — Setup bis zu 10× schneller
+> - 🐛 Doppeltes Gerät nach Klassenwechsel behoben
+> - 🃏 Card: Übersichtlicheres Config-UI, Unterrichtszeiten aus XML
+
+<br/>
 
 ## 🇩🇪 Deutsch
 
@@ -270,6 +291,21 @@ Contributions sind herzlich willkommen!
 <br/>
 
 ---
+
+> [!IMPORTANT]
+> 🎉 **VpMobile24 v2.4.9 is here!**
+>
+> ### New in v2.4.9
+>
+> - 📅 **Next Week** — button to preview next week's schedule, auto on weekends
+> - 🏫 **Current Lesson sensor & widget** — shows the currently running lesson
+> - 👥 **Multi-class card** — compare multiple classes in one card
+> - ⏱️ **Countdown** — sensor shows "in 23 min." to next lesson
+> - 📋 **Class selection from XML** — auto-load all classes during setup
+> - 🔧 **Change class & subjects independently** — via ⚙️ Configure
+> - ⚡ **Parallel data fetching** — setup up to 10× faster
+> - 🐛 Fixed duplicate device after class change
+> - 🃏 Card: cleaner config UI, lesson times auto-read from XML
 
 <br/>
 <br/>
