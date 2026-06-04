@@ -1348,139 +1348,739 @@ ha-card {
 customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
 window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
 
-// ── VpMobile24 Multi-Class Card (v2) ─────────────────────────────────────
+// ── VpMobile24 Multi-Class Card v2.4.9 ───────────────────────────────────
 class VpMobile24MultiCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this._config = {};
+    this._config   = {};
+    this._hass     = null;
+    this._weekOffset = 0;      // 0 = current, 1 = next
+    this._search   = '';
+    this._collapsed = {};      // entityId → bool
+    this._detail   = null;     // { lesson, className, period, time, dayName }
   }
 
+  // ── Config form ──────────────────────────────────────────────────────────
   static getStubConfig() {
-    return { entities: ['sensor.vpmobile24_week_table'], title: 'Stundenplan Übersicht', show_all_periods: false };
+    return {
+      entities: ['sensor.vpmobile24_week_table'],
+      title: 'Stundenplan Übersicht',
+      columns: 'auto',
+      sort_order: 'custom',
+      default_expanded: true,
+    };
   }
 
   static getConfigForm() {
     return {
       schema: [
-        { name: 'title', default: 'Stundenplan Übersicht', selector: { text: { type: 'text' } } },
-        { name: 'entities', required: true, selector: { entity: { multiple: true, filter: [{ integration: 'vpmobile24' }] } } },
-        { name: 'show_all_periods', default: false, selector: { boolean: {} } },
+        { name: 'title',    default: 'Stundenplan Übersicht', selector: { text: { type: 'text' } } },
+        { name: 'entities', required: true,
+          selector: { entity: { multiple: true, filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'columns',  default: 'auto',
+          selector: { select: { options: [
+            { value: 'auto',  label: 'Automatisch' },
+            { value: '1',     label: '1 Spalte'    },
+            { value: '2',     label: '2 Spalten'   },
+            { value: '3',     label: '3 Spalten'   },
+          ]}}},
+        { name: 'sort_order', default: 'custom',
+          selector: { select: { options: [
+            { value: 'custom',  label: 'Benutzerdefiniert' },
+            { value: 'alpha',   label: 'Alphabetisch'      },
+            { value: 'next',    label: 'Nächste Stunde'    },
+          ]}}},
+        { name: 'default_expanded', default: true, selector: { boolean: {} } },
+        { name: 'show_search',      default: true, selector: { boolean: {} } },
+        { name: 'show_week_nav',    default: true, selector: { boolean: {} } },
+        { name: 'show_legend',      default: true, selector: { boolean: {} } },
       ],
       computeLabel: (s) => ({
-        title: 'Titel',
-        entities: 'Wochentabellen-Sensoren (mehrere Klassen)',
-        show_all_periods: 'Alle Stunden anzeigen',
+        title:            'Kartentitel',
+        entities:         'Klassen-Sensoren',
+        columns:          'Spaltenanzahl',
+        sort_order:       'Sortierung',
+        default_expanded: 'Standardmäßig ausgeklappt',
+        show_search:      'Suchfeld anzeigen',
+        show_week_nav:    'Wochennavigation anzeigen',
+        show_legend:      'Legende anzeigen',
       })[s.name] || s.name,
     };
   }
 
   setConfig(config) {
-    if (!config || !config.entities || !config.entities.length) throw new Error('Mindestens eine Entity erforderlich');
+    if (!config || !config.entities || !Array.isArray(config.entities) || !config.entities.length)
+      throw new Error('Mindestens eine Entity erforderlich');
     this._config = config;
+    // init collapse state from localStorage
+    this._loadCollapseState();
     if (this._hass) this._render();
   }
 
-  set hass(hass) { this._hass = hass; if (this._config) this._render(); }
-  getCardSize() { return 3; }
-
-  _cancel(fach) {
-    return !fach || fach === '—' || fach === '---' || fach === '-' || (typeof fach === 'string' && fach.trim() === '');
+  set hass(hass) {
+    this._hass = hass;
+    // Auto-switch to next week on weekend
+    const dow = new Date().getDay();
+    if ((dow === 0 || dow === 6) && this._weekOffset === 0) this._weekOffset = 1;
+    if (this._config && Object.keys(this._config).length) this._render();
   }
 
-  _render() {
-    if (!this._hass || !this._config) return;
-    const entities = Array.isArray(this._config.entities) ? this._config.entities : [this._config.entities];
-    const title = this._config.title || 'Stundenplan Übersicht';
-    const showAll = this._config.show_all_periods === true;
-    const now = new Date();
-    const todayDow = now.getDay();
-    const todayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
+  get hass() { return this._hass; }
+  getCardSize() { return 5; }
+
+  // ── Collapse state (localStorage) ────────────────────────────────────────
+  _storeKey() { return 'vpm24_multi_collapsed_' + (this._config.title || 'default'); }
+
+  _loadCollapseState() {
+    try {
+      const raw = localStorage.getItem(this._storeKey());
+      this._collapsed = raw ? JSON.parse(raw) : {};
+    } catch(e) { this._collapsed = {}; }
+  }
+
+  _saveCollapseState() {
+    try { localStorage.setItem(this._storeKey(), JSON.stringify(this._collapsed)); } catch(e) {}
+  }
+
+  _toggleCollapse(entityId) {
+    const def = this._config.default_expanded !== false;
+    // current state: if not in map use default
+    const cur = this._collapsed[entityId] !== undefined ? this._collapsed[entityId] : !def;
+    this._collapsed[entityId] = !cur;
+    this._saveCollapseState();
+    this._render();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  _isCancelled(fach) {
+    if (!fach) return true;
+    if (typeof fach !== 'string') return false;
+    const f = fach.trim();
+    return f === '' || f === '-' || f === '---' || f === '—' || f === '–' || /^[-—–\s]+$/.test(f);
+  }
+
+  _lessonType(lesson) {
+    // returns: 'normal' | 'sub' | 'cancelled' | 'test' | 'event'
+    if (!lesson) return 'empty';
+    const fach = lesson.fach || '';
+    if (this._isCancelled(fach)) return 'cancelled';
+    const zi = (lesson.zusatzinfo || '').toLowerCase();
+    const fl = fach.toLowerCase();
+    if (zi.includes('klausur') || zi.includes('test') || zi.includes('arbeit') || fl.includes('klausur') || fl.includes('test')) return 'test';
+    if (zi.includes('ausflug') || zi.includes('event') || zi.includes('projekt') || fl.includes('ausflug')) return 'event';
+    if (lesson.ist_vertretung) return 'sub';
+    return 'normal';
+  }
+
+  _statusColor(type) {
+    return { normal:'#22c55e', sub:'#eab308', cancelled:'#ef4444', test:'#a855f7', event:'#3b82f6', empty:'transparent' }[type] || '#22c55e';
+  }
+
+  _statusBg(type) {
+    return { normal:'rgba(34,197,94,.12)', sub:'rgba(234,179,8,.13)', cancelled:'rgba(239,68,68,.15)', test:'rgba(168,85,247,.14)', event:'rgba(59,130,246,.13)', empty:'transparent' }[type] || 'rgba(34,197,94,.12)';
+  }
+
+  _className(entity, entityId) {
+    return (entity.attributes && entity.attributes.class)
+      || entityId.replace(/sensor\.vpmobile24_week_table_?/i, '').replace(/_/g,' ').trim()
+      || entityId;
+  }
+
+  _getWeekTable(entity) {
+    if (!entity || !entity.attributes) return null;
+    return this._weekOffset === 1
+      ? entity.attributes.next_week_table || null
+      : entity.attributes.week_table || null;
+  }
+
+  _mondayOfWeek(offset) {
+    const d = new Date();
+    const dow = d.getDay() || 7; // make Sunday = 7
+    d.setDate(d.getDate() - dow + 1 + offset * 7);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  _dayDates(offset) {
+    const mon = this._mondayOfWeek(offset);
+    return Array.from({length:5}, (_,i) => {
+      const d = new Date(mon);
+      d.setDate(mon.getDate() + i);
+      return d;
+    });
+  }
+
+  _kwNumber(offset) {
+    const d = this._mondayOfWeek(offset);
+    const jan4 = new Date(d.getFullYear(), 0, 4);
+    const startOfWeek1 = new Date(jan4);
+    startOfWeek1.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1);
+    return Math.round((d - startOfWeek1) / 604800000) + 1;
+  }
+
+  // Find next upcoming lesson for a class (used for sorting & display)
+  _nextLesson(weekTable) {
+    if (!weekTable) return null;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
-    const days = ['Mo','Di','Mi','Do','Fr'];
+    const now = new Date();
+    const todayDow = now.getDay(); // 0=Sun
+    const nowMins = now.getHours() * 60 + now.getMinutes();
 
-    let rows = '';
-    for (const entityId of entities) {
-      const entity = this._hass.states[entityId];
-      if (!entity) { rows += `<tr><td class="mc-class" colspan="6" style="color:#ef4444;font-size:.75em">⚠ ${entityId}</td></tr>`; continue; }
-      const weekTable = entity.attributes && entity.attributes.week_table;
-      const className = (entity.attributes && entity.attributes.class) || entityId.replace(/.*vpmobile24_week_table_?/,'') || entityId;
-      if (!weekTable) continue;
-
-      if (showAll) {
-        const periods = ['1','2','3','4','5','6','7','8','9','10'];
-        let first = true;
-        for (const p of periods) {
-          const hasSomething = dayKeys.some(dk => weekTable[dk] && weekTable[dk][p] && weekTable[dk][p].fach);
-          if (!hasSomething) continue;
-          rows += '<tr>';
-          rows += `<td class="mc-class${first ? '' : ' mc-cont'}">${first ? className : ''}</td>`;
-          rows += `<td class="mc-period">${p}</td>`;
-          dayKeys.forEach((day, di) => {
-            const isToday = di === todayIdx;
-            const slot = weekTable[day] && weekTable[day][p];
-            const fach = slot ? slot.fach : '';
-            const cancelled = this._cancel(fach);
-            const isSub = slot && slot.ist_vertretung && !cancelled;
-            let cls = 'mc-cell' + (isToday ? ' mc-today' : '') + (cancelled && slot ? ' mc-cancel' : isSub ? ' mc-sub' : '');
-            rows += `<td class="${cls}">${cancelled && slot ? '—' : (fach || '')}</td>`;
-          });
-          rows += '</tr>';
-          first = false;
+    for (let di = 0; di < 5; di++) {
+      const dayIdx = di + 1; // Mon=1..Fri=5
+      if (dayIdx < todayDow) continue;
+      const dayData = weekTable[dayKeys[di]] || {};
+      const periods = Object.keys(dayData).map(Number).sort((a,b)=>a-b);
+      for (const p of periods) {
+        const lesson = dayData[String(p)];
+        if (!lesson || this._isCancelled(lesson.fach)) continue;
+        // If today: check time
+        if (dayIdx === todayDow && lesson.zeit) {
+          const parts = lesson.zeit.split('-');
+          if (parts[0]) {
+            const [h,m] = parts[0].split(':').map(Number);
+            if ((h*60+m) <= nowMins) continue; // already passed
+          }
         }
-        rows += `<tr><td colspan="7" class="mc-div"></td></tr>`;
-      } else {
-        // Summary: show today's lesson count + next lesson preview
-        rows += '<tr>';
-        rows += `<td class="mc-class">${className}</td>`;
-        dayKeys.forEach((day, di) => {
-          const isToday = di === todayIdx;
-          const allSlots = weekTable[day] ? Object.values(weekTable[day]).filter(Boolean) : [];
-          const lessons = allSlots.filter(s => s.fach && !this._cancel(s.fach));
-          const cancelled = allSlots.filter(s => this._cancel(s.fach));
-          let text = lessons.length > 0 ? lessons.length + ' Std.' : '–';
-          let cls = 'mc-cell mc-summary' + (isToday ? ' mc-today' : '');
-          if (lessons.length === 0 && cancelled.length > 0) { cls += ' mc-cancel'; text = '—'; }
-          else if (cancelled.length > 0) cls += ' mc-warn';
-          const tip = lessons.slice(0,3).map(s=>s.fach).join(', ');
-          rows += `<td class="${cls}" title="${tip}">${text}</td>`;
-        });
-        rows += '</tr>';
+        return { day: dayKeys[di], dayIdx: di, period: p, lesson };
       }
     }
+    return null;
+  }
 
+  // Sort entities
+  _sortedEntities(entities) {
+    const sort = this._config.sort_order || 'custom';
+    if (sort === 'alpha') {
+      return [...entities].sort((a, b) => {
+        const ea = this._hass.states[a];
+        const eb = this._hass.states[b];
+        const na = ea ? this._className(ea, a) : a;
+        const nb = eb ? this._className(eb, b) : b;
+        return na.localeCompare(nb, 'de');
+      });
+    }
+    if (sort === 'next') {
+      return [...entities].sort((a, b) => {
+        const ea = this._hass.states[a];
+        const eb = this._hass.states[b];
+        const ta = ea ? this._getWeekTable(ea) : null;
+        const tb = eb ? this._getWeekTable(eb) : null;
+        const na = this._nextLesson(ta);
+        const nb = this._nextLesson(tb);
+        if (!na && !nb) return 0;
+        if (!na) return 1;
+        if (!nb) return -1;
+        if (na.dayIdx !== nb.dayIdx) return na.dayIdx - nb.dayIdx;
+        return na.period - nb.period;
+      });
+    }
+    return entities; // custom = as configured
+  }
+
+  // ── Week navigation ───────────────────────────────────────────────────────
+  _switchWeek(offset) {
+    this._weekOffset = offset;
+    this._render();
+  }
+
+  // ── Search ────────────────────────────────────────────────────────────────
+  _onSearch(val) {
+    this._search = val.toLowerCase().trim();
+    this._render();
+  }
+
+  // ── Detail popup ──────────────────────────────────────────────────────────
+  _showDetail(lesson, className, period, time, dayName) {
+    this._detail = { lesson, className, period, time, dayName };
+    const pop = this.shadowRoot.getElementById('mc-popup');
+    const ov  = this.shadowRoot.getElementById('mc-overlay');
+    if (!pop || !ov) return;
+    const type = this._lessonType(lesson);
+    const color = this._statusColor(type);
+    const fach    = (lesson && lesson.fach && !this._isCancelled(lesson.fach)) ? lesson.fach : '—';
+    const lehrer  = (lesson && lesson.lehrer)    || '';
+    const raum    = (lesson && lesson.raum)      || '';
+    const zeit    = (lesson && lesson.zeit)      || time || '';
+    const info    = (lesson && lesson.zusatzinfo)|| '';
+    const labels  = { normal:'Unterricht', sub:'Vertretung', cancelled:'AUSFALL', test:'Klassenarbeit', event:'Ereignis' };
+    const badge   = type !== 'normal' && type !== 'empty'
+      ? `<span style="font-size:.68em;font-weight:700;padding:2px 8px;border-radius:5px;background:${this._statusBg(type)};color:${color};border:1px solid ${color}40;margin-left:6px">${labels[type]||''}</span>`
+      : '';
+
+    let rows = '';
+    if (zeit)   rows += `<div class="mc-pop-row"><span class="mc-pop-icon">🕐</span><span class="mc-pop-lbl">Zeit</span><span class="mc-pop-val">${zeit}</span></div>`;
+    if (lehrer) rows += `<div class="mc-pop-row"><span class="mc-pop-icon">👤</span><span class="mc-pop-lbl">Lehrer</span><span class="mc-pop-val">${lehrer}</span></div>`;
+    if (raum)   rows += `<div class="mc-pop-row"><span class="mc-pop-icon">🚪</span><span class="mc-pop-lbl">Raum</span><span class="mc-pop-val">${raum}</span></div>`;
+    if (info)   rows += `<div class="mc-pop-row mc-pop-info"><span class="mc-pop-icon">ℹ️</span><span class="mc-pop-lbl">Info</span><span class="mc-pop-val">${info}</span></div>`;
+    if (!rows)  rows  = `<div class="mc-pop-empty">Keine weiteren Details verfügbar.</div>`;
+
+    if (type === 'cancelled') {
+      pop.innerHTML = `
+        <div class="mc-pop-ausfall">AUSFALL</div>
+        <div class="mc-pop-foot"><button class="mc-pop-btn" onclick="this.getRootNode().host._closeDetail()">Schließen</button></div>`;
+      pop.style.background = '#7f1d1d';
+      pop.style.boxShadow  = '0 0 0 1px rgba(239,68,68,.4),0 12px 48px rgba(239,68,68,.5)';
+    } else {
+      pop.innerHTML = `
+        <div class="mc-pop-head" style="border-bottom:2px solid ${color}40">
+          <span class="mc-pop-num">${period}. Std.</span>
+          <span class="mc-pop-fach">${fach}</span>${badge}
+          <span class="mc-pop-cls" style="color:${color}">${className}</span>
+        </div>
+        <div class="mc-pop-body">${rows}</div>
+        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" onclick="this.getRootNode().host._closeDetail()">Schließen</button></div>`;
+      pop.style.background = '#162040';
+      pop.style.boxShadow  = '0 12px 48px rgba(0,0,0,.7)';
+    }
+    pop.classList.remove('hidden');
+    ov.classList.remove('hidden');
+  }
+
+  _closeDetail() {
+    this._detail = null;
+    const pop = this.shadowRoot.getElementById('mc-popup');
+    const ov  = this.shadowRoot.getElementById('mc-overlay');
+    if (pop) pop.classList.add('hidden');
+    if (ov)  ov.classList.add('hidden');
+  }
+
+  // ── Main render ───────────────────────────────────────────────────────────
+  _render() {
+    if (!this._hass || !this._config) return;
+
+    const entities      = this._sortedEntities(this._config.entities);
+    const title         = this._config.title || 'Stundenplan Übersicht';
+    const showSearch    = this._config.show_search    !== false;
+    const showWeekNav   = this._config.show_week_nav  !== false;
+    const showLegend    = this._config.show_legend    !== false;
+    const defaultExpand = this._config.default_expanded !== false;
+    const colsCfg       = this._config.columns || 'auto';
+    const dayKeys       = ['monday','tuesday','wednesday','thursday','friday'];
+    const dayNames      = ['Mo','Di','Mi','Do','Fr'];
+    const dayFull       = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+
+    const now       = new Date();
+    const todayDow  = now.getDay(); // 0=Sun,1=Mon..
+    const nowMins   = now.getHours() * 60 + now.getMinutes();
+    const todayIdx  = (this._weekOffset === 0 && todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
+    const dates     = this._dayDates(this._weekOffset);
+    const kw        = this._kwNumber(this._weekOffset);
+
+    // Filter by search
+    const filtered = entities.filter(eid => {
+      if (!this._search) return true;
+      const ent = this._hass.states[eid];
+      if (!ent) return true;
+      const cn = this._className(ent, eid).toLowerCase();
+      return cn.includes(this._search);
+    });
+
+    // Responsive columns CSS
+    const colsMap = { '1':'1fr', '2':'repeat(2,1fr)', '3':'repeat(3,1fr)', 'auto':'repeat(auto-fill,minmax(320px,1fr))' };
+    const gridCols = colsMap[colsCfg] || colsMap['auto'];
+
+    // ── Build each class section ──────────────────────────────────────────
+    let sectionsHtml = '';
+    for (const entityId of filtered) {
+      const entity    = this._hass.states[entityId];
+      if (!entity) {
+        sectionsHtml += `<div class="mc-section mc-error">⚠ Entity nicht gefunden: ${entityId}</div>`;
+        continue;
+      }
+      const weekTable  = this._getWeekTable(entity);
+      const className  = this._className(entity, entityId);
+      const isCollapsed = this._collapsed[entityId] !== undefined
+        ? this._collapsed[entityId]
+        : !defaultExpand;
+
+      // Next lesson for badge
+      const nextL = this._nextLesson(weekTable);
+      const nextBadge = nextL && this._weekOffset === 0
+        ? `<span class="mc-next-badge">Nächste: ${dayNames[nextL.dayIdx]}, ${nextL.period}. Std${nextL.lesson.fach ? ' · ' + nextL.lesson.fach : ''}</span>`
+        : '';
+
+      // Stats row: count per type across whole week
+      let nNormal=0,nSub=0,nCancel=0;
+      if (weekTable) {
+        dayKeys.forEach(dk => {
+          const day = weekTable[dk] || {};
+          Object.values(day).forEach(les => {
+            if (!les) return;
+            const t = this._lessonType(les);
+            if (t==='cancelled') nCancel++;
+            else if (t==='sub') nSub++;
+            else if (t!=='empty') nNormal++;
+          });
+        });
+      }
+
+      // Build the timetable grid for this class
+      let gridHtml = '';
+      if (!isCollapsed) {
+        if (!weekTable) {
+          gridHtml = '<div class="mc-no-data">Keine Wochendaten verfügbar</div>';
+        } else {
+          // Collect periods that have at least one lesson
+          const maxPeriod = 10;
+          const usedPeriods = [];
+          for (let p = 1; p <= maxPeriod; p++) {
+            if (dayKeys.some(dk => weekTable[dk] && weekTable[dk][String(p)])) {
+              usedPeriods.push(p);
+            }
+          }
+
+          // Table header
+          gridHtml += '<div class="mc-grid-wrap"><table class="mc-tbl"><thead><tr><th class="mc-th-num">#</th>';
+          dayNames.forEach((d, di) => {
+            const isT = di === todayIdx;
+            const dateStr = dates[di] ? dates[di].getDate() : '';
+            if (isT) {
+              gridHtml += `<th><div class="mc-th-today"><span>${d}</span><span class="mc-th-date">${dateStr}</span></div></th>`;
+            } else {
+              gridHtml += `<th><span class="mc-th-day">${d}</span><span class="mc-th-date">${dateStr}</span></th>`;
+            }
+          });
+          gridHtml += '</tr></thead><tbody>';
+
+          // Current lesson detection
+          let currentPeriod = -1;
+          if (todayIdx >= 0 && weekTable) {
+            const todayData = weekTable[dayKeys[todayIdx]] || {};
+            for (const p of usedPeriods) {
+              const les = todayData[String(p)];
+              if (les && les.zeit) {
+                const parts = les.zeit.split('-');
+                if (parts.length === 2) {
+                  const [sh,sm] = parts[0].split(':').map(Number);
+                  const [eh,em] = parts[1].split(':').map(Number);
+                  if (nowMins >= sh*60+sm && nowMins <= eh*60+em) { currentPeriod = p; }
+                }
+              }
+            }
+          }
+
+          for (const p of usedPeriods) {
+            gridHtml += '<tr>';
+            // Period number + time
+            let timeStr = '';
+            for (const dk of dayKeys) {
+              const les = weekTable[dk] && weekTable[dk][String(p)];
+              if (les && les.zeit) { timeStr = les.zeit; break; }
+            }
+            gridHtml += `<td class="mc-td-num"><div class="mc-pnum">${p}</div>${timeStr ? `<div class="mc-ptime">${timeStr}</div>` : ''}</td>`;
+
+            dayNames.forEach((d, di) => {
+              const isT    = di === todayIdx;
+              const les    = weekTable[dayKeys[di]] && weekTable[dayKeys[di]][String(p)];
+              const type   = this._lessonType(les);
+              const color  = this._statusColor(type);
+              const bg     = this._statusBg(type);
+              const isCur  = isT && p === currentPeriod && type !== 'cancelled' && type !== 'empty';
+              const fach   = (les && !this._isCancelled(les.fach)) ? les.fach : (les ? '—' : '');
+              const clickable = !!les;
+              const onclk = clickable
+                ? `onclick="this.getRootNode().host._showDetail(${JSON.stringify(les).replace(/"/g,'&quot;')},'${className.replace(/'/g,"\\'")}',${p},'${timeStr}','${dayFull[di]}')" style="cursor:pointer"`
+                : '';
+              let tileStyle = '';
+              let tileCls   = 'mc-tile';
+              if (isCur) {
+                tileStyle = 'background:#14532d;color:#86efac;box-shadow:0 0 0 2px #22c55e;font-weight:700';
+              } else if (type === 'empty' || !les) {
+                tileStyle = `background:${isT ? 'rgba(37,99,235,.06)' : 'rgba(255,255,255,.03)'};color:#334155`;
+              } else {
+                tileStyle = `background:${bg};color:${type==='cancelled'?'#fca5a5':type==='sub'?'#fde68a':type==='test'?'#d8b4fe':type==='event'?'#93c5fd':'#dcfce7'};border:1px solid ${color}35`;
+              }
+              if (les) tileCls += ' mc-tile-hover';
+              const tooltip = les ? `title="${[les.fach, les.lehrer && '👤 '+les.lehrer, les.raum && '🚪 '+les.raum].filter(Boolean).join(' | ')}"` : '';
+              gridHtml += `<td class="${isT?'mc-td-today':''}">
+                <div class="mc-tile" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
+              </td>`;
+            });
+            gridHtml += '</tr>';
+          }
+          gridHtml += '</tbody></table></div>';
+
+          // Next lesson info bar (only current week)
+          if (nextL && this._weekOffset === 0) {
+            const nl = nextL.lesson;
+            const ntype = this._lessonType(nl);
+            const ncolor = this._statusColor(ntype);
+            gridHtml += `<div class="mc-next-bar" style="border-left:3px solid ${ncolor}">
+              <span class="mc-next-label">Nächste Stunde</span>
+              <span class="mc-next-info">${dayFull[nextL.dayIdx]}, ${nextL.period}. Stunde</span>
+              ${nl.fach ? `<span class="mc-next-fach" style="color:${ncolor}">${nl.fach}</span>` : ''}
+              ${nl.lehrer ? `<span class="mc-next-chip">👤 ${nl.lehrer}</span>` : ''}
+              ${nl.raum   ? `<span class="mc-next-chip">🚪 ${nl.raum}</span>` : ''}
+            </div>`;
+          }
+        }
+      }
+
+      sectionsHtml += `
+        <div class="mc-section">
+          <div class="mc-section-head" onclick="this.getRootNode().host._toggleCollapse('${entityId}')">
+            <div class="mc-section-left">
+              <span class="mc-chevron${isCollapsed ? '' : ' mc-chevron-open'}">›</span>
+              <span class="mc-class-name">${className}</span>
+              ${nextBadge}
+            </div>
+            <div class="mc-section-stats">
+              ${nNormal ? `<span class="mc-stat mc-stat-n">${nNormal}×</span>` : ''}
+              ${nSub    ? `<span class="mc-stat mc-stat-s">${nSub}× Vtg.</span>` : ''}
+              ${nCancel ? `<span class="mc-stat mc-stat-c">${nCancel}× Ausfall</span>` : ''}
+            </div>
+          </div>
+          <div class="mc-section-body${isCollapsed ? ' hidden' : ''}">
+            ${gridHtml}
+          </div>
+        </div>`;
+    }
+
+    if (!filtered.length) {
+      sectionsHtml = `<div class="mc-no-data">Keine Klassen gefunden${this._search ? ' für „' + this._search + '"' : ''}.</div>`;
+    }
+
+    // ── Week navigation labels ────────────────────────────────────────────
+    const weekLabel = `KW ${kw}`;
+    const prevLabel = this._weekOffset === 0 ? '' : '‹ Aktuelle Woche';
+    const nextLabel = this._weekOffset === 0 ? 'Nächste Woche ›' : '';
+
+    // ── Legend ────────────────────────────────────────────────────────────
+    const legendHtml = showLegend ? `
+      <div class="mc-legend">
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#22c55e"></span>Unterricht</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#eab308"></span>Vertretung</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#ef4444"></span>Ausfall</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#a855f7"></span>Klassenarbeit</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#3b82f6"></span>Ereignis</span>
+      </div>` : '';
+
+    // ── Full HTML ─────────────────────────────────────────────────────────
     this.shadowRoot.innerHTML = `
 <style>
-:host{display:block}
-ha-card{background:#0f1729!important;border-radius:14px!important;overflow:hidden;border:1px solid rgba(255,255,255,.08)!important;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e2e8f0!important}
-.mc-hdr{padding:12px 16px 10px;font-size:.9em;font-weight:700;color:#fff;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
-.mc-table{width:100%;border-collapse:separate;border-spacing:3px;padding:8px 10px 12px}
-.mc-table thead th{font-size:.7em;font-weight:700;text-transform:uppercase;color:#475569;padding:4px 2px;text-align:center;letter-spacing:.5px}
-.mc-today-hdr{color:#60a5fa!important}
-.mc-class{font-size:.82em;font-weight:700;color:#e2e8f0;padding:6px 8px 6px 2px;white-space:nowrap;min-width:36px}
-.mc-cont{color:transparent}
-.mc-period{font-size:.68em;font-weight:600;color:#475569;padding:3px 2px;text-align:center;min-width:16px}
-.mc-cell{background:rgba(255,255,255,.04);border-radius:6px;padding:6px 3px;text-align:center;font-size:.78em;font-weight:600;color:#e2e8f0;min-width:28px}
-.mc-summary{font-size:.82em;min-width:40px}
-.mc-today{background:rgba(37,99,235,.2)!important;color:#93c5fd!important}
-.mc-cancel{background:rgba(127,29,29,.4)!important;color:#fca5a5!important}
-.mc-sub{background:rgba(127,29,29,.25)!important;color:#fdba74!important}
-.mc-warn{box-shadow:inset 0 0 0 1px rgba(239,68,68,.3)}
-.mc-div{height:3px;padding:0}
+:host { display: block; }
+ha-card {
+  background: #0f1729 !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.55) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #e2e8f0 !important;
+}
+/* ── HEADER ── */
+.mc-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 10px;
+  background: rgba(255,255,255,.02);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap; gap: 8px;
+}
+.mc-hdr-icon {
+  width: 38px; height: 38px; flex-shrink: 0;
+  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+  border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.2em;
+  box-shadow: 0 3px 10px rgba(29,78,216,.45);
+}
+.mc-hdr-title {
+  font-size: 1.05em; font-weight: 700; color: #fff;
+  flex: 1; min-width: 100px;
+}
+.mc-hdr-kw {
+  font-size: .75em; font-weight: 600; color: #64748b;
+  background: rgba(255,255,255,.06); border-radius: 20px;
+  padding: 4px 10px; white-space: nowrap;
+}
+/* ── CONTROLS ── */
+.mc-controls {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  flex-wrap: wrap;
+}
+.mc-search {
+  flex: 1; min-width: 120px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px; padding: 6px 14px;
+  color: #e2e8f0; font-size: .82em; font-family: inherit;
+  outline: none; transition: border .2s;
+}
+.mc-search:focus { border-color: #3b82f6; background: rgba(59,130,246,.1); }
+.mc-search::placeholder { color: #475569; }
+.mc-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: .76em; font-weight: 500; color: #94a3b8;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+  transition: all .2s; line-height: 1.3;
+}
+.mc-pill:hover { background: rgba(255,255,255,.12); color: #e2e8f0; }
+.mc-pill-blue { color: #93c5fd; border-color: rgba(59,130,246,.3); background: rgba(59,130,246,.08); }
+.mc-pill-blue:hover { background: rgba(59,130,246,.18); border-color: #3b82f6; }
+.mc-pill-green { color: #86efac; border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
+.mc-pill-green:hover { background: rgba(34,197,94,.18); border-color: #22c55e; }
+/* ── GRID LAYOUT for sections ── */
+.mc-sections-grid {
+  display: grid;
+  grid-template-columns: ${gridCols};
+  gap: 10px;
+  padding: 10px 12px 14px;
+}
+/* ── SECTION ── */
+.mc-section {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px; overflow: hidden;
+}
+.mc-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; cursor: pointer;
+  background: rgba(255,255,255,.04);
+  transition: background .15s; user-select: none; gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.mc-section-head:hover { background: rgba(255,255,255,.07); }
+.mc-section-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; flex-wrap: wrap; }
+.mc-chevron {
+  font-size: 1.1em; color: #475569; font-weight: 700;
+  transition: transform .25s; display: inline-block; flex-shrink: 0;
+}
+.mc-chevron-open { transform: rotate(90deg); }
+.mc-class-name { font-size: .95em; font-weight: 700; color: #e2e8f0; white-space: nowrap; }
+.mc-next-badge {
+  font-size: .68em; font-weight: 600; color: #93c5fd;
+  background: rgba(59,130,246,.13); border: 1px solid rgba(59,130,246,.25);
+  border-radius: 12px; padding: 2px 8px; white-space: nowrap;
+}
+.mc-section-stats { display: flex; gap: 5px; flex-shrink: 0; }
+.mc-stat { font-size: .68em; font-weight: 700; border-radius: 10px; padding: 2px 7px; }
+.mc-stat-n { background: rgba(34,197,94,.12);  color: #86efac; }
+.mc-stat-s { background: rgba(234,179,8,.12);  color: #fde68a; }
+.mc-stat-c { background: rgba(239,68,68,.12);  color: #fca5a5; }
+.mc-section-body { padding: 0; transition: max-height .3s ease; }
+.mc-section-body.hidden { display: none; }
+.mc-no-data { padding: 14px 16px; color: #475569; font-size: .85em; font-style: italic; }
+.mc-error { padding: 14px; color: #ef4444; font-size: .82em; border: 1px solid rgba(239,68,68,.2); border-radius: 12px; }
+/* ── TIMETABLE ── */
+.mc-grid-wrap { overflow-x: auto; }
+.mc-tbl { width: 100%; border-collapse: separate; border-spacing: 0; padding: 6px 8px 8px; }
+.mc-tbl thead th {
+  font-size: .7em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: #475569; padding: 5px 3px;
+  text-align: center;
+}
+.mc-th-today { display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
+  background: #2563eb; color: #fff; border-radius: 7px; padding: 3px 9px;
+  font-size: .88em; font-weight: 700; }
+.mc-th-day  { display: block; font-size: .88em; }
+.mc-th-date { display: block; font-size: .8em; color: #475569; font-weight: 500; }
+.mc-th-today .mc-th-date { color: rgba(255,255,255,.75); }
+.mc-td-num { width: 44px; min-width: 44px; padding: 3px 4px; text-align: center; }
+.mc-pnum  { font-size: .82em; font-weight: 700; color: #94a3b8; line-height: 1.3; }
+.mc-ptime { font-size: .58em; color: #334155; white-space: nowrap; margin-top: 1px; }
+.mc-tbl td { padding: 3px 3px; vertical-align: middle; }
+.mc-td-today { background: rgba(37,99,235,.05); }
+.mc-tile {
+  border-radius: 7px; padding: 4px 3px;
+  font-size: .78em; font-weight: 600;
+  min-height: 38px; display: flex; align-items: center; justify-content: center;
+  text-align: center; transition: filter .12s, transform .12s;
+  line-height: 1.2;
+}
+.mc-tile-hover:hover { filter: brightness(1.18); transform: scale(1.05); }
+/* ── NEXT LESSON BAR ── */
+.mc-next-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 8px 8px; padding: 7px 12px;
+  background: rgba(255,255,255,.04); border-radius: 8px;
+  font-size: .75em;
+}
+.mc-next-label { font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
+.mc-next-info  { color: #94a3b8; }
+.mc-next-fach  { font-weight: 700; }
+.mc-next-chip  { color: #64748b; background: rgba(255,255,255,.05); border-radius: 6px; padding: 1px 6px; }
+/* ── LEGEND ── */
+.mc-legend {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  padding: 8px 16px 12px; font-size: .75em; color: #64748b;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.mc-leg-item { display: flex; align-items: center; gap: 5px; }
+.mc-leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* ── POPUP ── */
+.mc-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  z-index: 9998; backdrop-filter: blur(2px);
+}
+.mc-popup {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: min(380px, 94vw); z-index: 9999;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  color: #e2e8f0; font-family: inherit;
+}
+.mc-pop-head {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 16px 20px 12px;
+}
+.mc-pop-num  { font-size: .75em; font-weight: 600; color: #94a3b8; background: rgba(255,255,255,.08); border-radius: 5px; padding: 2px 7px; flex-shrink: 0; }
+.mc-pop-fach { font-size: 1.1em; font-weight: 800; color: #fff; }
+.mc-pop-cls  { font-size: .75em; font-weight: 600; background: rgba(255,255,255,.07); border-radius: 5px; padding: 2px 7px; margin-left: auto; }
+.mc-pop-body {}
+.mc-pop-row  { display: flex; align-items: center; gap: 10px; padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.mc-pop-row:last-child { border-bottom: none; }
+.mc-pop-info { background: rgba(245,158,11,.06); }
+.mc-pop-icon { font-size: 1em; width: 22px; text-align: center; flex-shrink: 0; }
+.mc-pop-lbl  { font-size: .75em; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 48px; }
+.mc-pop-val  { font-size: .9em; color: #e2e8f0; flex: 1; }
+.mc-pop-empty { padding: 16px 20px; color: #475569; font-size: .85em; font-style: italic; }
+.mc-pop-foot { padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.07); }
+.mc-pop-btn  { border: none; border-radius: 8px; padding: 9px 22px; cursor: pointer; font-size: .88em; font-family: inherit; color: #fff; transition: filter .2s; }
+.mc-pop-btn:hover { filter: brightness(1.15); }
+.mc-pop-ausfall { font-size: 2.5em; font-weight: 900; letter-spacing: 4px; text-align: center; padding: 36px 20px 20px; color: #fca5a5; text-shadow: 0 0 30px rgba(255,100,100,1); }
+.hidden { display: none !important; }
 </style>
 <ha-card>
-  <div class="mc-hdr">📅 ${title}</div>
-  <table class="mc-table">
-    <thead><tr>
-      <th></th>${showAll ? '<th style="color:#475569;font-size:.6em">#</th>' : ''}
-      ${days.map((d,i)=>`<th class="${i===todayIdx?'mc-today-hdr':''}">${d}</th>`).join('')}
-    </tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-</ha-card>`;
+  <!-- Header -->
+  <div class="mc-hdr">
+    <div class="mc-hdr-icon">📅</div>
+    <span class="mc-hdr-title">${title}</span>
+    <span class="mc-hdr-kw">${weekLabel}</span>
+    ${showWeekNav ? (this._weekOffset === 0
+      ? `<button class="mc-pill mc-pill-blue" onclick="this.getRootNode().host._switchWeek(1)">Nächste Woche ›</button>`
+      : `<button class="mc-pill mc-pill-green" onclick="this.getRootNode().host._switchWeek(0)">‹ Aktuelle Woche</button>`)
+      : ''}
+  </div>
+
+  <!-- Search / Controls -->
+  ${showSearch ? `<div class="mc-controls">
+    <input class="mc-search" type="search" placeholder="Klasse suchen …"
+      value="${this._search}"
+      oninput="this.getRootNode().host._onSearch(this.value)"
+      onchange="this.getRootNode().host._onSearch(this.value)">
+  </div>` : ''}
+
+  <!-- Class sections grid -->
+  <div class="mc-sections-grid">
+    ${sectionsHtml}
+  </div>
+
+  <!-- Legend -->
+  ${legendHtml}
+</ha-card>
+
+<!-- Detail popup -->
+<div id="mc-overlay" class="mc-overlay hidden" onclick="this.getRootNode().host._closeDetail()"></div>
+<div id="mc-popup"  class="mc-popup hidden"></div>`;
   }
 }
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
-window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Vergleichsansicht mehrerer Klassen', preview:true });
+window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
 console.log('✅ VpMobile24 Card v2.4.9 loaded');
