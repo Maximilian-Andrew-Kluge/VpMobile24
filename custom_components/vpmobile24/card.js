@@ -338,7 +338,7 @@ class VpMobile24Card extends HTMLElement {
     this._popupData = null;
     const popup   = this.shadowRoot.getElementById('popup');
     const overlay = this.shadowRoot.getElementById('popup-overlay');
-    if (popup)   { popup.classList.add('hidden'); popup.classList.remove('vp-popup-ausfall'); const t = popup.querySelector('#popup-title'); if(t) t.style.display=''; }
+    if (popup)   { popup.classList.add('hidden'); popup.classList.remove('vp-popup-ausfall'); }
     if (overlay) overlay.classList.add('hidden');
   }
 
@@ -351,71 +351,65 @@ class VpMobile24Card extends HTMLElement {
   _renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled) {
     const popup   = this.shadowRoot.getElementById('popup');
     const overlay = this.shadowRoot.getElementById('popup-overlay');
-    const title   = this.shadowRoot.getElementById('popup-title');
-    const content = this.shadowRoot.getElementById('popup-content');
-    if (!popup || !overlay || !title || !content) return;
+    if (!popup || !overlay) return;
 
     const t = this._t || this._buildTranslations();
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
-    const lehrer = (lesson && lesson.lehrer)  || '';
-    const raum   = (lesson && lesson.raum)    || '';
-    const zeit   = (lesson && lesson.zeit)    || slotTime || '';
+    const lehrer = (lesson && lesson.lehrer)     || '';
+    const raum   = (lesson && lesson.raum)       || '';
+    const zeit   = (lesson && lesson.zeit)       || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
-    // Determine type: cancelled, substitution, or normal
     const isActuallyCancelled = isCancelled || fach === '—';
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
 
-    // Title
-    let badge = '';
+    // ── Ausfall: big red popup ──
     if (isActuallyCancelled) {
-      badge = '<span class="vp-detail-badge vp-detail-cancelled">' + t.cancelled + '</span>';
-    } else if (isVertretung) {
-      badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
-    }
-    title.innerHTML =
-      '<span class="vp-detail-num">' + slotPeriod + '. ' + t.period + '</span>' +
-      (isActuallyCancelled ? '<span class="vp-detail-fach" style="color:#94a3b8">—</span>' : '<span class="vp-detail-fach">' + fach + '</span>') +
-      badge;
-
-    // Rows
-    let rows = '';
-    // Show period + time as first row (no Tag row)
-    rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">🕐</span>'
-      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
-      + '<span class="vp-detail-val">' + (zeit || slotTime || '—') + '</span></div>';
-
-    if (lehrer) rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">👤</span>'
-      + '<span class="vp-detail-label">' + t.teacher + '</span>'
-      + '<span class="vp-detail-val">' + lehrer + '</span></div>';
-
-    if (raum) rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">🚪</span>'
-      + '<span class="vp-detail-label">' + t.room + '</span>'
-      + '<span class="vp-detail-val">' + raum + '</span></div>';
-
-    if (info) rows += '<div class="vp-detail-row vp-detail-info-row">'
-      + '<span class="vp-detail-icon">ℹ️</span>'
-      + '<span class="vp-detail-label">' + t.info + '</span>'
-      + '<span class="vp-detail-val">' + info + '</span></div>';
-
-    if (isActuallyCancelled) {
-      // Ausfall: show big red message, no rows
-      // Build ausfall popup: no title bar, no lines, just red glow + AUSFALL
-      title.innerHTML = '';
-      title.style.display = 'none';
-      content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>';
-      popup.classList.add('vp-popup-ausfall');
+      popup.className = 'vp-popup vp-popup-ausfall';
+      popup.innerHTML = `
+        <div style="flex:1;display:flex;align-items:center;justify-content:center">
+          <div class="vp-ausfall-block">${t.cancel}</div>
+        </div>
+        <div class="vp-popup-footer" style="border-top:none;padding:0 20px 20px">
+          <button class="vp-popup-btn" style="background:rgba(255,255,255,.15)"
+            onclick="this.getRootNode().host._closePopup()">${t.close}</button>
+        </div>`;
       popup.classList.remove('hidden');
       overlay.classList.remove('hidden');
       return;
     }
-    if (!lehrer && !raum && !info) {
-      rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
+
+    // ── Normal / Vertretung ──
+    let badge = '';
+    if (isVertretung) {
+      badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
     }
 
-    content.innerHTML = rows;
+    let rows = '';
+    rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
+      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
+      + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
+    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span>'
+      + '<span class="vp-detail-label">' + t.teacher + '</span>'
+      + '<span class="vp-detail-val">' + lehrer + '</span></div>';
+    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span>'
+      + '<span class="vp-detail-label">' + t.room + '</span>'
+      + '<span class="vp-detail-val">' + raum + '</span></div>';
+    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span>'
+      + '<span class="vp-detail-label">' + t.info + '</span>'
+      + '<span class="vp-detail-val">' + info + '</span></div>';
+    if (!lehrer && !raum && !info)
+      rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
+
+    popup.className = 'vp-popup';
+    popup.innerHTML = `
+      <div class="vp-popup-title">
+        <span class="vp-detail-num">${slotPeriod}. ${t.period}</span>
+        <span class="vp-detail-fach">${fach}</span>${badge}
+      </div>
+      <div>${rows}</div>
+      <div class="vp-popup-footer">
+        <button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button>
+      </div>`;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
   }
@@ -1276,11 +1270,7 @@ ha-card {
 
 <!-- ── Lesson detail popup ── -->
 <div id="popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
-<div id="popup" class="vp-popup hidden">
-  <div id="popup-title" class="vp-popup-title"></div>
-  <div id="popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button></div>
-</div>
+<div id="popup" class="vp-popup hidden"></div>
 
 <!-- ── Info popup ── -->
 <div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
@@ -1465,7 +1455,6 @@ class VpMobile24MultiCard extends HTMLElement {
             { value: 'next',    label: 'Nächste Stunde'    },
           ]}}},
         { name: 'default_expanded', default: true, selector: { boolean: {} } },
-        { name: 'show_search',      default: true, selector: { boolean: {} } },
         { name: 'show_week_nav',    default: true, selector: { boolean: {} } },
         { name: 'show_legend',      default: true, selector: { boolean: {} } },
       ],
@@ -1475,7 +1464,6 @@ class VpMobile24MultiCard extends HTMLElement {
         columns:          'Spaltenanzahl',
         sort_order:       'Sortierung',
         default_expanded: 'Standardmäßig ausgeklappt',
-        show_search:      'Suchfeld anzeigen',
         show_week_nav:    'Wochennavigation anzeigen',
         show_legend:      'Legende anzeigen',
       })[s.name] || s.name,
@@ -1725,7 +1713,7 @@ class VpMobile24MultiCard extends HTMLElement {
 
     const entities      = this._sortedEntities(this._config.entities);
     const title         = this._config.title || 'Stundenplan Übersicht';
-    const showSearch    = this._config.show_search    !== false;
+    const showSearch    = false; // search removed per user request
     const showWeekNav   = this._config.show_week_nav  !== false;
     const showLegend    = this._config.show_legend    !== false;
     const defaultExpand = this._config.default_expanded !== false;
@@ -2130,14 +2118,6 @@ ha-card {
       : `<button class="mc-pill mc-pill-green" onclick="this.getRootNode().host._switchWeek(0)">‹ Aktuelle Woche</button>`)
       : ''}
   </div>
-
-  <!-- Search / Controls -->
-  ${showSearch ? `<div class="mc-controls">
-    <input class="mc-search" type="search" placeholder="Klasse suchen …"
-      value="${this._search}"
-      oninput="this.getRootNode().host._onSearch(this.value)"
-      onchange="this.getRootNode().host._onSearch(this.value)">
-  </div>` : ''}
 
   <!-- Class sections grid -->
   <div class="mc-sections-grid">
