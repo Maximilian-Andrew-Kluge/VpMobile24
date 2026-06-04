@@ -226,7 +226,7 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    if (this._config) {
+    if (this._config && Object.keys(this._config).length) {
       // Auto-switch to next week on weekends (Saturday=6, Sunday=0)
       const dow = new Date().getDay();
       const isWeekend = dow === 0 || dow === 6;
@@ -234,17 +234,16 @@ class VpMobile24Card extends HTMLElement {
         this._weekOffset = 1;
         this._mobDayIdx = 0;
       }
-      const anyPopupOpen = this._popupOpen || this._infoPopupOpen;
-      if (anyPopupOpen) {
-        // When viewing next week, always do a full re-render to avoid
-        // showing current week data behind the popup
-        if ((this._weekOffset || 0) !== 0) {
-          this._render();
-        } else {
-          this._updateTableOnly();
-          if (this._infoPopupOpen) {
-            this._renderInfoPopupContent();
-          }
+      // Always just update the table body; restore any open popup afterwards
+      if (this._popupOpen || this._infoPopupOpen) {
+        this._updateTableOnly();
+        // Re-show popup over the updated table
+        if (this._popupOpen && this._popupData) {
+          const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
+          this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+        }
+        if (this._infoPopupOpen) {
+          this._renderInfoPopupContent();
         }
       } else {
         this._render();
@@ -423,7 +422,11 @@ class VpMobile24Card extends HTMLElement {
     const weekTable = weekOffset === 1
       ? (entity.attributes && entity.attributes.next_week_table)
       : (entity.attributes && entity.attributes.week_table);
-    if (!weekTable) { this._render(); return; }
+    if (!weekTable) {
+      // Only do a full re-render if no popup is open
+      if (!this._popupOpen && !this._infoPopupOpen) this._render();
+      return;
+    }
 
     const t = this._t || this._buildTranslations();
     const showTime       = this._config.show_time !== false;
@@ -1522,24 +1525,20 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _lessonType(lesson) {
-    // returns: 'normal' | 'sub' | 'cancelled' | 'test' | 'event'
+    // returns: 'normal' | 'sub' | 'cancelled' | 'empty'
     if (!lesson) return 'empty';
     const fach = lesson.fach || '';
     if (this._isCancelled(fach)) return 'cancelled';
-    const zi = (lesson.zusatzinfo || '').toLowerCase();
-    const fl = fach.toLowerCase();
-    if (zi.includes('klausur') || zi.includes('test') || zi.includes('arbeit') || fl.includes('klausur') || fl.includes('test')) return 'test';
-    if (zi.includes('ausflug') || zi.includes('event') || zi.includes('projekt') || fl.includes('ausflug')) return 'event';
     if (lesson.ist_vertretung) return 'sub';
     return 'normal';
   }
 
   _statusColor(type) {
-    return { normal:'#22c55e', sub:'#eab308', cancelled:'#ef4444', test:'#a855f7', event:'#3b82f6', empty:'transparent' }[type] || '#22c55e';
+    return { normal:'#22c55e', sub:'#eab308', cancelled:'#ef4444', empty:'transparent' }[type] || '#22c55e';
   }
 
   _statusBg(type) {
-    return { normal:'rgba(34,197,94,.12)', sub:'rgba(234,179,8,.13)', cancelled:'rgba(239,68,68,.15)', test:'rgba(168,85,247,.14)', event:'rgba(59,130,246,.13)', empty:'transparent' }[type] || 'rgba(34,197,94,.12)';
+    return { normal:'rgba(34,197,94,.12)', sub:'rgba(234,179,8,.13)', cancelled:'rgba(239,68,68,.15)', empty:'transparent' }[type] || 'rgba(34,197,94,.12)';
   }
 
   _className(entity, entityId) {
@@ -1665,7 +1664,7 @@ class VpMobile24MultiCard extends HTMLElement {
     const raum    = (lesson && lesson.raum)      || '';
     const zeit    = (lesson && lesson.zeit)      || time || '';
     const info    = (lesson && lesson.zusatzinfo)|| '';
-    const labels  = { normal:'Unterricht', sub:'Vertretung', cancelled:'AUSFALL', test:'Klassenarbeit', event:'Ereignis' };
+    const labels  = { normal:'Unterricht', sub:'Vertretung', cancelled:'AUSFALL' };
     const badge   = type !== 'normal' && type !== 'empty'
       ? `<span style="font-size:.68em;font-weight:700;padding:2px 8px;border-radius:5px;background:${this._statusBg(type)};color:${color};border:1px solid ${color}40;margin-left:6px">${labels[type]||''}</span>`
       : '';
@@ -1851,7 +1850,7 @@ class VpMobile24MultiCard extends HTMLElement {
               } else if (type === 'empty' || !les) {
                 tileStyle = `background:${isT ? 'rgba(37,99,235,.06)' : 'rgba(255,255,255,.03)'};color:#334155`;
               } else {
-                tileStyle = `background:${bg};color:${type==='cancelled'?'#fca5a5':type==='sub'?'#fde68a':type==='test'?'#d8b4fe':type==='event'?'#93c5fd':'#dcfce7'};border:1px solid ${color}35`;
+                tileStyle = `background:${bg};color:${type==='cancelled'?'#fca5a5':type==='sub'?'#fde68a':'#dcfce7'};border:1px solid ${color}35`;
               }
               if (les) tileCls += ' mc-tile-hover';
               const tooltip = les ? `title="${[les.fach, les.lehrer && '👤 '+les.lehrer, les.raum && '🚪 '+les.raum].filter(Boolean).join(' | ')}"` : '';
@@ -1914,8 +1913,6 @@ class VpMobile24MultiCard extends HTMLElement {
         <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#22c55e"></span>Unterricht</span>
         <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#eab308"></span>Vertretung</span>
         <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#ef4444"></span>Ausfall</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#a855f7"></span>Klassenarbeit</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#3b82f6"></span>Ereignis</span>
       </div>` : '';
 
     // ── Full HTML ─────────────────────────────────────────────────────────
