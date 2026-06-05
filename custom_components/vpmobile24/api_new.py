@@ -145,11 +145,27 @@ class Stundenplan24API:
                         schedule_data["classes"].append(kurz.text)
 
             for class_short, kl_element in classes_to_process:
+                # ── Build set of lesson-numbers (Nr) from Unterricht block ──
+                # Each <UeNr> has a lesson number; <Nr> in <Std> references it.
+                # This tells us which lessons actually belong to THIS class/student.
+                unterricht_nrs: set[str] = set()
+                unterricht_el = kl_element.find("Unterricht")
+                if unterricht_el is not None:
+                    for ue in unterricht_el.findall("Ue"):
+                        ue_nr = ue.find("UeNr")
+                        if ue_nr is not None and ue_nr.text:
+                            unterricht_nrs.add(ue_nr.text.strip())
+
                 pl_element = kl_element.find("Pl")
                 if pl_element is not None:
                     for std in pl_element.findall("Std"):
                         lesson = self._parse_lesson(std, class_short)
                         if lesson:
+                            # Filter by Unterricht membership when possible
+                            lesson_nr = lesson.get("nr", "")
+                            if unterricht_nrs and lesson_nr and lesson_nr not in unterricht_nrs:
+                                # This lesson belongs to a parallel group not in the student's Unterricht
+                                continue
                             if lesson.get("is_change", False):
                                 schedule_data["changes"].append(lesson)
                             else:
@@ -182,6 +198,7 @@ class Stundenplan24API:
                 "course": "",
                 "info": "",
                 "is_change": False,
+                "nr": "",
             }
 
             st = std_element.find("St")
@@ -216,6 +233,10 @@ class Stundenplan24API:
             ku2 = std_element.find("Ku2")
             if ku2 is not None and ku2.text:
                 lesson["course"] = ku2.text
+
+            nr = std_element.find("Nr")
+            if nr is not None and nr.text:
+                lesson["nr"] = nr.text.strip()
 
             info = std_element.find("If")
             if info is not None and info.text:
