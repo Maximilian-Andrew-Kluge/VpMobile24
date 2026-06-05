@@ -1,6 +1,9 @@
 // VpMobile24 Card v2.4.9
 console.info('%c VpMobile24-CARD %c v2.4.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
+// Global registry — CSP-safe, no inline onclick needed
+window._vpm24 = window._vpm24 || {};
+
 class VpMobile24Card extends HTMLElement {
   constructor() {
     super();
@@ -8,6 +11,37 @@ class VpMobile24Card extends HTMLElement {
     this._config = {};
     this._t = null;
     this._weekOffset = 0;
+    this._uid = '_vpm24_' + Math.random().toString(36).slice(2);
+    window._vpm24[this._uid] = this;
+    // One persistent click handler on shadowRoot — never re-added
+    this._bound_click = (e) => this._handleClick(e);
+    this.shadowRoot.addEventListener('click', this._bound_click);
+  }
+
+  _handleClick(e) {
+    const el = e.target;
+    // Popup overlay
+    if (el.id === 'popup-overlay')      { this._closePopup();    return; }
+    if (el.id === 'info-popup-overlay') { this._closeInfoPopup(); return; }
+    // Any button with data-vpm
+    const btn = el.closest('[data-vpm]');
+    if (!btn) return;
+    e.stopPropagation();
+    const act = btn.dataset.vpm;
+    if (act === 'close')       { this._closePopup();    return; }
+    if (act === 'close-info')  { this._closeInfoPopup(); return; }
+    if (act === 'next-week')   { this._switchWeek(1);   return; }
+    if (act === 'cur-week')    { this._switchWeek(0);   return; }
+    if (act === 'reload')      { this._handleReload();  return; }
+    if (act === 'info')        { this._showInfoPopup();  return; }
+    if (act === 'mob-day')     { this._switchMobDay(Number(btn.dataset.vpmDay)); return; }
+    if (act === 'lesson') {
+      try {
+        const les = JSON.parse(btn.dataset.vpmLesson);
+        this._showLessonDetail(les, btn.dataset.vpmDay, Number(btn.dataset.vpmPeriod), btn.dataset.vpmTime, btn.dataset.vpmCancelled === 'true');
+      } catch(err) {}
+      return;
+    }
   }
 
   // ── Language helper ──────────────────────────────────────────────────────
@@ -449,10 +483,10 @@ class VpMobile24Card extends HTMLElement {
             cls += ' vp-empty';
           }
           const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const lessonAttr = (lesson && (lesson.fach || isCancelled))
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
-          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
+          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + lessonAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         bodyHtml += '</tr>';
       }
@@ -532,8 +566,8 @@ class VpMobile24Card extends HTMLElement {
         } else {
           rowCls += ' vp-mob-empty';
         }
-        const onclickAttr = (lesson && (lesson.fach || isCancelled))
-          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+        const lessonAttr = (lesson && (lesson.fach || isCancelled))
+          ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dName + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
           : '';
         const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
@@ -546,7 +580,7 @@ class VpMobile24Card extends HTMLElement {
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
         }
-        rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
+        rows += '<div class="' + rowCls + '" ' + lessonAttr + '>' + numPart + subjPart + '</div>';
       }
     });
 
@@ -766,10 +800,10 @@ class VpMobile24Card extends HTMLElement {
             cls += ' vp-empty';
           }
           const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
-          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
+          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + lessonAttr2 + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         tableHtml += '</tr>';
       }
@@ -791,7 +825,7 @@ class VpMobile24Card extends HTMLElement {
     days.forEach((d, i) => {
       const active = i === mobDayIdx ? ' vp-mob-tab-active' : '';
       const dn = dayDates[i];
-      mobTabs += '<button class="vp-mob-tab' + active + '" onclick="this.getRootNode().host._switchMobDay(' + i + ')"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
+      mobTabs += '<button class="vp-mob-tab' + active + '" data-vpm="mob-day" data-vpm-day="' + i + '"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
     });
     mobTabs += '</div>';
 
@@ -835,7 +869,7 @@ class VpMobile24Card extends HTMLElement {
             rowCls += ' vp-mob-empty';
           }
           const onclickAttr2 = (lesson && (lesson.fach || isCancelledMob))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelledMob + ')"'
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dName + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelledMob + '"'
             : '';
           const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
@@ -847,8 +881,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
           }
-          rows += '<div class="' + rowCls + '" ' + onclickAttr2 + '>' + numPart + subjPart + '</div>';
-        }
+          rows += '<div class="' + rowCls + '" ' + onclickAttr2 + '>' + numPart + subjPart + '</div>';        }
       });
       return rows;
     };
@@ -1219,13 +1252,13 @@ ha-card {
     <div class="vp-hdr-spacer"></div>
     <div class="vp-hdr-actions">
       ${infoBtn && weekOffset === 0
-        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" onclick="this.getRootNode().host._showInfoPopup()" title="${t.infoTitle}">ⓘ Info</button>`
+        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-vpm="info" title="${t.infoTitle}">ⓘ Info</button>`
         : ''}
       ${weekOffset === 0
-        ? `<button class="vp-pill vp-pill-blue" onclick="this.getRootNode().host._switchWeek(1)">${t.nextWeek}</button>`
-        : `<button class="vp-pill vp-pill-green" onclick="this.getRootNode().host._switchWeek(0)">${t.currentWeek}</button>`}
+        ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
+        : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
       ${reloadEntity
-        ? `<button class="vp-pill" onclick="this.getRootNode().host._handleReload()">↺</button>`
+        ? `<button class="vp-pill" data-vpm="reload">↺</button>`
         : ''}
     </div>
   </div>
@@ -1248,19 +1281,19 @@ ha-card {
 </ha-card>
 
 <!-- ── Lesson detail popup ── -->
-<div id="popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
+<div id="popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="popup" class="vp-popup hidden">
   <div id="popup-title" class="vp-popup-title">Details</div>
   <div id="popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close">${t.close}</button></div>
 </div>
 
 <!-- ── Info popup ── -->
-<div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
+<div id="info-popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="info-popup" class="vp-popup hidden">
   <div class="vp-info-popup-title">${t.infoTitle}</div>
   <div id="info-popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">${t.close}</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close}</button></div>
 </div>`;
 
     // ── Restore popup if it was open before this render ──────────────────
@@ -1409,6 +1442,26 @@ class VpMobile24MultiCard extends HTMLElement {
     this._search   = '';
     this._collapsed = {};      // entityId → bool
     this._detail   = null;     // { lesson, className, period, time, dayName }
+
+    // CSP-safe: one persistent click handler — no getRootNode() needed
+    this.shadowRoot.addEventListener('click', (e) => {
+      if (e.target.id === 'mc-overlay') { this._closeDetail(); return; }
+      const el = e.target.closest('[data-mc-action]');
+      if (!el) return;
+      e.stopPropagation();
+      const act = el.dataset.mcAction;
+      if (act === 'next-week')    { this._switchWeek(1); return; }
+      if (act === 'cur-week')     { this._switchWeek(0); return; }
+      if (act === 'toggle')       { this._toggleCollapse(el.dataset.mcId); return; }
+      if (act === 'close-detail') { this._closeDetail(); return; }
+      if (act === 'detail') {
+        try {
+          const les = JSON.parse(el.dataset.mcLesson);
+          this._showDetail(les, el.dataset.mcClass, Number(el.dataset.mcPeriod), el.dataset.mcTime, el.dataset.mcDay);
+        } catch(err) {}
+        return;
+      }
+    });
   }
 
   // ── Config form ──────────────────────────────────────────────────────────
@@ -1663,7 +1716,7 @@ class VpMobile24MultiCard extends HTMLElement {
     if (type === 'cancelled') {
       pop.innerHTML = `
         <div class="mc-pop-ausfall">AUSFALL</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" onclick="this.getRootNode().host._closeDetail()">Schließen</button></div>`;
+        <div class="mc-pop-foot"><button class="mc-pop-btn" data-mc-action="close-detail">Schließen</button></div>`;
       pop.style.background = '#7f1d1d';
       pop.style.boxShadow  = '0 0 0 1px rgba(239,68,68,.4),0 12px 48px rgba(239,68,68,.5)';
     } else {
@@ -1674,7 +1727,7 @@ class VpMobile24MultiCard extends HTMLElement {
           <span class="mc-pop-cls" style="color:${color}">${className}</span>
         </div>
         <div class="mc-pop-body">${rows}</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" onclick="this.getRootNode().host._closeDetail()">Schließen</button></div>`;
+        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" data-mc-action="close-detail">Schließen</button></div>`;
       pop.style.background = '#162040';
       pop.style.boxShadow  = '0 12px 48px rgba(0,0,0,.7)';
     }
@@ -1824,8 +1877,8 @@ class VpMobile24MultiCard extends HTMLElement {
               const isCur  = isT && p === currentPeriod && type !== 'cancelled' && type !== 'empty';
               const fach   = (les && !this._isCancelled(les.fach)) ? les.fach : (les ? '—' : '');
               const clickable = !!les;
-              const onclk = clickable
-                ? `onclick="this.getRootNode().host._showDetail(${JSON.stringify(les).replace(/"/g,'&quot;')},'${className.replace(/'/g,"\\'")}',${p},'${timeStr}','${dayFull[di]}')" style="cursor:pointer"`
+              const lessonAttrMc = clickable
+                ? `data-mc-action="detail" data-mc-lesson='${JSON.stringify(les).replace(/'/g,"&#39;")}' data-mc-class="${className.replace(/"/g,'&quot;')}" data-mc-period="${p}" data-mc-time="${timeStr}" data-mc-day="${dayFull[di]}" style="cursor:pointer"`
                 : '';
               let tileStyle = '';
               let tileCls   = 'mc-tile';
@@ -1839,7 +1892,7 @@ class VpMobile24MultiCard extends HTMLElement {
               if (les) tileCls += ' mc-tile-hover';
               const tooltip = les ? `title="${[les.fach, les.lehrer && '👤 '+les.lehrer, les.raum && '🚪 '+les.raum].filter(Boolean).join(' | ')}"` : '';
               gridHtml += `<td class="${isT?'mc-td-today':''}">
-                <div class="mc-tile" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
+                <div class="mc-tile" style="${tileStyle}" ${lessonAttrMc} ${tooltip}>${fach}</div>
               </td>`;
             });
             gridHtml += '</tr>';
@@ -1864,7 +1917,7 @@ class VpMobile24MultiCard extends HTMLElement {
 
       sectionsHtml += `
         <div class="mc-section">
-          <div class="mc-section-head" onclick="this.getRootNode().host._toggleCollapse('${entityId}')">
+          <div class="mc-section-head" data-mc-action="toggle" data-mc-id="${entityId}">
             <div class="mc-section-left">
               <span class="mc-chevron${isCollapsed ? '' : ' mc-chevron-open'}">›</span>
               <span class="mc-class-name">${className}</span>
@@ -2095,8 +2148,8 @@ ha-card {
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
-      ? `<button class="mc-pill mc-pill-blue" onclick="this.getRootNode().host._switchWeek(1)">Nächste Woche ›</button>`
-      : `<button class="mc-pill mc-pill-green" onclick="this.getRootNode().host._switchWeek(0)">‹ Aktuelle Woche</button>`)
+      ? `<button class="mc-pill mc-pill-blue" data-mc-action="next-week">Nächste Woche ›</button>`
+      : `<button class="mc-pill mc-pill-green" data-mc-action="cur-week">‹ Aktuelle Woche</button>`)
       : ''}
   </div>
 
@@ -2110,7 +2163,7 @@ ha-card {
 </ha-card>
 
 <!-- Detail popup -->
-<div id="mc-overlay" class="mc-overlay hidden" onclick="this.getRootNode().host._closeDetail()"></div>
+<div id="mc-overlay" class="mc-overlay hidden"></div>
 <div id="mc-popup"  class="mc-popup hidden"></div>`;
   }
 }
