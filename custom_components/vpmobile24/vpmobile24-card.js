@@ -1306,25 +1306,56 @@ customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
 
-// ── VpMobile24 Current Lesson Card ────────────────────────────────────────
+// ── VpMobile24 Current Lesson Card v2.4.9 ────────────────────────────────
 class VpMobile24CurrentCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._config = {};
+    this._timer  = null;
   }
 
   static getStubConfig() {
-    return { entity: 'sensor.vpmobile24_aktueller_unterricht' };
+    return {
+      entity:       'sensor.vpmobile24_aktueller_unterricht',
+      next_entity:  'sensor.vpmobile24_naechste_stunde',
+      week_entity:  'sensor.vpmobile24_wochentabelle',
+      title:        'Aktueller Unterricht',
+      show_progress:   true,
+      show_countdown:  true,
+      show_next:       true,
+      show_teacher:    true,
+      show_room:       true,
+      show_day_info:   true,
+    };
   }
 
   static getConfigForm() {
     return {
       schema: [
-        { name: 'entity', required: true, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
-        { name: 'title', default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
+        { name: 'entity',      required: true,  selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'next_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'week_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
+        { name: 'title',       default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
+        { name: 'show_progress',  default: true, selector: { boolean: {} } },
+        { name: 'show_countdown', default: true, selector: { boolean: {} } },
+        { name: 'show_next',      default: true, selector: { boolean: {} } },
+        { name: 'show_teacher',   default: true, selector: { boolean: {} } },
+        { name: 'show_room',      default: true, selector: { boolean: {} } },
+        { name: 'show_day_info',  default: true, selector: { boolean: {} } },
       ],
-      computeLabel: (s) => ({ entity: 'Sensor', title: 'Titel' })[s.name] || s.name,
+      computeLabel: (s) => ({
+        entity:       'Aktueller-Unterricht-Sensor',
+        next_entity:  'Nächste-Stunde-Sensor',
+        week_entity:  'Stundenplan-Sensor (für Tagesinfos)',
+        title:        'Kartentitel',
+        show_progress:'Fortschrittsbalken anzeigen',
+        show_countdown:'Countdown anzeigen',
+        show_next:    'Nächste Stunde anzeigen',
+        show_teacher: 'Lehrer anzeigen',
+        show_room:    'Raum anzeigen',
+        show_day_info:'Tagesinformationen anzeigen',
+      })[s.name] || s.name,
     };
   }
 
@@ -1337,93 +1368,322 @@ class VpMobile24CurrentCard extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this._config) this._render();
+    // Auto-update every minute for countdown/progress
+    if (!this._timer) {
+      this._timer = setInterval(() => { if (this._hass && this._config) this._render(); }, 30000);
+    }
   }
 
-  getCardSize() { return 2; }
+  disconnectedCallback() {
+    if (this._timer) { clearInterval(this._timer); this._timer = null; }
+  }
 
-  _render() {
-    if (!this._hass || !this._config) return;
-    const entity = this._hass.states[this._config.entity];
-    const title = this._config.title || 'Aktueller Unterricht';
+  getCardSize() { return 3; }
 
-    if (!entity) {
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:#ef4444;font-family:-apple-system,sans-serif">Entity nicht gefunden: ${this._config.entity}</div></ha-card>`;
-      return;
+  // ── Time helpers ─────────────────────────────────────────────────────────
+  _parseMins(str) {
+    if (!str || !str.includes(':')) return null;
+    const [h, m] = str.split(':').map(Number);
+    return isNaN(h) || isNaN(m) ? null : h * 60 + m;
+  }
+
+  _nowMins() {
+    const n = new Date();
+    return n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
+  }
+
+  _fmtCountdown(mins) {
+    const m = Math.max(0, Math.round(mins));
+    if (m === 0) return 'Gleich';
+    if (m < 60)  return m + ' Min.';
+    return Math.floor(m / 60) + 'h ' + (m % 60) + 'min';
+  }
+
+  _progress(startMins, endMins, nowMins) {
+    if (startMins === null || endMins === null) return 0;
+    const total = endMins - startMins;
+    if (total <= 0) return 100;
+    return Math.min(100, Math.max(0, ((nowMins - startMins) / total) * 100));
+  }
+
+  // ── Status detection ──────────────────────────────────────────────────────
+  _getStatus(entity, nextEntity, weekEntity) {
+    const now    = this._nowMins();
+    const attr   = entity ? entity.attributes : {};
+    const state  = entity ? (entity.state || '') : '';
+    const noData = !entity || state === 'Keine Daten' || state === 'No data';
+
+    const fach      = attr.fach        || '';
+    const zeitStart = attr.zeit_start  || '';
+    const zeitEnd   = attr.zeit_ende   || '';
+    const zeit      = attr.zeit        || '';
+    const lehrer    = attr.lehrer      || '';
+    const raum      = attr.raum        || '';
+    const stunde    = attr.stunde      || '';
+    const isAusfall = attr.ist_ausfall || false;
+    const isSub     = attr.ist_vertretung || false;
+    const info      = attr.zusatzinfo  || '';
+
+    const startMins = this._parseMins(zeitStart) ?? this._parseMins(zeit ? zeit.split('-')[0] : '');
+    const endMins   = this._parseMins(zeitEnd)   ?? this._parseMins(zeit ? zeit.split('-')[1] : '');
+
+    // Next lesson
+    const nextAttr  = nextEntity ? nextEntity.attributes : {};
+    const nextFach  = nextAttr.fach   || '';
+    const nextZeit  = nextAttr.zeit   || '';
+    const nextLehrer= nextAttr.lehrer || '';
+    const nextRaum  = nextAttr.raum   || '';
+    const nextStart = this._parseMins(nextZeit ? nextZeit.split('-')[0] : '');
+
+    // Day info from week schedule entity
+    let gesamt = 0, verbleibend = 0, unterrichtsEnde = '', nVertretung = 0;
+    if (weekEntity && weekEntity.attributes) {
+      const wa = weekEntity.attributes;
+      const stunden = wa.stunden_heute || [];
+      gesamt = wa.gesamt_stunden || 0;
+      stunden.forEach(s => {
+        if (!s.ist_vorbei) verbleibend++;
+        if (s.ist_vertretung) nVertretung++;
+        const e = (s.zeit || '').split('-')[1] || '';
+        if (e && (!unterrichtsEnde || e > unterrichtsEnde)) unterrichtsEnde = e;
+      });
     }
 
-    const state = entity.state || '';
-    const attr = entity.attributes || {};
-    const fach = attr.fach || state;
-    const zeit = attr.zeit || '';
-    const lehrer = attr.lehrer || '';
-    const raum = attr.raum || '';
-    const stunde = attr.stunde || '';
-    const isAusfall = attr.ist_ausfall || false;
-    const isSub = attr.ist_vertretung || false;
-    const info = attr.zusatzinfo || '';
-    const noLesson = state === 'Keine Daten' || state === 'No data' || !fach;
+    // Determine current state
+    if (!noData && fach && !isAusfall && startMins !== null && endMins !== null && now >= startMins && now <= endMins) {
+      return {
+        type: isSub ? 'sub' : 'lesson',
+        fach, lehrer, raum, stunde, zeit, info, isSub,
+        startMins, endMins,
+        progress: this._progress(startMins, endMins, now),
+        remaining: endMins - now,
+        nextFach, nextZeit, nextLehrer, nextRaum, nextStart,
+        gesamt, verbleibend, unterrichtsEnde, nVertretung,
+      };
+    }
 
-    const color = isAusfall ? '#ef4444' : isSub ? '#f97316' : '#3b82f6';
-    const bgColor = isAusfall ? 'rgba(239,68,68,0.12)' : isSub ? 'rgba(249,115,22,0.12)' : 'rgba(59,130,246,0.12)';
-    const icon = isAusfall ? '❌' : isSub ? '🔄' : '📚';
-    const label = isAusfall ? 'AUSFALL' : isSub ? 'Vertretung' : (stunde ? stunde + '. Stunde' : '');
+    // No lesson running → check next lesson
+    if (nextFach && nextStart !== null && now < nextStart) {
+      return {
+        type: 'free',
+        nextFach, nextZeit, nextLehrer, nextRaum, nextStart,
+        remaining: nextStart - now,
+        gesamt, verbleibend, unterrichtsEnde, nVertretung,
+        fach: '', lehrer: '', raum: '', stunde: '', zeit: '', info: '',
+      };
+    }
+
+    // End of day
+    return {
+      type: 'done',
+      unterrichtsEnde, gesamt, nVertretung,
+      fach: '', lehrer: '', raum: '', stunde: '', zeit: '', info: '',
+      nextFach, nextZeit,
+    };
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  _render() {
+    if (!this._hass || !this._config) return;
+
+    const entity     = this._hass.states[this._config.entity];
+    const nextEntity = this._config.next_entity  ? this._hass.states[this._config.next_entity]  : null;
+    const weekEntity = this._config.week_entity  ? this._hass.states[this._config.week_entity]  : null;
+    const title      = this._config.title || 'Aktueller Unterricht';
+    const showProg   = this._config.show_progress  !== false;
+    const showCount  = this._config.show_countdown !== false;
+    const showNext   = this._config.show_next      !== false;
+    const showTeach  = this._config.show_teacher   !== false;
+    const showRoom   = this._config.show_room      !== false;
+    const showDay    = this._config.show_day_info  !== false;
+
+    const s = this._getStatus(entity, nextEntity, weekEntity);
+
+    // ── Colors & icons per type ───────────────────────────────────────────
+    const themes = {
+      lesson: { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label:'Aktueller Unterricht' },
+      sub:    { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label:'Vertretung' },
+      free:   { color:'#3b82f6', bg:'rgba(59,130,246,.13)', border:'rgba(59,130,246,.35)', icon:'⏸', label:'Freistunde / Pause' },
+      done:   { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label:'Unterricht beendet' },
+    };
+    const th = themes[s.type] || themes.done;
+
+    // ── Main content ──────────────────────────────────────────────────────
+    let mainHtml = '';
+
+    if (s.type === 'lesson' || s.type === 'sub') {
+      mainHtml += `<div class="vc-subject">${s.fach}</div>`;
+      mainHtml += `<div class="vc-meta">`;
+      if (s.stunde) mainHtml += `<span class="vc-chip">${s.stunde}. Stunde</span>`;
+      if (s.zeit)   mainHtml += `<span class="vc-chip">🕐 ${s.zeit}</span>`;
+      if (showTeach && s.lehrer) mainHtml += `<span class="vc-chip">👤 ${s.lehrer}</span>`;
+      if (showRoom  && s.raum)   mainHtml += `<span class="vc-chip">🚪 ${s.raum}</span>`;
+      mainHtml += `</div>`;
+      if (s.info) mainHtml += `<div class="vc-info">ℹ️ ${s.info}</div>`;
+      if (showCount && s.remaining !== undefined) {
+        mainHtml += `<div class="vc-countdown">Noch <strong>${this._fmtCountdown(s.remaining)}</strong></div>`;
+      }
+      if (showProg && s.progress !== undefined) {
+        mainHtml += `<div class="vc-progress-wrap">
+          <div class="vc-progress-bar" style="width:${s.progress.toFixed(1)}%;background:${th.color}"></div>
+          <span class="vc-progress-pct">${Math.round(s.progress)}%</span>
+        </div>`;
+      }
+    } else if (s.type === 'free') {
+      if (s.nextFach) {
+        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.7">Nächste Stunde</div>`;
+        mainHtml += `<div class="vc-subject">${s.nextFach}</div>`;
+        mainHtml += `<div class="vc-meta">`;
+        if (s.nextZeit)   mainHtml += `<span class="vc-chip">🕐 ${s.nextZeit}</span>`;
+        if (showTeach && s.nextLehrer) mainHtml += `<span class="vc-chip">👤 ${s.nextLehrer}</span>`;
+        if (showRoom  && s.nextRaum)   mainHtml += `<span class="vc-chip">🚪 ${s.nextRaum}</span>`;
+        mainHtml += `</div>`;
+      }
+      if (showCount && s.remaining !== undefined) {
+        mainHtml += `<div class="vc-countdown">Beginnt in <strong>${this._fmtCountdown(s.remaining)}</strong></div>`;
+      }
+      if (showProg && s.nextStart !== undefined) {
+        const now = this._nowMins();
+        // Estimate break start from current time - 5min as fallback
+        const breakProg = s.remaining <= 20 ? this._progress(now - (20 - s.remaining), s.nextStart, now) : 0;
+        mainHtml += `<div class="vc-progress-wrap">
+          <div class="vc-progress-bar" style="width:${breakProg.toFixed(1)}%;background:${th.color}"></div>
+        </div>`;
+      }
+    } else {
+      // Done
+      if (s.unterrichtsEnde) {
+        mainHtml += `<div class="vc-subject" style="font-size:1em">Unterricht endete um ${s.unterrichtsEnde}</div>`;
+      } else {
+        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.6">Kein Unterricht mehr heute</div>`;
+      }
+    }
+
+    // ── Next lesson block ─────────────────────────────────────────────────
+    let nextHtml = '';
+    if (showNext && (s.type === 'lesson' || s.type === 'sub') && s.nextFach) {
+      nextHtml = `<div class="vc-next">
+        <span class="vc-next-label">Nächste</span>
+        <span class="vc-next-fach">${s.nextFach}</span>
+        ${s.nextZeit ? `<span class="vc-next-time">${s.nextZeit.split('-')[0]}</span>` : ''}
+        ${showRoom && s.nextRaum ? `<span class="vc-chip" style="font-size:.68em">🚪 ${s.nextRaum}</span>` : ''}
+      </div>`;
+    }
+
+    // ── Day info ──────────────────────────────────────────────────────────
+    let dayHtml = '';
+    if (showDay && (s.gesamt || s.nVertretung || s.unterrichtsEnde)) {
+      dayHtml = `<div class="vc-day">`;
+      if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">📚 ${s.gesamt} Stunden</span>`;
+      if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">⏳ ${s.verbleibend} verbleibend</span>`;
+      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f97316">🔄 ${s.nVertretung} Vertretung${s.nVertretung > 1 ? 'en' : ''}</span>`;
+      if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">🏁 Ende ${s.unterrichtsEnde}</span>`;
+      dayHtml += `</div>`;
+    }
 
     this.shadowRoot.innerHTML = `
 <style>
 :host { display: block; }
 ha-card {
   background: #0f1729 !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08) !important;
+  border: 1px solid ${th.border} !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 0 1px ${th.border} !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #e2e8f0 !important;
+  transition: border-color .4s, box-shadow .4s;
 }
-.vp-cur {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  background: ${bgColor};
-  border-left: 4px solid ${color};
+.vc-main {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px 12px;
+  background: ${th.bg};
+  border-left: 4px solid ${th.color};
+  min-height: 80px;
 }
-.vp-cur-icon { font-size: 1.8em; flex-shrink: 0; }
-.vp-cur-body { flex: 1; min-width: 0; }
-.vp-cur-title { font-size: .72em; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: #64748b; margin-bottom: 3px; }
-.vp-cur-fach { font-size: 1.4em; font-weight: 800; color: ${noLesson ? '#475569' : '#fff'}; line-height: 1.2; }
-.vp-cur-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
-.vp-cur-chip {
-  display: inline-flex; align-items: center; gap: 4px;
+.vc-icon {
+  font-size: 2em; flex-shrink: 0;
+  filter: drop-shadow(0 0 6px ${th.color}88);
+  animation: ${s.type === 'lesson' || s.type === 'sub' ? 'vc-pulse-icon 3s ease-in-out infinite' : 'none'};
+}
+@keyframes vc-pulse-icon {
+  0%,100% { filter: drop-shadow(0 0 4px ${th.color}88); }
+  50%      { filter: drop-shadow(0 0 12px ${th.color}cc); }
+}
+.vc-body { flex: 1; min-width: 0; }
+.vc-label {
+  font-size: .68em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: ${th.color}; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.vc-title-badge {
+  font-size: .7em; font-weight: 600; background: rgba(255,255,255,.08);
+  border-radius: 12px; padding: 1px 8px; color: #94a3b8;
+}
+.vc-subject {
+  font-size: 1.45em; font-weight: 800; color: #fff;
+  line-height: 1.2; margin-bottom: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vc-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.vc-chip {
+  display: inline-flex; align-items: center; gap: 3px;
   font-size: .72em; font-weight: 600; color: #94a3b8;
-  background: rgba(255,255,255,0.06); border-radius: 6px; padding: 2px 8px;
+  background: rgba(255,255,255,.07); border-radius: 20px; padding: 2px 9px;
+  border: 1px solid rgba(255,255,255,.08);
 }
-.vp-cur-badge {
-  display: inline-block; font-size: .68em; font-weight: 700;
-  padding: 2px 8px; border-radius: 5px; margin-left: 6px;
-  background: ${isAusfall ? 'rgba(239,68,68,.2)' : 'rgba(249,115,22,.2)'};
-  color: ${isAusfall ? '#fca5a5' : '#fdba74'};
-  border: 1px solid ${isAusfall ? 'rgba(239,68,68,.3)' : 'rgba(249,115,22,.3)'};
+.vc-chip-sm { font-size: .68em; padding: 2px 7px; }
+.vc-info { font-size: .75em; color: #f59e0b; margin-bottom: 5px; }
+.vc-countdown {
+  font-size: .82em; color: #94a3b8; margin-top: 2px;
 }
-.vp-cur-info { font-size: .75em; color: #f59e0b; margin-top: 4px; }
-.vp-cur-empty { padding: 16px 18px; color: #475569; font-size: .88em; font-style: italic; }
+.vc-countdown strong { color: ${th.color}; }
+/* Progress bar */
+.vc-progress-wrap {
+  margin-top: 10px; height: 5px;
+  background: rgba(255,255,255,.08); border-radius: 10px;
+  overflow: hidden; position: relative;
+}
+.vc-progress-bar {
+  height: 100%; border-radius: 10px;
+  transition: width .8s ease;
+  box-shadow: 0 0 8px ${th.color}88;
+}
+.vc-progress-pct {
+  position: absolute; right: 0; top: -16px;
+  font-size: .65em; color: ${th.color}; font-weight: 700;
+}
+/* Next lesson */
+.vc-next {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 18px;
+  background: rgba(255,255,255,.03);
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: .78em;
+}
+.vc-next-label { font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
+.vc-next-fach  { font-weight: 700; color: #e2e8f0; }
+.vc-next-time  { color: ${th.color}; font-weight: 600; }
+/* Day info */
+.vc-day {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 8px 18px 12px;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
 </style>
 <ha-card>
-  ${noLesson
-    ? `<div class="vp-cur-empty">🕐 ${title}: Kein laufender Unterricht</div>`
-    : `<div class="vp-cur">
-        <div class="vp-cur-icon">${icon}</div>
-        <div class="vp-cur-body">
-          <div class="vp-cur-title">${title}${label ? ' &nbsp;·&nbsp; ' + label : ''}</div>
-          <div class="vp-cur-fach">${isAusfall ? 'AUSFALL' : fach}${(isAusfall || isSub) ? '<span class="vp-cur-badge">' + (isAusfall ? 'Ausfall' : 'Vertretung') + '</span>' : ''}</div>
-          <div class="vp-cur-meta">
-            ${zeit ? '<span class="vp-cur-chip">🕐 ' + zeit + '</span>' : ''}
-            ${lehrer ? '<span class="vp-cur-chip">👤 ' + lehrer + '</span>' : ''}
-            ${raum ? '<span class="vp-cur-chip">🚪 ' + raum + '</span>' : ''}
-          </div>
-          ${info ? '<div class="vp-cur-info">ℹ️ ' + info + '</div>' : ''}
-        </div>
-      </div>`
-  }
+  <div class="vc-main">
+    <div class="vc-icon">${th.icon}</div>
+    <div class="vc-body">
+      <div class="vc-label">
+        ${th.label}
+        <span class="vc-title-badge">${title}</span>
+      </div>
+      ${mainHtml}
+    </div>
+  </div>
+  ${nextHtml}
+  ${dayHtml}
 </ha-card>`;
   }
 }
