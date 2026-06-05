@@ -1518,10 +1518,10 @@ class VpMobile24MultiCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Auto-switch to next week on weekend
     const dow = new Date().getDay();
     if ((dow === 0 || dow === 6) && this._weekOffset === 0) this._weekOffset = 1;
-    if (this._config && Object.keys(this._config).length) this._render();
+    // Don't re-render while popup is open — would destroy popup DOM
+    if (this._config && Object.keys(this._config).length && !this._detail) this._render();
   }
 
   get hass() { return this._hass; }
