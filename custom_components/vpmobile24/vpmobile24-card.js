@@ -252,6 +252,7 @@ class VpMobile24Card extends HTMLElement {
   setConfig(config) {
     if (!config || !config.entity) throw new Error('Entity ist erforderlich');
     this._config = JSON.parse(JSON.stringify(config));
+    // Always reset popup state on config — prevents popup persisting across page reloads
     this._popupOpen = false;
     this._popupData = null;
     this._infoPopupOpen = false;
@@ -277,31 +278,26 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    if (this._config && Object.keys(this._config).length) {
-      try {
-        // Auto-switch to next week on weekends (Saturday=6, Sunday=0)
-        const dow = new Date().getDay();
-        const isWeekend = dow === 0 || dow === 6;
-        if (isWeekend && (this._weekOffset === 0 || this._weekOffset === undefined)) {
-          this._weekOffset = 1;
-          this._mobDayIdx = 0;
-        }
-        if (this._popupOpen || this._infoPopupOpen) {
-          this._updateTableOnly();
-          if (this._popupOpen && this._popupData) {
-            const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
-            this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
-          }
-          if (this._infoPopupOpen) {
-            this._renderInfoPopupContent();
-          }
-        } else {
-          this._render();
-        }
-      } catch(e) {
-        // Never let errors in set hass() propagate to HA — it shows as Konfigurationsfehler
-        console.error('VpMobile24 set hass error:', e);
+    if (!this._config || !Object.keys(this._config).length) return;
+    try {
+      const dow = new Date().getDay();
+      if ((dow === 0 || dow === 6) && !this._weekOffset) {
+        this._weekOffset = 1;
+        this._mobDayIdx = 0;
       }
+      if (this._popupOpen || this._infoPopupOpen) {
+        // Popup open: only update table cells, then re-show popup
+        this._updateTableOnly();
+        if (this._popupOpen && this._popupData) {
+          const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
+          this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+        }
+        if (this._infoPopupOpen) this._renderInfoPopupContent();
+      } else {
+        this._render();
+      }
+    } catch(e) {
+      console.error('[VpMobile24] set hass error:', e);
     }
   }
   get hass() { return this._hass; }
@@ -719,6 +715,9 @@ class VpMobile24Card extends HTMLElement {
 
   _render() {
     if (!this._hass || !this._config) return;
+    // Never render while popup is open — it would destroy the popup DOM
+    if (this._popupOpen || this._infoPopupOpen) return;
+    try {
     const t = this._buildTranslations(); // also sets this._t
 
     const entity = this._hass.states[this._config.entity];
@@ -1357,14 +1356,12 @@ ha-card {
 </div>`;
 
     // ── Restore popup if it was open before this render ──────────────────
-    if (this._popupOpen && this._popupData) {
-      const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
-      this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
-    }
-    if (this._infoPopupOpen) {
-      this._renderInfoPopupContent();
-    }
+    // NOTE: We intentionally do NOT restore popup after _render() to prevent
+    // popup from persisting across page reloads. Popup is only shown via
+    // _showLessonDetail() which is triggered by user interaction.
+    // _updateTableOnly() + _renderPopupContent() handles the hass-update case.
 
+    } catch(e) { console.error('[VpMobile24] _render error:', e); }
   }
 }
 
