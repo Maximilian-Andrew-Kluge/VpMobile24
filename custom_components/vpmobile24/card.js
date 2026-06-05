@@ -1444,8 +1444,7 @@ class VpMobile24MultiCard extends HTMLElement {
     this._detail   = null;
     // CSP-safe: single persistent listener
     this.shadowRoot.addEventListener('click', (e) => {
-      if (e.target.id === 'mc-overlay') { this._closeDetail(); return; }
-      const t = e.target.closest('[data-mc]');
+      if (e.target.id === 'mc-overlay') { this._closeDetail(); return; }      const t = e.target.closest('[data-mc]');
       if (!t) return;
       e.stopPropagation();
       const act = t.dataset.mc;
@@ -1686,49 +1685,51 @@ class VpMobile24MultiCard extends HTMLElement {
     this._render();
   }
 
-  // ── Detail popup ──────────────────────────────────────────────────────────
+  // ── Detail popup — same style as main card ───────────────────────────────
   _showDetail(lesson, className, period, time, dayName) {
     this._detail = { lesson, className, period, time, dayName };
     const pop = this.shadowRoot.getElementById('mc-popup');
     const ov  = this.shadowRoot.getElementById('mc-overlay');
     if (!pop || !ov) return;
-    const type = this._lessonType(lesson);
-    const color = this._statusColor(type);
-    const fach    = (lesson && lesson.fach && !this._isCancelled(lesson.fach)) ? lesson.fach : '—';
-    const lehrer  = (lesson && lesson.lehrer)    || '';
-    const raum    = (lesson && lesson.raum)      || '';
-    const zeit    = (lesson && lesson.zeit)      || time || '';
-    const info    = (lesson && lesson.zusatzinfo)|| '';
-    const labels  = { normal:'Unterricht', sub:'Vertretung', cancelled:'AUSFALL' };
-    const badge   = type !== 'normal' && type !== 'empty'
-      ? `<span style="font-size:.68em;font-weight:700;padding:2px 8px;border-radius:5px;background:${this._statusBg(type)};color:${color};border:1px solid ${color}40;margin-left:6px">${labels[type]||''}</span>`
-      : '';
 
-    let rows = '';
-    if (zeit)   rows += `<div class="mc-pop-row"><span class="mc-pop-icon">🕐</span><span class="mc-pop-lbl">Zeit</span><span class="mc-pop-val">${zeit}</span></div>`;
-    if (lehrer) rows += `<div class="mc-pop-row"><span class="mc-pop-icon">👤</span><span class="mc-pop-lbl">Lehrer</span><span class="mc-pop-val">${lehrer}</span></div>`;
-    if (raum)   rows += `<div class="mc-pop-row"><span class="mc-pop-icon">🚪</span><span class="mc-pop-lbl">Raum</span><span class="mc-pop-val">${raum}</span></div>`;
-    if (info)   rows += `<div class="mc-pop-row mc-pop-info"><span class="mc-pop-icon">ℹ️</span><span class="mc-pop-lbl">Info</span><span class="mc-pop-val">${info}</span></div>`;
-    if (!rows)  rows  = `<div class="mc-pop-empty">Keine weiteren Details verfügbar.</div>`;
+    const fach   = (lesson && lesson.fach && !this._isCancelled(lesson.fach)) ? lesson.fach : '—';
+    const lehrer = (lesson && lesson.lehrer)     || '';
+    const raum   = (lesson && lesson.raum)       || '';
+    const zeit   = (lesson && lesson.zeit)       || time || '';
+    const info   = (lesson && lesson.zusatzinfo) || '';
+    const isActuallyCancelled = this._isCancelled(lesson ? lesson.fach : null);
+    const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
 
-    if (type === 'cancelled') {
-      pop.innerHTML = `
-        <div class="mc-pop-ausfall">AUSFALL</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" data-mc="close-detail">Schließen</button></div>`;
-      pop.style.background = '#7f1d1d';
-      pop.style.boxShadow  = '0 0 0 1px rgba(239,68,68,.4),0 12px 48px rgba(239,68,68,.5)';
-    } else {
-      pop.innerHTML = `
-        <div class="mc-pop-head" style="border-bottom:2px solid ${color}40">
-          <span class="mc-pop-num">${period}. Std.</span>
-          <span class="mc-pop-fach">${fach}</span>${badge}
-          <span class="mc-pop-cls" style="color:${color}">${className}</span>
-        </div>
-        <div class="mc-pop-body">${rows}</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" data-mc="close-detail">Schließen</button></div>`;
-      pop.style.background = '#162040';
-      pop.style.boxShadow  = '0 12px 48px rgba(0,0,0,.7)';
+    if (isActuallyCancelled) {
+      pop.className = 'vp-popup vp-popup-ausfall';
+      pop.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center">'
+        + '<div class="vp-ausfall-block">AUSFALL</div></div>'
+        + '<div class="vp-popup-footer" style="border-top:none;padding:0 20px 20px">'
+        + '<button class="vp-popup-btn" data-mc="close-detail">Schließen</button></div>';
+      pop.classList.remove('hidden');
+      ov.classList.remove('hidden');
+      return;
     }
+
+    let badge = '';
+    if (isVertretung) badge = '<span class="vp-detail-badge vp-detail-sub">Vertretung</span>';
+
+    let rows = '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
+      + '<span class="vp-detail-label">' + period + '. Stunde</span>'
+      + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
+    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span><span class="vp-detail-label">Lehrer</span><span class="vp-detail-val">' + lehrer + '</span></div>';
+    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span><span class="vp-detail-label">Raum</span><span class="vp-detail-val">' + raum + '</span></div>';
+    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-label">Info</span><span class="vp-detail-val">' + info + '</span></div>';
+    if (!lehrer && !raum && !info) rows += '<div class="vp-detail-empty">Keine weiteren Details verfügbar.</div>';
+
+    pop.className = 'vp-popup';
+    pop.innerHTML = '<div class="vp-popup-title">'
+      + '<span class="vp-detail-num">' + period + '. Stunde</span>'
+      + '<span class="vp-detail-fach">' + fach + '</span>' + badge
+      + '<span style="margin-left:auto;font-size:.72em;color:#64748b;background:rgba(255,255,255,.07);padding:2px 8px;border-radius:5px">' + className + '</span>'
+      + '</div>'
+      + '<div>' + rows + '</div>'
+      + '<div class="vp-popup-footer"><button class="vp-popup-btn" data-mc="close-detail">Schließen</button></div>';
     pop.classList.remove('hidden');
     ov.classList.remove('hidden');
   }
@@ -1737,7 +1738,7 @@ class VpMobile24MultiCard extends HTMLElement {
     this._detail = null;
     const pop = this.shadowRoot.getElementById('mc-popup');
     const ov  = this.shadowRoot.getElementById('mc-overlay');
-    if (pop) pop.classList.add('hidden');
+    if (pop) { pop.classList.add('hidden'); pop.classList.remove('vp-popup-ausfall'); }
     if (ov)  ov.classList.add('hidden');
   }
 
@@ -2161,8 +2162,8 @@ ha-card {
 </ha-card>
 
 <!-- Detail popup -->
-<div id="mc-overlay" class="mc-overlay hidden"></div>
-<div id="mc-popup"  class="mc-popup hidden"></div>`;
+<div id="mc-overlay" class="vp-popup-overlay hidden"></div>
+<div id="mc-popup"  class="vp-popup hidden"></div>`;
   }
 }
 
