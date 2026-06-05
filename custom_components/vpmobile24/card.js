@@ -1435,17 +1435,30 @@ class VpMobile24CurrentCard extends HTMLElement {
     const nextRaum  = nextAttr.raum   || '';
     const nextStart = this._parseMins(nextZeit ? nextZeit.split('-')[0] : '');
 
-    // Day info from week schedule entity
+    // Day info from week schedule entity — exclude cancelled lessons
     let gesamt = 0, verbleibend = 0, unterrichtsEnde = '', nVertretung = 0;
     if (weekEntity && weekEntity.attributes) {
       const wa = weekEntity.attributes;
       const stunden = wa.stunden_heute || [];
-      gesamt = wa.gesamt_stunden || 0;
+      const nowM = this._nowMins();
       stunden.forEach(s => {
-        if (!s.ist_vorbei) verbleibend++;
+        const f = (s.fach || '').trim();
+        const isCan = !f || f === '---' || f === '—' || f === '-' || /^[-—–\s]+$/.test(f);
+        if (isCan) return; // skip cancelled
+        gesamt++;
         if (s.ist_vertretung) nVertretung++;
-        const e = (s.zeit || '').split('-')[1] || '';
-        if (e && (!unterrichtsEnde || e > unterrichtsEnde)) unterrichtsEnde = e;
+        // Get end time from zeit (format "HH:MM-HH:MM")
+        const endT = (s.zeit || '').split('-')[1] || '';
+        if (endT) {
+          const endM = this._parseMins(endT);
+          if (endM !== null && (!unterrichtsEnde || endM > this._parseMins(unterrichtsEnde))) {
+            unterrichtsEnde = endT;
+          }
+          // Count remaining: lesson hasn't ended yet
+          if (endM !== null && nowM <= endM) verbleibend++;
+        } else if (!s.ist_vorbei) {
+          verbleibend++;
+        }
       });
     }
 
