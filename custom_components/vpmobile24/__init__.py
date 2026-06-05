@@ -264,24 +264,23 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     def _is_parallel_course_cancellation(self, base_schedule, weekday_index, period, cancel_course):
         """Return True if the cancellation is for a parallel course the student doesn't attend.
 
-        Logic: If the cancelled entry has a specific course (Ku2) AND
-        that course exists in base_schedule AND
-        there are OTHER courses for the same (weekday, period) in base_schedule
-        → this cancellation belongs to a parallel group the student is not in.
+        If the cancelled entry has a specific course (Ku2) AND
+        that course does NOT appear in base_schedule for any weekday/period
+        (meaning the student is not enrolled in it) → it's not relevant.
+        But if there's no course info, we keep it (safe default).
         """
         if not cancel_course:
             return False
-        # The cancelled course must exist in base_schedule (it's a known course)
-        cancel_course_known = (weekday_index, period, cancel_course) in base_schedule
-        if not cancel_course_known:
-            return False
-        # Count distinct courses for this (weekday, period)
-        other_courses = [
-            crs for (wd, per, crs), subj in base_schedule.items()
-            if wd == weekday_index and per == period and crs != cancel_course
-        ]
-        # If there are other parallel courses in the same slot → parallel group
-        return len(other_courses) > 0
+        # Check if this course appears anywhere in the student's base_schedule
+        student_has_course = any(
+            crs == cancel_course
+            for (wd, per, crs) in base_schedule.keys()
+        )
+        # If the student never has this course → it's a parallel group they don't attend
+        if not student_has_course:
+            return True
+        # The student does have this course somewhere → keep the cancellation
+        return False
 
     async def _async_update_data(self):
         """Update data via library."""
