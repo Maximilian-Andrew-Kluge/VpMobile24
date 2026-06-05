@@ -400,6 +400,29 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug(f"Base schedule created with {len(base_schedule)} entries")
 
             # ----------------------------------------------------------------
+            # Build student_courses: all Ku2 course names the student actually
+            # attends (from non-cancelled lessons across the whole week cache).
+            # Used to filter out cancellations of parallel groups.
+            # ----------------------------------------------------------------
+            student_courses: set[str] = set()
+            for date_str in week_dates:
+                if date_str in self._week_data_cache:
+                    for lesson in self._week_data_cache[date_str].get("lessons", []):
+                        subj   = lesson.get("subject", "")
+                        course = lesson.get("course", "")
+                        is_chg = lesson.get("is_change", False)
+                        # Only count genuinely attended lessons (not cancellations)
+                        if is_chg:
+                            continue
+                        if not subj or subj.strip() in ["\u2014", "---", "", "-", " "]:
+                            continue
+                        if course:
+                            student_courses.add(course)
+                        student_courses.add(subj)
+
+            _LOGGER.debug(f"Student courses: {sorted(student_courses)}")
+
+            # ----------------------------------------------------------------
             # Assemble filtered week data
             # ----------------------------------------------------------------
             all_lessons = []
@@ -417,24 +440,26 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                         for lesson in cached_day.get("lessons", []):
                             subject = lesson.get("subject", "")
-                            period = lesson.get("period", "")
+                            period  = lesson.get("period", "")
+                            lesson_course = lesson.get("course", "")
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
-                                lesson_course = lesson.get("course", "")
+                                # Cancelled lesson
                                 if lesson_course and lesson_course in self.excluded_subjects:
-                                    _LOGGER.debug(f"Skipping cancelled lesson for excluded course {lesson_course} on {date_str} period {period}")
                                     continue
-                                # Skip if this is a parallel-group cancellation the student doesn't attend
-                                if self._is_parallel_course_cancellation(base_schedule, weekday_index, period, lesson_course):
-                                    _LOGGER.debug(f"Skipping parallel-group cancellation for course {lesson_course} on {date_str} period {period}")
+                                # Skip if student doesn't attend this course
+                                if lesson_course and lesson_course not in student_courses:
+                                    _LOGGER.debug(f"Skipping cancelled lesson - not in student courses: {lesson_course}")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
                                 )
                                 if original_subject and original_subject in self.excluded_subjects:
-                                    _LOGGER.debug(f"Skipping cancelled lesson for excluded subject {original_subject} on {date_str} period {period}")
                                     continue
                             elif subject in self.excluded_subjects:
+                                continue
+                            # Skip normal lessons for courses the student doesn't attend
+                            elif lesson_course and lesson_course not in student_courses and lesson_course in self.excluded_subjects:
                                 continue
 
                             lesson_copy = lesson.copy()
@@ -444,22 +469,20 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                         for change in cached_day.get("changes", []):
                             subject = change.get("subject", "")
-                            period = change.get("period", "")
+                            period  = change.get("period", "")
+                            change_course = change.get("course", "")
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
-                                change_course = change.get("course", "")
                                 if change_course and change_course in self.excluded_subjects:
-                                    _LOGGER.debug(f"Skipping cancelled change for excluded course {change_course} on {date_str} period {period}")
                                     continue
-                                # Skip if this is a parallel-group cancellation the student doesn't attend
-                                if self._is_parallel_course_cancellation(base_schedule, weekday_index, period, change_course):
-                                    _LOGGER.debug(f"Skipping parallel-group cancellation for course {change_course} on {date_str} period {period}")
+                                # Skip if student doesn't attend this course
+                                if change_course and change_course not in student_courses:
+                                    _LOGGER.debug(f"Skipping cancelled change - not in student courses: {change_course}")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
                                 )
                                 if original_subject and original_subject in self.excluded_subjects:
-                                    _LOGGER.debug(f"Skipping cancelled change for excluded subject {original_subject} on {date_str} period {period}")
                                     continue
                             elif subject in self.excluded_subjects:
                                 continue
