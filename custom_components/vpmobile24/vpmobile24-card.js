@@ -364,54 +364,45 @@ class VpMobile24Card extends HTMLElement {
     const isActuallyCancelled = isCancelled || fach === '—';
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
 
-    // ── Ausfall: big red popup ──
     if (isActuallyCancelled) {
       popup.className = 'vp-popup vp-popup-ausfall';
-      popup.innerHTML = `
-        <div style="flex:1;display:flex;align-items:center;justify-content:center">
-          <div class="vp-ausfall-block">${t.cancel}</div>
-        </div>
-        <div class="vp-popup-footer" style="border-top:none;padding:0 20px 20px">
-          <button class="vp-popup-btn" style="background:rgba(255,255,255,.15)"
-            onclick="this.getRootNode().host._closePopup()">${t.close}</button>
-        </div>`;
-      popup.classList.remove('hidden');
-      overlay.classList.remove('hidden');
-      return;
+      popup.innerHTML = '<div style="flex:1;display:flex;align-items:center;justify-content:center">'
+        + '<div class="vp-ausfall-block">' + (t.cancel || 'AUSFALL') + '</div></div>'
+        + '<div class="vp-popup-footer" style="border-top:none;padding:0 20px 20px">'
+        + '<button class="vp-popup-btn vp-close-btn" style="background:rgba(255,255,255,.15)">'
+        + (t.close || 'Schließen') + '</button></div>';
+    } else {
+      let badge = isVertretung
+        ? '<span class="vp-detail-badge vp-detail-sub">' + (t.substitution || 'Vertretung') + '</span>'
+        : '';
+      let rows = '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
+        + '<span class="vp-detail-label">' + slotPeriod + '. ' + (t.period || 'Std.') + '</span>'
+        + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
+      if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span>'
+        + '<span class="vp-detail-label">' + (t.teacher || 'Lehrer') + '</span>'
+        + '<span class="vp-detail-val">' + lehrer + '</span></div>';
+      if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span>'
+        + '<span class="vp-detail-label">' + (t.room || 'Raum') + '</span>'
+        + '<span class="vp-detail-val">' + raum + '</span></div>';
+      if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span>'
+        + '<span class="vp-detail-label">' + (t.info || 'Info') + '</span>'
+        + '<span class="vp-detail-val">' + info + '</span></div>';
+      if (!lehrer && !raum && !info)
+        rows += '<div class="vp-detail-empty">' + (t.noDetail || 'Keine Details.') + '</div>';
+
+      popup.className = 'vp-popup';
+      popup.innerHTML = '<div class="vp-popup-title">'
+        + '<span class="vp-detail-num">' + slotPeriod + '. ' + (t.period || 'Std.') + '</span>'
+        + '<span class="vp-detail-fach">' + fach + '</span>' + badge + '</div>'
+        + '<div>' + rows + '</div>'
+        + '<div class="vp-popup-footer"><button class="vp-popup-btn vp-close-btn">'
+        + (t.close || 'Schließen') + '</button></div>';
     }
 
-    // ── Normal / Vertretung ──
-    let badge = '';
-    if (isVertretung) {
-      badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
-    }
+    // Attach close handler via addEventListener — no inline onclick
+    const btn = popup.querySelector('.vp-close-btn');
+    if (btn) btn.addEventListener('click', () => this._closePopup());
 
-    let rows = '';
-    rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
-      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
-      + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
-    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span>'
-      + '<span class="vp-detail-label">' + t.teacher + '</span>'
-      + '<span class="vp-detail-val">' + lehrer + '</span></div>';
-    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span>'
-      + '<span class="vp-detail-label">' + t.room + '</span>'
-      + '<span class="vp-detail-val">' + raum + '</span></div>';
-    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span>'
-      + '<span class="vp-detail-label">' + t.info + '</span>'
-      + '<span class="vp-detail-val">' + info + '</span></div>';
-    if (!lehrer && !raum && !info)
-      rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
-
-    popup.className = 'vp-popup';
-    popup.innerHTML = `
-      <div class="vp-popup-title">
-        <span class="vp-detail-num">${slotPeriod}. ${t.period}</span>
-        <span class="vp-detail-fach">${fach}</span>${badge}
-      </div>
-      <div>${rows}</div>
-      <div class="vp-popup-footer">
-        <button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button>
-      </div>`;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
   }
@@ -1279,15 +1270,15 @@ ha-card {
 </ha-card>
 
 <!-- ── Lesson detail popup ── -->
-<div id="popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
+<div id="popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="popup" class="vp-popup hidden"></div>
 
 <!-- ── Info popup ── -->
-<div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
+<div id="info-popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="info-popup" class="vp-popup hidden">
   <div class="vp-info-popup-title">${t.infoTitle}</div>
   <div id="info-popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">${t.close}</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn">${t.close}</button></div>
 </div>`;
 
     // ── Restore popup if it was open before this render ──────────────────
@@ -1298,6 +1289,14 @@ ha-card {
     if (this._infoPopupOpen) {
       this._renderInfoPopupContent();
     }
+
+    // ── Attach overlay close listeners (no inline onclick) ────────────────
+    const ov1 = this.shadowRoot.getElementById('popup-overlay');
+    if (ov1) ov1.addEventListener('click', () => this._closePopup());
+    const ov2 = this.shadowRoot.getElementById('info-popup-overlay');
+    if (ov2) ov2.addEventListener('click', () => this._closeInfoPopup());
+    const infoCloseBtn = this.shadowRoot.querySelector('#info-popup .vp-popup-btn');
+    if (infoCloseBtn) infoCloseBtn.addEventListener('click', () => this._closeInfoPopup());
   }
 }
 
