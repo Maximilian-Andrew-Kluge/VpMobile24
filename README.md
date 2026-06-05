@@ -30,7 +30,7 @@
 > 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
 >
 >
-> Veröffentlichung Datum: **06.06.2026**
+> Veröffentlichung Datum: **08.06.2026**
 >
 > ### Neue Features in der v2.5.0
 >
@@ -299,7 +299,7 @@ Contributions sind herzlich willkommen!
 > 🎉 **Major Update Announced – VpMobile24 v2.5.0**
 >
 >
-> Publication Date: **06.06.2026**
+> Publication Date: **08.06.2026**
 >
 > ### New Features in the v2.5.0
 >
