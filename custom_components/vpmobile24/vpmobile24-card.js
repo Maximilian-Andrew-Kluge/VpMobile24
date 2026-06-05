@@ -6,8 +6,45 @@ class VpMobile24Card extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this._config = {};
-    this._t = null; // language strings — set in _render(), used everywhere
-    this._weekOffset = 0; // 0 = current week, 1 = next week
+    this._t = null;
+    this._weekOffset = 0;
+
+    // ── Single persistent event delegation — set ONCE, never again ────────
+    this.shadowRoot.addEventListener('click', (e) => {
+      // 1. Overlay → close popup
+      if (e.target.id === 'popup-overlay') {
+        this._closePopup(); return;
+      }
+      // 2. Overlay → close info popup
+      if (e.target.id === 'info-popup-overlay') {
+        this._closeInfoPopup(); return;
+      }
+      // 2b. Info popup close button
+      if (e.target.closest('#info-popup') && e.target.classList.contains('vp-popup-btn')) {
+        this._closeInfoPopup(); return;
+      }
+      // 3. Lesson tile (desktop table + mobile list)
+      const tile = e.target.closest('[data-lesson]');
+      if (tile) {
+        e.stopPropagation();
+        try {
+          const lesson    = JSON.parse(tile.dataset.lesson);
+          const day       = tile.dataset.day;
+          const period    = Number(tile.dataset.period);
+          const time      = tile.dataset.time;
+          const cancelled = tile.dataset.cancelled === 'true';
+          this._showLessonDetail(lesson, day, period, time, cancelled);
+        } catch(err) { /* ignore */ }
+        return;
+      }
+      // 4. Mobile day tab
+      const tab = e.target.closest('[data-mobday]');
+      if (tab) {
+        e.stopPropagation();
+        this._switchMobDay(Number(tab.dataset.mobday));
+        return;
+      }
+    });
   }
 
   // ── Language helper ──────────────────────────────────────────────────────
@@ -1290,36 +1327,6 @@ ha-card {
       this._renderInfoPopupContent();
     }
 
-    // ── Attach overlay close listeners (no inline onclick) ────────────────
-    const ov1 = this.shadowRoot.getElementById('popup-overlay');
-    if (ov1) ov1.addEventListener('click', () => this._closePopup());
-    const ov2 = this.shadowRoot.getElementById('info-popup-overlay');
-    if (ov2) ov2.addEventListener('click', () => this._closeInfoPopup());
-    const infoCloseBtn = this.shadowRoot.querySelector('#info-popup .vp-popup-btn');
-    if (infoCloseBtn) infoCloseBtn.addEventListener('click', () => this._closeInfoPopup());
-
-    // ── Event delegation for tiles and mobile tabs ────────────────────────
-    this.shadowRoot.addEventListener('click', (e) => {
-      // Lesson tile click (desktop + mobile)
-      const tile = e.target.closest('[data-lesson]');
-      if (tile) {
-        try {
-          const lesson     = JSON.parse(tile.dataset.lesson);
-          const day        = tile.dataset.day;
-          const period     = Number(tile.dataset.period);
-          const time       = tile.dataset.time;
-          const cancelled  = tile.dataset.cancelled === 'true';
-          this._showLessonDetail(lesson, day, period, time, cancelled);
-        } catch(err) { /* ignore parse errors */ }
-        return;
-      }
-      // Mobile day tab click
-      const tab = e.target.closest('[data-mobday]');
-      if (tab) {
-        this._switchMobDay(Number(tab.dataset.mobday));
-        return;
-      }
-    });
   }
 }
 
