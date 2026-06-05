@@ -346,7 +346,9 @@ class VpMobile24Card extends HTMLElement {
   _showLessonDetail(lesson, dayName, slotPeriod, slotTime, isCancelled) {
     this._popupOpen = true;
     this._popupData = { lesson, dayName, slotPeriod, slotTime, isCancelled };
-    this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+    try {
+      this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+    } catch(e) { console.error('[VpMobile24] popup error:', e); }
   }
 
   _renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled) {
@@ -354,8 +356,11 @@ class VpMobile24Card extends HTMLElement {
     const overlay = this.shadowRoot.getElementById('popup-overlay');
     const title   = this.shadowRoot.getElementById('popup-title');
     const content = this.shadowRoot.getElementById('popup-content');
-    if (!popup || !overlay || !title || !content) return;
-    const t = this._t || this._buildTranslations();
+    if (!popup || !overlay || !title || !content) {
+      console.warn('[VpMobile24] popup DOM not ready');
+      return;
+    }
+    const t = this._buildTranslations(); // always rebuild to ensure fresh
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
     const lehrer = (lesson && lesson.lehrer) || '';
     const raum   = (lesson && lesson.raum)   || '';
