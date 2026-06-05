@@ -251,21 +251,37 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         )
 
     def _resolve_original_subject(self, base_schedule, weekday_index, period, course):
-        """Return the original subject for a cancelled slot, or '' if ambiguous.
-
-        Uses course to distinguish AGs that share the same period.
-        If course is empty and multiple subjects exist for the slot, returns ''
-        so the entry stays visible (safe default: show rather than hide).
-        """
+        """Return the original subject for a cancelled slot, or '' if ambiguous."""
         if course:
             return base_schedule.get((weekday_index, period, course), "")
-        # No course info — collect all subjects for this (weekday, period)
         candidates = [
             subj for (wd, per, _crs), subj in base_schedule.items()
             if wd == weekday_index and per == period
         ]
         unique = list(dict.fromkeys(candidates))
         return unique[0] if len(unique) == 1 else ""
+
+    def _is_parallel_course_cancellation(self, base_schedule, weekday_index, period, cancel_course):
+        """Return True if the cancellation is for a parallel course the student doesn't attend.
+
+        Logic: If the cancelled entry has a specific course (Ku2) AND
+        that course exists in base_schedule AND
+        there are OTHER courses for the same (weekday, period) in base_schedule
+        → this cancellation belongs to a parallel group the student is not in.
+        """
+        if not cancel_course:
+            return False
+        # The cancelled course must exist in base_schedule (it's a known course)
+        cancel_course_known = (weekday_index, period, cancel_course) in base_schedule
+        if not cancel_course_known:
+            return False
+        # Count distinct courses for this (weekday, period)
+        other_courses = [
+            crs for (wd, per, crs), subj in base_schedule.items()
+            if wd == weekday_index and per == period and crs != cancel_course
+        ]
+        # If there are other parallel courses in the same slot → parallel group
+        return len(other_courses) > 0
 
     async def _async_update_data(self):
         """Update data via library."""
@@ -405,11 +421,13 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period = lesson.get("period", "")
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
-                                # Cancelled lesson — check course name first, then resolve from base_schedule
                                 lesson_course = lesson.get("course", "")
-                                # Direct course match: if the course itself is excluded, skip
                                 if lesson_course and lesson_course in self.excluded_subjects:
                                     _LOGGER.debug(f"Skipping cancelled lesson for excluded course {lesson_course} on {date_str} period {period}")
+                                    continue
+                                # Skip if this is a parallel-group cancellation the student doesn't attend
+                                if self._is_parallel_course_cancellation(base_schedule, weekday_index, period, lesson_course):
+                                    _LOGGER.debug(f"Skipping parallel-group cancellation for course {lesson_course} on {date_str} period {period}")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
@@ -431,9 +449,12 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 change_course = change.get("course", "")
-                                # Direct course match: if the course itself is excluded, skip
                                 if change_course and change_course in self.excluded_subjects:
                                     _LOGGER.debug(f"Skipping cancelled change for excluded course {change_course} on {date_str} period {period}")
+                                    continue
+                                # Skip if this is a parallel-group cancellation the student doesn't attend
+                                if self._is_parallel_course_cancellation(base_schedule, weekday_index, period, change_course):
+                                    _LOGGER.debug(f"Skipping parallel-group cancellation for course {change_course} on {date_str} period {period}")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
