@@ -477,10 +477,10 @@ class VpMobile24Card extends HTMLElement {
             cls += ' vp-empty';
           }
           const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const dataAttr = (lesson && (lesson.fach || isCancelled))
+            ? 'data-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;') + '\' data-day=\'' + dayFullNames[di] + '\' data-period=\'' + slot.period + '\' data-time=\'' + slot.time + '\' data-cancelled=\'' + isCancelled + '\''
             : '';
-          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
+          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + dataAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         bodyHtml += '</tr>';
       }
@@ -560,8 +560,8 @@ class VpMobile24Card extends HTMLElement {
         } else {
           rowCls += ' vp-mob-empty';
         }
-        const onclickAttr = (lesson && (lesson.fach || isCancelled))
-          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+        const dataAttr = (lesson && (lesson.fach || isCancelled))
+          ? 'data-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;') + '\' data-day=\'' + dName + '\' data-period=\'' + slot.period + '\' data-time=\'' + slot.time + '\' data-cancelled=\'' + isCancelled + '\''
           : '';
         const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
@@ -574,7 +574,7 @@ class VpMobile24Card extends HTMLElement {
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
         }
-        rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
+        rows += '<div class="' + rowCls + '" ' + dataAttr + '>' + numPart + subjPart + '</div>';
       }
     });
 
@@ -788,10 +788,10 @@ class VpMobile24Card extends HTMLElement {
             cls += ' vp-empty';
           }
           const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const dataAttr = (lesson && (lesson.fach || isCancelled))
+            ? 'data-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;') + '\' data-day=\'' + dayFullNames[di] + '\' data-period=\'' + slot.period + '\' data-time=\'' + slot.time + '\' data-cancelled=\'' + isCancelled + '\''
             : '';
-          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
+          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + dataAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         tableHtml += '</tr>';
       }
@@ -813,7 +813,7 @@ class VpMobile24Card extends HTMLElement {
     days.forEach((d, i) => {
       const active = i === mobDayIdx ? ' vp-mob-tab-active' : '';
       const dn = dayDates[i];
-      mobTabs += '<button class="vp-mob-tab' + active + '" onclick="this.getRootNode().host._switchMobDay(' + i + ')"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
+      mobTabs += '<button class="vp-mob-tab' + active + '" data-mobday="' + i + '"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
     });
     mobTabs += '</div>';
 
@@ -856,8 +856,8 @@ class VpMobile24Card extends HTMLElement {
           } else {
             rowCls += ' vp-mob-empty';
           }
-          const onclickAttr = (lesson && (lesson.fach || isCancelledMob))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelledMob + ')"'
+          const dataAttr2 = (lesson && (lesson.fach || isCancelledMob))
+            ? 'data-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;') + '\' data-day=\'' + dName + '\' data-period=\'' + slot.period + '\' data-time=\'' + slot.time + '\' data-cancelled=\'' + isCancelledMob + '\''
             : '';
           const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
@@ -869,7 +869,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
           }
-          rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
+          rows += '<div class="' + rowCls + '" ' + dataAttr2 + '>' + numPart + subjPart + '</div>';
         }
       });
       return rows;
@@ -1297,6 +1297,29 @@ ha-card {
     if (ov2) ov2.addEventListener('click', () => this._closeInfoPopup());
     const infoCloseBtn = this.shadowRoot.querySelector('#info-popup .vp-popup-btn');
     if (infoCloseBtn) infoCloseBtn.addEventListener('click', () => this._closeInfoPopup());
+
+    // ── Event delegation for tiles and mobile tabs ────────────────────────
+    this.shadowRoot.addEventListener('click', (e) => {
+      // Lesson tile click (desktop + mobile)
+      const tile = e.target.closest('[data-lesson]');
+      if (tile) {
+        try {
+          const lesson     = JSON.parse(tile.dataset.lesson);
+          const day        = tile.dataset.day;
+          const period     = Number(tile.dataset.period);
+          const time       = tile.dataset.time;
+          const cancelled  = tile.dataset.cancelled === 'true';
+          this._showLessonDetail(lesson, day, period, time, cancelled);
+        } catch(err) { /* ignore parse errors */ }
+        return;
+      }
+      // Mobile day tab click
+      const tab = e.target.closest('[data-mobday]');
+      if (tab) {
+        this._switchMobDay(Number(tab.dataset.mobday));
+        return;
+      }
+    });
   }
 }
 
