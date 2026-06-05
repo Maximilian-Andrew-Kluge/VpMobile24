@@ -470,6 +470,24 @@ class VpMobile24Card extends HTMLElement {
     const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
     const slots = this._buildTimeSlots(useCustomTimes);
 
+    // ── Calculate current lesson ──────────────────────────────────────────
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    let currentLessonNum = -1;
+    if (todayIdx >= 0) {
+      slots.forEach(slot => {
+        if (!slot.isPause && slot.time) {
+          const parts = slot.time.split('-');
+          if (parts.length === 2) {
+            const [sh, sm] = parts[0].split(':').map(Number);
+            const [eh, em] = parts[1].split(':').map(Number);
+            if (nowMins >= sh * 60 + sm && nowMins <= eh * 60 + em)
+              currentLessonNum = slot.lessonNumber;
+          }
+        }
+      });
+    }
+
     const tbody = this.shadowRoot.querySelector('.vp-table tbody');
     if (!tbody) {
       // No table found (e.g. mobile view) — never call _render() while popup is open
