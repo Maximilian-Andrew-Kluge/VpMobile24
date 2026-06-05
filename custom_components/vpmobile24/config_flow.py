@@ -111,6 +111,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             )
                             for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
                                 subject = (entry.get("subject") or "").strip()
+                                course  = (entry.get("course")  or "").strip()
                                 if (
                                     subject
                                     and not subject.startswith("KPL")
@@ -121,6 +122,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                                     and 2 <= len(subject) <= 10
                                 ):
                                     found.add(subject)
+                                # Also include course (Ku2) so parallel groups can be deselected
+                                if (
+                                    course
+                                    and not course.startswith("KPL")
+                                    and not course.startswith("---")
+                                    and 2 <= len(course) <= 12
+                                    and course != subject
+                                ):
+                                    found.add(course)
                         except Exception as err:
                             _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
                         return found
@@ -358,6 +368,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         schedule_data.get("lessons", []) + schedule_data.get("changes", [])
                     ):
                         subject = (entry.get("subject") or "").strip()
+                        course  = (entry.get("course")  or "").strip()
                         if (
                             subject
                             and not subject.startswith("KPL")
@@ -368,6 +379,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                             and 2 <= len(subject) <= 10
                         ):
                             found.add(subject)
+                        # Also include course (Ku2) so parallel groups can be deselected
+                        if (
+                            course
+                            and not course.startswith("KPL")
+                            and not course.startswith("---")
+                            and 2 <= len(course) <= 12
+                            and course != subject
+                        ):
+                            found.add(course)
                 except Exception:
                     pass
                 return found
