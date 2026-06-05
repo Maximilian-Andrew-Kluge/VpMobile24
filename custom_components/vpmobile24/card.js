@@ -1,9 +1,6 @@
 // VpMobile24 Card v2.4.9
 console.info('%c VpMobile24-CARD %c v2.4.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
-// Global registry — CSP-safe, no inline onclick needed
-window._vpm24 = window._vpm24 || {};
-
 class VpMobile24Card extends HTMLElement {
   constructor() {
     super();
@@ -11,11 +8,7 @@ class VpMobile24Card extends HTMLElement {
     this._config = {};
     this._t = null;
     this._weekOffset = 0;
-    this._uid = '_vpm24_' + Math.random().toString(36).slice(2);
-    window._vpm24[this._uid] = this;
-    // One persistent click handler on shadowRoot — never re-added
-    this._bound_click = (e) => this._handleClick(e);
-    this.shadowRoot.addEventListener('click', this._bound_click);
+    this.shadowRoot.addEventListener('click', (e) => this._handleClick(e));
   }
 
   _handleClick(e) {
@@ -868,7 +861,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             rowCls += ' vp-mob-empty';
           }
-          const onclickAttr2 = (lesson && (lesson.fach || isCancelledMob))
+          const lessonAttrMob = (lesson && (lesson.fach || isCancelledMob))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dName + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelledMob + '"'
             : '';
           const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
@@ -881,7 +874,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
           }
-          rows += '<div class="' + rowCls + '" ' + onclickAttr2 + '>' + numPart + subjPart + '</div>';        }
+          rows += '<div class="' + rowCls + '" ' + lessonAttrMob + '>' + numPart + subjPart + '</div>';        }
       });
       return rows;
     };
