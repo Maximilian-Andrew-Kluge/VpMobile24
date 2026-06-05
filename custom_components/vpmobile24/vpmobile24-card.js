@@ -214,12 +214,15 @@ class VpMobile24Card extends HTMLElement {
 
   _switchWeek(offset) {
     this._weekOffset = offset;
+    // Close any open popup before switching week
+    this._popupOpen = false;
+    this._popupData = null;
+    this._infoPopupOpen = false;
     if (offset === 0) {
-      // Returning to current week: jump to today's tab
       const todayDow = new Date().getDay();
       this._mobDayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : 0;
     } else {
-      this._mobDayIdx = 0; // next week: start at Monday
+      this._mobDayIdx = 0;
     }
     this._render();
   }
@@ -440,7 +443,11 @@ class VpMobile24Card extends HTMLElement {
     const slots = this._buildTimeSlots(useCustomTimes);
 
     const tbody = this.shadowRoot.querySelector('.vp-table tbody');
-    if (!tbody) { this._render(); return; }
+    if (!tbody) {
+      // No table found (e.g. mobile view) — never call _render() while popup is open
+      if (!this._popupOpen && !this._infoPopupOpen) this._render();
+      return;
+    }
 
     let bodyHtml = '';
     slots.forEach(slot => {
@@ -1282,6 +1289,15 @@ ha-card {
   <div id="info-popup-content"></div>
   <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">${t.close}</button></div>
 </div>`;
+
+    // ── Restore popup if it was open before this render ──────────────────
+    if (this._popupOpen && this._popupData) {
+      const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
+      this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+    }
+    if (this._infoPopupOpen) {
+      this._renderInfoPopupContent();
+    }
   }
 }
 
