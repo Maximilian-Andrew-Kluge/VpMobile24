@@ -44,6 +44,17 @@ class VpMobile24Card extends HTMLElement {
         this._switchMobDay(Number(tab.dataset.mobday));
         return;
       }
+      // 5. Header action buttons
+      const btn = e.target.closest('[data-action]');
+      if (btn) {
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        if (action === 'info')      this._showInfoPopup();
+        if (action === 'next-week') this._switchWeek(1);
+        if (action === 'cur-week')  this._switchWeek(0);
+        if (action === 'reload')    this._handleReload();
+        return;
+      }
     });
   }
 
@@ -244,9 +255,9 @@ class VpMobile24Card extends HTMLElement {
     this._popupOpen = false;
     this._popupData = null;
     this._infoPopupOpen = false;
-    this._mobDayIdx = null; // reset to today on config change
-    this._weekOffset = 0;   // reset to current week on config change
-    if (this._hass) this._render();
+    this._mobDayIdx = null;
+    this._weekOffset = 0;
+    if (this._hass) { try { this._render(); } catch(e) { console.error('VpMobile24 render error:', e); } }
   }
 
   _switchWeek(offset) {
@@ -267,26 +278,29 @@ class VpMobile24Card extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this._config && Object.keys(this._config).length) {
-      // Auto-switch to next week on weekends (Saturday=6, Sunday=0)
-      const dow = new Date().getDay();
-      const isWeekend = dow === 0 || dow === 6;
-      if (isWeekend && (this._weekOffset === 0 || this._weekOffset === undefined)) {
-        this._weekOffset = 1;
-        this._mobDayIdx = 0;
-      }
-      // Always just update the table body; restore any open popup afterwards
-      if (this._popupOpen || this._infoPopupOpen) {
-        this._updateTableOnly();
-        // Re-show popup over the updated table
-        if (this._popupOpen && this._popupData) {
-          const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
-          this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+      try {
+        // Auto-switch to next week on weekends (Saturday=6, Sunday=0)
+        const dow = new Date().getDay();
+        const isWeekend = dow === 0 || dow === 6;
+        if (isWeekend && (this._weekOffset === 0 || this._weekOffset === undefined)) {
+          this._weekOffset = 1;
+          this._mobDayIdx = 0;
         }
-        if (this._infoPopupOpen) {
-          this._renderInfoPopupContent();
+        if (this._popupOpen || this._infoPopupOpen) {
+          this._updateTableOnly();
+          if (this._popupOpen && this._popupData) {
+            const { lesson, dayName, slotPeriod, slotTime, isCancelled } = this._popupData;
+            this._renderPopupContent(lesson, dayName, slotPeriod, slotTime, isCancelled);
+          }
+          if (this._infoPopupOpen) {
+            this._renderInfoPopupContent();
+          }
+        } else {
+          this._render();
         }
-      } else {
-        this._render();
+      } catch(e) {
+        // Never let errors in set hass() propagate to HA — it shows as Konfigurationsfehler
+        console.error('VpMobile24 set hass error:', e);
       }
     }
   }
@@ -718,16 +732,22 @@ class VpMobile24Card extends HTMLElement {
     }
 
     const title         = (this._config.header_settings && this._config.header_settings.title)     || this._config.title     || 'Stundenplan';
-    // Auto class name: if config has no class_name or still has the default '5a',
-    // prefer the class from the sensor attribute
     const cfgClass = (this._config.header_settings && this._config.header_settings.class_name) || this._config.class_name || '';
     const sensorClass = (entity.attributes && entity.attributes.class) || '';
     const className = (cfgClass && cfgClass !== '5a') ? cfgClass : (sensorClass || cfgClass);
     const showHeader    = this._config.show_header !== false;
-    const showTime      = this._config.show_time !== false;
-    const highlightToday = this._config.highlight_today !== false;
+    const showTime      = (this._config.header_settings && this._config.header_settings.show_time  !== undefined)
+                          ? this._config.header_settings.show_time !== false
+                          : this._config.show_time !== false;
+    const highlightToday = (this._config.header_settings && this._config.header_settings.highlight_today !== undefined)
+                           ? this._config.header_settings.highlight_today !== false
+                           : this._config.highlight_today !== false;
     const useCustomTimes = this._config.use_custom_times === true;
     const weekOffset    = this._weekOffset || 0;
+    // Resolve additional_info_entity + reload_entity from top-level OR nested sensors object
+    const sensors = this._config.sensors || {};
+    const additionalInfoEntity = this._config.additional_info_entity || sensors.additional_info_entity || null;
+    const reloadEntity         = this._config.reload_entity          || sensors.reload_entity          || null;
 
     // Pick correct week table
     const weekTable = weekOffset === 1
@@ -783,9 +803,9 @@ class VpMobile24Card extends HTMLElement {
     // ── INFO BUTTON & POPUP DATA ──
     let infoBtn = false;
     let infoBtnHasInfo = false;
-    if (this._config.additional_info_entity) {
+    if (additionalInfoEntity) {
       infoBtn = true;
-      const infoEnt = this._hass.states[this._config.additional_info_entity];
+      const infoEnt = this._hass.states[additionalInfoEntity];
       if (infoEnt && infoEnt.attributes) {
         const allg  = infoEnt.attributes.allgemeine_infos  || [];
         const stund = infoEnt.attributes.stunden_infos     || [];
@@ -1296,13 +1316,13 @@ ha-card {
     <div class="vp-hdr-spacer"></div>
     <div class="vp-hdr-actions">
       ${infoBtn && weekOffset === 0
-        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" onclick="this.getRootNode().host._showInfoPopup()" title="${t.infoTitle}">ⓘ Info</button>`
+        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-action="info" title="${t.infoTitle}">ⓘ Info</button>`
         : ''}
       ${weekOffset === 0
-        ? `<button class="vp-pill vp-pill-blue" onclick="this.getRootNode().host._switchWeek(1)">${t.nextWeek}</button>`
-        : `<button class="vp-pill vp-pill-green" onclick="this.getRootNode().host._switchWeek(0)">${t.currentWeek}</button>`}
-      ${this._config.reload_entity
-        ? `<button class="vp-pill" onclick="this.getRootNode().host._handleReload()">↺</button>`
+        ? `<button class="vp-pill vp-pill-blue" data-action="next-week">${t.nextWeek}</button>`
+        : `<button class="vp-pill vp-pill-green" data-action="cur-week">${t.currentWeek}</button>`}
+      ${reloadEntity
+        ? `<button class="vp-pill" data-action="reload">↺</button>`
         : ''}
     </div>
   </div>
