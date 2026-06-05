@@ -405,8 +405,12 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period = lesson.get("period", "")
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
-                                # Cancelled lesson — resolve original subject safely
+                                # Cancelled lesson — check course name first, then resolve from base_schedule
                                 lesson_course = lesson.get("course", "")
+                                # Direct course match: if the course itself is excluded, skip
+                                if lesson_course and lesson_course in self.excluded_subjects:
+                                    _LOGGER.debug(f"Skipping cancelled lesson for excluded course {lesson_course} on {date_str} period {period}")
+                                    continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
                                 )
@@ -427,6 +431,10 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 change_course = change.get("course", "")
+                                # Direct course match: if the course itself is excluded, skip
+                                if change_course and change_course in self.excluded_subjects:
+                                    _LOGGER.debug(f"Skipping cancelled change for excluded course {change_course} on {date_str} period {period}")
+                                    continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
                                 )
