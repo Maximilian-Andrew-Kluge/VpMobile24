@@ -1,12 +1,47 @@
 // VpMobile24 Card v2.4.9
 console.info('%c VpMobile24-CARD %c v2.4.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
+// Global registry — CSP-safe, no inline onclick needed
+window._vpm24 = window._vpm24 || {};
+
 class VpMobile24Card extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this._config = {};
-    this._t = null; // language strings — set in _render(), used everywhere
+    this._t = null;
+    this._weekOffset = 0;
+    this._uid = '_vpm24_' + Math.random().toString(36).slice(2);
+    window._vpm24[this._uid] = this;
+    // One persistent click handler on shadowRoot — never re-added
+    this._bound_click = (e) => this._handleClick(e);
+    this.shadowRoot.addEventListener('click', this._bound_click);
+  }
+
+  _handleClick(e) {
+    const el = e.target;
+    // Popup overlay
+    if (el.id === 'popup-overlay')      { this._closePopup();    return; }
+    if (el.id === 'info-popup-overlay') { this._closeInfoPopup(); return; }
+    // Any button with data-vpm
+    const btn = el.closest('[data-vpm]');
+    if (!btn) return;
+    e.stopPropagation();
+    const act = btn.dataset.vpm;
+    if (act === 'close')       { this._closePopup();    return; }
+    if (act === 'close-info')  { this._closeInfoPopup(); return; }
+    if (act === 'next-week')   { this._switchWeek(1);   return; }
+    if (act === 'cur-week')    { this._switchWeek(0);   return; }
+    if (act === 'reload')      { this._handleReload();  return; }
+    if (act === 'info')        { this._showInfoPopup();  return; }
+    if (act === 'mob-day')     { this._switchMobDay(Number(btn.dataset.vpmDay)); return; }
+    if (act === 'lesson') {
+      try {
+        const les = JSON.parse(btn.dataset.vpmLesson);
+        this._showLessonDetail(les, btn.dataset.vpmDay, Number(btn.dataset.vpmPeriod), btn.dataset.vpmTime, btn.dataset.vpmCancelled === 'true');
+      } catch(err) {}
+      return;
+    }
   }
 
   // ── Language helper ──────────────────────────────────────────────────────
@@ -23,6 +58,8 @@ class VpMobile24Card extends HTMLElement {
            genInfo:'📢 Allgemeine Informationen',
            infoTitle:'ℹ️ Zusatzinformationen',
            refresh:'↺ Aktualisieren',
+           nextWeek:'Nächste Woche \u2192',
+           currentWeek:'\u2190 Aktuelle Woche',
            classLabel:'Klasse',
            noData:'Keine Wochendaten verfügbar',
            entityNotFound:'Entity nicht gefunden',
@@ -38,6 +75,8 @@ class VpMobile24Card extends HTMLElement {
            genInfo:'📢 General Information',
            infoTitle:'ℹ️ Additional Information',
            refresh:'↺ Refresh',
+           nextWeek:'Next Week \u2192',
+           currentWeek:'\u2190 Current Week',
            classLabel:'Class',
            noData:'No weekly data available',
            entityNotFound:'Entity not found',
@@ -53,6 +92,8 @@ class VpMobile24Card extends HTMLElement {
            genInfo:'📢 Informations g\u00e9n\u00e9rales',
            infoTitle:'ℹ️ Informations suppl\u00e9mentaires',
            refresh:'↺ Actualiser',
+           nextWeek:'Semaine suivante \u2192',
+           currentWeek:'\u2190 Semaine actuelle',
            classLabel:'Classe',
            noData:'Aucune donn\u00e9e hebdomadaire disponible',
            entityNotFound:'Entit\u00e9 introuvable',
@@ -80,8 +121,8 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Week Table Sensor",additional_info_entity:"Zusatzinfo Sensor",reload_entity:"Neu laden Button",title:"Titel",class_name:"Klassenname",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",header_settings:"Header-Einstellungen",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
-        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
         fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
       return (L[hl]||L.de);
@@ -97,66 +138,92 @@ class VpMobile24Card extends HTMLElement {
     };
 
     const _sectionTitles = {
-      de: { header_settings: 'Header-Einstellungen', time_settings: 'Uhrzeiten-Anpassung' },
-      en: { header_settings: 'Header Settings', time_settings: 'Time Settings' },
-      fr: { header_settings: 'Param\u00e8tres En-t\u00eate', time_settings: 'Personnalisation des Horaires' }
+      de: {
+        sensors:         '📡 Sensoren',
+        header_settings: '🎨 Header & Anzeige',
+        time_settings:   '⏰ Uhrzeiten-Anpassung',
+      },
+      en: {
+        sensors:         '📡 Sensors',
+        header_settings: '🎨 Header & Display',
+        time_settings:   '⏰ Time Settings',
+      },
+      fr: {
+        sensors:         '📡 Capteurs',
+        header_settings: '🎨 En-t\u00eate & Affichage',
+        time_settings:   '⏰ Personnalisation des Horaires',
+      },
     };
     const hl0 = _hl(null);
     const st = _sectionTitles[['de','en','fr'].includes(hl0) ? hl0 : 'de'];
 
     return {
       schema: [
-        { name: "entity", required: true, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
-        { name: "additional_info_entity", required: false, selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
-        { name: "reload_entity", required: false, selector: { entity: { domain: "button" } } },
+        // ── Pflicht-Sensor ────────────────────────────────────────────────
+        { name: "entity", required: true,
+          selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
+
+        // ── Optionale Sensoren (eingeklappt) ──────────────────────────────
+        { type: "expandable", name: "sensors", title: st.sensors, collapsed: true,
+          schema: [
+            { name: "additional_info_entity", required: false,
+              selector: { entity: { filter: [{ integration: "vpmobile24" }] } } },
+            { name: "reload_entity", required: false,
+              selector: { entity: { domain: "button" } } },
+          ]
+        },
+
+        // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
         { name: "show_header", default: true, selector: { boolean: {} } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
-            { name: "title", default: "Stundenplan", selector: { text: { type: "text" } } },
-            { name: "class_name", default: "5a", selector: { text: { type: "text" } } }
+            { name: "title",           default: "Stundenplan", selector: { text: { type: "text" } } },
+            { name: "class_name",      default: "",    selector: { text: { type: "text" } } },
+            { name: "highlight_today", default: true,  selector: { boolean: {} } },
+            { name: "show_time",       default: true,  selector: { boolean: {} } },
           ]
         },
-        { name: "highlight_today", default: true, selector: { boolean: {} } },
-        { name: "show_time", default: true, selector: { boolean: {} } },
+
+        // ── Uhrzeiten (eingeklappt) ───────────────────────────────────────
         { name: "use_custom_times", default: false, selector: { boolean: {} } },
         { type: "expandable", name: "time_settings", title: st.time_settings, collapsed: true,
           schema: [
             { name: "lesson_count", default: 8, selector: { number: { min: 1, max: 10, step: 1, mode: "box" } } },
-            { name: "pause_count", default: 2, selector: { number: { min: 0, max: 5, step: 1, mode: "box" } } },
-            { name: "time_1", default: "07:45-08:30", selector: { text: { type: "text" } } },
-            { name: "time_2", default: "08:40-09:25", selector: { text: { type: "text" } } },
-            { name: "time_3", default: "09:25-10:10", selector: { text: { type: "text" } } },
-            { name: "time_4", default: "10:35-11:20", selector: { text: { type: "text" } } },
-            { name: "time_5", default: "11:30-12:15", selector: { text: { type: "text" } } },
-            { name: "time_6", default: "12:45-13:30", selector: { text: { type: "text" } } },
-            { name: "time_7", default: "13:40-14:25", selector: { text: { type: "text" } } },
-            { name: "time_8", default: "14:35-15:20", selector: { text: { type: "text" } } },
-            { name: "time_9", default: "15:00-15:45", selector: { text: { type: "text" } } },
+            { name: "pause_count",  default: 2, selector: { number: { min: 0, max: 5,  step: 1, mode: "box" } } },
+            { name: "time_1",  default: "07:45-08:30", selector: { text: { type: "text" } } },
+            { name: "time_2",  default: "08:40-09:25", selector: { text: { type: "text" } } },
+            { name: "time_3",  default: "09:25-10:10", selector: { text: { type: "text" } } },
+            { name: "time_4",  default: "10:35-11:20", selector: { text: { type: "text" } } },
+            { name: "time_5",  default: "11:30-12:15", selector: { text: { type: "text" } } },
+            { name: "time_6",  default: "12:45-13:30", selector: { text: { type: "text" } } },
+            { name: "time_7",  default: "13:40-14:25", selector: { text: { type: "text" } } },
+            { name: "time_8",  default: "14:35-15:20", selector: { text: { type: "text" } } },
+            { name: "time_9",  default: "15:00-15:45", selector: { text: { type: "text" } } },
             { name: "time_10", default: "15:50-16:35", selector: { text: { type: "text" } } },
             { type: "grid", name: "pause_1_config", schema: [
-              { name: "pause_1", default: "10:10-10:30", selector: { text: { type: "text" } } },
+              { name: "pause_1",       default: "10:10-10:30", selector: { text: { type: "text" } } },
               { name: "pause_1_after", default: 3, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_2_config", schema: [
-              { name: "pause_2", default: "12:15-12:45", selector: { text: { type: "text" } } },
+              { name: "pause_2",       default: "12:15-12:45", selector: { text: { type: "text" } } },
               { name: "pause_2_after", default: 5, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_3_config", schema: [
-              { name: "pause_3", default: "13:15-13:20", selector: { text: { type: "text" } } },
+              { name: "pause_3",       default: "13:15-13:20", selector: { text: { type: "text" } } },
               { name: "pause_3_after", default: 6, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_4_config", schema: [
-              { name: "pause_4", default: "14:55-15:00", selector: { text: { type: "text" } } },
+              { name: "pause_4",       default: "14:55-15:00", selector: { text: { type: "text" } } },
               { name: "pause_4_after", default: 8, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]},
             { type: "grid", name: "pause_5_config", schema: [
-              { name: "pause_5", default: "16:35-16:40", selector: { text: { type: "text" } } },
+              { name: "pause_5",       default: "16:35-16:40", selector: { text: { type: "text" } } },
               { name: "pause_5_after", default: 10, selector: { number: { min: 0, max: 10, step: 1, mode: "box" } } }
             ]}
           ]
         }
       ],
-      computeLabel: (s, hass) => _cfgLabels(hass)[s.name],
+      computeLabel: (s, hass) => _cfgLabels(hass)[s.name] || s.name,
       computeHelper: (s, hass) => _cfgHelpers(hass)[s.name],
       computeVisible: () => true,
     };
@@ -164,7 +231,7 @@ class VpMobile24Card extends HTMLElement {
 
   static getStubConfig() {
     return { entity:'sensor.vpmobile24_week_table', show_header:true, show_time:true,
-      highlight_today:true, use_custom_times:false,
+      highlight_today:true, use_custom_times:false, theme:'navy',
       header_settings:{ title:'Stundenplan', class_name:'5a' } };
   }
 
@@ -174,21 +241,35 @@ class VpMobile24Card extends HTMLElement {
     this._popupOpen = false;
     this._popupData = null;
     this._infoPopupOpen = false;
-    this._mobDayIdx = null; // reset to today on config change
+    this._mobDayIdx = null;
+    this._weekOffset = 0;
     if (this._hass) this._render();
+  }
+
+  _switchWeek(offset) {
+    this._weekOffset = offset;
+    this._popupOpen = false;
+    this._popupData = null;
+    this._infoPopupOpen = false;
+    if (offset === 0) {
+      const todayDow = new Date().getDay();
+      this._mobDayIdx = (todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : 0;
+    } else {
+      this._mobDayIdx = 0;
+    }
+    this._render();
   }
 
   set hass(hass) {
     this._hass = hass;
     if (this._config) {
-      const anyPopupOpen = this._popupOpen || this._infoPopupOpen;
-      if (anyPopupOpen) {
-        // Only update table content, keep popups alive
+      const dow = new Date().getDay();
+      if ((dow === 0 || dow === 6) && !this._weekOffset) {
+        this._weekOffset = 1; this._mobDayIdx = 0;
+      }
+      if (this._popupOpen || this._infoPopupOpen) {
         this._updateTableOnly();
-        // If info popup is open, refresh its content with latest data
-        if (this._infoPopupOpen) {
-          this._renderInfoPopupContent();
-        }
+        if (this._infoPopupOpen) this._renderInfoPopupContent();
       } else {
         this._render();
       }
@@ -198,12 +279,15 @@ class VpMobile24Card extends HTMLElement {
   getCardSize() { return 6; }
 
   _handleReload() {
-    if (!this._config.reload_entity) return;
-    this._hass.callService('button', 'press', { entity_id: this._config.reload_entity });
+    const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
+    if (!r) return;
+    this._hass.callService('button', 'press', { entity_id: r });
   }
 
   _showInfoPopup() {
-    if (!this._config.additional_info_entity) return;
+    const e = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
+    if (!e) return;
+    if ((this._weekOffset || 0) !== 0) return;
     this._infoPopupOpen = true;
     this._renderInfoPopupContent();
   }
@@ -213,54 +297,32 @@ class VpMobile24Card extends HTMLElement {
     const overlay = this.shadowRoot.getElementById('info-popup-overlay');
     const content = this.shadowRoot.getElementById('info-popup-content');
     if (!popup || !overlay || !content) return;
-
     const t = this._t || this._buildTranslations();
     const wdKeys = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     const wdDE = t.wdFull;
     const todayIdx = new Date().getDay();
     const todayKey = wdKeys[todayIdx];
     const todayName = wdDE[todayIdx];
-
-    const ent = this._hass && this._config.additional_info_entity
-      ? this._hass.states[this._config.additional_info_entity]
-      : null;
-
-    // Try week_infos first (new sensor format), fall back to flat arrays
+    const infoEnt = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
+    const ent = this._hass && infoEnt ? this._hass.states[infoEnt] : null;
     const weekInfos = ent && ent.attributes && ent.attributes.week_infos;
-    let allg  = [];
-    let stund = [];
-
+    let allg = [], stund = [];
     if (weekInfos && weekInfos[todayKey]) {
-      allg  = weekInfos[todayKey].allgemeine_infos  || [];
-      stund = weekInfos[todayKey].stunden_infos     || [];
+      allg = weekInfos[todayKey].allgemeine_infos || [];
+      stund = weekInfos[todayKey].stunden_infos || [];
     } else if (ent && ent.attributes) {
-      // Fallback: flat arrays (old sensor format) — filter by today's name
-      const rawAllg  = ent.attributes.allgemeine_infos  || [];
-      const rawStund = ent.attributes.stunden_infos     || [];
-      const filterDay = (arr) => arr.filter(t => {
-        const text = String(t);
-        const hasDayRef = wdDE.some(d => text.includes(d));
-        return !hasDayRef || text.includes(todayName);
-      });
-      allg  = filterDay(rawAllg);
-      stund = filterDay(rawStund);
+      const ra = ent.attributes.allgemeine_infos || [];
+      const rs = ent.attributes.stunden_infos || [];
+      const fd = (arr) => arr.filter(x => { const tx = String(x); return !wdDE.some(d => tx.includes(d)) || tx.includes(todayName); });
+      allg = fd(ra); stund = fd(rs);
     }
-
     let html = '';
-
     if (allg.length > 0) {
-      html += '<div class="vp-info-section">'
-        + '<div class="vp-info-section-label">' + t.genInfo + '</div>'
-        + allg.map(a => '<div class="vp-info-entry"><span>' + a + '</span></div>').join('')
-        + '</div>';
+      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + t.genInfo + '</div>'
+        + allg.map(a => '<div class="vp-info-entry"><span>' + a + '</span></div>').join('') + '</div>';
     }
-
-    if (!html) {
-      html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
-    } else {
-      html += '<div style="height:8px"></div>';
-    }
-
+    if (!html) html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
+    else html += '<div style="height:8px"></div>';
     content.innerHTML = html;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
@@ -268,10 +330,10 @@ class VpMobile24Card extends HTMLElement {
 
   _closeInfoPopup() {
     this._infoPopupOpen = false;
-    const popup   = this.shadowRoot.getElementById('info-popup');
-    const overlay = this.shadowRoot.getElementById('info-popup-overlay');
-    if (popup)   popup.classList.add('hidden');
-    if (overlay) overlay.classList.add('hidden');
+    const p = this.shadowRoot.getElementById('info-popup');
+    const o = this.shadowRoot.getElementById('info-popup-overlay');
+    if (p) p.classList.add('hidden');
+    if (o) o.classList.add('hidden');
   }
 
   _closePopup() {
@@ -279,7 +341,12 @@ class VpMobile24Card extends HTMLElement {
     this._popupData = null;
     const popup   = this.shadowRoot.getElementById('popup');
     const overlay = this.shadowRoot.getElementById('popup-overlay');
-    if (popup)   { popup.classList.add('hidden'); popup.classList.remove('vp-popup-ausfall'); const t = popup.querySelector('#popup-title'); if(t) t.style.display=''; }
+    if (popup) {
+      popup.classList.add('hidden');
+      popup.classList.remove('vp-popup-ausfall');
+      const tt = popup.querySelector('#popup-title');
+      if (tt) tt.style.display = '';
+    }
     if (overlay) overlay.classList.add('hidden');
   }
 
@@ -295,67 +362,34 @@ class VpMobile24Card extends HTMLElement {
     const title   = this.shadowRoot.getElementById('popup-title');
     const content = this.shadowRoot.getElementById('popup-content');
     if (!popup || !overlay || !title || !content) return;
-
     const t = this._t || this._buildTranslations();
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
-    const lehrer = (lesson && lesson.lehrer)  || '';
-    const raum   = (lesson && lesson.raum)    || '';
-    const zeit   = (lesson && lesson.zeit)    || slotTime || '';
+    const lehrer = (lesson && lesson.lehrer) || '';
+    const raum   = (lesson && lesson.raum)   || '';
+    const zeit   = (lesson && lesson.zeit)   || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
-    // Determine type: cancelled, substitution, or normal
     const isActuallyCancelled = isCancelled || fach === '—';
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
-
-    // Title
-    let badge = '';
     if (isActuallyCancelled) {
-      badge = '<span class="vp-detail-badge vp-detail-cancelled">' + t.cancelled + '</span>';
-    } else if (isVertretung) {
-      badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
-    }
-    title.innerHTML =
-      '<span class="vp-detail-num">' + slotPeriod + '. ' + t.period + '</span>' +
-      (isActuallyCancelled ? '<span class="vp-detail-fach" style="color:#94a3b8">—</span>' : '<span class="vp-detail-fach">' + fach + '</span>') +
-      badge;
-
-    // Rows
-    let rows = '';
-    // Show period + time as first row (no Tag row)
-    rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">🕐</span>'
-      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
-      + '<span class="vp-detail-val">' + (zeit || slotTime || '—') + '</span></div>';
-
-    if (lehrer) rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">👤</span>'
-      + '<span class="vp-detail-label">' + t.teacher + '</span>'
-      + '<span class="vp-detail-val">' + lehrer + '</span></div>';
-
-    if (raum) rows += '<div class="vp-detail-row">'
-      + '<span class="vp-detail-icon">🚪</span>'
-      + '<span class="vp-detail-label">' + t.room + '</span>'
-      + '<span class="vp-detail-val">' + raum + '</span></div>';
-
-    if (info) rows += '<div class="vp-detail-row vp-detail-info-row">'
-      + '<span class="vp-detail-icon">ℹ️</span>'
-      + '<span class="vp-detail-label">' + t.info + '</span>'
-      + '<span class="vp-detail-val">' + info + '</span></div>';
-
-    if (isActuallyCancelled) {
-      // Ausfall: show big red message, no rows
-      // Build ausfall popup: no title bar, no lines, just red glow + AUSFALL
-      title.innerHTML = '';
-      title.style.display = 'none';
+      title.innerHTML = ''; title.style.display = 'none';
       content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>';
       popup.classList.add('vp-popup-ausfall');
       popup.classList.remove('hidden');
       overlay.classList.remove('hidden');
       return;
     }
-    if (!lehrer && !raum && !info) {
-      rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
-    }
-
+    let badge = '';
+    if (isVertretung) badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
+    title.style.display = '';
+    title.innerHTML = '<span class="vp-detail-num">' + slotPeriod + '. ' + t.period + '</span>'
+      + '<span class="vp-detail-fach">' + fach + '</span>' + badge;
+    let rows = '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
+      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
+      + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
+    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span><span class="vp-detail-label">' + t.teacher + '</span><span class="vp-detail-val">' + lehrer + '</span></div>';
+    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span><span class="vp-detail-label">' + t.room + '</span><span class="vp-detail-val">' + raum + '</span></div>';
+    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-label">' + t.info + '</span><span class="vp-detail-val">' + info + '</span></div>';
+    if (!lehrer && !raum && !info) rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
     content.innerHTML = rows;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
@@ -366,8 +400,15 @@ class VpMobile24Card extends HTMLElement {
     if (!this._hass || !this._config) return;
     const entity = this._hass.states[this._config.entity];
     if (!entity) return;
-    const weekTable = entity.attributes && entity.attributes.week_table;
-    if (!weekTable) return;
+    const weekOffset = this._weekOffset || 0;
+    const weekTable = weekOffset === 1
+      ? (entity.attributes && entity.attributes.next_week_table)
+      : (entity.attributes && entity.attributes.week_table);
+    if (!weekTable) {
+      // Only do a full re-render if no popup is open
+      if (!this._popupOpen && !this._infoPopupOpen) this._render();
+      return;
+    }
 
     const t = this._t || this._buildTranslations();
     const showTime       = this._config.show_time !== false;
@@ -380,8 +421,30 @@ class VpMobile24Card extends HTMLElement {
     const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
     const slots = this._buildTimeSlots(useCustomTimes);
 
+    // ── Calculate current lesson ──────────────────────────────────────────
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    let currentLessonNum = -1;
+    if (todayIdx >= 0) {
+      slots.forEach(slot => {
+        if (!slot.isPause && slot.time) {
+          const parts = slot.time.split('-');
+          if (parts.length === 2) {
+            const [sh, sm] = parts[0].split(':').map(Number);
+            const [eh, em] = parts[1].split(':').map(Number);
+            if (nowMins >= sh * 60 + sm && nowMins <= eh * 60 + em)
+              currentLessonNum = slot.lessonNumber;
+          }
+        }
+      });
+    }
+
     const tbody = this.shadowRoot.querySelector('.vp-table tbody');
-    if (!tbody) { this._render(); return; }
+    if (!tbody) {
+      // No table found (e.g. mobile view) — never call _render() while popup is open
+      if (!this._popupOpen && !this._infoPopupOpen) this._render();
+      return;
+    }
 
     let bodyHtml = '';
     slots.forEach(slot => {
@@ -408,19 +471,22 @@ class VpMobile24Card extends HTMLElement {
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
             text = lesson.fach;
-            if (isVertretung) cls += ' vp-sub';
-            else if (isToday) cls += ' vp-today-tile';
+            const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
+            if (isCurrent)         cls += ' vp-current';
+            else if (isVertretung) cls += ' vp-sub';
+            else                   cls += ' vp-normal';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             text = '—';
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
-            cls += isToday ? ' vp-today-tile vp-empty' : ' vp-empty';
+            cls += ' vp-empty';
           }
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
+          const lessonAttr = (lesson && (lesson.fach || isCancelled))
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
-          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + '>' + text + '</div></td>';
+          bodyHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + lessonAttr + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         bodyHtml += '</tr>';
       }
@@ -437,7 +503,10 @@ class VpMobile24Card extends HTMLElement {
     const useCustomTimes = this._config.use_custom_times === true;
     const highlightToday = this._config.highlight_today !== false;
     const entity = this._hass && this._hass.states[this._config.entity];
-    const weekTable = entity && entity.attributes && entity.attributes.week_table;
+    const weekOffset = this._weekOffset || 0;
+    const weekTable = weekOffset === 1
+      ? (entity && entity.attributes && entity.attributes.next_week_table)
+      : (entity && entity.attributes && entity.attributes.week_table);
     if (!weekTable) return;
 
     const slots = this._buildTimeSlots(useCustomTimes);
@@ -484,23 +553,23 @@ class VpMobile24Card extends HTMLElement {
           (typeof rawFach === "string" && rawFach.trim() === "") ||
           (typeof rawFach === "string" && /^[-\u2014\u2013\s]+$/.test(rawFach))
         );
-        // Current lesson highlight
-        const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         if (isCancelled) {
           subj = '—';
           rowCls += ' vp-mob-cancelled vp-mob-clickable';
         } else if (lesson && lesson.fach) {
           subj = lesson.fach;
           isSub = !!lesson.ist_vertretung;
+          const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
           if (isCurrent) rowCls += ' vp-mob-current';
           else if (isSub) rowCls += ' vp-mob-sub';
           rowCls += ' vp-mob-clickable';
         } else {
           rowCls += ' vp-mob-empty';
         }
-        const onclickAttr = (lesson && (lesson.fach || isCancelled))
-          ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g,'&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+        const lessonAttr = (lesson && (lesson.fach || isCancelled))
+          ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dName + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
           : '';
+        const isCurrent = isViewingToday && !isCancelled && slot.lessonNumber === currentLessonNum;
         const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
           + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
         let subjPart;
@@ -511,7 +580,7 @@ class VpMobile24Card extends HTMLElement {
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
         }
-        rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
+        rows += '<div class="' + rowCls + '" ' + lessonAttr + '>' + numPart + subjPart + '</div>';
       }
     });
 
@@ -533,6 +602,24 @@ class VpMobile24Card extends HTMLElement {
       pause_1:'10:10-10:30', pause_1_after:3,
       pause_2:'12:15-12:45', pause_2_after:5,
     };
+
+    // Auto-populate times from XML sensor data when not using custom times
+    if (!useCustomTimes && this._hass && this._config.entity) {
+      const entity = this._hass.states[this._config.entity];
+      const weekTable = entity && entity.attributes && entity.attributes.week_table;
+      if (weekTable) {
+        const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
+        for (let p = 1; p <= 10; p++) {
+          for (const day of dayKeys) {
+            const lesson = weekTable[day] && weekTable[day][String(p)];
+            if (lesson && lesson.zeit && lesson.zeit.includes('-')) {
+              defaults['time_' + p] = lesson.zeit;
+              break;
+            }
+          }
+        }
+      }
+    }
 
     // HA stores grid sub-schemas as nested objects: pause_1_config: { pause_1: "...", pause_1_after: 3 }
     // We need to read from both the nested config object AND the flat top-level keys
@@ -569,35 +656,66 @@ class VpMobile24Card extends HTMLElement {
 
   _render() {
     if (!this._hass || !this._config) return;
-    const t = this._buildTranslations(); // also sets this._t
+    const t = this._buildTranslations();
 
     const entity = this._hass.states[this._config.entity];
     if (!entity) {
       this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#ef4444">' + t.entityNotFound + ': ' + this._config.entity + '</div></ha-card>';
       return;
     }
-    const weekTable = entity.attributes && entity.attributes.week_table;
-    if (!weekTable) {
+    if (!entity.attributes || !entity.attributes.week_table) {
       this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#94a3b8">' + t.noData + '</div></ha-card>';
       return;
     }
 
     const title         = (this._config.header_settings && this._config.header_settings.title)     || this._config.title     || 'Stundenplan';
-    const className     = (this._config.header_settings && this._config.header_settings.class_name) || this._config.class_name || '5a';
+    const cfgClass = (this._config.header_settings && this._config.header_settings.class_name) || this._config.class_name || '';
+    const sensorClass = (entity.attributes && entity.attributes.class) || '';
+    const className = (cfgClass && cfgClass !== '5a') ? cfgClass : (sensorClass || cfgClass);
     const showHeader    = this._config.show_header !== false;
-    const showTime      = this._config.show_time !== false;
-    const highlightToday = this._config.highlight_today !== false;
+    const showTime      = (this._config.header_settings && this._config.header_settings.show_time  !== undefined)
+                          ? this._config.header_settings.show_time !== false
+                          : this._config.show_time !== false;
+    const highlightToday = (this._config.header_settings && this._config.header_settings.highlight_today !== undefined)
+                           ? this._config.header_settings.highlight_today !== false
+                           : this._config.highlight_today !== false;
     const useCustomTimes = this._config.use_custom_times === true;
+    const weekOffset    = this._weekOffset || 0;
+    // Resolve additional_info_entity + reload_entity from top-level OR nested sensors object
+    const sensors = this._config.sensors || {};
+    const additionalInfoEntity = this._config.additional_info_entity || sensors.additional_info_entity || null;
+    const reloadEntity         = this._config.reload_entity          || sensors.reload_entity          || null;
+
+    // Pick correct week table
+    const weekTable = weekOffset === 1
+      ? (entity.attributes && entity.attributes.next_week_table) || null
+      : entity.attributes.week_table;
+
+    // If next week data not yet available, show loading state
+    if (weekOffset === 1 && !weekTable) {
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
+        <div style="font-size:1.5em;margin-bottom:12px">⏳</div>
+        <div style="font-weight:600;color:#e2e8f0;margin-bottom:6px">${t.nextWeek}</div>
+        <div style="font-size:.85em">Daten werden geladen…</div>
+      </div></ha-card>`;
+      return;
+    }
 
     const now = new Date();
-    const wdn = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-    const mon = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-    const dateChip = wdn[now.getDay()] + ', ' + now.getDate() + '. ' + mon[now.getMonth()];
-
     const days = t.days;
     const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
     const todayDow = now.getDay();
-    const todayIdx = highlightToday && todayDow >= 1 && todayDow <= 5 ? todayDow - 1 : -1;
+    // Only highlight today column when viewing current week
+    const todayIdx = (weekOffset === 0 && highlightToday && todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
+
+    // Calculate Monday of the displayed week
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1) + weekOffset * 7);
+    const dayDates = days.map((_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d.getDate();
+    });
 
     const slots = this._buildTimeSlots(useCustomTimes);
 
@@ -622,9 +740,9 @@ class VpMobile24Card extends HTMLElement {
     // ── INFO BUTTON & POPUP DATA ──
     let infoBtn = false;
     let infoBtnHasInfo = false;
-    if (this._config.additional_info_entity) {
+    if (additionalInfoEntity) {
       infoBtn = true;
-      const infoEnt = this._hass.states[this._config.additional_info_entity];
+      const infoEnt = this._hass.states[additionalInfoEntity];
       if (infoEnt && infoEnt.attributes) {
         const allg  = infoEnt.attributes.allgemeine_infos  || [];
         const stund = infoEnt.attributes.stunden_infos     || [];
@@ -633,15 +751,6 @@ class VpMobile24Card extends HTMLElement {
     }
 
     // ── TABLE HTML ──
-    // Calculate dates for each weekday column (Mon-Fri of current week)
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
-    const dayDates = days.map((_, i) => {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      return d.getDate(); // just the day number
-    });
-
     let tableHtml = '<table class="vp-table"><thead><tr><th class="vp-th-num">#</th>';
     days.forEach((d, i) => {
       const dateNum = dayDates[i];
@@ -680,20 +789,21 @@ class VpMobile24Card extends HTMLElement {
           if (lesson && lesson.fach && !isCancelled) {
             text = lesson.fach;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
-            if (isCurrent) cls += ' vp-current'; // green always wins over red
+            if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
-            else if (isToday) cls += ' vp-today-tile';
+            else                   cls += ' vp-normal';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             text = '—';
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
-            cls += isToday ? ' vp-today-tile vp-empty' : ' vp-empty';
+            cls += ' vp-empty';
           }
-          const onclickAttr = (lesson && (lesson.fach || isCancelled))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dayFullNames[di] + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelled + ')"'
+          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
+          const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
-          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + onclickAttr + '>' + text + '</div></td>';
+          tableHtml += '<td class="' + (isToday ? 'vp-today-col' : '') + '"><div class="' + cls + '" ' + lessonAttr2 + (tip ? ' title="' + tip.replace(/"/g,'&quot;') + '"' : '') + '>' + text + '</div></td>';
         });
         tableHtml += '</tr>';
       }
@@ -715,7 +825,7 @@ class VpMobile24Card extends HTMLElement {
     days.forEach((d, i) => {
       const active = i === mobDayIdx ? ' vp-mob-tab-active' : '';
       const dn = dayDates[i];
-      mobTabs += '<button class="vp-mob-tab' + active + '" onclick="this.getRootNode().host._switchMobDay(' + i + ')"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
+      mobTabs += '<button class="vp-mob-tab' + active + '" data-vpm="mob-day" data-vpm-day="' + i + '"><span class="vp-mob-tab-day">' + d + '</span><span class="vp-mob-tab-date">' + dn + '</span></button>';
     });
     mobTabs += '</div>';
 
@@ -758,8 +868,8 @@ class VpMobile24Card extends HTMLElement {
           } else {
             rowCls += ' vp-mob-empty';
           }
-          const onclickAttr = (lesson && (lesson.fach || isCancelledMob))
-            ? 'onclick="this.getRootNode().host._showLessonDetail(' + JSON.stringify(lesson).replace(/"/g, '&quot;') + ',\'' + dName + '\',' + slot.period + ',\'' + slot.time + '\',' + isCancelledMob + ')"'
+          const onclickAttr2 = (lesson && (lesson.fach || isCancelledMob))
+            ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dName + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelledMob + '"'
             : '';
           const numPart = '<div class="vp-mob-left' + (isCurrent ? ' vp-mob-left-current' : '') + '"><span class="vp-mob-num">' + slot.period + '</span>'
             + (showTime ? '<span class="vp-mob-time">' + slot.time + '</span>' : '') + '</div>';
@@ -771,340 +881,424 @@ class VpMobile24Card extends HTMLElement {
           } else {
             subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
           }
-          rows += '<div class="' + rowCls + '" ' + onclickAttr + '>' + numPart + subjPart + '</div>';
-        }
+          rows += '<div class="' + rowCls + '" ' + onclickAttr2 + '>' + numPart + subjPart + '</div>';        }
       });
       return rows;
     };
 
     let mobileHtml = mobTabs + '<div id="vp-mob-content">' + buildMobRows(mobDayKey, mobDayIdx) + '</div>';
 
+    // ── KW + Smart status bar ────────────────────────────────────────────
+    const kwNum = (() => {
+      const d = new Date(monday);
+      const jan4 = new Date(d.getFullYear(), 0, 4);
+      const startW1 = new Date(jan4);
+      startW1.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1);
+      return Math.round((d - startW1) / 604800000) + 1;
+    })();
+
+    // Smart hints: count today's substitutions & cancellations
+    let smartHints = [];
+    if (todayIdx >= 0 && weekTable) {
+      const todayData = weekTable[dayKeys[todayIdx]] || {};
+      let nSub = 0, nCancel = 0, lastEnd = '';
+      slots.forEach(slot => {
+        if (slot.isPause) return;
+        const les = todayData[String(slot.lessonNumber)];
+        if (!les) return;
+        const rawF = les.fach;
+        const isCan = !rawF || rawF === '---' || rawF === '—' || rawF === '-' || (typeof rawF === 'string' && rawF.trim() === '');
+        if (isCan) { nCancel++; }
+        else if (les.ist_vertretung) { nSub++; }
+        if (!isCan && les.fach && slot.time) {
+          const p = slot.time.split('-');
+          if (p[1]) lastEnd = p[1];
+        }
+      });
+      if (nCancel > 0) smartHints.push(`<span class="vp-hint vp-hint-red">⚠ ${nCancel}× Ausfall heute</span>`);
+      if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× Vertretung heute</span>`);
+      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 Unterricht endet ${lastEnd}</span>`);
+    }
+    // Next lesson (when current lesson is active)
+    if (currentLessonNum >= 0 && todayIdx >= 0 && weekTable) {
+      const todayData = weekTable[dayKeys[todayIdx]] || {};
+      const nextPeriodNum = slots.find(s => !s.isPause && s.lessonNumber > currentLessonNum);
+      if (nextPeriodNum) {
+        const nextLes = todayData[String(nextPeriodNum.lessonNumber)];
+        if (nextLes && nextLes.fach) {
+          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ Nächste: ${nextLes.fach}${nextPeriodNum.time ? ' · ' + nextPeriodNum.time.split('-')[0] : ''}</span>`);
+        }
+      }
+    }
+
     this.shadowRoot.innerHTML = `
 <style>
 :host { display: block; }
 ha-card {
   background: #0f1729 !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   overflow: hidden;
-  box-shadow: 0 6px 32px rgba(0,0,0,0.55) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #e2e8f0 !important;
 }
-/* HEADER */
+
+/* ══ HEADER ══════════════════════════════════════════════════════════════ */
 .vp-hdr {
   display: ${showHeader ? 'flex' : 'none'};
   align-items: center; gap: 10px;
-  padding: 12px 14px 10px; background: #0f1729;
-  flex-wrap: nowrap; min-width: 0;
+  padding: 13px 16px 10px;
+  background: linear-gradient(180deg, rgba(37,99,235,0.12) 0%, rgba(15,23,41,0) 100%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-wrap: wrap;
 }
-.vp-hdr-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.vp-hdr-row1 { display: flex; align-items: center; gap: 7px; flex-wrap: nowrap; min-width: 0; }
 .vp-hdr-icon {
-  width: 42px; height: 42px; flex-shrink: 0;
+  width: 40px; height: 40px; flex-shrink: 0;
   background: linear-gradient(135deg,#3b82f6,#1d4ed8);
   border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.3em;
-  box-shadow: 0 3px 10px rgba(29,78,216,0.45);
+  justify-content: center; font-size: 1.2em;
+  box-shadow: 0 4px 14px rgba(29,78,216,0.5);
 }
-.vp-hdr-body { flex: 1; min-width: 0; }
-.vp-hdr-top { display: flex; align-items: center; gap: 6px; }
+.vp-hdr-body { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 2px; }
+.vp-hdr-top  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .vp-hdr-title {
-  font-size: 1.15em; font-weight: 700; color: #fff;
-  line-height: 1.2; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
+  font-size: 1.1em; font-weight: 800; color: #fff;
+  letter-spacing: -0.2px; line-height: 1.2;
 }
-.vp-hdr-sub { font-size: 0.8em; color: #94a3b8; white-space: nowrap; }
-.vp-hdr-sep { color: #334155; font-size: 0.9em; flex-shrink: 0; }
-.vp-hdr-spacer { flex: 1; min-width: 8px; }
-@media (max-width: 600px) {
-  .vp-hdr { flex-wrap: wrap; gap: 6px; }
-  .vp-hdr-spacer { display: none; }
-  .vp-hdr-title { font-size: 1.05em; }
+.vp-hdr-class {
+  font-size: .72em; font-weight: 700; color: #3b82f6;
+  background: rgba(59,130,246,0.13); border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 6px; padding: 2px 8px;
 }
-.vp-hdr-actions {
-  display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto;
+.vp-hdr-sub {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
 }
-/* Unified pill style */
+.vp-hdr-kw {
+  font-size: .7em; font-weight: 600; color: #64748b;
+}
+.vp-hdr-spacer { flex: 1; }
+.vp-hdr-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+/* ── Pills ── */
 .vp-pill {
   display: inline-flex; align-items: center; gap: 4px;
   background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.13);
-  border-radius: 20px; padding: 5px 11px;
-  font-size: 0.76em; font-weight: 500;
-  color: #94a3b8; white-space: nowrap;
-  cursor: default; font-family: inherit;
-  transition: all .2s; line-height: 1.3;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 0.73em; font-weight: 600; color: #94a3b8;
+  white-space: nowrap; cursor: pointer; font-family: inherit;
+  transition: all .18s; line-height: 1.3;
 }
-.vp-pill-btn { cursor: pointer; }
-.vp-pill-btn:hover { background: rgba(255,255,255,0.11); color: #e2e8f0; border-color: rgba(255,255,255,0.22); }
-.vp-pill-info {
-  background: rgba(245,158,11,0.1);
-  border-color: rgba(245,158,11,0.3);
-  color: #fcd34d; cursor: pointer; padding: 5px 9px;
-}
-.vp-pill-info:hover { background: rgba(245,158,11,0.2); border-color: #fcd34d; }
-.vp-pill-info.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
+.vp-pill:hover { background: rgba(255,255,255,0.12); color: #e2e8f0; }
+.vp-pill-blue  { color: #93c5fd; border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.09); }
+.vp-pill-blue:hover  { background: rgba(59,130,246,0.2); border-color: #3b82f6; color: #bfdbfe; }
+.vp-pill-green { color: #86efac; border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
+.vp-pill-green:hover { background: rgba(34,197,94,0.2); border-color: #22c55e; }
+.vp-pill-amber { color: #fcd34d; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.09); }
+.vp-pill-amber:hover { background: rgba(245,158,11,0.2); border-color: #f59e0b; }
+.vp-pill-amber.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
 @keyframes vp-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
   50%      { box-shadow: 0 0 0 5px rgba(245,158,11,0); }
 }
-/* On mobile: stack header vertically */
-@media (max-width: 600px) {
-  .vp-hdr { flex-wrap: wrap; align-items: flex-start; }
-  .vp-hdr-body { flex: 1 1 calc(100% - 54px); }
-  .vp-hdr-actions { width: 100%; margin-left: 54px; margin-top: 2px; }
+
+/* ── Smart hints bar ── */
+.vp-hints {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 7px 16px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  min-height: 0;
 }
-/* TABLE */
-.vp-table { width: 100%; border-collapse: separate; border-spacing: 0; padding: 0 12px 12px; }
+.vp-hints:empty { display: none; }
+.vp-hint {
+  font-size: .72em; font-weight: 600; border-radius: 20px;
+  padding: 3px 10px; white-space: nowrap;
+}
+.vp-hint-red    { background: rgba(239,68,68,.12);  color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
+.vp-hint-yellow { background: rgba(234,179,8,.12);  color: #fde68a; border: 1px solid rgba(234,179,8,.2); }
+.vp-hint-blue   { background: rgba(59,130,246,.12); color: #93c5fd; border: 1px solid rgba(59,130,246,.2); }
+.vp-hint-green  { background: rgba(34,197,94,.12);  color: #86efac; border: 1px solid rgba(34,197,94,.2); }
+
+/* ══ TABLE ═══════════════════════════════════════════════════════════════ */
+.vp-table { width: 100%; border-collapse: separate; border-spacing: 0; padding: 6px 10px 10px; }
 .vp-table th {
-  padding: 8px 4px; text-align: center; color: #475569;
-  font-size: 0.78em; font-weight: 600; text-transform: uppercase;
-  letter-spacing: .5px; border-bottom: 1px solid rgba(255,255,255,0.07);
-  background: #0f1729; line-height: 1.2;
+  padding: 7px 3px; text-align: center;
+  font-size: 0.74em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: #475569;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: transparent; line-height: 1.3;
 }
-.vp-th-day { display: block; }
-.vp-th-date { display: block; font-size: 0.85em; color: #334155; font-weight: 500; text-transform: none; letter-spacing: 0; }
-.vp-th-num { width: 56px; min-width: 56px; }
-.vp-table td { padding: 3px 3px; text-align: center; vertical-align: middle; background: #0f1729; height: 52px; }
-.vp-td-num { width: 56px; min-width: 56px; padding: 4px 6px; }
-.vp-snum  { font-size: .88em; font-weight: 600; color: #94a3b8; line-height: 1.3; }
-.vp-stime { font-size: .68em; color: #475569; margin-top: 1px; white-space: nowrap; }
-/* TILES – all same height */
-.vp-tile {
-  background: #1a2a50; border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: #e2e8f0;
-  height: 46px; min-height: 46px;
-  display: flex; align-items: center;
-  justify-content: center; transition: background .15s;
-}
-.vp-tile.vp-empty { background: rgba(255,255,255,0.03); color: #475569; }
-.vp-today-col .vp-tile {
-  background: #1a2a50; border-radius: 8px; padding: 0 5px;
-  font-size: .88em; font-weight: 500; color: #e2e8f0;
-  height: 46px; min-height: 46px;
-  display: flex; align-items: center;
-  justify-content: center; transition: background .15s;
-}
-.vp-today-col .vp-tile.vp-empty { background: rgba(37,99,235,.2); color: rgba(255,255,255,.3); }
-.vp-tile.vp-sub { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
-/* Cancelled lesson – always red, every column */
-.vp-tile.vp-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; font-size: 1.1em; }
-.vp-today-col .vp-tile.vp-cancelled { background: #991b1b !important; color: #fca5a5 !important; box-shadow: 0 0 0 2px rgba(239,68,68,0.5); }
+.vp-th-num { width: 52px; min-width: 52px; }
+.vp-th-day  { display: block; font-size: .9em; }
+.vp-th-date { display: block; font-size: .82em; color: #334155; font-weight: 500;
+              text-transform: none; letter-spacing: 0; margin-top: 1px; }
 .vp-today-pill {
-  background: #2563eb; color: #fff; border-radius: 8px;
-  padding: 4px 10px; font-weight: 700; font-size: .82em;
-  text-transform: uppercase; letter-spacing: .5px; display: inline-flex;
-  flex-direction: column; align-items: center; gap: 1px;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff; border-radius: 8px; padding: 4px 10px;
+  font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .5px;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.5);
 }
-.vp-today-date { font-size: 0.85em; font-weight: 500; opacity: 0.85; text-transform: none; letter-spacing: 0; }
-/* PAUSE */
-.vp-pause-tr td { padding: 2px 0; background: #0f1729; }
+.vp-today-date { font-size: .8em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
+
+.vp-table td { padding: 2px 2px; text-align: center; vertical-align: middle; background: transparent; }
+.vp-td-num  { width: 52px; min-width: 52px; padding: 3px 4px; }
+.vp-snum    { font-size: .84em; font-weight: 700; color: #64748b; line-height: 1.3; }
+.vp-stime   { font-size: .62em; color: #334155; margin-top: 1px; white-space: nowrap; }
+.vp-today-col td,
+.vp-today-col    { background: rgba(37,99,235,0.04) !important; }
+
+/* ── Tiles ── */
+.vp-tile {
+  border-radius: 9px; padding: 0 4px;
+  font-size: .84em; font-weight: 600; color: #e2e8f0;
+  height: 48px; min-height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  transition: filter .12s, transform .12s, box-shadow .12s;
+  background: #1a2a50;
+  line-height: 1.2; text-align: center;
+}
+.vp-tile.vp-empty {
+  background: rgba(255,255,255,0.025);
+  color: transparent;
+}
+.vp-today-col .vp-tile.vp-empty {
+  background: rgba(37,99,235,0.05);
+  border: 1px dashed rgba(37,99,235,0.2);
+}
+.vp-tile.vp-normal     { background: rgba(34,197,94,.1); color: #86efac; border: 1px solid rgba(34,197,94,.2); }
+.vp-tile.vp-today-tile { background: #1e3a6e; color: #bfdbfe; }
+.vp-tile.vp-sub        { background: rgba(234,179,8,0.18) !important; color: #fde68a !important; border: 1px solid rgba(234,179,8,0.3); font-weight: 700; }
+.vp-tile.vp-cancelled  { background: rgba(239,68,68,0.18) !important; color: #fca5a5 !important; border: 1px solid rgba(239,68,68,0.3); font-weight: 700; }
+.vp-today-col .vp-tile.vp-normal  { background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.3); }
+.vp-today-col .vp-tile.vp-cancelled { background: rgba(239,68,68,0.25) !important; box-shadow: 0 0 0 1px rgba(239,68,68,0.4); }
+.vp-tile.vp-current    {
+  background: linear-gradient(135deg, #14532d, #166534) !important;
+  color: #bbf7d0 !important; font-weight: 800;
+  box-shadow: 0 0 0 2px #22c55e, 0 0 16px rgba(34,197,94,0.35) !important;
+}
+.vp-tile-clickable { cursor: pointer; }
+.vp-tile-clickable:hover { filter: brightness(1.18); transform: scale(1.04); }
+
+/* ── Pause row ── */
+.vp-pause-tr td { padding: 2px 0; background: transparent !important; }
 .vp-pause-cell {
-  text-align: center; color: #93c5fd; font-size: .82em;
-  padding: 9px 0; font-style: italic; font-weight: 500;
-  background: rgba(37,99,235,0.1);
-  border-top: 2px solid rgba(37,99,235,0.35);
-  border-bottom: 2px solid rgba(37,99,235,0.35);
+  text-align: center; color: #60a5fa; font-size: .76em;
+  padding: 8px 0; font-style: italic; font-weight: 600;
+  background: rgba(37,99,235,0.08);
+  border-top: 1px solid rgba(37,99,235,0.25);
+  border-bottom: 1px solid rgba(37,99,235,0.25);
   letter-spacing: 0.3px;
 }
-/* LEGEND */
-.vp-legend { display: flex; gap: 18px; padding: 8px 20px 16px; font-size: .82em; background: #0f1729; }
-.vp-legend-item { display: flex; align-items: center; gap: 6px; }
+
+/* ══ LEGEND ══════════════════════════════════════════════════════════════ */
+.vp-legend {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  padding: 7px 16px 12px; font-size: .75em;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.vp-legend-item { display: flex; align-items: center; gap: 5px; color: #64748b; }
 .vp-ldot { width: 8px; height: 8px; border-radius: 50%; }
-.vp-ldot-t { background: #3b82f6; }
-.vp-ldot-s { background: #ef4444; }
-.vp-lt { color: #60a5fa; font-weight: 600; }
-.vp-ls { color: #f87171; font-weight: 600; }
-.vp-ldot-c { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.6); }
-.vp-lc { color: #86efac; font-weight: 600; }
-/* MOBILE */
+.vp-ldot-today   { background: #3b82f6; }
+.vp-ldot-sub     { background: #eab308; }
+.vp-ldot-cancel  { background: #ef4444; }
+.vp-ldot-current { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,.6); }
+.vp-lbl-today   { color: #60a5fa;  font-weight: 600; }
+.vp-lbl-sub     { color: #fde68a;  font-weight: 600; }
+.vp-lbl-cancel  { color: #fca5a5;  font-weight: 600; }
+.vp-lbl-current { color: #86efac;  font-weight: 600; }
+
+/* ══ MOBILE ══════════════════════════════════════════════════════════════ */
 .vp-desktop { display: block; }
-.vp-mobile  { display: none; }
-@media (max-width: 600px) { .vp-desktop { display: none; } .vp-mobile { display: block; } }
+.vp-mobile  { display: none;  }
+@media (max-width: 600px) {
+  .vp-desktop { display: none;  }
+  .vp-mobile  { display: block; }
+}
+
 /* Day tabs */
 .vp-mob-tabs {
-  display: flex; gap: 4px; padding: 10px 12px 6px;
-  background: #0f1729;
+  display: flex; gap: 3px; padding: 8px 10px 5px;
 }
 .vp-mob-tab {
-  flex: 1; border: none; border-radius: 8px;
-  background: rgba(255,255,255,.06); color: #64748b;
-  font-size: .75em; font-weight: 600; cursor: pointer;
+  flex: 1; border: none; border-radius: 9px;
+  background: rgba(255,255,255,.05); color: #475569;
+  font-size: .72em; font-weight: 700; cursor: pointer;
   font-family: inherit; transition: all .15s;
-  text-transform: uppercase; letter-spacing: .4px;
+  text-transform: uppercase; letter-spacing: .3px;
   display: flex; flex-direction: column; align-items: center;
-  gap: 1px; padding: 6px 4px;
+  gap: 1px; padding: 7px 3px;
 }
-.vp-mob-tab:hover { background: rgba(255,255,255,.1); color: #94a3b8; }
-.vp-mob-tab-active { background: #2563eb !important; color: #fff !important; }
-.vp-mob-tab-day { font-size: .82em; font-weight: 700; line-height: 1.2; }
-.vp-mob-tab-date { font-size: .72em; font-weight: 500; opacity: .8; line-height: 1.2; }
-/* Lesson rows */
+.vp-mob-tab:hover { background: rgba(255,255,255,.09); color: #94a3b8; }
+.vp-mob-tab-active { background: linear-gradient(135deg,#2563eb,#1d4ed8) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(37,99,235,.4); }
+.vp-mob-tab-day  { font-size: .85em; font-weight: 800; line-height: 1.2; }
+.vp-mob-tab-date { font-size: .7em;  font-weight: 500; opacity: .8; line-height: 1.2; }
+
+/* Mobile lesson rows */
 .vp-mob-lesson {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.05);
+  padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .12s;
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
-.vp-mob-sub   { background: rgba(127,29,29,.25); border-left: 3px solid #7f1d1d; }
-.vp-mob-cancelled { background: rgba(127,29,29,.25); border-left: 3px solid #ef4444; }
-.vp-mob-current { background: rgba(20,83,45,.35); border-left: 3px solid #22c55e; }
-.vp-mob-empty { opacity: .45; }
-.vp-mob-left  { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
+.vp-mob-sub       { background: rgba(234,179,8,.1);  border-left: 3px solid #eab308; }
+.vp-mob-cancelled { background: rgba(239,68,68,.1);  border-left: 3px solid #ef4444; }
+.vp-mob-current   { background: rgba(20,83,45,.3);   border-left: 3px solid #22c55e; }
+.vp-mob-empty     { opacity: .4; }
+.vp-mob-left { display: flex; flex-direction: column; align-items: center; min-width: 42px; }
 .vp-mob-left-current .vp-mob-num  { color: #86efac !important; }
 .vp-mob-left-current .vp-mob-time { color: #4ade80 !important; }
-.vp-mob-num   { font-size: .9em; font-weight: 700; color: #94a3b8; line-height: 1.2; }
-.vp-mob-time  { font-size: .62em; color: #475569; margin-top: 1px; white-space: nowrap; }
-.vp-mob-subj  {
-  flex: 1; font-size: .95em; font-weight: 500; color: #e2e8f0;
+.vp-mob-num  { font-size: .88em; font-weight: 800; color: #64748b; line-height: 1.2; }
+.vp-mob-time { font-size: .6em;  color: #334155; margin-top: 1px; white-space: nowrap; }
+.vp-mob-subj {
+  flex: 1; font-size: .92em; font-weight: 600; color: #e2e8f0;
   background: #1a2a50; border-radius: 8px;
-  padding: 8px 12px; text-align: center;
+  padding: 8px 12px; text-align: center; line-height: 1.3;
 }
-.vp-mob-subj-sub   { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 600; }
-.vp-mob-subj-cancelled { background: #7f1d1d !important; color: #fca5a5 !important; font-weight: 700; }
-.vp-mob-subj-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
-.vp-mob-subj-empty { background: rgba(255,255,255,.03) !important; color: #475569 !important; }
-/* Pause row */
+.vp-mob-subj-sub      { background: rgba(234,179,8,.18) !important; color: #fde68a !important; }
+.vp-mob-subj-cancelled{ background: rgba(239,68,68,.18) !important; color: #fca5a5 !important; font-weight: 700; }
+.vp-mob-subj-current  { background: linear-gradient(135deg,#14532d,#166534) !important; color: #bbf7d0 !important; font-weight: 800; box-shadow: 0 0 0 2px #22c55e; }
+.vp-mob-subj-empty    { background: rgba(255,255,255,.03) !important; color: #334155 !important; }
 .vp-mob-pause-row {
-  text-align: center; padding: 8px 14px;
-  border-top: 2px solid rgba(37,99,235,0.35);
-  border-bottom: 2px solid rgba(37,99,235,0.35);
-  background: rgba(37,99,235,0.1);
-  color: #93c5fd; font-size: .78em; font-style: italic; font-weight: 500;
+  text-align: center; padding: 7px 14px;
+  border-top: 1px solid rgba(37,99,235,0.25);
+  border-bottom: 1px solid rgba(37,99,235,0.25);
+  background: rgba(37,99,235,0.07);
+  color: #60a5fa; font-size: .74em; font-style: italic; font-weight: 600;
 }
-/* POPUP */
-.vp-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 999; }
-.vp-popup-ausfall .vp-popup-title { display: none !important; }
-.vp-popup-ausfall #popup-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0; }
-.vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; background: transparent; }
-.vp-popup-ausfall {
-  background: #7f1d1d !important;
-  border-color: rgba(239,68,68,0.5) !important;
-  box-shadow: 0 0 0 1px rgba(239,68,68,0.3), 0 12px 48px rgba(239,68,68,0.5), 0 0 80px rgba(239,68,68,0.25) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 220px;
-}
-.vp-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #162040; border-radius: 14px; box-shadow: 0 12px 48px rgba(0,0,0,.7); padding: 0; max-width: 380px; width: 92%; z-index: 1000; border: 1px solid rgba(255,255,255,.12); color: #e2e8f0; overflow: hidden; }
-.vp-popup-title { font-size: 1em; font-weight: 700; color: #fff; padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.vp-detail-num { font-size: .78em; font-weight: 600; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 5px; }
-.vp-detail-fach { font-size: 1.1em; font-weight: 800; color: #fff; }
-.vp-detail-badge { font-size: .7em; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
-.vp-detail-sub { background: rgba(239,68,68,.2); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
-.vp-detail-cancelled { background: rgba(100,116,139,0.12); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
-/* Detail rows */
-.vp-detail-row { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
-.vp-detail-row:last-child { border-bottom: none; }
-.vp-detail-info-row { background: rgba(245,158,11,.06); }
-.vp-detail-icon { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
-.vp-detail-label { font-size: .78em; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 52px; }
-.vp-detail-val { font-size: .95em; font-weight: 500; color: #e2e8f0; flex: 1; }
-.vp-detail-empty { padding: 16px 20px; color: #475569; font-size: .88em; font-style: italic; }
-/* Clickable tiles */
-.vp-tile-clickable { cursor: pointer; }
-.vp-tile-clickable:hover { filter: brightness(1.15); transform: scale(1.03); transition: transform .12s, filter .12s; }
 .vp-mob-clickable { cursor: pointer; }
 .vp-mob-clickable:hover { filter: brightness(1.1); }
-/* INFO BUTTON */
-.vp-info-btn {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: rgba(245,158,11,.15); border: 1.5px solid rgba(245,158,11,.4);
-  color: #fcd34d; font-size: .9em; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all .2s; font-family: inherit;
-  line-height: 1;
+
+/* ══ POPUPS ══════════════════════════════════════════════════════════════ */
+.vp-popup-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.65);
+  z-index: 9998; backdrop-filter: blur(3px);
 }
-.vp-info-btn:hover { background: rgba(245,158,11,.3); border-color: #fcd34d; transform: scale(1.1); }
-.vp-info-btn.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
-@keyframes vp-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.4); }
-  50%      { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+.vp-popup {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: #131f38; border-radius: 16px;
+  box-shadow: 0 16px 56px rgba(0,0,0,.75);
+  max-width: 380px; width: 92%; z-index: 9999;
+  border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; overflow: hidden;
 }
-/* INFO POPUP */
+.vp-popup-title {
+  font-size: 1em; font-weight: 700; color: #fff;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.vp-detail-num    { font-size: .75em; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 5px; }
+.vp-detail-fach   { font-size: 1.1em; font-weight: 800; color: #fff; }
+.vp-detail-badge  { font-size: .68em; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+.vp-detail-sub    { background: rgba(234,179,8,.2);  color: #fde68a; border: 1px solid rgba(234,179,8,.3); }
+.vp-detail-cancelled { background: rgba(239,68,68,.15); color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+.vp-detail-row    { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.vp-detail-row:last-child { border-bottom: none; }
+.vp-detail-info-row { background: rgba(245,158,11,.06); }
+.vp-detail-icon   { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
+.vp-detail-label  { font-size: .75em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 52px; }
+.vp-detail-val    { font-size: .92em; font-weight: 500; color: #e2e8f0; flex: 1; }
+.vp-detail-empty  { padding: 16px 20px; color: #475569; font-size: .85em; font-style: italic; }
+.vp-popup-footer  { padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
+.vp-popup-btn     { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 9px 22px; cursor: pointer; font-size: .88em; font-family: inherit; transition: background .18s; }
+.vp-popup-btn:hover { background: #1d4ed8; }
+/* Ausfall popup */
+.vp-popup-ausfall {
+  background: linear-gradient(135deg,#7f1d1d,#991b1b) !important;
+  border-color: rgba(239,68,68,0.5) !important;
+  box-shadow: 0 0 0 1px rgba(239,68,68,.3), 0 16px 56px rgba(239,68,68,.45), 0 0 80px rgba(239,68,68,.2) !important;
+  display: flex !important; flex-direction: column !important; min-height: 220px;
+}
+.vp-popup-ausfall .vp-popup-title { display: none !important; }
+.vp-popup-ausfall #popup-content  { flex: 1; display: flex; align-items: center; justify-content: center; }
+.vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
+.vp-ausfall-block {
+  color: #fca5a5; font-size: 2.6em; font-weight: 900;
+  letter-spacing: 5px; text-align: center; padding: 20px;
+  text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
+}
+/* Info popup */
 .vp-info-popup-title {
-  padding: 16px 20px 12px;
-  font-size: 1em; font-weight: 700; color: #fcd34d;
+  padding: 16px 20px 12px; font-size: 1em; font-weight: 700; color: #fcd34d;
   border-bottom: 1px solid rgba(245,158,11,.2);
   display: flex; align-items: center; gap: 8px;
 }
-.vp-info-popup-date {
-  font-size: .78em; font-weight: 500; color: #94a3b8;
-  margin-left: auto;
-}
 .vp-info-section { padding: 12px 20px 4px; }
-.vp-info-section-label {
-  font-size: .7em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .8px; color: #64748b; margin-bottom: 8px;
-}
+.vp-info-section-label { font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #64748b; margin-bottom: 8px; }
 .vp-info-entry {
   display: flex; gap: 10px; align-items: flex-start;
   padding: 9px 12px; margin-bottom: 6px;
-  background: rgba(245,158,11,.07);
-  border: 1px solid rgba(245,158,11,.15);
-  border-radius: 8px; font-size: .88em; color: #e2e8f0; line-height: 1.5;
+  background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.15);
+  border-radius: 8px; font-size: .86em; color: #e2e8f0; line-height: 1.5;
 }
-.vp-info-entry-icon { flex-shrink: 0; font-size: 1em; margin-top: 1px; }
-.vp-info-none { padding: 16px 20px; color: #475569; font-size: .88em; font-style: italic; }
-/* Popup footer */
-.vp-popup-footer { padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn { background: #2563eb; color: #fff; border: none; border-radius: 7px; padding: 9px 22px; cursor: pointer; font-size: .9em; font-family: inherit; transition: background .2s; }
-.vp-popup-btn:hover { background: #1d4ed8; }
-.info-item { padding: 10px 12px; margin-bottom: 8px; background: rgba(255,255,255,.05); border-radius: 6px; border-left: 3px solid #f59e0b; font-size: .9em; color: #94a3b8; }
+.vp-info-none { padding: 16px 20px; color: #475569; font-size: .86em; font-style: italic; }
 .hidden { display: none !important; }
-/* Ausfall popup */
-.vp-ausfall-block {
-  background: transparent;
-  color: #fca5a5;
-  font-size: 2.5em; font-weight: 900;
-  letter-spacing: 4px; text-align: center;
-  padding: 20px;
-  text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
-}
-/* Current lesson highlight (green glow) */
-.vp-tile.vp-current { background: #14532d !important; color: #86efac !important; font-weight: 700; box-shadow: 0 0 0 2px #22c55e; }
-.vp-today-col .vp-tile.vp-current { background: #166534 !important; color: #bbf7d0 !important; box-shadow: 0 0 0 2px #4ade80; }
-/* Today pill with date below */
-.vp-today-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; background: #2563eb; color: #fff; border-radius: 8px; padding: 4px 12px; font-weight: 700; font-size: .82em; text-transform: uppercase; letter-spacing: .5px; }
-.vp-today-date { font-size: .82em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
-/* Other day headers with date */
-.vp-th-day { display: block; font-size: .78em; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #475569; }
-.vp-th-date { display: block; font-size: .82em; font-weight: 600; color: #334155; margin-top: 1px; }
 </style>
 <ha-card>
+
+  <!-- ── Header ── -->
   <div class="vp-hdr">
     <div class="vp-hdr-icon">📅</div>
     <div class="vp-hdr-body">
-      <div class="vp-hdr-row1">
+      <div class="vp-hdr-top">
         <span class="vp-hdr-title">${title}</span>
-        ${infoBtn ? '<button class="vp-pill vp-pill-info vp-pill-btn' + (infoBtnHasInfo ? ' has-info' : '') + '" onclick="this.getRootNode().host._showInfoPopup()" title="' + t.infoTitle + '">ⓘ</button>' : ''}
-        <div class="vp-hdr-spacer"></div>
-        ${this._config.reload_entity ? '<button class="vp-pill vp-pill-btn" onclick="this.getRootNode().host._handleReload()">' + t.refresh + '</button>' : ''}
+        ${className ? `<span class="vp-hdr-class">${t.classLabel} ${className}</span>` : ''}
       </div>
-      <span class="vp-hdr-sub">${t.classLabel} ${className}</span>
+      <div class="vp-hdr-sub">
+        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? 'Aktuelle Woche' : 'Nächste Woche'}</span>
+      </div>
+    </div>
+    <div class="vp-hdr-spacer"></div>
+    <div class="vp-hdr-actions">
+      ${infoBtn && weekOffset === 0
+        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-vpm="info" title="${t.infoTitle}">ⓘ Info</button>`
+        : ''}
+      ${weekOffset === 0
+        ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
+        : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
+      ${reloadEntity
+        ? `<button class="vp-pill" data-vpm="reload">↺</button>`
+        : ''}
     </div>
   </div>
+
+  <!-- ── Smart hints bar ── -->
+  <div class="vp-hints">${smartHints.join('')}</div>
+
+  <!-- ── Table (desktop) / Tabs (mobile) ── -->
   <div class="vp-desktop">${tableHtml}</div>
   <div class="vp-mobile">${mobileHtml}</div>
+
+  <!-- ── Legend ── -->
   <div class="vp-legend">
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-t"></span><span class="vp-lt">${t.today}</span></div>
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-s"></span><span class="vp-ls">${t.sub}</span></div>
-    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-c"></span><span class="vp-lc">${t.now}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-today"></span><span class="vp-lbl-today">${t.today}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-sub"></span><span class="vp-lbl-sub">${t.sub}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-cancel"></span><span class="vp-lbl-cancel">${t.cancelled}</span></div>
+    <div class="vp-legend-item"><span class="vp-ldot vp-ldot-current"></span><span class="vp-lbl-current">${t.now}</span></div>
   </div>
+
 </ha-card>
-<!-- Lesson detail popup -->
-<div id="popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closePopup()"></div>
+
+<!-- ── Lesson detail popup ── -->
+<div id="popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="popup" class="vp-popup hidden">
   <div id="popup-title" class="vp-popup-title">Details</div>
   <div id="popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closePopup()">${t.close}</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close">${t.close}</button></div>
 </div>
-<!-- Info popup -->
-<div id="info-popup-overlay" class="vp-popup-overlay hidden" onclick="this.getRootNode().host._closeInfoPopup()"></div>
+
+<!-- ── Info popup ── -->
+<div id="info-popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="info-popup" class="vp-popup hidden">
   <div class="vp-info-popup-title">${t.infoTitle}</div>
   <div id="info-popup-content"></div>
-  <div class="vp-popup-footer"><button class="vp-popup-btn" onclick="this.getRootNode().host._closeInfoPopup()">${t.close}</button></div>
+  <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close}</button></div>
 </div>`;
+
+    // ── Restore popup if it was open before this render ──────────────────
+    // NOTE: popup state is managed separately via _popupOpen/_popupData
+    // _render() never restores popups — user must re-click to open them
   }
 }
 
@@ -1244,28 +1438,26 @@ class VpMobile24MultiCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this._config   = {};
     this._hass     = null;
-    this._weekOffset = 0;      // 0 = current, 1 = next
+    this._weekOffset = 0;
     this._search   = '';
-    this._collapsed = {};      // entityId → bool
-    this._detail   = null;     // { lesson, className, period, time, dayName }
-
-    // CSP-safe: one persistent click handler — no getRootNode() needed
+    this._collapsed = {};
+    this._detail   = null;
+    // CSP-safe: single persistent listener
     this.shadowRoot.addEventListener('click', (e) => {
       if (e.target.id === 'mc-overlay') { this._closeDetail(); return; }
-      const el = e.target.closest('[data-mc-action]');
-      if (!el) return;
+      const t = e.target.closest('[data-mc]');
+      if (!t) return;
       e.stopPropagation();
-      const act = el.dataset.mcAction;
+      const act = t.dataset.mc;
+      if (act === 'close-detail') { this._closeDetail(); return; }
       if (act === 'next-week')    { this._switchWeek(1); return; }
       if (act === 'cur-week')     { this._switchWeek(0); return; }
-      if (act === 'toggle')       { this._toggleCollapse(el.dataset.mcId); return; }
-      if (act === 'close-detail') { this._closeDetail(); return; }
+      if (act === 'collapse')     { this._toggleCollapse(t.dataset.mcId); return; }
       if (act === 'detail') {
         try {
-          const les = JSON.parse(el.dataset.mcLesson);
-          this._showDetail(les, el.dataset.mcClass, Number(el.dataset.mcPeriod), el.dataset.mcTime, el.dataset.mcDay);
+          const les = JSON.parse(t.dataset.mcLesson);
+          this._showDetail(les, t.dataset.mcClass, Number(t.dataset.mcPeriod), t.dataset.mcTime, t.dataset.mcDay);
         } catch(err) {}
-        return;
       }
     });
   }
@@ -1522,7 +1714,7 @@ class VpMobile24MultiCard extends HTMLElement {
     if (type === 'cancelled') {
       pop.innerHTML = `
         <div class="mc-pop-ausfall">AUSFALL</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" data-mc-action="close-detail">Schließen</button></div>`;
+        <div class="mc-pop-foot"><button class="mc-pop-btn" data-mc="close-detail">Schließen</button></div>`;
       pop.style.background = '#7f1d1d';
       pop.style.boxShadow  = '0 0 0 1px rgba(239,68,68,.4),0 12px 48px rgba(239,68,68,.5)';
     } else {
@@ -1533,7 +1725,7 @@ class VpMobile24MultiCard extends HTMLElement {
           <span class="mc-pop-cls" style="color:${color}">${className}</span>
         </div>
         <div class="mc-pop-body">${rows}</div>
-        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" data-mc-action="close-detail">Schließen</button></div>`;
+        <div class="mc-pop-foot"><button class="mc-pop-btn" style="background:${color}" data-mc="close-detail">Schließen</button></div>`;
       pop.style.background = '#162040';
       pop.style.boxShadow  = '0 12px 48px rgba(0,0,0,.7)';
     }
@@ -1683,8 +1875,8 @@ class VpMobile24MultiCard extends HTMLElement {
               const isCur  = isT && p === currentPeriod && type !== 'cancelled' && type !== 'empty';
               const fach   = (les && !this._isCancelled(les.fach)) ? les.fach : (les ? '—' : '');
               const clickable = !!les;
-              const lessonAttrMc = clickable
-                ? `data-mc-action="detail" data-mc-lesson='${JSON.stringify(les).replace(/'/g,"&#39;")}' data-mc-class="${className.replace(/"/g,'&quot;')}" data-mc-period="${p}" data-mc-time="${timeStr}" data-mc-day="${dayFull[di]}" style="cursor:pointer"`
+              const onclk = clickable
+                ? `data-mc="detail" data-mc-lesson='${JSON.stringify(les).replace(/'/g,"&#39;").replace(/\\/g,"\\\\")}' data-mc-class='${className.replace(/'/g,"&#39;")}' data-mc-period='${p}' data-mc-time='${timeStr}' data-mc-day='${dayFull[di]}' style="cursor:pointer"`
                 : '';
               let tileStyle = '';
               let tileCls   = 'mc-tile';
@@ -1698,7 +1890,7 @@ class VpMobile24MultiCard extends HTMLElement {
               if (les) tileCls += ' mc-tile-hover';
               const tooltip = les ? `title="${[les.fach, les.lehrer && '👤 '+les.lehrer, les.raum && '🚪 '+les.raum].filter(Boolean).join(' | ')}"` : '';
               gridHtml += `<td class="${isT?'mc-td-today':''}">
-                <div class="mc-tile" style="${tileStyle}" ${lessonAttrMc} ${tooltip}>${fach}</div>
+                <div class="mc-tile" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
               </td>`;
             });
             gridHtml += '</tr>';
@@ -1723,7 +1915,7 @@ class VpMobile24MultiCard extends HTMLElement {
 
       sectionsHtml += `
         <div class="mc-section">
-          <div class="mc-section-head" data-mc-action="toggle" data-mc-id="${entityId}">
+          <div class="mc-section-head" data-mc="collapse" data-mc-id="${entityId}">
             <div class="mc-section-left">
               <span class="mc-chevron${isCollapsed ? '' : ' mc-chevron-open'}">›</span>
               <span class="mc-class-name">${className}</span>
@@ -1954,8 +2146,8 @@ ha-card {
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
-      ? `<button class="mc-pill mc-pill-blue" data-mc-action="next-week">Nächste Woche ›</button>`
-      : `<button class="mc-pill mc-pill-green" data-mc-action="cur-week">‹ Aktuelle Woche</button>`)
+      ? `<button class="mc-pill mc-pill-blue" data-mc="next-week">Nächste Woche ›</button>`
+      : `<button class="mc-pill mc-pill-green" data-mc="cur-week">‹ Aktuelle Woche</button>`)
       : ''}
   </div>
 
