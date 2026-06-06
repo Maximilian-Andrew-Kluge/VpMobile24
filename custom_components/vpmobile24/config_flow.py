@@ -421,17 +421,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step 2 — choose which subjects to include (uncheck = exclude)."""
         if user_input is not None:
+            def _is_course_group(s: str) -> bool:
+                return any(c.isdigit() for c in s) and len(s) > 3
+
             excluded = [
                 s for s in self._available_subjects
-                if not user_input.get(s, True)
+                if not user_input.get(s, True) and not _is_course_group(s)
             ]
-            # selected_courses = active entries that look like course group names
-            # (contain digits, length > 3, e.g. "789WB12", "7INb1", "7SPju")
+            # selected_courses = course groups that are explicitly checked ON
             selected_courses = [
                 s for s in self._available_subjects
-                if user_input.get(s, True)
-                and any(c.isdigit() for c in s)
-                and len(s) > 3
+                if _is_course_group(s) and user_input.get(s, False)
             ]
             old_class = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
@@ -465,10 +465,24 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             CONF_EXCLUDED_SUBJECTS,
             self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
         )
-        schema_dict = {
-            vol.Optional(s, default=(s not in current_excluded)): bool
-            for s in self._available_subjects
-        }
+        current_selected = self._config_entry.options.get(
+            CONF_SELECTED_COURSES,
+            self._config_entry.data.get(CONF_SELECTED_COURSES, []),
+        )
+
+        def _is_course_group(s: str) -> bool:
+            """Return True if this looks like a parallel course group (e.g. 789WB12, 7INb1)."""
+            return any(c.isdigit() for c in s) and len(s) > 3
+
+        schema_dict = {}
+        for s in self._available_subjects:
+            if _is_course_group(s):
+                # Course groups: default OFF unless explicitly in selected_courses
+                default_val = s in current_selected
+            else:
+                # Normal subjects: default ON unless in excluded
+                default_val = s not in current_excluded
+            schema_dict[vol.Optional(s, default=default_val)] = bool
         return self.async_show_form(
             step_id="subjects",
             data_schema=vol.Schema(schema_dict),
