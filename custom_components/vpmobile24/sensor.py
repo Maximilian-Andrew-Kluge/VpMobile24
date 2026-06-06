@@ -421,10 +421,34 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             for i in range(5)
         }
         cache = getattr(self.coordinator, "_week_data_cache", {})
+        excluded = getattr(self.coordinator, "excluded_subjects", [])
+        selected = getattr(self.coordinator, "selected_courses", [])
+
+        def _should_include(lesson: dict) -> bool:
+            subj   = lesson.get("subject", "") or ""
+            course = lesson.get("course",  "") or ""
+            # Excluded subject
+            if subj and subj in excluded:
+                return False
+            # Whitelist: if selected_courses set, skip other course groups
+            if selected and course and course not in selected:
+                if any(c.isdigit() for c in course):
+                    return False
+            # Cancelled lesson for non-attended course
+            is_cancelled = not subj or subj.strip() in ["\u2014", "---", "", "-", " "]
+            if is_cancelled and course:
+                if course in excluded:
+                    return False
+                if selected and course not in selected and any(c.isdigit() for c in course):
+                    return False
+            return True
+
         next_week_lessons = []
         for date_str, day_data in cache.items():
             if date_str in next_week_dates:
                 for lesson in day_data.get("lessons", []) + day_data.get("changes", []):
+                    if not _should_include(lesson):
+                        continue
                     lesson_copy = lesson.copy()
                     lesson_copy["date"] = date_str
                     next_week_lessons.append(lesson_copy)
