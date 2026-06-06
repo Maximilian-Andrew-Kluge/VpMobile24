@@ -31,7 +31,7 @@ class VpMobile24Card extends HTMLElement {
     if (act === 'close')       { this._closePopup();    return; }
     if (act === 'close-info')  { this._closeInfoPopup(); return; }
     if (act === 'next-week')   { this._switchWeek(this._weekOffset + 1); return; }
-    if (act === 'cur-week')    { this._switchWeek(Math.max(0, this._weekOffset - 1)); return; }
+    if (act === 'cur-week')    { this._switchWeek(0); return; }
     if (act === 'reload')      { this._handleReload();  return; }
     if (act === 'info')        { this._showInfoPopup();  return; }
     if (act === 'mob-day')     { this._switchMobDay(Number(btn.dataset.vpmDay)); return; }
@@ -1262,10 +1262,9 @@ ha-card {
       ${infoBtn && weekOffset === 0
         ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-vpm="info" title="${t.infoTitle}">ⓘ Info</button>`
         : ''}
-      ${weekOffset > 0
-        ? `<button class="vp-pill vp-pill-green" data-vpm="cur-week">‹ Zurück</button>`
-        : ''}
-      <button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>
+      ${weekOffset === 0
+        ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
+        : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
       ${reloadEntity
         ? `<button class="vp-pill" data-vpm="reload">↺</button>`
         : ''}
