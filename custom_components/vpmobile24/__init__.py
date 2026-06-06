@@ -244,6 +244,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self.class_name = class_name
         self.excluded_subjects = excluded_subjects or []
         self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
+        _LOGGER.warning(f"VPM24_DEBUG Coordinator init: excluded={self.excluded_subjects}, selected_courses={self.selected_courses}")
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
@@ -425,6 +426,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         student_courses.add(subj)
 
             _LOGGER.debug(f"Student courses: {sorted(student_courses)}")
+            _LOGGER.warning(f"VPM24_DEBUG selected_courses={self.selected_courses}, excluded={self.excluded_subjects}, student_courses={sorted(student_courses)}")
 
             # ----------------------------------------------------------------
             # Assemble filtered week data
@@ -450,15 +452,17 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             # Whitelist filter: if selected_courses is set, skip lessons
                             # that belong to a different course group
                             if self.selected_courses and lesson_course and lesson_course not in self.selected_courses:
+                                _LOGGER.warning(f"VPM24_DEBUG SKIP lesson period={period} course={lesson_course} subject={subject} (not in selected_courses)")
                                 continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 # Cancelled lesson
                                 if lesson_course and lesson_course in self.excluded_subjects:
+                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled lesson period={period} course={lesson_course} (excluded)")
                                     continue
                                 # Skip if student doesn't attend this course
                                 if lesson_course and lesson_course not in student_courses:
-                                    _LOGGER.debug(f"Skipping cancelled lesson - not in student courses: {lesson_course}")
+                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled lesson period={period} course={lesson_course} (not in student_courses)")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
@@ -483,13 +487,15 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                             # Whitelist filter: skip changes for other course groups
                             if self.selected_courses and change_course and change_course not in self.selected_courses:
+                                _LOGGER.warning(f"VPM24_DEBUG SKIP change period={period} course={change_course} subject={subject} (not in selected_courses)")
                                 continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 if change_course and change_course in self.excluded_subjects:
+                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled change period={period} course={change_course} (excluded)")
                                     continue
                                 if change_course and change_course not in student_courses:
-                                    _LOGGER.debug(f"Skipping cancelled change - not in student courses: {change_course}")
+                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled change period={period} course={change_course} (not in student_courses)")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
