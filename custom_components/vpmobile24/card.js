@@ -30,8 +30,8 @@ class VpMobile24Card extends HTMLElement {
     const act = btn.dataset.vpm;
     if (act === 'close')       { this._closePopup();    return; }
     if (act === 'close-info')  { this._closeInfoPopup(); return; }
-    if (act === 'next-week')   { this._switchWeek(1);   return; }
-    if (act === 'cur-week')    { this._switchWeek(0);   return; }
+    if (act === 'next-week')   { this._switchWeek(this._weekOffset + 1); return; }
+    if (act === 'cur-week')    { this._switchWeek(Math.max(0, this._weekOffset - 1)); return; }
     if (act === 'reload')      { this._handleReload();  return; }
     if (act === 'info')        { this._showInfoPopup();  return; }
     if (act === 'mob-day')     { this._switchMobDay(Number(btn.dataset.vpmDay)); return; }
@@ -1246,7 +1246,7 @@ ha-card {
         ${className ? `<span class="vp-hdr-class">${t.classLabel} ${className}</span>` : ''}
       </div>
       <div class="vp-hdr-sub">
-        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? 'Aktuelle Woche' : 'Nächste Woche'}</span>
+        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? 'Aktuelle Woche' : weekOffset === 1 ? 'Nächste Woche' : 'Übernächste Woche'}</span>
       </div>
     </div>
     <div class="vp-hdr-spacer"></div>
@@ -1254,9 +1254,10 @@ ha-card {
       ${infoBtn && weekOffset === 0
         ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-vpm="info" title="${t.infoTitle}">ⓘ Info</button>`
         : ''}
-      ${weekOffset === 0
-        ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
-        : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
+      ${weekOffset > 0
+        ? `<button class="vp-pill vp-pill-green" data-vpm="cur-week">‹ Zurück</button>`
+        : ''}
+      <button class="vp-pill vp-pill-blue" data-vpm="next-week">${weekOffset === 0 ? t.nextWeek : 'Übernächste Woche →'}</button>
       ${reloadEntity
         ? `<button class="vp-pill" data-vpm="reload">↺</button>`
         : ''}
