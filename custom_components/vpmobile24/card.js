@@ -248,6 +248,7 @@ class VpMobile24Card extends HTMLElement {
 
   _switchWeek(offset) {
     this._weekOffset = offset;
+    this._manualWeekOffset = true;  // user navigated manually — disable auto-switch
     this._popupOpen = false;
     this._popupData = null;
     this._infoPopupOpen = false;
@@ -264,7 +265,8 @@ class VpMobile24Card extends HTMLElement {
     this._hass = hass;
     if (this._config) {
       const dow = new Date().getDay();
-      if ((dow === 0 || dow === 6) && !this._weekOffset) {
+      // Auto-switch to next week on weekends — but only if user hasn't navigated manually
+      if ((dow === 0 || dow === 6) && !this._weekOffset && !this._manualWeekOffset) {
         this._weekOffset = 1; this._mobDayIdx = 0;
       }
       if (this._popupOpen || this._infoPopupOpen) {
