@@ -29,10 +29,9 @@
 > [!IMPORTANT]
 > 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
 >
+> 🚀 **Geplante Veröffentlichung:** *08.06.2026 um 12:00 Uhr (MESZ)*
 >
-> Veröffentlichung Datum: **08.06.2026**
->
-> ### Neue Features in der v2.5.0
+> ### Neue Features in v2.5.0
 >
 > - 📅 **Nächste Woche** — Button zum Vorschauen der nächsten Woche, am Wochenende automatisch
 > - 🏫 **Sensor & Widget „Aktueller Unterricht"** — zeigt die gerade laufende Stunde
@@ -298,10 +297,9 @@ Contributions sind herzlich willkommen!
 > [!IMPORTANT]
 > 🎉 **Major Update Announced – VpMobile24 v2.5.0**
 >
+> 🚀 **Scheduled Release:** *June 8, 2026 at 12:00 PM (CEST)*
 >
-> Publication Date: **08.06.2026**
->
-> ### New Features in the v2.5.0
+> ### New Features in v2.5.0
 >
 > - 📅 **Next Week** — button to preview next week's schedule, auto on weekends
 > - 🏫 **Current Lesson sensor & widget** — shows the currently running lesson
