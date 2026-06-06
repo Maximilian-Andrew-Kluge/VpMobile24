@@ -427,14 +427,11 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         def _should_include(lesson: dict) -> bool:
             subj   = lesson.get("subject", "") or ""
             course = lesson.get("course",  "") or ""
-            # Excluded subject
             if subj and subj in excluded:
                 return False
-            # Whitelist: if selected_courses set, skip other course groups
             if selected and course and course not in selected:
                 if any(c.isdigit() for c in course):
                     return False
-            # Cancelled lesson for non-attended course
             is_cancelled = not subj or subj.strip() in ["\u2014", "---", "", "-", " "]
             if is_cancelled and course:
                 if course in excluded:
@@ -444,6 +441,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
             return True
 
         next_week_lessons = []
+        next_next_week_lessons = []
         for date_str, day_data in cache.items():
             if date_str in next_week_dates:
                 for lesson in day_data.get("lessons", []) + day_data.get("changes", []):
@@ -453,9 +451,25 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                     lesson_copy["date"] = date_str
                     next_week_lessons.append(lesson_copy)
 
+        # Build next_next_week_table (offset=2)
+        next_next_monday = next_monday + timedelta(weeks=1)
+        next_next_week_dates = {
+            (next_next_monday + timedelta(days=i)).isoformat()
+            for i in range(5)
+        }
+        for date_str, day_data in cache.items():
+            if date_str in next_next_week_dates:
+                for lesson in day_data.get("lessons", []) + day_data.get("changes", []):
+                    if not _should_include(lesson):
+                        continue
+                    lesson_copy = lesson.copy()
+                    lesson_copy["date"] = date_str
+                    next_next_week_lessons.append(lesson_copy)
+
         return {
             "week_table": self._create_week_table(all_lessons),
             "next_week_table": self._create_week_table(next_week_lessons),
+            "next_next_week_table": self._create_week_table(next_next_week_lessons),
             "class": getattr(self.coordinator, "class_name", ""),
             "total_lessons": len(all_lessons),
             "week_lessons_count": len(week_lessons),

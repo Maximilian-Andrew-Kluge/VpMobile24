@@ -351,28 +351,33 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         _LOGGER.warning("Could not fetch schedule for %s: %s", target_date, ex)
                     continue
 
-            # ── Feature 1: Pre-fetch next week so the card can show it ──────
+            # ── Feature 1: Pre-fetch next week + next_next week ──────────────
             next_monday = monday_this_week + timedelta(weeks=1)
-            next_week_dates = [
-                (next_monday + timedelta(days=i)).isoformat() for i in range(5)
-            ]
-            for date_str in next_week_dates:
-                if date_str not in self._week_data_cache:
-                    try:
-                        target = date.fromisoformat(date_str)
-                        day_data = await self.api.async_get_schedule(target, self.class_name)
-                        self._week_data_cache[date_str] = {
-                            "lessons": day_data.get("lessons", []),
-                            "changes": day_data.get("changes", []),
-                            "additional_info": day_data.get("additional_info", []),
-                            "timestamp": day_data.get("timestamp", "")
-                        }
-                        _LOGGER.debug("Pre-fetched next week %s", date_str)
-                    except Exception as ex:
-                        ex_str = str(ex)
-                        if "404" not in ex_str:
-                            _LOGGER.debug("Could not pre-fetch next week %s: %s", date_str, ex)
-                        continue
+            next_next_monday = monday_this_week + timedelta(weeks=2)
+            prefetch_dates = []
+            for i in range(5):
+                d1 = (next_monday + timedelta(days=i)).isoformat()
+                d2 = (next_next_monday + timedelta(days=i)).isoformat()
+                if d1 not in self._week_data_cache:
+                    prefetch_dates.append(d1)
+                if d2 not in self._week_data_cache:
+                    prefetch_dates.append(d2)
+            for date_str in prefetch_dates:
+                try:
+                    target = date.fromisoformat(date_str)
+                    day_data = await self.api.async_get_schedule(target, self.class_name)
+                    self._week_data_cache[date_str] = {
+                        "lessons": day_data.get("lessons", []),
+                        "changes": day_data.get("changes", []),
+                        "additional_info": day_data.get("additional_info", []),
+                        "timestamp": day_data.get("timestamp", "")
+                    }
+                    _LOGGER.debug("Pre-fetched %s", date_str)
+                except Exception as ex:
+                    ex_str = str(ex)
+                    if "404" not in ex_str:
+                        _LOGGER.debug("Could not pre-fetch %s: %s", date_str, ex)
+                    continue
 
             # ----------------------------------------------------------------
             # Build base_schedule: normal timetable without substitutions.

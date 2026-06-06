@@ -401,7 +401,9 @@ class VpMobile24Card extends HTMLElement {
     const entity = this._hass.states[this._config.entity];
     if (!entity) return;
     const weekOffset = this._weekOffset || 0;
-    const weekTable = weekOffset === 1
+    const weekTable = weekOffset === 2
+      ? (entity.attributes && entity.attributes.next_next_week_table)
+      : weekOffset === 1
       ? (entity.attributes && entity.attributes.next_week_table)
       : (entity.attributes && entity.attributes.week_table);
     if (!weekTable) {
@@ -504,7 +506,9 @@ class VpMobile24Card extends HTMLElement {
     const highlightToday = this._config.highlight_today !== false;
     const entity = this._hass && this._hass.states[this._config.entity];
     const weekOffset = this._weekOffset || 0;
-    const weekTable = weekOffset === 1
+    const weekTable = weekOffset === 2
+      ? (entity && entity.attributes && entity.attributes.next_next_week_table)
+      : weekOffset === 1
       ? (entity && entity.attributes && entity.attributes.next_week_table)
       : (entity && entity.attributes && entity.attributes.week_table);
     if (!weekTable) return;
@@ -687,12 +691,14 @@ class VpMobile24Card extends HTMLElement {
     const reloadEntity         = this._config.reload_entity          || sensors.reload_entity          || null;
 
     // Pick correct week table
-    const weekTable = weekOffset === 1
+    const weekTable = weekOffset === 2
+      ? (entity.attributes && entity.attributes.next_next_week_table) || null
+      : weekOffset === 1
       ? (entity.attributes && entity.attributes.next_week_table) || null
       : entity.attributes.week_table;
 
-    // If next week data not yet available, show loading state
-    if (weekOffset === 1 && !weekTable) {
+    // If next/next_next week data not yet available, show loading state
+    if (weekOffset >= 1 && !weekTable) {
       this.shadowRoot.innerHTML = `<ha-card><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
         <div style="font-size:1.5em;margin-bottom:12px">⏳</div>
         <div style="font-weight:600;color:#e2e8f0;margin-bottom:6px">${t.nextWeek}</div>
