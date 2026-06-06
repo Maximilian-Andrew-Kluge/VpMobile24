@@ -1263,7 +1263,7 @@ ha-card {
       ${weekOffset > 0
         ? `<button class="vp-pill vp-pill-green" data-vpm="cur-week">‹ Zurück</button>`
         : ''}
-      <button class="vp-pill vp-pill-blue" data-vpm="next-week">${weekOffset === 0 ? t.nextWeek : 'Übernächste Woche →'}</button>
+      <button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>
       ${reloadEntity
         ? `<button class="vp-pill" data-vpm="reload">↺</button>`
         : ''}
