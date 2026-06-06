@@ -1,4 +1,4 @@
-﻿﻿<div align="center">
+﻿﻿﻿<div align="center">
 
 <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
