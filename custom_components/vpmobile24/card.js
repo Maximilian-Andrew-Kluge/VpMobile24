@@ -1800,7 +1800,8 @@ class VpMobile24MultiCard extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     const dow = new Date().getDay();
-    if ((dow === 0 || dow === 6) && this._weekOffset === 0) this._weekOffset = 1;
+    // Auto-switch on weekends only if user hasn't navigated manually
+    if ((dow === 0 || dow === 6) && this._weekOffset === 0 && !this._manualWeekOffset) this._weekOffset = 1;
     // Don't re-render while popup is open — would destroy popup DOM
     if (this._config && Object.keys(this._config).length && !this._detail) this._render();
   }
@@ -1957,6 +1958,7 @@ class VpMobile24MultiCard extends HTMLElement {
   // ── Week navigation ───────────────────────────────────────────────────────
   _switchWeek(offset) {
     this._weekOffset = offset;
+    this._manualWeekOffset = true;  // user navigated manually — disable auto-switch
     this._render();
   }
 
