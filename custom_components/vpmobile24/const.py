@@ -8,6 +8,7 @@ CONF_USERNAME = "username"
 CONF_PASSWORD = "password"
 CONF_CLASS_NAME = "class_name"
 CONF_EXCLUDED_SUBJECTS = "excluded_subjects"
+CONF_SELECTED_COURSES = "selected_courses"  # whitelist of Ku2 course groups
 
 # Default values
 DEFAULT_UPDATE_INTERVAL = 15  # minutes

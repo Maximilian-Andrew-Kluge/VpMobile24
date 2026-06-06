@@ -17,6 +17,7 @@ from .const import (
     CONF_SCHOOL_ID,
     CONF_CLASS_NAME,
     CONF_EXCLUDED_SUBJECTS,
+    CONF_SELECTED_COURSES,
     DEFAULT_BASE_URL,
     DOMAIN,
 )
@@ -424,7 +425,14 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 s for s in self._available_subjects
                 if not user_input.get(s, True)
             ]
-            # Build new title if class changed
+            # selected_courses = active entries that look like course group names
+            # (contain digits, length > 3, e.g. "789WB12", "7INb1", "7SPju")
+            selected_courses = [
+                s for s in self._available_subjects
+                if user_input.get(s, True)
+                and any(c.isdigit() for c in s)
+                and len(s) > 3
+            ]
             old_class = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
                 or self._config_entry.data.get(CONF_CLASS_NAME, "")
@@ -440,6 +448,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 data={
                     CONF_CLASS_NAME: self._new_class_name,
                     CONF_EXCLUDED_SUBJECTS: excluded,
+                    CONF_SELECTED_COURSES: selected_courses,
                 },
             )
 

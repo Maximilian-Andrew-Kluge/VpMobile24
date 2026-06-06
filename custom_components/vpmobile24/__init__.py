@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, DEFAULT_BASE_URL
+from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, DEFAULT_BASE_URL
 from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
@@ -128,7 +128,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass,
         api,
         entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name"),
-        entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, []))
+        entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, [])),
+        entry.options.get(CONF_SELECTED_COURSES, entry.data.get(CONF_SELECTED_COURSES, [])),
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -168,6 +169,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def _async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
         new_class = entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name")
         new_excluded = entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, []))
+        new_selected = entry.options.get(CONF_SELECTED_COURSES, entry.data.get(CONF_SELECTED_COURSES, []))
         coord = hass.data[DOMAIN][entry.entry_id]
         class_changed = coord.class_name != new_class
         if class_changed:
@@ -199,6 +201,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 )
 
         coord.excluded_subjects = new_excluded
+        coord.selected_courses  = new_selected
         await coord.async_request_refresh()
 
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
@@ -235,11 +238,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None) -> None:
+    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None) -> None:
         """Initialize."""
         self.api = api
         self.class_name = class_name
         self.excluded_subjects = excluded_subjects or []
+        self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
@@ -443,6 +447,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period  = lesson.get("period", "")
                             lesson_course = lesson.get("course", "")
 
+                            # Whitelist filter: if selected_courses is set, skip lessons
+                            # that belong to a different course group
+                            if self.selected_courses and lesson_course and lesson_course not in self.selected_courses:
+                                continue
+
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 # Cancelled lesson
                                 if lesson_course and lesson_course in self.excluded_subjects:
@@ -472,10 +481,13 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period  = change.get("period", "")
                             change_course = change.get("course", "")
 
+                            # Whitelist filter: skip changes for other course groups
+                            if self.selected_courses and change_course and change_course not in self.selected_courses:
+                                continue
+
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 if change_course and change_course in self.excluded_subjects:
                                     continue
-                                # Skip if student doesn't attend this course
                                 if change_course and change_course not in student_courses:
                                     _LOGGER.debug(f"Skipping cancelled change - not in student courses: {change_course}")
                                     continue
