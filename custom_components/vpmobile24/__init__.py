@@ -405,27 +405,28 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug(f"Base schedule created with {len(base_schedule)} entries")
 
             # ----------------------------------------------------------------
-            # Build student_courses: all Ku2 course names the student actually
-            # attends (from non-cancelled lessons across the whole week cache).
-            # Used to filter out cancellations of parallel groups.
+            # Build student_courses: use selected_courses whitelist if set,
+            # otherwise fall back to deriving from cache.
             # ----------------------------------------------------------------
-            student_courses: set[str] = set()
-            for date_str in week_dates:
-                if date_str in self._week_data_cache:
-                    for lesson in self._week_data_cache[date_str].get("lessons", []):
-                        subj   = lesson.get("subject", "")
-                        course = lesson.get("course", "")
-                        is_chg = lesson.get("is_change", False)
-                        # Only count genuinely attended lessons (not cancellations)
-                        if is_chg:
-                            continue
-                        if not subj or subj.strip() in ["\u2014", "---", "", "-", " "]:
-                            continue
-                        if course:
-                            student_courses.add(course)
-                        student_courses.add(subj)
+            if self.selected_courses:
+                # User explicitly chose which course groups they attend
+                student_courses: set[str] = set(self.selected_courses)
+            else:
+                student_courses = set()
+                for date_str in week_dates:
+                    if date_str in self._week_data_cache:
+                        for lesson in self._week_data_cache[date_str].get("lessons", []):
+                            subj   = lesson.get("subject", "")
+                            course = lesson.get("course", "")
+                            is_chg = lesson.get("is_change", False)
+                            if is_chg:
+                                continue
+                            if not subj or subj.strip() in ["\u2014", "---", "", "-", " "]:
+                                continue
+                            if course:
+                                student_courses.add(course)
+                            student_courses.add(subj)
 
-            _LOGGER.debug(f"Student courses: {sorted(student_courses)}")
             _LOGGER.warning(f"VPM24_DEBUG selected_courses={self.selected_courses}, excluded={self.excluded_subjects}, student_courses={sorted(student_courses)}")
 
             # ----------------------------------------------------------------
