@@ -1,4 +1,4 @@
-﻿﻿﻿<div align="center">
+﻿﻿﻿﻿﻿<div align="center">
 
 <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
@@ -309,19 +309,34 @@ Contributions sind herzlich willkommen!
 > [!IMPORTANT]
 > 🎉 **Major Update Announced – VpMobile24 v2.5.0**
 >
-> 🚀 **Scheduled Release:** *June 8, 2026 at 12:00 PM (CEST)*
+> 🚀 **Scheduled Release:** *coming soon*
 >
 > ### New Features in v2.5.0
 >
-> - 📅 **Next Week** — button to preview next week's schedule, auto on weekends
-> - 🏫 **Current Lesson sensor & widget** — shows the currently running lesson
-> - 👥 **Multi-class card** — compare multiple classes in one card
-> - ⏱️ **Countdown** — sensor shows "in 23 min." to next lesson
-> - 📋 **Class selection from XML** — auto-load all classes during setup
-> - 🔧 **Change class & subjects independently** — via ⚙️ Configure
-> - ⚡ **Parallel data fetching** — setup up to 10× faster
-> - 🐛 Fixed duplicate device after class change
-> - 🃏 Card: cleaner config UI, lesson times auto-read from XML
+> #### 🃏 Cards
+> - 📅 **Extended week navigation** — KW display, Next/Current Week with manual override (no more auto-reset)
+> - 📆 **Week after next** — button navigates unlimited weeks into the future
+> - 🔮 **Weekend preview** — card automatically shows next week on Sat/Sun
+> - 📊 **Smart Status Bar** — shows cancellations, substitutions and end of school today
+> - 🟢🟡🔴 **New status colors** — Green = normal, Yellow = substitution, Red = cancelled (instead of uniform blue)
+> - 💡 **Tooltips** — teacher & room on hover over a lesson
+>
+> #### 👥 Multi-Class Card
+> - 📋 **Completely rewritten** — modern collapsible sections per class
+> - ✅ **Collapsible** — state saved in localStorage
+> - 🔢 **Statistics badges** — lessons / substitutions / cancellations per class at a glance
+> - 📅 **Next lesson display** — visible per class directly
+>
+> #### ⏱️ Current Lesson Card
+> - � **Completely new** — real-time progress bar, countdown, next lesson, daily info
+> - 🏁 **End of school** — calculated automatically from real (non-cancelled) lessons
+>
+> #### 🔧 Integration Backend
+> - 🎓 **Parallel course filter** — `789WB12`, `7INb1` etc. now appear in subject selection; only selected courses are shown
+> - 🚫 **Foreign cancellations filtered** — cancellation of `789WB2` no longer appears if you have `789WB12`
+> - 📅 **Week after next preloaded** — `next_next_week_table` available in sensor
+> - �️ **CSP-safe** — all `onclick` handlers replaced by event delegation (works with nginx/DuckDNS/Reverse Proxy)
+> - 🐛 **Popup bug fixed** — no more configuration error when opening lesson details
 
 <br/>
 <br/>
