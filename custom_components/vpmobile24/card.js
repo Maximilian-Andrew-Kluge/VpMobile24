@@ -1328,7 +1328,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       entity:       'sensor.vpmobile24_aktueller_unterricht',
       next_entity:  'sensor.vpmobile24_naechste_stunde',
       week_entity:  'sensor.vpmobile24_wochentabelle',
-      title:        'Aktueller Unterricht',
+      title:        '',
       show_progress:   true,
       show_countdown:  true,
       show_next:       true,
@@ -1352,18 +1352,24 @@ class VpMobile24CurrentCard extends HTMLElement {
         { name: 'show_room',      default: true, selector: { boolean: {} } },
         { name: 'show_day_info',  default: true, selector: { boolean: {} } },
       ],
-      computeLabel: (s) => ({
-        entity:       'Aktueller-Unterricht-Sensor',
-        next_entity:  'Nächste-Stunde-Sensor',
-        week_entity:  'Stundenplan-Sensor (für Tagesinfos)',
-        title:        'Kartentitel',
-        show_progress:'Fortschrittsbalken anzeigen',
-        show_countdown:'Countdown anzeigen',
-        show_next:    'Nächste Stunde anzeigen',
-        show_teacher: 'Lehrer anzeigen',
-        show_room:    'Raum anzeigen',
-        show_day_info:'Tagesinformationen anzeigen',
-      })[s.name] || s.name,
+      computeLabel: (s) => {
+        const lang = document.querySelector('home-assistant')?._hass?.language?.substring(0,2) || 'de';
+        const L = {
+          de: { entity:'Aktueller-Unterricht-Sensor', next_entity:'Nächste-Stunde-Sensor',
+                week_entity:'Stundenplan-Sensor (für Tagesinfos)', title:'Kartentitel',
+                show_progress:'Fortschrittsbalken', show_countdown:'Countdown',
+                show_next:'Nächste Stunde', show_teacher:'Lehrer', show_room:'Raum', show_day_info:'Tagesinfos' },
+          en: { entity:'Current Lesson Sensor', next_entity:'Next Lesson Sensor',
+                week_entity:'Schedule Sensor (for daily info)', title:'Card title',
+                show_progress:'Progress bar', show_countdown:'Countdown',
+                show_next:'Next lesson', show_teacher:'Teacher', show_room:'Room', show_day_info:'Daily info' },
+          fr: { entity:'Capteur cours actuel', next_entity:'Capteur prochain cours',
+                week_entity:'Capteur planning (infos du jour)', title:'Titre de la carte',
+                show_progress:'Barre de progression', show_countdown:'Compte à rebours',
+                show_next:'Prochain cours', show_teacher:'Professeur', show_room:'Salle', show_day_info:'Infos du jour' },
+        };
+        return (L[lang] || L.de)[s.name] || s.name;
+      },
     };
   }
 
@@ -1548,7 +1554,8 @@ class VpMobile24CurrentCard extends HTMLElement {
     const entity     = this._hass.states[this._config.entity];
     const nextEntity = this._config.next_entity  ? this._hass.states[this._config.next_entity]  : null;
     const weekEntity = this._config.week_entity  ? this._hass.states[this._config.week_entity]  : null;
-    const title      = this._config.title || 'Aktueller Unterricht';
+    const tc         = this._getT();
+    const title      = this._config.title || tc.currentLesson;
     const showProg   = this._config.show_progress  !== false;
     const showCount  = this._config.show_countdown !== false;
     const showNext   = this._config.show_next      !== false;
@@ -1557,7 +1564,6 @@ class VpMobile24CurrentCard extends HTMLElement {
     const showDay    = this._config.show_day_info  !== false;
 
     const s = this._getStatus(entity, nextEntity, weekEntity);
-    const tc = this._getT();
 
     // ── Colors & icons per type ───────────────────────────────────────────
     const themes = {
