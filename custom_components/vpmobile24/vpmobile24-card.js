@@ -1994,6 +1994,26 @@ class VpMobile24MultiCard extends HTMLElement {
     return entities; // custom = as configured
   }
 
+  // ── Translations for MultiCard ────────────────────────────────────────────
+  _getMcT() {
+    const lang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+    const l = ['de','en','fr'].includes(lang) ? lang : 'de';
+    return {
+      de: { sub:'Vtg.', cancel:'Ausfall', lesson:'Unterricht', subFull:'Vertretung',
+            nextLesson:'Nächste Stunde', period:'Stunde',
+            curWeek:'‹ Aktuelle Woche', nextWeek:'Nächste Woche ›',
+            noClasses:'Keine Klassen gefunden', kw:'KW' },
+      en: { sub:'Sub.', cancel:'Cancel.', lesson:'Lesson', subFull:'Substitution',
+            nextLesson:'Next Lesson', period:'Period',
+            curWeek:'‹ Current Week', nextWeek:'Next Week ›',
+            noClasses:'No classes found', kw:'CW' },
+      fr: { sub:'Remp.', cancel:'Annulé', lesson:'Cours', subFull:'Remplacement',
+            nextLesson:'Prochain cours', period:'Heure',
+            curWeek:'‹ Semaine actuelle', nextWeek:'Semaine suivante ›',
+            noClasses:'Aucune classe trouvée', kw:'SC' },
+    }[l];
+  }
+
   // ── Week navigation ───────────────────────────────────────────────────────
   _switchWeek(offset) {
     this._weekOffset = offset;
@@ -2070,7 +2090,7 @@ class VpMobile24MultiCard extends HTMLElement {
 
     const entities      = this._sortedEntities(this._config.entities);
     const title         = this._config.title || 'Stundenplan Übersicht';
-    const showSearch    = false; // search removed per user request
+    const showSearch    = false;
     const showWeekNav   = this._config.show_week_nav  !== false;
     const showLegend    = this._config.show_legend    !== false;
     const defaultExpand = this._config.default_expanded !== false;
@@ -2078,6 +2098,7 @@ class VpMobile24MultiCard extends HTMLElement {
     const dayKeys       = ['monday','tuesday','wednesday','thursday','friday'];
     const dayNames      = ['Mo','Di','Mi','Do','Fr'];
     const dayFull       = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+    const mc = this._getMcT();
 
     const now       = new Date();
     const todayDow  = now.getDay(); // 0=Sun,1=Mon..
@@ -2116,7 +2137,7 @@ class VpMobile24MultiCard extends HTMLElement {
       // Next lesson for badge
       const nextL = this._nextLesson(weekTable);
       const nextBadge = nextL && this._weekOffset === 0
-        ? `<span class="mc-next-badge">Nächste: ${dayNames[nextL.dayIdx]}, ${nextL.period}. Std${nextL.lesson.fach ? ' · ' + nextL.lesson.fach : ''}</span>`
+        ? `<span class="mc-next-badge">${mc.nextLesson}: ${dayNames[nextL.dayIdx]}, ${nextL.period}. ${mc.period}${nextL.lesson.fach ? ' · ' + nextL.lesson.fach : ''}</span>`
         : '';
 
       // Stats row: count per type across whole week
@@ -2226,8 +2247,8 @@ class VpMobile24MultiCard extends HTMLElement {
             const ntype = this._lessonType(nl);
             const ncolor = this._statusColor(ntype);
             gridHtml += `<div class="mc-next-bar" style="border-left:3px solid ${ncolor}">
-              <span class="mc-next-label">Nächste Stunde</span>
-              <span class="mc-next-info">${dayFull[nextL.dayIdx]}, ${nextL.period}. Stunde</span>
+              <span class="mc-next-label">${mc.nextLesson}</span>
+              <span class="mc-next-info">${dayFull[nextL.dayIdx]}, ${nextL.period}. ${mc.period}</span>
               ${nl.fach ? `<span class="mc-next-fach" style="color:${ncolor}">${nl.fach}</span>` : ''}
               ${nl.lehrer ? `<span class="mc-next-chip">👤 ${nl.lehrer}</span>` : ''}
               ${nl.raum   ? `<span class="mc-next-chip">🚪 ${nl.raum}</span>` : ''}
@@ -2246,8 +2267,8 @@ class VpMobile24MultiCard extends HTMLElement {
             </div>
             <div class="mc-section-stats">
               ${nNormal ? `<span class="mc-stat mc-stat-n">${nNormal}×</span>` : ''}
-              ${nSub    ? `<span class="mc-stat mc-stat-s">${nSub}× Vtg.</span>` : ''}
-              ${nCancel ? `<span class="mc-stat mc-stat-c">${nCancel}× Ausfall</span>` : ''}
+              ${nSub    ? `<span class="mc-stat mc-stat-s">${nSub}× ${mc.sub}</span>` : ''}
+              ${nCancel ? `<span class="mc-stat mc-stat-c">${nCancel}× ${mc.cancel}</span>` : ''}
             </div>
           </div>
           <div class="mc-section-body${isCollapsed ? ' hidden' : ''}">
@@ -2257,20 +2278,16 @@ class VpMobile24MultiCard extends HTMLElement {
     }
 
     if (!filtered.length) {
-      sectionsHtml = `<div class="mc-no-data">Keine Klassen gefunden${this._search ? ' für „' + this._search + '"' : ''}.</div>`;
+      sectionsHtml = `<div class="mc-no-data">${mc.noClasses}.</div>`;
     }
 
-    // ── Week navigation labels ────────────────────────────────────────────
-    const weekLabel = `KW ${kw}`;
-    const prevLabel = this._weekOffset === 0 ? '' : '‹ Aktuelle Woche';
-    const nextLabel = this._weekOffset === 0 ? 'Nächste Woche ›' : '';
+    const weekLabel = `${mc.kw} ${kw}`;
 
-    // ── Legend ────────────────────────────────────────────────────────────
     const legendHtml = showLegend ? `
       <div class="mc-legend">
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#22c55e"></span>Unterricht</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#eab308"></span>Vertretung</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#ef4444"></span>Ausfall</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#22c55e"></span>${mc.lesson}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#eab308"></span>${mc.subFull}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#ef4444"></span>${mc.cancel}</span>
       </div>` : '';
 
     // ── Full HTML ─────────────────────────────────────────────────────────
@@ -2475,8 +2492,8 @@ ha-card {
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
-      ? `<button class="mc-pill mc-pill-blue" data-mc="next-week">Nächste Woche ›</button>`
-      : `<button class="mc-pill mc-pill-green" data-mc="cur-week">‹ Aktuelle Woche</button>`)
+      ? `<button class="mc-pill mc-pill-blue" data-mc="next-week">${mc.nextWeek}</button>`
+      : `<button class="mc-pill mc-pill-green" data-mc="cur-week">${mc.curWeek}</button>`)
       : ''}
   </div>
 

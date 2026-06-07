@@ -133,8 +133,6 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 
 ### 📸 Screenshots
 
-> 💡 **Screenshots für die neuen Karten werden noch hinzugefügt.**
-
 #### 🗓️ Stundenplan-Karte
 
 <table>
@@ -391,8 +389,6 @@ Timetables should be available in Home Assistant without friction — as structu
 
 ### 📸 Screenshots
 
-> 💡 **Screenshots for the new cards will be added soon.**
-
 #### 🗓️ Timetable Card
 
 <table>
@@ -429,11 +425,11 @@ Timetables should be available in Home Assistant without friction — as structu
 <tr>
   <td align="center" width="50%">
     <b>Multi-Class</b><br/><br/>
-    <i>📷 Screenshot coming soon</i>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/multi-card.png" alt="Multi-Class Card" width="100%"/>
   </td>
   <td align="center" width="50%">
     <b>Current Lesson</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/current-card.png" alt="Lovelace Card" width="100%"/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/current-card.png" alt="Current Lesson" width="100%"/>
   </td>
 </tr>
 </table>
