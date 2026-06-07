@@ -1,4 +1,4 @@
-????<div align="center">
+<div align="center">
 
 <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
@@ -13,10 +13,10 @@
 
 <br/>
 
-[**?? Via HACS installieren**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Bug melden**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
+[**ğŸ“¦ Via HACS installieren**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;&nbsp;Â·&nbsp;&nbsp;
+[**ğŸŒ Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;Â·&nbsp;&nbsp;
+[**ğŸ’¬ Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;Â·&nbsp;&nbsp;
+[**ğŸ› Bug melden**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
 
 </div>
 
@@ -27,40 +27,43 @@
 <br/>
 
 > [!IMPORTANT]
-> ?? **Großes Update angekündigt – VpMobile24 v2.5.0**
+> ğŸ‰ **GroÃŸes Update angekÃ¼ndigt â€“ VpMobile24 v2.5.0**
 >
-> ?? **Geplante Veröffentlichung:** *08.06.2026 / 12:00Uhr*
+> ğŸš€ **Geplante VerÃ¶ffentlichung:** *08.06.2026 um 12:00 Uhr (MESZ)*
 >
 > ### Neue Features in v2.5.0
 >
-> #### ?? Karten
-> - ?? **Erweiterte Wochennavigation** — KW anzeigen, Nächste/Aktuelle Woche
-> - ?? **Wochenvorschau am Wochenende** — Karte zeigt automatisch die nächste Woche Sa/So
-> - ?? **Smart Status Bar** — zeigt Ausfälle, Vertretungen und Unterrichtsende heute
-> - ?????? **Neue Statusfarben** — Grün = normal, Gelb = Vertretung, Rot = Ausfall (statt einheitlichem Blau)
-> - ?? **Tooltips** — Lehrer & Raum beim Hover über eine Stunde
+> #### ğŸƒ Karten
+> - ğŸ“… **Erweiterte Wochennavigation** â€” KW anzeigen, NÃ¤chste/Aktuelle Woche mit manuellem Override (kein automatisches ZurÃ¼ckspringen mehr)
+> - ğŸ“† **ÃœbernÃ¤chste Woche** â€” Button navigiert unbegrenzt weiter in die Zukunft
+> - ğŸ”® **Wochenvorschau am Wochenende** â€” Karte zeigt automatisch die nÃ¤chste Woche Sa/So
+> - ğŸ“Š **Smart Status Bar** â€” zeigt AusfÃ¤lle, Vertretungen und Unterrichtsende heute
+> - ğŸŸ¢ğŸŸ¡ğŸ”´ **Neue Statusfarben** â€” GrÃ¼n = normal, Gelb = Vertretung, Rot = Ausfall
+> - ğŸ’¡ **Tooltips** â€” Lehrer & Raum beim Hover Ã¼ber eine Stunde
 >
-> #### ?? Mehrere Klassen Card
-> - ?? **Komplett neu** — Nächste Stunde, KW anzeigen
-> - ? **Einklappbar** — Zustand wird gespeichert
-> - ?? **Statistik-Badges** — Stunden / Vertretungen / Ausfälle pro Klasse auf einen Blick
-> - ?? **Nächste-Stunde-Anzeige** — pro Klasse direkt sichtbar
+> #### ğŸ‘¥ Mehrere Klassen Card
+> - ğŸ“‹ **Komplett neu geschrieben** â€” moderne kollabierbare Abschnitte pro Klasse
+> - âœ… **Einklappbar** â€” Zustand wird in localStorage gespeichert
+> - ğŸ”¢ **Statistik-Badges** â€” Stunden / Vertretungen / AusfÃ¤lle pro Klasse auf einen Blick
+> - ğŸ“… **NÃ¤chste-Stunde-Anzeige** â€” pro Klasse direkt sichtbar
 >
-> #### ?? Aktueller Unterricht Card
-> - ?? **Komplett neu** — Echtzeit-Fortschrittsbalken, Countdown, Nächste Stunde, Tagesinfos
-> - ?? **Unterrichtsende** — berechnet automatisch aus echten (nicht-ausgefallenen) Stunden
+> #### â±ï¸ Aktueller Unterricht Card
+> - ğŸ”„ **Komplett neu** â€” Echtzeit-Fortschrittsbalken, Countdown, NÃ¤chste Stunde, Tagesinfos
+> - ğŸ **Unterrichtsende** â€” berechnet automatisch aus echten (nicht-ausgefallenen) Stunden
 >
-> #### ?? Integration Backend
-> - ?? **Parallelkurs-Filter** — `789WB12`, `7INb1` etc. erscheinen jetzt in der Fächerauswahl; nur ausgewählte Kurse werden angezeigt
-> - ?? **Fremde Ausfälle gefiltert** — Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
-> - ?? **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
+> #### ğŸ”§ Integration Backend
+> - ğŸ“ **Parallelkurs-Filter** â€” `789WB12`, `7INb1` etc. erscheinen jetzt in der FÃ¤cherauswahl; nur ausgewÃ¤hlte Kurse werden angezeigt
+> - ğŸš« **Fremde AusfÃ¤lle gefiltert** â€” Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
+> - ğŸ“… **ÃœbernÃ¤chste Woche vorgeladen** â€” `next_next_week_table` im Sensor verfÃ¼gbar
+> - ğŸ›¡ï¸ **CSP-sicher** â€” alle `onclick`-Handler durch Event-Delegation ersetzt (funktioniert mit nginx/DuckDNS/Reverse Proxy)
+> - ğŸ› **Popup-Bug behoben** â€” kein Konfigurationsfehler mehr beim Ã–ffnen von Stunden-Details
 
 <br/>
 
-## ???? Deutsch
+## ğŸ‡©ğŸ‡ª Deutsch
 
 > [!WARNING]
-> **Beta-Version** — aktiv in Entwicklung. Feedback und Fehlerberichte sind jederzeit willkommen — als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
+> **Beta-Version** â€” aktiv in Entwicklung. Feedback und Fehlerberichte sind jederzeit willkommen â€” als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
 
 <br/>
 
@@ -70,7 +73,7 @@
 - [Features](#-features)
 - [Screenshots](#-screenshots)
 - [Installation](#-installation)
-- [Einrichtung](#?-einrichtung)
+- [Einrichtung](#ï¸-einrichtung)
 - [Lovelace Card](#-lovelace-card)
 - [Sensoren](#-sensoren)
 - [Mitmachen](#-mitmachen)
@@ -79,54 +82,47 @@
 
 ---
 
-### ?? Beschreibung
+### ğŸ“Œ Beschreibung
 
 **VpMobile24** ist eine Home Assistant Custom Integration, die Stundenplandaten von [Stundenplan24.de](https://www.stundenplan24.de) direkt in dein Smart Home bringt.
 
-Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als strukturierte Sensoren für Automationen, Dashboards und Benachrichtigungen. Die mitgelieferte Lovelace Card macht alles sofort nutzbar, ohne eine Zeile YAML.
+StundenplÃ¤ne sollen ohne Umwege in Home Assistant sichtbar sein â€” als strukturierte Sensoren fÃ¼r Automationen, Dashboards und Benachrichtigungen. Die mitgelieferte Lovelace Card macht alles sofort nutzbar, ohne eine Zeile YAML.
 
 <br/>
 
 ---
 
-### ? Features
+### âœ¨ Features
 
 <table>
 <tr>
 <td valign="top" width="50%">
 
-#### ?? Integration
+#### ğŸ“¡ Sensoren
 
-| | |
-|---|---|
-| ?? | Wochenübersicht Mo–Fr + nächste Woche |
-| ?? | Automatischer Datenabruf alle 15 Min. |
-| ?? | Mehrere Klassen mit gleichen Zugangsdaten |
-| ?? | Vollständig mehrsprachig (DE / EN / FR) |
-| ?? | Strukturierte Tages- und Wochensensoren |
-| ? | Automatische Updates via HACS |
-| ?? | Klasse & Fächer nachträglich änderbar |
-| ?? | Klassenauswahl automatisch aus XML |
-| ?? | Countdown bis zur nächsten Stunde |
-| ?? | Sensor „Aktueller Unterricht" |
+| Sensor | Beschreibung |
+|--------|-------------|
+| `sensor.vpmobile24_week_table` | VollstÃ¤ndige Wochentabelle |
+| `sensor.vpmobile24_naechste_stunde` | NÃ¤chste Unterrichtsstunde |
+| `sensor.vpmobile24_heutiger_stundenplan` | Heutiger Stundenplan |
+| `sensor.vpmobile24_zusatzinfos` | ZusÃ¤tzliche Informationen |
+| `sensor.vpmobile24_aenderungen` | Vertretungen & Ã„nderungen |
+| `sensor.vpmobile24_aktueller_unterricht` | Aktuell laufende Stunde |
 
 </td>
 <td valign="top" width="50%">
 
-#### ?? Lovelace Card
+#### ğŸƒ Lovelace Card
 
 | | |
-|---|---|
-| ?? | Navy Dark Design — unabhängig vom HA-Theme |
-| ?? | Responsiv: Desktop-Tabelle & Handy-Modus |
-| ?? | Aktuelle Stunde grün hervorgehoben |
-| ?? | Ausfallstunden immer rot (alle Spalten) |
-| ??? | Klick-Popup mit Lehrer, Raum & Uhrzeit |
-| ? | Zusatzinfos pro Tag per Button |
-| ? | Eigene Uhrzeiten konfigurierbar |
-| ?? | Nächste Woche anzeigen (Button) |
-| ?? | Widget „Aktueller Unterricht" |
-| ?? | Mehrere Klassen in einer Card |
+|--|--|
+| ğŸ“… | Wochenansicht mit Navigation |
+| ğŸ”„ | Automatische Aktualisierung |
+| ğŸ“± | Responsive (Desktop + Mobile) |
+| ğŸŒ | DE / EN / FR |
+| ğŸ‘¥ | Mehrere Klassen gleichzeitig |
+| â±ï¸ | Aktueller Unterricht Widget |
+| ğŸ“ | Parallelkurs-Filter |
 
 </td>
 </tr>
@@ -136,21 +132,51 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als strukturie
 
 ---
 
-### Screenshots
+### ğŸ“¸ Screenshots
+
+> ğŸ’¡ **Screenshots fÃ¼r die neuen Karten werden noch hinzugefÃ¼gt.**
+
+#### ğŸ—“ï¸ Stundenplan-Karte
 
 <table>
 <tr>
-  <td align="center" width="33%">
-    <b>Wochenübersicht</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="Wochenübersicht" width="100%"/>
+  <td align="center" width="50%">
+    <b>WochenÃ¼bersicht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="WochenÃ¼bersicht" width="100%"/>
   </td>
-  <td align="center" width="33%">
+  <td align="center" width="50%">
     <b>Lovelace Card</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" alt="Lovelace Card" width="100%"/>
   </td>
-  <td align="center" width="33%">
-    <b>Konfiguration</b><br/><br/>
+</tr>
+</table>
+
+#### âš™ï¸ Konfiguration
+
+<table>
+<tr>
+  <td align="center" width="50%">
+    <b>Einrichtung</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png" alt="Konfiguration" width="100%"/>
+  </td>
+  <td align="center" width="50%">
+    <b>FÃ¤cherauswahl (inkl. Parallelkurse)</b><br/><br/>
+    <i>ğŸ“· Screenshot folgt</i>
+  </td>
+</tr>
+</table>
+
+#### ğŸ‘¥ Mehrere Klassen-Karte Â· â±ï¸ Aktueller Unterricht-Karte
+
+<table>
+<tr>
+  <td align="center" width="50%">
+    <b>Mehrere Klassen</b><br/><br/>
+    <i>ğŸ“· Screenshot folgt</i>
+  </td>
+  <td align="center" width="50%">
+    <b>Aktueller Unterricht</b><br/><br/>
+    <i>ğŸ“· Screenshot folgt</i>
   </td>
 </tr>
 </table>
@@ -159,226 +185,154 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als strukturie
 
 ---
 
-### ?? Installation
+### ğŸš€ Installation
 
-#### ? Via HACS (empfohlen)
+#### âœ… Via HACS (empfohlen)
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge">
-  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="In HACS öffnen"/>
+  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="In HACS Ã¶ffnen"/>
 </a>
 
-1. **HACS öffnen** — in Home Assistant zu HACS navigieren
-2. **Custom Repository hinzufügen** — Menü `?` ? Benutzerdefinierte Repositories
-3. **URL eingeben** und Kategorie `Integration` wählen:
+1. **HACS Ã¶ffnen** â€” in Home Assistant zu HACS navigieren
+2. **Custom Repository hinzufÃ¼gen** â€” MenÃ¼ `â‹®` â†’ Benutzerdefinierte Repositories
+3. **URL eingeben** und Kategorie `Integration` wÃ¤hlen:
    ```
    https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-4. **Installieren** — Integration suchen und installieren
+4. **VpMobile24** suchen und **Herunterladen** klicken
 5. **Home Assistant neu starten**
 
-#### ?? Installation
+#### ğŸ”§ Manuelle Installation
 
-1. Repository klonen oder als ZIP herunterladen:
-   ```bash
-   git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-   ```
-2. Ordner `custom_components/vpmobile24/` nach `/config/custom_components/vpmobile24/` kopieren
+1. Dieses Repository klonen oder als ZIP herunterladen
+2. Den Ordner `custom_components/vpmobile24` nach `/config/custom_components/vpmobile24` kopieren
 3. Home Assistant neu starten
 
 <br/>
 
 ---
 
-### ?? Einrichtung
+### âš™ï¸ Einrichtung
 
-**Einstellungen ? Geräte & Dienste ? Integration hinzufügen ? VpMobile24**
-
-| Feld | Beschreibung | Beispiel |
-|------|--------------|---------|
-| `Schulnummer` | ID aus der Stundenplan24-URL | `10001329` |
-| `Benutzername` | Dein Anmeldename | `schueler` |
-| `Passwort` | Dein Passwort | `••••••••` |
-| `Klasse` | Klassenkennung | `10a` |
-
-> [!TIP]
-> **Mehrere Klassen** lassen sich durch erneutes Hinzufügen der Integration einrichten — auch mit denselben Zugangsdaten. Jede Klasse erhält ein eigenes Gerät mit eigenen Sensoren (`VpMobile24 – 10a (12345)`).
-
-> [!TIP]
-> **Klasse oder Fächer nachträglich ändern:** Einstellungen ? Geräte & Dienste ? VpMobile24 ? ?? Konfigurieren. Dort kannst du unabhängig voneinander **Fächer wechseln** (Auswahl anpassen) oder **Klasse wechseln** (neue Klasse eingeben, Fächerliste wird neu geladen).
+1. **Einstellungen** â†’ **Integrationen** â†’ **+ Integration hinzufÃ¼gen**
+2. Nach **VpMobile24** suchen
+3. Eingeben:
+   - **Schul-ID** (z.B. `10213745`)
+   - **Benutzername** und **Passwort** von Stundenplan24.de
+4. **Klasse auswÃ¤hlen** (z.B. `7b`, `10a`)
+5. **FÃ¤cher auswÃ¤hlen** â€” Parallelkurse (z.B. `789WB10`) einzeln wÃ¤hlen
+6. Fertig â€” alle Sensoren werden automatisch erstellt
 
 <br/>
 
 ---
 
-### ?? Lovelace Card
+### ğŸƒ Lovelace Card
 
 Die Card wird beim HA-Start automatisch nach `/config/www/vpmobile24/` kopiert.
 
-**Schritt 1 — Ressource registrieren:**
-
-Einstellungen ? Dashboards ? `?` ? Ressourcen ? `+ Hinzufügen`
-
-| Feld | Wert |
-|------|------|
-| URL | `/local/vpmobile24/vpmobile24-card.js` |
-| Ressourcentyp | JavaScript-Modul |
-
-**Schritt 2 — Card hinzufügen:**
-
-Dashboard bearbeiten ? `+ Karte hinzufügen` ? **VpMobile24 Card** suchen
-
-Oder direkt per YAML:
-
+**Stundenplan-Karte** hinzufÃ¼gen:
 ```yaml
 type: custom:vpmobile24-card
 entity: sensor.vpmobile24_week_table
-additional_info_entity: sensor.vpmobile24_zusatzinfos
-reload_entity: button.vpmobile24_daten_neu_laden
-show_header: true
-header_settings:
-  title: Stundenplan
-  class_name: 10b
-highlight_today: true
-show_time: true
 ```
 
-> [!TIP]
-> **Widget „Aktueller Unterricht"** — zeigt die gerade laufende Stunde kompakt an. Hinzufügen per YAML:
-> ```yaml
-> type: custom:vpmobile24-current-card
-> entity: sensor.vpmobile24_aktueller_unterricht
-> title: Aktueller Unterricht
-> ```
+**Mehrere Klassen** hinzufÃ¼gen:
+```yaml
+type: custom:vpmobile24-multi-card
+entities:
+  - sensor.vpmobile24_7a_week_table
+  - sensor.vpmobile24_7b_week_table
+```
 
-> [!TIP]
-> **Mehrere Klassen Card** — vergleicht mehrere Klassen auf einen Blick:
-> ```yaml
-> type: custom:vpmobile24-multi-card
-> title: Stundenplan Übersicht
-> entities:
->   - sensor.vpmobile24_week_table_10a
->   - sensor.vpmobile24_week_table_10b
-> ```
-
-> [!NOTE]
-> Die Sprache der Card wird automatisch aus der HA-Systemsprache erkannt (DE / EN / FR). Keine manuelle Einstellung nötig.
+**Aktueller Unterricht** hinzufÃ¼gen:
+```yaml
+type: custom:vpmobile24-current-card
+entity: sensor.vpmobile24_aktueller_unterricht
+next_entity: sensor.vpmobile24_naechste_stunde
+week_entity: sensor.vpmobile24_heutiger_stundenplan
+```
 
 <br/>
 
 ---
 
-### ?? Sensoren
+### ğŸ“¡ Sensoren
 
-Nach der Einrichtung werden folgende Entitäten automatisch erstellt:
-
-| Entität | Beschreibung |
-|---------|--------------|
-| `sensor.vpmobile24_week_table` | Vollständige Wochenübersicht — wird von der Card verwendet |
-| `sensor.vpmobile24_naechste_stunde` | Nächste Unterrichtsstunde heute + Countdown |
-| `sensor.vpmobile24_aktueller_unterricht` | Gerade laufende Stunde mit Fach, Lehrer & Raum |
-| `sensor.vpmobile24_wochenstundenplan` | Heutiger Stundenplan mit allen Stunden |
-| `sensor.vpmobile24_zusatzinfos` | Zusatzinformationen und Hinweise pro Tag |
-| `sensor.vpmobile24_aenderungen` | Aktuelle Vertretungen und Änderungen |
-| `calendar.vpmobile24_wochenkalender` | Wochenkalender für die HA-Kalender-Ansicht |
-| `button.vpmobile24_daten_neu_laden` | Manuelles Neuladen der Stundenplandaten |
-
-> [!NOTE]
-> Bei mehreren Klassen werden die Entitäts-IDs mit der Klasse ergänzt. Die genauen IDs findest du unter **Einstellungen ? Geräte & Dienste ? VpMobile24**.
-
-Alle Sensoren werden automatisch alle **15 Minuten** aktualisiert.
+| Sensor | State | Wichtige Attribute |
+|--------|-------|-------------------|
+| `week_table` | Anzahl Stunden | `week_table`, `next_week_table`, `next_next_week_table` |
+| `naechste_stunde` | Fach + Zeit | `fach`, `zeit`, `lehrer`, `raum`, `countdown_minuten` |
+| `heutiger_stundenplan` | Anzahl Stunden | `stunden_heute`, `gesamt_stunden` |
+| `zusatzinfos` | Anzahl Infos | `allgemeine_infos`, `stunden_infos` |
+| `aenderungen` | Anzahl Ã„nderungen | `alle_aenderungen` |
+| `aktueller_unterricht` | Fach | `fach`, `zeit`, `lehrer`, `raum`, `ist_ausfall`, `ist_vertretung` |
 
 <br/>
 
 ---
 
-### ?? Mitmachen
+### ğŸ¤ Mitmachen
 
-Contributions sind herzlich willkommen!
+BeitrÃ¤ge sind herzlich willkommen!
 
-| | |
-|---|---|
-| ?? **Bug gefunden?** | [Issue erstellen](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new) |
-| ?? **Idee?** | [Diskussion starten](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions) |
-| ?? **Code beitragen** | Fork ? Branch ? Pull Request |
-| ?? **Community** | [Discord beitreten](https://discord.gg/57uvCeRw43) |
+- ğŸ› **Bugs melden** â†’ [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+- ğŸ’¡ **Feature vorschlagen** â†’ [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+- ğŸ”§ **Pull Request** â†’ [CONTRIBUTING.md](CONTRIBUTING.md)
+- ğŸ’¬ **Community** â†’ [Discord](https://discord.gg/57uvCeRw43)
 
 <br/>
 
 ---
+
+## ğŸ‡¬ğŸ‡§ English
 
 > [!IMPORTANT]
-> ?? **Major Update Announced – VpMobile24 v2.5.0**
+> ğŸ‰ **Major Update Announced â€“ VpMobile24 v2.5.0**
 >
-> ?? **Scheduled Release:** *coming soon*
+> ğŸš€ **Scheduled Release:** *June 8, 2026 at 12:00 PM (CEST)*
 >
 > ### New Features in v2.5.0
 >
-> #### ?? Cards
-> - ?? **Extended week navigation** — KW display, Next/Current Week with manual override (no more auto-reset)
-> - ?? **Week after next** — button navigates unlimited weeks into the future
-> - ?? **Weekend preview** — card automatically shows next week on Sat/Sun
-> - ?? **Smart Status Bar** — shows cancellations, substitutions and end of school today
-> - ?????? **New status colors** — Green = normal, Yellow = substitution, Red = cancelled (instead of uniform blue)
-> - ?? **Tooltips** — teacher & room on hover over a lesson
+> #### ğŸƒ Cards
+> - ğŸ“… **Extended week navigation** â€” KW display, Next/Current Week with manual override (no more auto-reset)
+> - ğŸ“† **Week after next** â€” button navigates unlimited weeks into the future
+> - ğŸ”® **Weekend preview** â€” card automatically shows next week on Sat/Sun
+> - ğŸ“Š **Smart Status Bar** â€” shows cancellations, substitutions and end of school today
+> - ğŸŸ¢ğŸŸ¡ğŸ”´ **New status colors** â€” Green = normal, Yellow = substitution, Red = cancelled
+> - ğŸ’¡ **Tooltips** â€” teacher & room on hover over a lesson
 >
-> #### ?? Multi-Class Card
-> - ?? **Completely rewritten** — modern collapsible sections per class
-> - ? **Collapsible** — state saved in localStorage
-> - ?? **Statistics badges** — lessons / substitutions / cancellations per class at a glance
-> - ?? **Next lesson display** — visible per class directly
+> #### ğŸ‘¥ Multi-Class Card
+> - ğŸ“‹ **Completely rewritten** â€” modern collapsible sections per class
+> - âœ… **Collapsible** â€” state saved in localStorage
+> - ğŸ”¢ **Statistics badges** â€” lessons / substitutions / cancellations per class at a glance
+> - ğŸ“… **Next lesson display** â€” visible per class directly
 >
-> #### ?? Current Lesson Card
-> - ? **Completely new** — real-time progress bar, countdown, next lesson, daily info
-> - ?? **End of school** — calculated automatically from real (non-cancelled) lessons
+> #### â±ï¸ Current Lesson Card
+> - ğŸ”„ **Completely new** â€” real-time progress bar, countdown, next lesson, daily info
+> - ğŸ **End of school** â€” calculated automatically from real (non-cancelled) lessons
 >
-> #### ?? Integration Backend
-> - ?? **Parallel course filter** — `789WB12`, `7INb1` etc. now appear in subject selection; only selected courses are shown
-> - ?? **Foreign cancellations filtered** — cancellation of `789WB2` no longer appears if you have `789WB12`
-> - ?? **Week after next preloaded** — `next_next_week_table` available in sensor
-> - ?? **CSP-safe** — all `onclick` handlers replaced by event delegation (works with nginx/DuckDNS/Reverse Proxy)
-> - ?? **Popup bug fixed** — no more configuration error when opening lesson details
-
-<br/>
-<br/>
-
-## ???? English
-
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/EN%20Banner.png" alt="VpMobile24" width="100%"/>
-
-<br/>
-<br/>
-
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
-[![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
-
-<br/>
-
-[**?? Install via HACS**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Discord**](https://discord.gg/57uvCeRw43) &nbsp;&nbsp;·&nbsp;&nbsp;
-[**?? Report a bug**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
-
-</div>
+> #### ğŸ”§ Integration Backend
+> - ğŸ“ **Parallel course filter** â€” `789WB12`, `7INb1` etc. now appear in subject selection; only selected courses are shown
+> - ğŸš« **Foreign cancellations filtered** â€” cancellation of `789WB2` no longer appears if you have `789WB12`
+> - ğŸ“… **Week after next preloaded** â€” `next_next_week_table` available in sensor
+> - ğŸ›¡ï¸ **CSP-safe** â€” all `onclick` handlers replaced by event delegation (works with nginx/DuckDNS/Reverse Proxy)
+> - ğŸ› **Popup bug fixed** â€” no more configuration error when opening lesson details
 
 <br/>
 
 > [!WARNING]
-> **Beta version** — actively in development. Feedback and bug reports are always welcome — open a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or join [Discord](https://discord.gg/57uvCeRw43).
+> **Beta version** â€” actively in development. Feedback and bug reports are always welcome â€” as a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or on [Discord](https://discord.gg/57uvCeRw43).
 
 <br/>
 
-### Table of contents
+### Table of Contents
 
 - [Description](#-description)
 - [Features](#-features-1)
 - [Screenshots](#-screenshots-1)
 - [Installation](#-installation-1)
-- [Setup](#?-setup-1)
+- [Setup](#ï¸-setup)
 - [Lovelace Card](#-lovelace-card-1)
 - [Sensors](#-sensors-1)
 - [Contributing](#-contributing-1)
@@ -387,54 +341,47 @@ Contributions sind herzlich willkommen!
 
 ---
 
-### ?? Description
+### ğŸ“Œ Description
 
 **VpMobile24** is a Home Assistant custom integration that brings school timetable data from [Stundenplan24.de](https://www.stundenplan24.de) directly into your smart home.
 
-Timetables should be available in Home Assistant without friction — as structured sensors for automations, dashboards, and notifications. The included Lovelace card makes everything usable immediately, without writing a single line of YAML.
+Timetables should be available in Home Assistant without friction â€” as structured sensors for automations, dashboards, and notifications. The included Lovelace card makes everything usable immediately, without writing a single line of YAML.
 
 <br/>
 
 ---
 
-### ? Features
+### âœ¨ Features
 
 <table>
 <tr>
 <td valign="top" width="50%">
 
-#### ?? Integration
+#### ğŸ“¡ Sensors
 
-| | |
-|---|---|
-| ?? | Weekly overview Mon–Fri + next week |
-| ?? | Automatic data refresh every 15 min. |
-| ?? | Multiple classes with same credentials |
-| ?? | Fully multilingual (DE / EN / FR) |
-| ?? | Structured daily and weekly sensors |
-| ? | Automatic updates via HACS |
-| ?? | Change class & subjects after setup |
-| ?? | Class selection auto-loaded from XML |
-| ?? | Countdown to next lesson |
-| ?? | "Current Lesson" sensor |
+| Sensor | Description |
+|--------|-------------|
+| `sensor.vpmobile24_week_table` | Full week table |
+| `sensor.vpmobile24_naechste_stunde` | Next lesson |
+| `sensor.vpmobile24_heutiger_stundenplan` | Today's schedule |
+| `sensor.vpmobile24_zusatzinfos` | Additional info |
+| `sensor.vpmobile24_aenderungen` | Changes & substitutions |
+| `sensor.vpmobile24_aktueller_unterricht` | Currently running lesson |
 
 </td>
 <td valign="top" width="50%">
 
-#### ?? Lovelace Card
+#### ğŸƒ Lovelace Card
 
 | | |
-|---|---|
-| ?? | Navy dark design — independent of HA theme |
-| ?? | Responsive: desktop table & mobile mode |
-| ?? | Current lesson highlighted in green |
-| ?? | Cancelled lessons always red (all columns) |
-| ??? | Click popup with teacher, room & time |
-| ? | Daily additional info via button |
-| ? | Custom period times configurable |
-| ?? | Next week view (button) |
-| ?? | "Current Lesson" widget card |
-| ?? | Multi-class comparison card |
+|--|--|
+| ğŸ“… | Week view with navigation |
+| ğŸ”„ | Automatic updates |
+| ğŸ“± | Responsive (Desktop + Mobile) |
+| ğŸŒ | DE / EN / FR |
+| ğŸ‘¥ | Multiple classes at once |
+| â±ï¸ | Current lesson widget |
+| ğŸ“ | Parallel course filter |
 
 </td>
 </tr>
@@ -444,21 +391,51 @@ Timetables should be available in Home Assistant without friction — as structure
 
 ---
 
-### Screenshots
+### ğŸ“¸ Screenshots
+
+> ğŸ’¡ **Screenshots for the new cards will be added soon.**
+
+#### ğŸ—“ï¸ Timetable Card
 
 <table>
 <tr>
-  <td align="center" width="33%">
+  <td align="center" width="50%">
     <b>Weekly Overview</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Weekly Overview" width="100%"/>
   </td>
-  <td align="center" width="33%">
+  <td align="center" width="50%">
     <b>Lovelace Card</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Lovelace Card" width="100%"/>
   </td>
-  <td align="center" width="33%">
-    <b>Configuration</b><br/><br/>
+</tr>
+</table>
+
+#### âš™ï¸ Configuration
+
+<table>
+<tr>
+  <td align="center" width="50%">
+    <b>Setup</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Configuration" width="100%"/>
+  </td>
+  <td align="center" width="50%">
+    <b>Subject selection (incl. parallel courses)</b><br/><br/>
+    <i>ğŸ“· Screenshot coming soon</i>
+  </td>
+</tr>
+</table>
+
+#### ğŸ‘¥ Multi-Class Card Â· â±ï¸ Current Lesson Card
+
+<table>
+<tr>
+  <td align="center" width="50%">
+    <b>Multi-Class</b><br/><br/>
+    <i>ğŸ“· Screenshot coming soon</i>
+  </td>
+  <td align="center" width="50%">
+    <b>Current Lesson</b><br/><br/>
+    <i>ğŸ“· Screenshot coming soon</i>
   </td>
 </tr>
 </table>
@@ -467,130 +444,101 @@ Timetables should be available in Home Assistant without friction — as structure
 
 ---
 
-### ?? Installation
+### ğŸš€ Installation
 
-#### ? Via HACS (recommended)
+#### âœ… Via HACS (recommended)
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge">
   <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open in HACS"/>
 </a>
 
-1. **Open HACS** — navigate to HACS in Home Assistant
-2. **Add custom repository** — menu `?` ? Custom Repositories
+1. **Open HACS** â€” navigate to HACS in Home Assistant
+2. **Add Custom Repository** â€” menu `â‹®` â†’ Custom Repositories
 3. **Enter URL** and select category `Integration`:
    ```
    https://github.com/Maximilian-Andrew-Kluge/VpMobile24
    ```
-4. **Install** — find the integration and install it
+4. Search for **VpMobile24** and click **Download**
 5. **Restart Home Assistant**
 
-#### ?? Manual installation
+#### ğŸ”§ Manual Installation
 
-1. Clone or download the repository as ZIP:
-   ```bash
-   git clone https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-   ```
-2. Copy `custom_components/vpmobile24/` to `/config/custom_components/vpmobile24/`
+1. Clone or download this repository as ZIP
+2. Copy the folder `custom_components/vpmobile24` to `/config/custom_components/vpmobile24`
 3. Restart Home Assistant
 
 <br/>
 
 ---
 
-### ?? Setup
+### âš™ï¸ Setup
 
-**Settings ? Devices & Services ? Add Integration ? VpMobile24**
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| `School ID` | ID from the Stundenplan24 URL | `10001329` |
-| `Username` | Your login name | `student` |
-| `Password` | Your password | `••••••••` |
-| `Class` | Class identifier | `10a` |
-
-> [!TIP]
-> **Multiple classes** can be added by re-adding the integration — even with the same credentials. Each class gets its own device with its own sensors (`VpMobile24 – 10a (12345)`).
-
-> [!TIP]
-> **Change class or subjects after setup:** Settings ? Devices & Services ? VpMobile24 ? ?? Configure. You can independently **change subjects** (adjust selection) or **change class** (enter new class, subject list reloads automatically).
+1. **Settings** â†’ **Integrations** â†’ **+ Add Integration**
+2. Search for **VpMobile24**
+3. Enter:
+   - **School ID** (e.g. `10213745`)
+   - **Username** and **Password** from Stundenplan24.de
+4. **Select class** (e.g. `7b`, `10a`)
+5. **Select subjects** â€” select parallel courses (e.g. `789WB10`) individually
+6. Done â€” all sensors are created automatically
 
 <br/>
 
 ---
 
-### ?? Lovelace Card
+### ğŸƒ Lovelace Card
 
 The card is automatically copied to `/config/www/vpmobile24/` on every HA start.
 
-**Step 1 — Register resource:**
-
-Settings ? Dashboards ? `?` ? Resources ? `+ Add`
-
-| Field | Value |
-|-------|-------|
-| URL | `/local/vpmobile24/vpmobile24-card.js` |
-| Resource type | JavaScript module |
-
-**Step 2 — Add card:**
-
-Edit dashboard ? `+ Add card` ? search for **VpMobile24 Card**
-
-Or directly via YAML:
-
+**Timetable Card**:
 ```yaml
 type: custom:vpmobile24-card
 entity: sensor.vpmobile24_week_table
-additional_info_entity: sensor.vpmobile24_zusatzinfos
-reload_entity: button.vpmobile24_daten_neu_laden
-show_header: true
-header_settings:
-  title: Timetable
-  class_name: 10b
-highlight_today: true
-show_time: true
 ```
 
-> [!NOTE]
-> The card language is automatically detected from your HA system language (DE / EN / FR). No manual configuration needed.
+**Multi-Class Card**:
+```yaml
+type: custom:vpmobile24-multi-card
+entities:
+  - sensor.vpmobile24_7a_week_table
+  - sensor.vpmobile24_7b_week_table
+```
+
+**Current Lesson Card**:
+```yaml
+type: custom:vpmobile24-current-card
+entity: sensor.vpmobile24_aktueller_unterricht
+next_entity: sensor.vpmobile24_naechste_stunde
+week_entity: sensor.vpmobile24_heutiger_stundenplan
+```
 
 <br/>
 
 ---
 
-### ?? Sensors
+### ğŸ“¡ Sensors
 
-After setup, the following entities are created automatically:
-
-| Entity | Description |
-|--------|-------------|
-| `sensor.vpmobile24_week_table` | Full weekly timetable — used by the card |
-| `sensor.vpmobile24_naechste_stunde` | Next lesson today + countdown |
-| `sensor.vpmobile24_aktueller_unterricht` | Currently running lesson with subject, teacher & room |
-| `sensor.vpmobile24_wochenstundenplan` | Today's full schedule |
-| `sensor.vpmobile24_zusatzinfos` | Additional info and notices per day |
-| `sensor.vpmobile24_aenderungen` | Current substitutions and changes |
-| `calendar.vpmobile24_wochenkalender` | Weekly calendar for HA calendar view |
-| `button.vpmobile24_daten_neu_laden` | Manual data reload |
-
-> [!NOTE]
-> With multiple classes, entity IDs are suffixed with the class name. Find the exact IDs under **Settings ? Devices & Services ? VpMobile24**.
-
-All sensors refresh automatically every **15 minutes**.
+| Sensor | State | Key Attributes |
+|--------|-------|----------------|
+| `week_table` | Lesson count | `week_table`, `next_week_table`, `next_next_week_table` |
+| `naechste_stunde` | Subject + time | `fach`, `zeit`, `lehrer`, `raum`, `countdown_minuten` |
+| `heutiger_stundenplan` | Lesson count | `stunden_heute`, `gesamt_stunden` |
+| `zusatzinfos` | Info count | `allgemeine_infos`, `stunden_infos` |
+| `aenderungen` | Change count | `alle_aenderungen` |
+| `aktueller_unterricht` | Subject | `fach`, `zeit`, `lehrer`, `raum`, `ist_ausfall`, `ist_vertretung` |
 
 <br/>
 
 ---
 
-### ?? Contributing
+### ğŸ¤ Contributing
 
-Contributions of all kinds are welcome!
+Contributions are welcome!
 
-| | |
-|---|---|
-| ?? **Found a bug?** | [Open an issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new) |
-| ?? **Have an idea?** | [Start a discussion](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/discussions) |
-| ?? **Want to code?** | Fork ? branch ? pull request |
-| ?? **Community** | [Join Discord](https://discord.gg/57uvCeRw43) |
+- ğŸ› **Report bugs** â†’ [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+- ğŸ’¡ **Suggest features** â†’ [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+- ğŸ”§ **Pull Request** â†’ [CONTRIBUTING.md](CONTRIBUTING.md)
+- ğŸ’¬ **Community** â†’ [Discord](https://discord.gg/57uvCeRw43)
 
 <br/>
 
@@ -598,12 +546,9 @@ Contributions of all kinds are welcome!
 
 <div align="center">
 
-<br/>
+Made with â¤ï¸ for the Home Assistant community
 
-Made with ?? by [Maximilian-Andrew Kluge](https://github.com/Maximilian-Andrew-Kluge)
-
-[![MIT License](https://img.shields.io/badge/License-MIT-22c55e.svg?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/Maximilian-Andrew-Kluge/VpMobile24?style=flat-square&color=f59e0b)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/stargazers)
-[![GitHub Release](https://img.shields.io/github/release/Maximilian-Andrew-Kluge/VpMobile24.svg?style=flat-square&label=Latest)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=f59e0b)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=3b82f6)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/network)
 
 </div>
