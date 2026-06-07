@@ -29,7 +29,7 @@
 > [!IMPORTANT]
 > 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
 >
-> 🚀 **Geplante Veröffentlichung:** *08.06.2026 um 12:00 Uhr (MESZ)*
+> 🚀 **Geplante Veröffentlichung:** *08.06.2026 um 10:00 Uhr (MESZ)*
 >
 > ### Neue Features in v2.5.0
 >
@@ -287,7 +287,7 @@ Beiträge sind herzlich willkommen!
 > [!IMPORTANT]
 > 🎉 **Major Update Announced – VpMobile24 v2.5.0**
 >
-> 🚀 **Scheduled Release:** *June 8, 2026 at 12:00 PM (CEST)*
+> 🚀 **Scheduled Release:** *June 8, 2026 at 10:00 PM (CEST)*
 >
 > ### New Features in v2.5.0
 >
