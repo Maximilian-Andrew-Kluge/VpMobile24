@@ -244,7 +244,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self.class_name = class_name
         self.excluded_subjects = excluded_subjects or []
         self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
-        _LOGGER.warning(f"VPM24_DEBUG Coordinator init: excluded={self.excluded_subjects}, selected_courses={self.selected_courses}")
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
@@ -432,7 +431,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                 student_courses.add(course)
                             student_courses.add(subj)
 
-            _LOGGER.warning(f"VPM24_DEBUG selected_courses={self.selected_courses}, excluded={self.excluded_subjects}, student_courses={sorted(student_courses)}")
+            _LOGGER.debug(f"Student courses: {sorted(student_courses)}")
 
             # ----------------------------------------------------------------
             # Assemble filtered week data
