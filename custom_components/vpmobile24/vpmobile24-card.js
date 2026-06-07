@@ -923,9 +923,9 @@ class VpMobile24Card extends HTMLElement {
           if (p[1]) lastEnd = p[1];
         }
       });
-      if (nCancel > 0) smartHints.push(`<span class="vp-hint vp-hint-red">⚠ ${nCancel}× Ausfall heute</span>`);
-      if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× Vertretung heute</span>`);
-      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 Unterricht endet ${lastEnd}</span>`);
+      if (nCancel > 0) smartHints.push(`<span class="vp-hint vp-hint-red">⚠ ${nCancel}× ${t.cancelled}</span>`);
+      if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× ${t.sub}</span>`);
+      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 ${t.today}: ${lastEnd}</span>`);
     }
     // Next lesson (when current lesson is active)
     if (currentLessonNum >= 0 && todayIdx >= 0 && weekTable) {
@@ -1254,7 +1254,7 @@ ha-card {
         ${className ? `<span class="vp-hdr-class">${t.classLabel} ${className}</span>` : ''}
       </div>
       <div class="vp-hdr-sub">
-        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? 'Aktuelle Woche' : weekOffset === 1 ? 'Nächste Woche' : 'Übernächste Woche'}</span>
+        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'}</span>
       </div>
     </div>
     <div class="vp-hdr-spacer"></div>
@@ -1400,10 +1400,48 @@ class VpMobile24CurrentCard extends HTMLElement {
     return n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60;
   }
 
-  _fmtCountdown(mins) {
+  // ── Translations for CurrentCard ─────────────────────────────────────────
+  _getT() {
+    const lang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+    const l = ['de','en','fr'].includes(lang) ? lang : 'de';
+    return {
+      de: {
+        currentLesson: 'Aktueller Unterricht', sub: 'Vertretung',
+        freePause: 'Freistunde / Pause', done: 'Unterricht beendet',
+        period: 'Stunde', nextLesson: 'Nächste Stunde',
+        remaining: 'Noch', startsIn: 'Beginnt in',
+        endedAt: 'Unterricht endete um', noLesson: 'Kein Unterricht mehr heute',
+        soon: 'Gleich', min: 'Min.', lessons: 'Stunden',
+        remaining2: 'verbleibend', cancel: 'Ausfall heute',
+        subst: 'Vertretung heute', endAt: 'Ende', next: 'Nächste',
+      },
+      en: {
+        currentLesson: 'Current Lesson', sub: 'Substitution',
+        freePause: 'Free Period / Break', done: 'School ended',
+        period: 'Period', nextLesson: 'Next Lesson',
+        remaining: 'Remaining', startsIn: 'Starts in',
+        endedAt: 'School ended at', noLesson: 'No more lessons today',
+        soon: 'Soon', min: 'min.', lessons: 'lessons',
+        remaining2: 'remaining', cancel: 'cancellation today',
+        subst: 'substitution today', endAt: 'End', next: 'Next',
+      },
+      fr: {
+        currentLesson: 'Cours actuel', sub: 'Remplacement',
+        freePause: 'Heure libre / Pause', done: 'Cours terminé',
+        period: 'Heure', nextLesson: 'Prochain cours',
+        remaining: 'Reste', startsIn: 'Commence dans',
+        endedAt: 'Cours terminé à', noLesson: 'Plus de cours aujourd\'hui',
+        soon: 'Bientôt', min: 'min.', lessons: 'heures',
+        remaining2: 'restantes', cancel: 'annulation aujourd\'hui',
+        subst: 'remplacement aujourd\'hui', endAt: 'Fin', next: 'Prochain',
+      },
+    }[l];
+  }
+
+  _fmtCountdown(mins, tc) {
     const m = Math.max(0, Math.round(mins));
-    if (m === 0) return 'Gleich';
-    if (m < 60)  return m + ' Min.';
+    if (m === 0) return tc.soon;
+    if (m < 60)  return m + ' ' + tc.min;
     return Math.floor(m / 60) + 'h ' + (m % 60) + 'min';
   }
 
@@ -1519,13 +1557,14 @@ class VpMobile24CurrentCard extends HTMLElement {
     const showDay    = this._config.show_day_info  !== false;
 
     const s = this._getStatus(entity, nextEntity, weekEntity);
+    const tc = this._getT();
 
     // ── Colors & icons per type ───────────────────────────────────────────
     const themes = {
-      lesson: { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label:'Aktueller Unterricht' },
-      sub:    { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label:'Vertretung' },
-      free:   { color:'#3b82f6', bg:'rgba(59,130,246,.13)', border:'rgba(59,130,246,.35)', icon:'⏸', label:'Freistunde / Pause' },
-      done:   { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label:'Unterricht beendet' },
+      lesson: { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label: tc.currentLesson },
+      sub:    { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label: tc.sub },
+      free:   { color:'#3b82f6', bg:'rgba(59,130,246,.13)', border:'rgba(59,130,246,.35)', icon:'⏸', label: tc.freePause },
+      done:   { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label: tc.done },
     };
     const th = themes[s.type] || themes.done;
 
@@ -1535,14 +1574,14 @@ class VpMobile24CurrentCard extends HTMLElement {
     if (s.type === 'lesson' || s.type === 'sub') {
       mainHtml += `<div class="vc-subject">${s.fach}</div>`;
       mainHtml += `<div class="vc-meta">`;
-      if (s.stunde) mainHtml += `<span class="vc-chip">${s.stunde}. Stunde</span>`;
+      if (s.stunde) mainHtml += `<span class="vc-chip">${s.stunde}. ${tc.period}</span>`;
       if (s.zeit)   mainHtml += `<span class="vc-chip">🕐 ${s.zeit}</span>`;
       if (showTeach && s.lehrer) mainHtml += `<span class="vc-chip">👤 ${s.lehrer}</span>`;
       if (showRoom  && s.raum)   mainHtml += `<span class="vc-chip">🚪 ${s.raum}</span>`;
       mainHtml += `</div>`;
       if (s.info) mainHtml += `<div class="vc-info">ℹ️ ${s.info}</div>`;
       if (showCount && s.remaining !== undefined) {
-        mainHtml += `<div class="vc-countdown">Noch <strong>${this._fmtCountdown(s.remaining)}</strong></div>`;
+        mainHtml += `<div class="vc-countdown">${tc.remaining} <strong>${this._fmtCountdown(s.remaining, tc)}</strong></div>`;
       }
       if (showProg && s.progress !== undefined) {
         mainHtml += `<div class="vc-progress-wrap">
@@ -1552,7 +1591,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       }
     } else if (s.type === 'free') {
       if (s.nextFach) {
-        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.7">Nächste Stunde</div>`;
+        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.7">${tc.nextLesson}</div>`;
         mainHtml += `<div class="vc-subject">${s.nextFach}</div>`;
         mainHtml += `<div class="vc-meta">`;
         if (s.nextZeit)   mainHtml += `<span class="vc-chip">🕐 ${s.nextZeit}</span>`;
@@ -1561,7 +1600,7 @@ class VpMobile24CurrentCard extends HTMLElement {
         mainHtml += `</div>`;
       }
       if (showCount && s.remaining !== undefined) {
-        mainHtml += `<div class="vc-countdown">Beginnt in <strong>${this._fmtCountdown(s.remaining)}</strong></div>`;
+        mainHtml += `<div class="vc-countdown">${tc.startsIn} <strong>${this._fmtCountdown(s.remaining, tc)}</strong></div>`;
       }
       if (showProg && s.nextStart !== undefined) {
         const now = this._nowMins();
@@ -1574,9 +1613,9 @@ class VpMobile24CurrentCard extends HTMLElement {
     } else {
       // Done
       if (s.unterrichtsEnde) {
-        mainHtml += `<div class="vc-subject" style="font-size:1em">Unterricht endete um ${s.unterrichtsEnde}</div>`;
+        mainHtml += `<div class="vc-subject" style="font-size:1em">${tc.endedAt} ${s.unterrichtsEnde}</div>`;
       } else {
-        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.6">Kein Unterricht mehr heute</div>`;
+        mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.6">${tc.noLesson}</div>`;
       }
     }
 
@@ -1584,7 +1623,7 @@ class VpMobile24CurrentCard extends HTMLElement {
     let nextHtml = '';
     if (showNext && (s.type === 'lesson' || s.type === 'sub') && s.nextFach) {
       nextHtml = `<div class="vc-next">
-        <span class="vc-next-label">Nächste</span>
+        <span class="vc-next-label">${tc.next}</span>
         <span class="vc-next-fach">${s.nextFach}</span>
         ${s.nextZeit ? `<span class="vc-next-time">${s.nextZeit.split('-')[0]}</span>` : ''}
         ${showRoom && s.nextRaum ? `<span class="vc-chip" style="font-size:.68em">🚪 ${s.nextRaum}</span>` : ''}
@@ -1595,10 +1634,10 @@ class VpMobile24CurrentCard extends HTMLElement {
     let dayHtml = '';
     if (showDay && (s.gesamt || s.nVertretung || s.unterrichtsEnde)) {
       dayHtml = `<div class="vc-day">`;
-      if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">📚 ${s.gesamt} Stunden</span>`;
-      if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">⏳ ${s.verbleibend} verbleibend</span>`;
-      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f97316">🔄 ${s.nVertretung} Vertretung${s.nVertretung > 1 ? 'en' : ''}</span>`;
-      if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">🏁 Ende ${s.unterrichtsEnde}</span>`;
+      if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">📚 ${s.gesamt} ${tc.lessons}</span>`;
+      if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">⏳ ${s.verbleibend} ${tc.remaining2}</span>`;
+      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f97316">🔄 ${s.nVertretung}× ${tc.subst}</span>`;
+      if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">🏁 ${tc.endAt} ${s.unterrichtsEnde}</span>`;
       dayHtml += `</div>`;
     }
 
