@@ -29,21 +29,20 @@
 > [!IMPORTANT]
 > 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
 >
-> 🚀 **Geplante Veröffentlichung:** *demnächst*
+> 🚀 **Geplante Veröffentlichung:** *08.06.2026 / 12:00Uhr*
 >
 > ### Neue Features in v2.5.0
 >
 > #### 🃏 Karten
-> - 📅 **Erweiterte Wochennavigation** — KW anzeigen, Nächste/Aktuelle Woche mit manuellem Override (kein automatisches Zurückspringen mehr)
-> - 📆 **Übernächste Woche** — Button navigiert unbegrenzt weiter in die Zukunft
+> - 📅 **Erweiterte Wochennavigation** — KW anzeigen, Nächste/Aktuelle Woche
 > - 🔮 **Wochenvorschau am Wochenende** — Karte zeigt automatisch die nächste Woche Sa/So
 > - 📊 **Smart Status Bar** — zeigt Ausfälle, Vertretungen und Unterrichtsende heute
 > - 🟢🟡🔴 **Neue Statusfarben** — Grün = normal, Gelb = Vertretung, Rot = Ausfall (statt einheitlichem Blau)
 > - 💡 **Tooltips** — Lehrer & Raum beim Hover über eine Stunde
 >
 > #### 👥 Mehrere Klassen Card
-> - 📋 **Komplett neu geschrieben** — moderne kollabierbare Abschnitte pro Klasse
-> - ✅ **Einklappbar** — Zustand wird in localStorage gespeichert
+> - 🔄 **Komplett neu** — Nächste Stunde, KW anzeigen
+> - ✅ **Einklappbar** — Zustand wird gespeichert
 > - 🔢 **Statistik-Badges** — Stunden / Vertretungen / Ausfälle pro Klasse auf einen Blick
 > - 📅 **Nächste-Stunde-Anzeige** — pro Klasse direkt sichtbar
 >
@@ -55,8 +54,6 @@
 > - 🎓 **Parallelkurs-Filter** — `789WB12`, `7INb1` etc. erscheinen jetzt in der Fächerauswahl; nur ausgewählte Kurse werden angezeigt
 > - 🚫 **Fremde Ausfälle gefiltert** — Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
 > - 📅 **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
-> - 🛡️ **CSP-sicher** — alle `onclick`-Handler durch Event-Delegation ersetzt (funktioniert mit nginx/DuckDNS/Reverse Proxy)
-> - 🐛 **Popup-Bug behoben** — kein Konfigurationsfehler mehr beim Öffnen von Stunden-Details
 
 <br/>
 
