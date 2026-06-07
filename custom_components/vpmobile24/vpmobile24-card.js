@@ -1555,7 +1555,11 @@ class VpMobile24CurrentCard extends HTMLElement {
     const nextEntity = this._config.next_entity  ? this._hass.states[this._config.next_entity]  : null;
     const weekEntity = this._config.week_entity  ? this._hass.states[this._config.week_entity]  : null;
     const tc         = this._getT();
-    const title      = this._config.title || tc.currentLesson;
+    // If title is empty, default German, or not set → use translated default
+    const rawTitle   = this._config.title || '';
+    const title      = (rawTitle === '' || rawTitle === 'Aktueller Unterricht' || rawTitle === 'Current Lesson' || rawTitle === 'Cours actuel')
+      ? tc.currentLesson
+      : rawTitle;
     const showProg   = this._config.show_progress  !== false;
     const showCount  = this._config.show_countdown !== false;
     const showNext   = this._config.show_next      !== false;
