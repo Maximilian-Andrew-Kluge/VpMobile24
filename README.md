@@ -55,7 +55,6 @@
 > - 🎓 **Parallelkurs-Filter** — `789WB12`, `7INb1` etc. erscheinen jetzt in der Fächerauswahl; nur ausgewählte Kurse werden angezeigt
 > - 🚫 **Fremde Ausfälle gefiltert** — Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
 > - 📅 **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
-> - 🛡️ **CSP-sicher** — alle `onclick`-Handler durch Event-Delegation ersetzt (funktioniert mit nginx/DuckDNS/Reverse Proxy)
 > - 🐛 **Popup-Bug behoben** — kein Konfigurationsfehler mehr beim Öffnen von Stunden-Details
 
 <br/>
@@ -316,7 +315,6 @@ Beiträge sind herzlich willkommen!
 > - 🎓 **Parallel course filter** — `789WB12`, `7INb1` etc. now appear in subject selection; only selected courses are shown
 > - 🚫 **Foreign cancellations filtered** — cancellation of `789WB2` no longer appears if you have `789WB12`
 > - 📅 **Week after next preloaded** — `next_next_week_table` available in sensor
-> - 🛡️ **CSP-safe** — all `onclick` handlers replaced by event delegation (works with nginx/DuckDNS/Reverse Proxy)
 > - 🐛 **Popup bug fixed** — no more configuration error when opening lesson details
 
 <br/>
