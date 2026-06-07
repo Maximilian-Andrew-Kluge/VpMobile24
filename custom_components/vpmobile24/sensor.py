@@ -123,7 +123,7 @@ def _device_info(config_entry) -> dict:
         "name": name,
         "manufacturer": "VpMobile24",
         "model": "Stundenplan Integration",
-        "sw_version": "2.4.9",
+        "sw_version": "2.5.0",
     }
 
 
