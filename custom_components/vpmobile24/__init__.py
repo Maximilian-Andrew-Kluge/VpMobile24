@@ -457,18 +457,14 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             # Whitelist filter: if selected_courses is set, skip lessons
                             # that belong to a different course group (course groups have digits)
                             if self.selected_courses and lesson_course and lesson_course not in self.selected_courses:
-                                if any(c.isdigit() for c in lesson_course):  # only filter actual course groups
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP lesson period={period} course={lesson_course} subject={subject} (not in selected_courses)")
+                                if any(c.isdigit() for c in lesson_course):
                                     continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 # Cancelled lesson
                                 if lesson_course and lesson_course in self.excluded_subjects:
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled lesson period={period} course={lesson_course} (excluded)")
                                     continue
-                                # Skip if student doesn't attend this course
                                 if lesson_course and lesson_course not in student_courses:
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled lesson period={period} course={lesson_course} (not in student_courses)")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
@@ -493,16 +489,13 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
                             # Whitelist filter: skip changes for other course groups
                             if self.selected_courses and change_course and change_course not in self.selected_courses:
-                                if any(c.isdigit() for c in change_course):  # only filter actual course groups
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP change period={period} course={change_course} subject={subject} (not in selected_courses)")
+                                if any(c.isdigit() for c in change_course):
                                     continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 if change_course and change_course in self.excluded_subjects:
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled change period={period} course={change_course} (excluded)")
                                     continue
                                 if change_course and change_course not in student_courses:
-                                    _LOGGER.warning(f"VPM24_DEBUG SKIP cancelled change period={period} course={change_course} (not in student_courses)")
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
