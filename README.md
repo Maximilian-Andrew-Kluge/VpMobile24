@@ -29,19 +29,34 @@
 > [!IMPORTANT]
 > 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
 >
-> 🚀 **Geplante Veröffentlichung:** *08.06.2026 um 12:00 Uhr (MESZ)*
+> 🚀 **Geplante Veröffentlichung:** *demnächst*
 >
 > ### Neue Features in v2.5.0
 >
-> - 📅 **Nächste Woche** — Button zum Vorschauen der nächsten Woche, am Wochenende automatisch
-> - 🏫 **Sensor & Widget „Aktueller Unterricht"** — zeigt die gerade laufende Stunde
-> - 👥 **Mehrere Klassen Card** — Vergleichsansicht mehrerer Klassen in einer Card
-> - ⏱️ **Countdown** — Sensor zeigt „in 23 Min." bis zur nächsten Stunde
-> - 📋 **Klassenauswahl aus XML** — beim Setup automatisch alle Klassen laden
-> - 🔧 **Fächer & Klasse ändern** — unabhängig voneinander per ⚙️ Konfigurieren
-> - ⚡ **Paralleler Datenabruf** — Setup bis zu 10× schneller
-> - 🐛 Doppeltes Gerät nach Klassenwechsel behoben
-> - 🃏 Card: Übersichtlicheres Config-UI, Unterrichtszeiten aus XML
+> #### 🃏 Karten
+> - 📅 **Erweiterte Wochennavigation** — KW anzeigen, Nächste/Aktuelle Woche mit manuellem Override (kein automatisches Zurückspringen mehr)
+> - 📆 **Übernächste Woche** — Button navigiert unbegrenzt weiter in die Zukunft
+> - 🔮 **Wochenvorschau am Wochenende** — Karte zeigt automatisch die nächste Woche Sa/So
+> - 📊 **Smart Status Bar** — zeigt Ausfälle, Vertretungen und Unterrichtsende heute
+> - 🟢🟡🔴 **Neue Statusfarben** — Grün = normal, Gelb = Vertretung, Rot = Ausfall (statt einheitlichem Blau)
+> - 💡 **Tooltips** — Lehrer & Raum beim Hover über eine Stunde
+>
+> #### 👥 Mehrere Klassen Card
+> - 📋 **Komplett neu geschrieben** — moderne kollabierbare Abschnitte pro Klasse
+> - ✅ **Einklappbar** — Zustand wird in localStorage gespeichert
+> - 🔢 **Statistik-Badges** — Stunden / Vertretungen / Ausfälle pro Klasse auf einen Blick
+> - 📅 **Nächste-Stunde-Anzeige** — pro Klasse direkt sichtbar
+>
+> #### ⏱️ Aktueller Unterricht Card
+> - 🔄 **Komplett neu** — Echtzeit-Fortschrittsbalken, Countdown, Nächste Stunde, Tagesinfos
+> - 🏁 **Unterrichtsende** — berechnet automatisch aus echten (nicht-ausgefallenen) Stunden
+>
+> #### 🔧 Integration Backend
+> - 🎓 **Parallelkurs-Filter** — `789WB12`, `7INb1` etc. erscheinen jetzt in der Fächerauswahl; nur ausgewählte Kurse werden angezeigt
+> - 🚫 **Fremde Ausfälle gefiltert** — Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
+> - 📅 **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
+> - 🛡️ **CSP-sicher** — alle `onclick`-Handler durch Event-Delegation ersetzt (funktioniert mit nginx/DuckDNS/Reverse Proxy)
+> - 🐛 **Popup-Bug behoben** — kein Konfigurationsfehler mehr beim Öffnen von Stunden-Details
 
 <br/>
 
