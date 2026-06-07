@@ -161,7 +161,7 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
   </td>
   <td align="center" width="50%">
     <b>Fächerauswahl (inkl. Parallelkurse)</b><br/><br/>
-    <i>📷 Screenshot folgt</i>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/subject-select.png" alt="Konfiguration" width="100%"/>
   </td>
 </tr>
 </table>
@@ -172,11 +172,11 @@ Stundenpläne sollen ohne Umwege in Home Assistant sichtbar sein — als struktu
 <tr>
   <td align="center" width="50%">
     <b>Mehrere Klassen</b><br/><br/>
-    <i>📷 Screenshot folgt</i>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/multi-card.png" alt="Konfiguration" width="100%"/>
   </td>
   <td align="center" width="50%">
     <b>Aktueller Unterricht</b><br/><br/>
-    <i>📷 Screenshot folgt</i>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/current-card.png" alt="Konfiguration" width="100%"/>
   </td>
 </tr>
 </table>
@@ -420,7 +420,7 @@ Timetables should be available in Home Assistant without friction — as structu
   </td>
   <td align="center" width="50%">
     <b>Subject selection (incl. parallel courses)</b><br/><br/>
-    <i>📷 Screenshot coming soon</i>
+      <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/subject-select.png" alt="Lovelace Card" width="100%"/>
   </td>
 </tr>
 </table>
@@ -435,7 +435,7 @@ Timetables should be available in Home Assistant without friction — as structu
   </td>
   <td align="center" width="50%">
     <b>Current Lesson</b><br/><br/>
-    <i>📷 Screenshot coming soon</i>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/current-card.png" alt="Lovelace Card" width="100%"/>
   </td>
 </tr>
 </table>
