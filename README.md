@@ -7,7 +7,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Beta-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
+[![Status](https://img.shields.io/badge/Status-Stable-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -27,9 +27,13 @@
 <br/>
 
 > [!IMPORTANT]
-> 🎉 **Großes Update angekündigt – VpMobile24 v2.5.0**
+> 🎉 **VpMobile24 v2.5.0 ist jetzt verfügbar**
 >
-> 🚀 **Geplante Veröffentlichung:** *08.06.2026 um 10:00 Uhr (MESZ)*
+> 🚀 **Veröffentlicht am 08.06.2026**
+>
+> 📥 **Jetzt über HACS aktualisieren**
+>
+> 👉 **Release Notes:** https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
 >
 > ### Neue Features in v2.5.0
 >
@@ -62,7 +66,7 @@
 ## 🇩🇪 Deutsch
 
 > [!WARNING]
-> **Beta-Version** — aktiv in Entwicklung. Feedback und Fehlerberichte sind jederzeit willkommen — als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
+> **Veröffentlichte Version** — Feedback und Fehlerberichte sind jederzeit willkommen — als [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder auf [Discord](https://discord.gg/57uvCeRw43).
 
 <br/>
 
@@ -285,9 +289,13 @@ Beiträge sind herzlich willkommen!
 ## 🇬🇧 English
 
 > [!IMPORTANT]
-> 🎉 **Major Update Announced – VpMobile24 v2.5.0**
+> 🎉 **VpMobile24 v2.5.0 is now available**
 >
-> 🚀 **Scheduled Release:** *June 8, 2026 at 10:00 PM (CEST)*
+> 🚀 **Released on June 8, 2026**
+>
+> 📥 **Update now via HACS**
+>
+> 👉 **Release Notes:** https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
 >
 > ### New Features in v2.5.0
 >
@@ -318,7 +326,7 @@ Beiträge sind herzlich willkommen!
 <br/>
 
 > [!WARNING]
-> **Beta version** — actively in development. Feedback and bug reports are always welcome — as a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or on [Discord](https://discord.gg/57uvCeRw43).
+> **Released version** — Feedback and bug reports are always welcome — as a [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) or on [Discord](https://discord.gg/57uvCeRw43).
 
 <br/>
 
