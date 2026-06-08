@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="VpMobile24 – Home Assistant Integration für Stundenpläne. Stundenplan24 direkt in HA, mit Lovelace Card, Mehrsprachigkeit (DE/EN/FR), mehreren Klassen und automatischem Update alle 15 Minuten." />
+  <meta name="description" content="VpMobile24 � Home Assistant Integration f�r Stundenpl�ne. Stundenplan24 direkt in HA, mit Lovelace Card, Mehrsprachigkeit (DE/EN/FR), mehreren Klassen und automatischem Update alle 15 Minuten." />
   <meta name="theme-color" content="#0a0f1e" />
-  <title>VpMobile24 – Home Assistant Integration</title>
+  <title>VpMobile24 � Home Assistant Integration</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 56 56' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='56' y2='56'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360a5fa'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='56' height='56' rx='14' fill='url(%23a)'/%3E%3Crect x='9' y='16' width='30' height='26' rx='4' fill='white' fill-opacity='.15'/%3E%3Crect x='9' y='16' width='30' height='26' rx='4' stroke='white' stroke-width='1.5' fill='none'/%3E%3Crect x='9' y='16' width='30' height='8' rx='4' fill='white' fill-opacity='.25'/%3E%3Crect x='9' y='20' width='30' height='4' fill='white' fill-opacity='.25'/%3E%3Crect x='17' y='12' width='3' height='8' rx='1.5' fill='white' fill-opacity='.9'/%3E%3Crect x='28' y='12' width='3' height='8' rx='1.5' fill='white' fill-opacity='.9'/%3E%3Crect x='14' y='29' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='21' y='29' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='14' y='35' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='21' y='35' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Ccircle cx='40' cy='40' r='10' fill='%230f1729'/%3E%3Ccircle cx='40' cy='40' r='9' fill='url(%23b)'/%3E%3Ccircle cx='40' cy='40' r='6.5' fill='none' stroke='white' stroke-width='1.2' stroke-opacity='.6'/%3E%3Cline x1='40' y1='40' x2='40' y2='35.5' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='40' y1='40' x2='43' y2='42' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='40' cy='40' r='1' fill='white'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -51,9 +51,9 @@
 </head>
 <body>
 
-  <!-- ===== ANNOUNCEMENT BANNER v2.5.0 ===== -->
+  <!-- ===== RELEASE BANNER v2.5.0 ===== -->
   <div id="announcement-banner" style="
-    background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+    background: linear-gradient(135deg, #16a34a, #15803d);
     color: #fff;
     text-align: center;
     padding: 12px 20px;
@@ -69,20 +69,20 @@
     gap: 12px;
     flex-wrap: wrap;
   ">
-    <span>🎉</span>
-    <span><strong>VpMobile24 v2.5.0</strong> erscheint am <strong>8. Juni 2026 um 12:00 Uhr (MESZ)</strong></span>
-    <span style="opacity:.7">·</span>
-    <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" target="_blank" rel="noopener" style="
-      color: #bfdbfe;
+    <span>??</span>
+    <span><strong>VpMobile24 v2.5.0</strong> ist jetzt verf�gbar!</span>
+    <span style="opacity:.7">�</span>
+    <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest" target="_blank" rel="noopener" style="
+      color: #bbf7d0;
       text-decoration: underline;
       text-underline-offset: 2px;
       font-weight: 700;
-    ">Mehr erfahren →</a>
+    ">Release Notes ?</a>
     <button onclick="document.getElementById('announcement-banner').style.display='none'" style="
       position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
       background: none; border: none; color: rgba(255,255,255,.7);
       font-size: 1.2em; cursor: pointer; line-height: 1; padding: 4px 8px;
-    " title="Schließen">✕</button>
+    " title="Schlie�en">?</button>
   </div>
 
   <!-- ===== HERO ===== -->
@@ -134,7 +134,7 @@
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
           <div class="hero-version-row">
-            <span class="version-tag ver-stable gh-version-stable">v2.4.9</span>
+            <span class="version-tag ver-stable gh-version-stable">v2.5.0</span>
             <span class="version-beta-block" style="display:none !important;">
               <span class="version-tag ver-beta gh-version-beta">Beta</span>
             </span>
@@ -145,28 +145,28 @@
 
         <div class="hero-features">
           <div class="hf-item">
-            <span class="hf-icon">🔄</span>
+            <span class="hf-icon">??</span>
             <div>
               <strong>Automatischer Datenabruf</strong>
               <span>Alle 15 Minuten</span>
             </div>
           </div>
           <div class="hf-item">
-            <span class="hf-icon">👥</span>
+            <span class="hf-icon">??</span>
             <div>
               <strong>Mehrere Klassen</strong>
               <span>Flexibel &amp; einfach</span>
             </div>
           </div>
           <div class="hf-item">
-            <span class="hf-icon">🖱️</span>
+            <span class="hf-icon">???</span>
             <div>
               <strong>Klick-Details</strong>
               <span>Lehrer &amp; Raum per Klick</span>
             </div>
           </div>
           <div class="hf-item">
-            <span class="hf-icon">ℹ️</span>
+            <span class="hf-icon">??</span>
             <div>
               <strong>Zusatzinfos</strong>
               <span>Pro Tag anzeigen</span>
@@ -186,7 +186,7 @@
       </div>
 
       <div class="hero-right">
-        <!-- Navy Card Mockup – echter Style -->
+        <!-- Navy Card Mockup � echter Style -->
         <div class="hero-mockup-wrap">
           <svg viewBox="0 0 480 380" xmlns="http://www.w3.org/2000/svg" class="hero-mockup-svg">
             <!-- Card background -->
@@ -194,18 +194,18 @@
 
             <!-- Header -->
             <rect x="16" y="16" width="36" height="36" rx="9" fill="url(#hdrGrad)"/>
-            <text x="34" y="38" text-anchor="middle" font-size="16" font-family="sans-serif">📅</text>
+            <text x="34" y="38" text-anchor="middle" font-size="16" font-family="sans-serif">??</text>
             <text x="62" y="33" fill="#fff" font-size="13" font-weight="700" font-family="Inter,sans-serif">Stundenplan</text>
             <text x="62" y="47" fill="#94a3b8" font-size="9" font-family="Inter,sans-serif">Klasse 10b</text>
-            <!-- ⓘ button -->
+            <!-- ? button -->
             <circle cx="340" cy="34" r="12" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
-            <text x="340" y="39" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">ⓘ</text>
+            <text x="340" y="39" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="sans-serif">?</text>
             <!-- Date chip -->
             <rect x="358" y="22" width="72" height="24" rx="12" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
             <text x="394" y="38" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="Inter,sans-serif">Di, 13. Mai</text>
             <!-- Reload -->
             <rect x="436" y="22" width="28" height="24" rx="7" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-            <text x="450" y="38" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="sans-serif">↺</text>
+            <text x="450" y="38" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="sans-serif">?</text>
 
             <!-- Column headers -->
             <rect x="0" y="64" width="480" height="22" fill="rgba(0,0,0,0.2)"/>
@@ -262,7 +262,7 @@
             <rect x="0" y="188" width="480" height="20" fill="rgba(0,0,0,0.2)"/>
             <line x1="0" y1="188" x2="480" y2="188" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
             <line x1="0" y1="208" x2="480" y2="208" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-            <text x="240" y="202" text-anchor="middle" fill="#64748b" font-size="8" font-style="italic" font-family="Inter,sans-serif">Pause 10:10 – 10:30</text>
+            <text x="240" y="202" text-anchor="middle" fill="#64748b" font-size="8" font-style="italic" font-family="Inter,sans-serif">Pause 10:10 � 10:30</text>
 
             <!-- Row 4 -->
             <rect x="0" y="208" width="480" height="34" fill="rgba(255,255,255,0.015)"/>
@@ -285,7 +285,7 @@
             <text x="96" y="263" text-anchor="middle" fill="#fff" font-size="9" font-weight="600" font-family="Inter,sans-serif">DE</text>
             <!-- Vertretung -->
             <rect x="142" y="245" width="68" height="28" rx="7" fill="#7f1d1d"/>
-            <text x="176" y="263" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">—</text>
+            <text x="176" y="263" text-anchor="middle" fill="#fca5a5" font-size="9" font-weight="600" font-family="Inter,sans-serif">�</text>
             <rect x="226" y="245" width="68" height="28" rx="7" fill="#1a2a50"/>
             <text x="260" y="263" text-anchor="middle" fill="#e2e8f0" font-size="9" font-family="Inter,sans-serif">MA</text>
             <rect x="310" y="245" width="68" height="28" rx="7" fill="rgba(255,255,255,0.03)"/>
@@ -309,13 +309,13 @@
             <text x="122" y="112" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">TAG</text>
             <text x="175" y="112" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">Montag</text>
             <text x="122" y="128" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">LEHRER</text>
-            <text x="175" y="128" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">Müller</text>
+            <text x="175" y="128" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">M�ller</text>
             <text x="122" y="144" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">RAUM</text>
             <text x="175" y="144" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">A204</text>
             <text x="122" y="160" fill="#64748b" font-size="7" font-weight="600" font-family="Inter,sans-serif">ZEIT</text>
-            <text x="175" y="160" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">07:45–08:30</text>
+            <text x="175" y="160" fill="#e2e8f0" font-size="8.5" font-family="Inter,sans-serif">07:45�08:30</text>
             <rect x="240" y="174" width="62" height="18" rx="6" fill="#2563eb"/>
-            <text x="271" y="186" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Inter,sans-serif">Schließen</text>
+            <text x="271" y="186" text-anchor="middle" fill="#fff" font-size="8" font-weight="700" font-family="Inter,sans-serif">Schlie�en</text>
 
             <defs>
               <linearGradient id="hdrGrad" x1="0" y1="0" x2="36" y2="36">
@@ -352,7 +352,7 @@
       <div class="stat-divider"></div>
       <div class="stat-item">
         <span class="stat-num">0</span>
-        <span class="stat-label">Zeilen YAML nötig</span>
+        <span class="stat-label">Zeilen YAML n�tig</span>
       </div>
     </div>
   </div>
@@ -368,8 +368,8 @@
         <a href="#sensors">Sensoren</a>
         <a href="#troubleshooting">Hilfe</a>
       </div>
-      <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="topnav-cta" target="_blank" rel="noopener">GitHub →</a>
-      <button class="nav-burger" onclick="toggleNav()" aria-label="Menü">
+      <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="topnav-cta" target="_blank" rel="noopener">GitHub ?</a>
+      <button class="nav-burger" onclick="toggleNav()" aria-label="Men�">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -390,56 +390,44 @@
       <div class="container">
         <div class="section-label">Features</div>
         <h2 class="section-title">Alles was du brauchst</h2>
-        <p class="section-desc">VpMobile24 bringt deinen Stundenplan direkt in Home Assistant – mit modernem Navy-Design, smarten Funktionen und vollständiger Mehrsprachigkeit.</p>
+        <p class="section-desc">VpMobile24 bringt deinen Stundenplan direkt in Home Assistant — mit drei modernen Cards, Parallelkurs-Filter, Countdown und vollständiger Mehrsprachigkeit (DE/EN/FR).</p>
 
         <!-- Feature Categories -->
         <div class="feature-categories">
 
-          <!-- Lovelace Card -->
+          <!-- Lovelace Cards -->
           <div class="feat-category">
             <div class="feat-cat-header">
               <span class="feat-cat-icon">🃏</span>
               <div>
-                <div class="feat-cat-title">Lovelace Card</div>
-                <div class="feat-cat-sub">Visuell, interaktiv, responsiv</div>
+                <div class="feat-cat-title">Lovelace Cards</div>
+                <div class="feat-cat-sub">Drei moderne Cards für jeden Anwendungsfall</div>
               </div>
             </div>
             <div class="feat-list">
               <div class="feat-item">
                 <span class="feat-dot" style="background:#3b82f6"></span>
-                <div><strong>Wochenübersicht</strong> – Mo–Fr auf einen Blick, heutiger Tag blau hervorgehoben</div>
+                <div><strong>Stundenplan-Karte</strong> — Mo–Fr auf einen Blick, KW-Anzeige, Wochennavigation</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)"></span>
-                <div><strong>Aktuelle Stunde grün</strong> – automatisch anhand der Uhrzeit erkannt</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.5)"></span>
-                <div><strong>Ausfallstunden rot</strong> – in allen Spalten, klickbar mit AUSFALL-Popup</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#7f1d1d"></span>
-                <div><strong>Vertretungen</strong> – dunkelrot markiert, Popup mit Lehrer &amp; Raum</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#93c5fd"></span>
-                <div><strong>Pausen hervorgehoben</strong> – blauer Balken zwischen den Stunden</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#fcd34d"></span>
-                <div><strong>ⓘ Zusatzinfos</strong> – pulsierender Button, zeigt Tagesinfos per Klick</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#60a5fa"></span>
-                <div><strong>Nächste Woche</strong> – Button zum Anzeigen der nächsten Woche, am WE automatisch</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#4ade80"></span>
-                <div><strong>Aktueller Unterricht Widget</strong> – zeigt die laufende Stunde als kompakte Card</div>
+                <div><strong>Statusfarben</strong> — 🟢 Normal · 🟡 Vertretung · 🔴 Ausfall · Smart Status Bar</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#a78bfa"></span>
-                <div><strong>Mehrere Klassen</strong> – Vergleichsansicht für mehrere Klassen in einer Card</div>
+                <div><strong>Mehrere Klassen-Karte</strong> — kollabierbar, Statistik-Badges, Nächste-Stunde-Anzeige</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#4ade80"></span>
+                <div><strong>Aktueller Unterricht-Karte</strong> — Fortschrittsbalken, Countdown, Tagesinfos</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#fcd34d"></span>
+                <div><strong>Zusatzinfos</strong> — pulsierender Button, zeigt Tagesinfos per Klick</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#60a5fa"></span>
+                <div><strong>Wochennavigation</strong> — Nächste/Übernächste Woche, am WE automatisch</div>
               </div>
             </div>
           </div>
@@ -456,23 +444,19 @@
             <div class="feat-list">
               <div class="feat-item">
                 <span class="feat-dot" style="background:#1d4ed8"></span>
-                <div><strong>Navy Dark Design</strong> – modernes #0f1729 Farbschema, kein HA-Theme</div>
+                <div><strong>Navy Dark Design</strong> — modernes #0f1729 Farbschema</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#3b82f6"></span>
-                <div><strong>Handy-Modus</strong> – Einzelspalte mit Tab-Navigation (Mo/11, Di/12 …)</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#60a5fa"></span>
-                <div><strong>Tab-Persistenz</strong> – gewählter Tag bleibt auch bei HA-Updates erhalten</div>
+                <div><strong>Handy-Modus</strong> — Einzelspalte mit Tab-Navigation</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#94a3b8"></span>
-                <div><strong>Popup bleibt offen</strong> – kein Schließen beim automatischen Daten-Update</div>
+                <div><strong>Popup stabil</strong> — schließt sich nicht beim automatischen Update</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#475569"></span>
-                <div><strong>Datum in Spaltenköpfen</strong> – Tag + Datum (Mo / 11) auf einen Blick</div>
+                <div><strong>CSP-sicher</strong> — funktioniert mit nginx, DuckDNS &amp; Reverse Proxy</div>
               </div>
             </div>
           </div>
@@ -483,45 +467,41 @@
               <span class="feat-cat-icon">⚙️</span>
               <div>
                 <div class="feat-cat-title">Integration</div>
-                <div class="feat-cat-sub">Automatisch, mehrsprachig, flexibel</div>
+                <div class="feat-cat-sub">Automatisch, zuverlässig, konfigurierbar</div>
               </div>
             </div>
             <div class="feat-list">
               <div class="feat-item">
                 <span class="feat-dot" style="background:#22c55e"></span>
-                <div><strong>Mehrere Klassen</strong> – gleiche Zugangsdaten, eigene Geräte pro Klasse</div>
+                <div><strong>Mehrere Klassen</strong> — gleiche Zugangsdaten, eigene Geräte pro Klasse</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#3b82f6"></span>
-                <div><strong>Auto-Refresh</strong> – Daten alle 15 Minuten, manueller Reload-Button</div>
+                <div><strong>Auto-Refresh</strong> — alle 15 Min., manuell per Aktualisieren-Button</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#60a5fa"></span>
-                <div><strong>Vollständig mehrsprachig</strong> – DE / EN / FR, automatisch aus HA-Sprache</div>
+                <div><strong>Vollständig mehrsprachig</strong> — DE / EN / FR vollständig übersetzt</div>
               </div>
               <div class="feat-item">
-                <span class="feat-dot" style="background:#fcd34d"></span>
-                <div><strong>Fächer ausschließen</strong> – unerwünschte Fächer beim Setup herausfiltern</div>
+                <span class="feat-dot" style="background:#f97316"></span>
+                <div><strong>Parallelkurs-Filter</strong> — nur eigene Kurse anzeigen (z.B. 789WB12)</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#a78bfa"></span>
-                <div><strong>Klasse &amp; Fächer ändern</strong> – nachträglich per ⚙️ Konfigurieren, unabhängig voneinander</div>
+                <div><strong>Klasse &amp; Fächer ändern</strong> — nachträglich per ⚙️ Konfigurieren</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#34d399"></span>
-                <div><strong>Klassenauswahl aus XML</strong> – beim Setup automatisch alle Klassen der Schule laden</div>
+                <div><strong>Klassenauswahl aus XML</strong> — alle Klassen der Schule automatisch laden</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#f59e0b"></span>
-                <div><strong>Countdown bis nächste Stunde</strong> – Sensor zeigt „in 23 Min." für Automationen</div>
-              </div>
-              <div class="feat-item">
-                <span class="feat-dot" style="background:#94a3b8"></span>
-                <div><strong>Eigene Uhrzeiten</strong> – Stunden- und Pausenzeiten visuell konfigurierbar</div>
+                <div><strong>Countdown bis nächste Stunde</strong> — Sensor zeigt „in 23 Min."</div>
               </div>
               <div class="feat-item">
                 <span class="feat-dot" style="background:#475569"></span>
-                <div><strong>HACS-kompatibel</strong> – einfache Installation und automatische Updates</div>
+                <div><strong>HACS-kompatibel</strong> — einfache Installation &amp; automatische Updates</div>
               </div>
             </div>
           </div>
@@ -539,7 +519,7 @@
         <p class="section-desc">Wähle deine bevorzugte Installationsmethode. HACS ist der empfohlene Weg.</p>
 
         <div class="tabs">
-          <button class="tab-btn active" data-tab="hacs">⭐ HACS (empfohlen)</button>
+          <button class="tab-btn active" data-tab="hacs">📦 HACS (empfohlen)</button>
           <button class="tab-btn" data-tab="manual">🔧 Manuell</button>
         </div>
 
@@ -555,12 +535,12 @@
                     <div class="option-card-title">⭐ Option A – Direkt in HACS öffnen</div>
                     <p>Klicke auf den Button und HACS öffnet sich automatisch mit dem vorausgefüllten Repository:</p>
                     <a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge" class="hacs-btn" target="_blank" rel="noopener">
-                      <span>🏠</span> In HACS öffnen
+                      <span>📦</span> In HACS öffnen
                     </a>
                     <p class="option-note">Empfohlen – funktioniert nur wenn <code>my.home-assistant.io</code> in deiner HA-Instanz konfiguriert ist.</p>
                   </div>
                   <div class="option-card">
-                    <div class="option-card-title">🔗 Option B – Repository URL manuell</div>
+                    <div class="option-card-title">🔧 Option B – Repository URL manuell</div>
                     <p>Öffne HACS, klicke auf <code>⋮</code> → <strong>„Benutzerdefiniertes Repository"</strong> und füge diese URL ein:</p>
                     <div class="code-block">
                       <div class="code-label">Repository URL</div>
@@ -569,7 +549,7 @@
                         <button class="copy-btn" onclick="copyText(this, 'https://github.com/Maximilian-Andrew-Kluge/VpMobile24')">Kopieren</button>
                       </div>
                     </div>
-                    <p class="option-note">Kategorie: <strong>Integration</strong> → Hinzufügen klicken.</p>
+                    <p class="option-note">Kategorie: <strong>Integration</strong> ? Hinzuf�gen klicken.</p>
                   </div>
                 </div>
               </div>
@@ -579,9 +559,9 @@
               <div class="step-num">2</div>
               <div class="step-body">
                 <h3>Integration installieren &amp; HA neu starten</h3>
-                <p>Suche in HACS nach <strong>VpMobile24</strong>, klicke auf <strong>Installieren</strong> und starte Home Assistant anschließend neu.</p>
+                <p>Suche in HACS nach <strong>VpMobile24</strong>, klicke auf <strong>Installieren</strong> und starte Home Assistant anschlie�end neu.</p>
                 <div class="info-box">
-                  <span>💡</span>
+                  <span>??</span>
                   <span>Nach dem Neustart erscheint die Integration automatisch in der Integrationsliste.</span>
                 </div>
               </div>
@@ -591,7 +571,7 @@
               <div class="step-num">3</div>
               <div class="step-body">
                 <h3>Integration einrichten</h3>
-                <p>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</strong> und suche nach <strong>VpMobile24</strong>.</p>
+                <p>Gehe zu <strong>Einstellungen ? Ger�te &amp; Dienste ? Integration hinzuf�gen</strong> und suche nach <strong>VpMobile24</strong>.</p>
                 <div class="config-fields">
                   <div class="config-field">
                     <span class="cf-label">Schul-ID</span>
@@ -621,10 +601,10 @@
               <div class="step-num">1</div>
               <div class="step-body">
                 <h3>Integration herunterladen</h3>
-                <p>Wähle eine der folgenden Methoden:</p>
+                <p>W�hle eine der folgenden Methoden:</p>
                 <div class="option-grid">
                   <div class="option-card">
-                    <div class="option-card-title">Option A – Git Clone</div>
+                    <div class="option-card-title">Option A � Git Clone</div>
                     <p>Klone das komplette Repository mit Git:</p>
                     <div class="code-block">
                       <div class="code-label">Terminal</div>
@@ -636,12 +616,12 @@
                     <p class="option-note">Danach liegt der Ordner <code>VpMobile24/custom_components/vpmobile24/</code> lokal vor.</p>
                   </div>
                   <div class="option-card">
-                    <div class="option-card-title">Option B – ZIP herunterladen</div>
-                    <p>Lade nur den <code>custom_components</code>-Ordner als ZIP herunter — immer die neueste Version:</p>
+                    <div class="option-card-title">Option B � ZIP herunterladen</div>
+                    <p>Lade nur den <code>custom_components</code>-Ordner als ZIP herunter � immer die neueste Version:</p>
                     <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/archive/refs/heads/main.zip" class="download-btn">
-                      ⬇️ custom_components herunterladen
+                      ?? custom_components herunterladen
                     </a>
-                    <p class="option-note">ZIP enthält den kompletten Repo-Stand. Entpacke und kopiere nur den Ordner <code>custom_components/vpmobile24/</code>.</p>
+                    <p class="option-note">ZIP enth�lt den kompletten Repo-Stand. Entpacke und kopiere nur den Ordner <code>custom_components/vpmobile24/</code>.</p>
                   </div>
                 </div>
               </div>
@@ -666,7 +646,7 @@
               <div class="step-num">3</div>
               <div class="step-body">
                 <h3>Home Assistant neu starten &amp; einrichten</h3>
-                <p>Starte Home Assistant neu. Gehe dann zu <strong>Einstellungen → Geräte &amp; Dienste</strong> und füge die <strong>VpMobile24</strong> Integration hinzu.</p>
+                <p>Starte Home Assistant neu. Gehe dann zu <strong>Einstellungen ? Ger�te &amp; Dienste</strong> und f�ge die <strong>VpMobile24</strong> Integration hinzu.</p>
               </div>
             </div>
           </div>
@@ -685,9 +665,9 @@
           <div class="step">
             <div class="step-num">1</div>
             <div class="step-body">
-              <h3>Ressource in Home Assistant hinzufügen</h3>
-              <p>Gehe zu <strong>Einstellungen → Dashboards</strong>, klicke oben rechts auf <code>⋮</code> und wähle <strong>Ressourcen</strong>.</p>
-              <p>Klicke auf <strong>+ Ressource hinzufügen</strong> und trage folgendes ein:</p>
+              <h3>Ressource in Home Assistant hinzuf�gen</h3>
+              <p>Gehe zu <strong>Einstellungen ? Dashboards</strong>, klicke oben rechts auf <code>?</code> und w�hle <strong>Ressourcen</strong>.</p>
+              <p>Klicke auf <strong>+ Ressource hinzuf�gen</strong> und trage folgendes ein:</p>
               <div class="config-fields">
                 <div class="config-field">
                   <span class="cf-label">URL</span>
@@ -702,7 +682,7 @@
                 </div>
               </div>
               <div class="info-box">
-                <span>💡</span>
+                <span>??</span>
                 <span>Die Card-Datei wird beim Start von Home Assistant automatisch nach <code>/config/www/vpmobile24/</code> kopiert. Du musst nichts manuell kopieren!</span>
               </div>
             </div>
@@ -711,11 +691,11 @@
           <div class="step">
             <div class="step-num">2</div>
             <div class="step-body">
-              <h3>Card zum Dashboard hinzufügen</h3>
-              <p>Öffne dein Dashboard, klicke auf <strong>Bearbeiten → + Karte hinzufügen</strong> und suche nach <strong>VpMobile24 Card</strong>.</p>
-              <p>Alternativ kannst du die Card direkt per YAML hinzufügen:</p>
+              <h3>Card zum Dashboard hinzuf�gen</h3>
+              <p>�ffne dein Dashboard, klicke auf <strong>Bearbeiten ? + Karte hinzuf�gen</strong> und suche nach <strong>VpMobile24 Card</strong>.</p>
+              <p>Alternativ kannst du die Card direkt per YAML hinzuf�gen:</p>
               <div class="code-block">
-                <div class="code-label">Vollständige YAML-Konfiguration</div>
+                <div class="code-label">Vollst�ndige YAML-Konfiguration</div>
                 <pre class="code-pre"><code>type: custom:vpmobile24-card
 entity: sensor.vpmobile24_week_table
 additional_info_entity: sensor.vpmobile24_zusatzinfos
@@ -736,7 +716,7 @@ use_custom_times: false</code></pre>
             <div class="step-num">3</div>
             <div class="step-body">
               <h3>Card konfigurieren</h3>
-              <p>Die Card bietet eine vollständige visuelle Konfiguration – kein YAML nötig. Alle Optionen im Überblick:</p>
+              <p>Die Card bietet eine vollst�ndige visuelle Konfiguration � kein YAML n�tig. Alle Optionen im �berblick:</p>
               <div class="options-table">
                 <div class="ot-head">
                   <span>Option</span><span>Beschreibung</span><span>Standard</span>
@@ -746,8 +726,8 @@ use_custom_times: false</code></pre>
                 <div class="ot-row"><span><code>highlight_today</code></span><span>Heutigen Tag hervorheben</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>show_time</code></span><span>Uhrzeiten anzeigen</span><span><code>true</code></span></div>
                 <div class="ot-row"><span><code>use_custom_times</code></span><span>Eigene Uhrzeiten verwenden</span><span><code>false</code></span></div>
-                <div class="ot-row"><span><code>additional_info_entity</code></span><span>Zusatzinfo-Sensor (ⓘ-Button)</span><span><code>—</code></span></div>
-                <div class="ot-row"><span><code>reload_entity</code></span><span>Neu-laden Button Entity</span><span><code>—</code></span></div>
+                <div class="ot-row"><span><code>additional_info_entity</code></span><span>Zusatzinfo-Sensor (?-Button)</span><span><code>�</code></span></div>
+                <div class="ot-row"><span><code>reload_entity</code></span><span>Neu-laden Button Entity</span><span><code>�</code></span></div>
               </div>
             </div>
           </div>
@@ -760,48 +740,48 @@ use_custom_times: false</code></pre>
       <div class="container">
         <div class="section-label">Sensoren</div>
         <h2 class="section-title">Erstellte Sensoren</h2>
-        <p class="section-desc">Nach der Einrichtung stehen dir folgende Sensoren in Home Assistant zur Verfügung:</p>
+        <p class="section-desc">Nach der Einrichtung stehen dir folgende Sensoren in Home Assistant zur Verf�gung:</p>
 
         <div class="sensors-grid">
           <div class="sensor-card sensor-main">
-            <div class="sensor-icon">📅</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>sensor.vpmobile24_week_table</code></div>
-            <div class="sensor-desc">Vollständige Wochenübersicht – wird von der Lovelace Card verwendet</div>
+            <div class="sensor-desc">Vollst�ndige Wochen�bersicht � wird von der Lovelace Card verwendet</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">🕐</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>sensor.vpmobile24_naechste_stunde</code></div>
-            <div class="sensor-desc">Nächste Unterrichtsstunde heute</div>
+            <div class="sensor-desc">N�chste Unterrichtsstunde heute</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">📆</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>sensor.vpmobile24_wochenstundenplan</code></div>
             <div class="sensor-desc">Heutiger Stundenplan mit allen Stunden</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">ℹ️</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>sensor.vpmobile24_zusatzinfos</code></div>
             <div class="sensor-desc">Zusatzinformationen und Hinweise pro Tag</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">🔄</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>sensor.vpmobile24_aenderungen</code></div>
-            <div class="sensor-desc">Aktuelle Vertretungen und Stundenplanänderungen</div>
+            <div class="sensor-desc">Aktuelle Vertretungen und Stundenplan�nderungen</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">📅</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>calendar.vpmobile24_week_calendar</code></div>
-            <div class="sensor-desc">Wochenkalender – nutzbar in HA-Kalender-Ansicht</div>
+            <div class="sensor-desc">Wochenkalender � nutzbar in HA-Kalender-Ansicht</div>
           </div>
           <div class="sensor-card">
-            <div class="sensor-icon">🔁</div>
+            <div class="sensor-icon">??</div>
             <div class="sensor-name"><code>button.vpmobile24_reload</code></div>
             <div class="sensor-desc">Manuelles Neuladen der Stundenplandaten</div>
           </div>
         </div>
         <div class="info-box" style="margin-top:20px">
-          <span>💡</span>
-          <span>Bei mehreren Klassen werden die Sensor-IDs mit der Klasse ergänzt, z.B. <code>sensor.vpmobile24_week_table_10b</code>. Die genauen IDs findest du unter <strong>Einstellungen → Geräte &amp; Dienste → VpMobile24</strong>.</span>
+          <span>??</span>
+          <span>Bei mehreren Klassen werden die Sensor-IDs mit der Klasse erg�nzt, z.B. <code>sensor.vpmobile24_week_table_10b</code>. Die genauen IDs findest du unter <strong>Einstellungen ? Ger�te &amp; Dienste ? VpMobile24</strong>.</span>
         </div>
       </div>
     </section>
@@ -811,15 +791,15 @@ use_custom_times: false</code></pre>
       <div class="container">
         <div class="section-label">Hilfe</div>
         <h2 class="section-title">Troubleshooting</h2>
-        <p class="section-desc">Etwas funktioniert nicht? Hier sind die häufigsten Probleme und ihre Lösungen.</p>
+        <p class="section-desc">Etwas funktioniert nicht? Hier sind die h�ufigsten Probleme und ihre L�sungen.</p>
 
         <div class="faq-list">
           <details class="faq-item">
             <summary>Card wird nicht angezeigt</summary>
             <div class="faq-body">
               <ol>
-                <li>Überprüfe, ob die VpMobile24 Integration installiert ist</li>
-                <li>Überprüfe, ob die Ressource korrekt hinzugefügt wurde (<code>/local/vpmobile24/vpmobile24-card.js</code>)</li>
+                <li>�berpr�fe, ob die VpMobile24 Integration installiert ist</li>
+                <li>�berpr�fe, ob die Ressource korrekt hinzugef�gt wurde (<code>/local/vpmobile24/vpmobile24-card.js</code>)</li>
                 <li>Leere den Browser-Cache mit <kbd>Strg</kbd> + <kbd>F5</kbd></li>
                 <li>Starte Home Assistant neu</li>
               </ol>
@@ -827,11 +807,11 @@ use_custom_times: false</code></pre>
           </details>
 
           <details class="faq-item">
-            <summary>Änderungen werden nicht übernommen</summary>
+            <summary>�nderungen werden nicht �bernommen</summary>
             <div class="faq-body">
               <ol>
                 <li>Leere den Browser-Cache mit <kbd>Strg</kbd> + <kbd>F5</kbd></li>
-                <li>Öffne die Browser-Konsole (<kbd>F12</kbd>) und prüfe auf Fehler</li>
+                <li>�ffne die Browser-Konsole (<kbd>F12</kbd>) und pr�fe auf Fehler</li>
                 <li>Stelle sicher, dass die neueste Version geladen wurde</li>
               </ol>
             </div>
@@ -840,7 +820,7 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Entity nicht gefunden / Sensor fehlt</summary>
             <div class="faq-body">
-              <p>Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist und der Sensor <code>sensor.vpmobile24_week_table</code> existiert. Gehe zu <strong>Einstellungen → Geräte &amp; Dienste</strong> und prüfe den Status der Integration.</p>
+              <p>Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist und der Sensor <code>sensor.vpmobile24_week_table</code> existiert. Gehe zu <strong>Einstellungen ? Ger�te &amp; Dienste</strong> und pr�fe den Status der Integration.</p>
             </div>
           </details>
 
@@ -849,8 +829,8 @@ use_custom_times: false</code></pre>
             <div class="faq-body">
               <ol>
                 <li>Stelle sicher, dass die Integration installiert und geladen ist</li>
-                <li>Starte Home Assistant neu – die Card wird beim Start automatisch kopiert</li>
-                <li>Prüfe die Logs unter <strong>Einstellungen → System → Protokolle</strong></li>
+                <li>Starte Home Assistant neu � die Card wird beim Start automatisch kopiert</li>
+                <li>Pr�fe die Logs unter <strong>Einstellungen ? System ? Protokolle</strong></li>
               </ol>
             </div>
           </details>
@@ -858,33 +838,33 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Stundenplan wird nicht aktualisiert</summary>
             <div class="faq-body">
-              <p>Die Integration ruft Daten alle 15 Minuten ab. Prüfe deine Zugangsdaten und stelle sicher, dass deine Schule VpMobile24 / Stundenplan24 verwendet. Bei anhaltenden Problemen erstelle ein Issue auf GitHub.</p>
+              <p>Die Integration ruft Daten alle 15 Minuten ab. Pr�fe deine Zugangsdaten und stelle sicher, dass deine Schule VpMobile24 / Stundenplan24 verwendet. Bei anhaltenden Problemen erstelle ein Issue auf GitHub.</p>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>Pausen-Zeiten werden nicht übernommen</summary>
+            <summary>Pausen-Zeiten werden nicht �bernommen</summary>
             <div class="faq-body">
-              <p>Wenn du eigene Pausenzeiten verwenden möchtest, musst du nach dem Aktivieren von <strong>„Eigene Uhrzeiten verwenden"</strong> die gewünschten Zeiten im aufklappbaren Bereich <strong>„Uhrzeiten-Anpassung"</strong> eintragen.</p>
+              <p>Wenn du eigene Pausenzeiten verwenden m�chtest, musst du nach dem Aktivieren von <strong>�Eigene Uhrzeiten verwenden"</strong> die gew�nschten Zeiten im aufklappbaren Bereich <strong>�Uhrzeiten-Anpassung"</strong> eintragen.</p>
               <ol>
-                <li>Aktiviere die Option <strong>„Eigene Uhrzeiten verwenden"</strong> in der Card-Konfiguration</li>
-                <li>Klappe den Abschnitt <strong>„Uhrzeiten-Anpassung"</strong> auf – er erscheint direkt darunter</li>
-                <li>Trage dort deine gewünschten Pausen-Zeiten ein und speichere die Konfiguration</li>
+                <li>Aktiviere die Option <strong>�Eigene Uhrzeiten verwenden"</strong> in der Card-Konfiguration</li>
+                <li>Klappe den Abschnitt <strong>�Uhrzeiten-Anpassung"</strong> auf � er erscheint direkt darunter</li>
+                <li>Trage dort deine gew�nschten Pausen-Zeiten ein und speichere die Konfiguration</li>
               </ol>
               <div class="info-box" style="margin-top: 10px;">
-                <span>💡</span>
-                <span>Die Zeiten werden erst übernommen, wenn sie im aufgeklappten Bereich eingetragen und gespeichert wurden.</span>
+                <span>??</span>
+                <span>Die Zeiten werden erst �bernommen, wenn sie im aufgeklappten Bereich eingetragen und gespeichert wurden.</span>
               </div>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>Aktuelle Stunde wird nicht grün markiert</summary>
+            <summary>Aktuelle Stunde wird nicht gr�n markiert</summary>
             <div class="faq-body">
-              <p>Die grüne Hervorhebung funktioniert nur wenn <code>show_time: true</code> gesetzt ist und die Uhrzeiten korrekt konfiguriert sind. Die Card liest die Stunden-Zeiten und vergleicht sie mit der aktuellen Uhrzeit.</p>
+              <p>Die gr�ne Hervorhebung funktioniert nur wenn <code>show_time: true</code> gesetzt ist und die Uhrzeiten korrekt konfiguriert sind. Die Card liest die Stunden-Zeiten und vergleicht sie mit der aktuellen Uhrzeit.</p>
               <ol>
-                <li>Stelle sicher dass <strong>„Uhrzeiten anzeigen"</strong> aktiviert ist</li>
-                <li>Bei eigenen Zeiten: prüfe ob die Zeiten im Format <code>07:45-08:30</code> eingetragen sind</li>
+                <li>Stelle sicher dass <strong>�Uhrzeiten anzeigen"</strong> aktiviert ist</li>
+                <li>Bei eigenen Zeiten: pr�fe ob die Zeiten im Format <code>07:45-08:30</code> eingetragen sind</li>
                 <li>Die Markierung erscheint nur am heutigen Tag</li>
               </ol>
             </div>
@@ -893,16 +873,16 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Mehrere Klassen mit gleichen Zugangsdaten einrichten</summary>
             <div class="faq-body">
-              <p>Ab v2.4.9 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
+              <p>Ab v2.5.0 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
               <ol>
-                <li>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → Integration hinzufügen</strong></li>
-                <li>Wähle erneut <strong>VpMobile24</strong> und gib dieselben Zugangsdaten ein</li>
+                <li>Gehe zu <strong>Einstellungen ? Ger�te &amp; Dienste ? Integration hinzuf�gen</strong></li>
+                <li>W�hle erneut <strong>VpMobile24</strong> und gib dieselben Zugangsdaten ein</li>
                 <li>Trage eine andere Klasse ein (z.B. <code>10b</code> statt <code>10a</code>)</li>
-                <li>Jede Klasse bekommt ein eigenes Gerät: <strong>VpMobile24 – 10a (12345)</strong> und <strong>VpMobile24 – 10b (12345)</strong></li>
+                <li>Jede Klasse bekommt ein eigenes Ger�t: <strong>VpMobile24 � 10a (12345)</strong> und <strong>VpMobile24 � 10b (12345)</strong></li>
               </ol>
               <div class="info-box" style="margin-top:10px">
-                <span>💡</span>
-                <span>Gleiche Schule + gleiche Klasse wird automatisch verhindert – du bekommst eine Fehlermeldung wenn du versuchst eine bereits konfigurierte Kombination erneut anzulegen.</span>
+                <span>??</span>
+                <span>Gleiche Schule + gleiche Klasse wird automatisch verhindert � du bekommst eine Fehlermeldung wenn du versuchst eine bereits konfigurierte Kombination erneut anzulegen.</span>
               </div>
             </div>
           </details>
@@ -910,14 +890,14 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Ausfallstunden werden grau statt rot angezeigt</summary>
             <div class="faq-body">
-              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.4.9</strong> aktualisiert ist.</p>
+              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle � der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.5.0</strong> aktualisiert ist.</p>
             </div>
           </details>
 
           <details class="faq-item">
-            <summary>ⓘ-Button wird nicht angezeigt</summary>
+            <summary>?-Button wird nicht angezeigt</summary>
             <div class="faq-body">
-              <p>Der ⓘ-Button erscheint nur wenn <code>additional_info_entity</code> in der Card-Konfiguration gesetzt ist:</p>
+              <p>Der ?-Button erscheint nur wenn <code>additional_info_entity</code> in der Card-Konfiguration gesetzt ist:</p>
               <div class="code-block" style="margin-top:10px">
                 <div class="code-label">YAML</div>
                 <div class="code-line">
@@ -935,24 +915,24 @@ use_custom_times: false</code></pre>
       <div class="container cta-inner">
         <div class="cta-badge">Kostenlos &amp; Open Source</div>
         <h2>Bereit loszulegen?</h2>
-        <p>Installiere VpMobile24 jetzt und hab deinen Stundenplan immer im Blick – in weniger als 5 Minuten eingerichtet.</p>
+        <p>Installiere VpMobile24 jetzt und hab deinen Stundenplan immer im Blick � in weniger als 5 Minuten eingerichtet.</p>
         <div class="cta-buttons">
           <a href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge" class="btn btn-primary" target="_blank" rel="noopener">
-            <span>🏠</span> Via HACS installieren
+            <span>??</span> Via HACS installieren
           </a>
           <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" class="btn btn-secondary" target="_blank" rel="noopener">
             GitHub Repository
           </a>
           <a href="https://discord.gg/57uvCeRw43" class="btn btn-discord" target="_blank" rel="noopener">
-            <span>💬</span> Discord Community
+            <span>??</span> Discord Community
           </a>
         </div>
         <div class="version-badge">
           <span class="ver-pill ver-pill-stable">
-            🟢 Stable: <strong class="gh-version-stable">v2.4.9</strong>
+            ?? Stable: <strong class="gh-version-stable">v2.5.0</strong>
           </span>
           <span class="version-beta-block ver-pill ver-pill-beta" style="display:none !important;">
-            🟡 Beta: <strong class="gh-version-beta">–</strong>
+            ?? Beta: <strong class="gh-version-beta">�</strong>
           </span>
         </div>
       </div>
@@ -969,7 +949,7 @@ use_custom_times: false</code></pre>
         <a href="https://discord.gg/57uvCeRw43">Discord</a>
         <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/blob/main/LICENSE">Lizenz</a>
       </div>
-      <div class="footer-copy">Made with ❤️ for Home Assistant · <span class="by">@by Maximilian</span></div>
+      <div class="footer-copy">Made with ?? for Home Assistant � <span class="by">@by Maximilian</span></div>
     </div>
   </footer>
 
