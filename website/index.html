@@ -319,7 +319,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-num">5+</span>
+        <span class="stat-num">8</span>
         <span class="stat-label">Sensoren pro Klasse</span>
       </div>
       <div class="stat-divider"></div>
@@ -800,17 +800,6 @@ use_custom_times: false</code></pre>
           </details>
 
           <details class="faq-item">
-            <summary>Änderungen werden nicht übernommen</summary>
-            <div class="faq-body">
-              <ol>
-                <li>Leere den Browser-Cache mit <kbd>Strg</kbd> + <kbd>F5</kbd></li>
-                <li>Öffne die Browser-Konsole (<kbd>F12</kbd>) und prüfe auf Fehler</li>
-                <li>Stelle sicher, dass die neueste Version geladen wurde</li>
-              </ol>
-            </div>
-          </details>
-
-          <details class="faq-item">
             <summary>Entity nicht gefunden / Sensor fehlt</summary>
             <div class="faq-body">
               <p>Stelle sicher, dass die VpMobile24 Integration korrekt installiert ist und der Sensor <code>sensor.vpmobile24_week_table</code> existiert. Gehe zu <strong>Einstellungen → Geräte &amp; Dienste</strong> und prüfe den Status der Integration.</p>
@@ -852,18 +841,6 @@ use_custom_times: false</code></pre>
           </details>
 
           <details class="faq-item">
-            <summary>Aktuelle Stunde wird nicht grün markiert</summary>
-            <div class="faq-body">
-              <p>Die grüne Hervorhebung funktioniert nur wenn <code>show_time: true</code> gesetzt ist und die Uhrzeiten korrekt konfiguriert sind. Die Card liest die Stunden-Zeiten und vergleicht sie mit der aktuellen Uhrzeit.</p>
-              <ol>
-                <li>Stelle sicher dass <strong>„Uhrzeiten anzeigen"</strong> aktiviert ist</li>
-                <li>Bei eigenen Zeiten: prüfe ob die Zeiten im Format <code>07:45-08:30</code> eingetragen sind</li>
-                <li>Die Markierung erscheint nur am heutigen Tag</li>
-              </ol>
-            </div>
-          </details>
-
-          <details class="faq-item">
             <summary>Mehrere Klassen mit gleichen Zugangsdaten einrichten</summary>
             <div class="faq-body">
               <p>Ab v2.5.0 kannst du mehrere Klassen derselben Schule mit identischen Zugangsdaten einrichten:</p>
@@ -877,13 +854,6 @@ use_custom_times: false</code></pre>
                 <span>💡</span>
                 <span>Gleiche Schule + gleiche Klasse wird automatisch verhindert – du bekommst eine Fehlermeldung wenn du versuchst eine bereits konfigurierte Kombination erneut anzulegen.</span>
               </div>
-            </div>
-          </details>
-
-          <details class="faq-item">
-            <summary>Ausfallstunden werden grau statt rot angezeigt</summary>
-            <div class="faq-body">
-              <p>Ausfallstunden (Fach = <code>---</code> oder leer) werden als rote Kacheln angezeigt. Falls sie grau erscheinen, liegt es an der Datenquelle – der Sensor liefert keinen Ausfall-Marker. Stelle sicher dass die Integration auf <strong>v2.5.0</strong> aktualisiert ist.</p>
             </div>
           </details>
 
