@@ -927,14 +927,24 @@ class VpMobile24Card extends HTMLElement {
       if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× ${t.sub}</span>`);
       if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 ${t.today}: ${lastEnd}</span>`);
     }
-    // Next lesson (when current lesson is active)
+    // Next lesson (when current lesson is active) — skip cancelled lessons
     if (currentLessonNum >= 0 && todayIdx >= 0 && weekTable) {
       const todayData = weekTable[dayKeys[todayIdx]] || {};
-      const nextPeriodNum = slots.find(s => !s.isPause && s.lessonNumber > currentLessonNum);
+      const isCancelledFach = (f) => !f || f === '---' || f === '—' || f === '-' || (typeof f === 'string' && f.trim() === '');
+      // Find next non-cancelled lesson
+      const nextPeriodNum = slots.find(s => {
+        if (s.isPause || s.lessonNumber <= currentLessonNum) return false;
+        const les = todayData[String(s.lessonNumber)];
+        return les && les.fach && !isCancelledFach(les.fach);
+      });
       if (nextPeriodNum) {
         const nextLes = todayData[String(nextPeriodNum.lessonNumber)];
         if (nextLes && nextLes.fach) {
-          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ Nächste: ${nextLes.fach}${nextPeriodNum.time ? ' · ' + nextPeriodNum.time.split('-')[0] : ''}</span>`);
+          const nextLabel = t.nextWeek ? t.today.replace('Heute','Nächste') : 'Nächste';
+          const nl = { de:'Nächste', en:'Next', fr:'Prochain' };
+          const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+          const nextStr = (nl[haLang] || nl.de);
+          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ ${nextStr}: ${nextLes.fach}${nextPeriodNum.time ? ' · ' + nextPeriodNum.time.split('-')[0] : ''}</span>`);
         }
       }
     }
