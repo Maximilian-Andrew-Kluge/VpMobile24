@@ -61,6 +61,19 @@
 > - 📅 **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
 > - 🐛 **Popup-Bug behoben** — kein Konfigurationsfehler mehr beim Öffnen von Stunden-Details
 
+
+> [!TIP]
+> 🔄 **Bei Problemen nach einem Update**
+>
+> Falls die Integration nach einem Update nicht korrekt funktioniert:
+>
+> 1. 🗑️ Die Integration in Home Assistant entfernen
+> 2. ➕ Die Integration erneut konfigurieren
+> 3. 🔄 Home Assistant vollständig neu starten
+>
+> In den meisten Fällen werden dadurch Konfigurations- oder Aktualisierungsprobleme behoben.
+
+
 <br/>
 
 ## 🇩🇪 Deutsch
@@ -323,6 +336,19 @@ Beiträge sind herzlich willkommen!
 > - 📅 **Week after next preloaded** — `next_next_week_table` available in sensor
 > - 🐛 **Popup bug fixed** — no more configuration error when opening lesson details
 
+
+> [!TIP]
+> 🔄 **If you experience issues after an update**
+>
+> If the integration does not work correctly after updating:
+>
+> 1. 🗑️ Remove the integration from Home Assistant
+> 2. ➕ Configure the integration again
+> 3. 🔄 Fully restart Home Assistant
+>
+> In most cases, this resolves configuration and update-related issues.
+
+
 <br/>
 
 > [!WARNING]
@@ -554,3 +580,5 @@ Made with ❤️ for the Home Assistant community
 [![GitHub Forks](https://img.shields.io/github/forks/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge&color=3b82f6)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/network)
 
 </div>
+
+
