@@ -22,56 +22,56 @@
 
 <br/>
 
----
-
-<br/>
+## 🚀 Aktuelles Release
 
 > [!IMPORTANT]
+>
 > 🎉 **VpMobile24 v2.5.0 ist jetzt verfügbar**
 >
-> 🚀 **Veröffentlicht am 08.06.2026**
+> 📅 **Veröffentlicht am:** 08.06.2026
 >
 > 📥 **Jetzt über HACS aktualisieren**
 >
-> 👉 **Release Notes:** https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
->
-> ### Neue Features in v2.5.0
->
-> #### 🃏 Karten
-> - 📅 **Erweiterte Wochennavigation** — KW anzeigen, Nächste/Aktuelle Woche mit manuellem Override (kein automatisches Zurückspringen mehr)
-> - 📆 **Übernächste Woche** — Button navigiert unbegrenzt weiter in die Zukunft
-> - 🔮 **Wochenvorschau am Wochenende** — Karte zeigt automatisch die nächste Woche Sa/So
-> - 📊 **Smart Status Bar** — zeigt Ausfälle, Vertretungen und Unterrichtsende heute
-> - 🟢🟡🔴 **Neue Statusfarben** — Grün = normal, Gelb = Vertretung, Rot = Ausfall
-> - 💡 **Tooltips** — Lehrer & Raum beim Hover über eine Stunde
->
-> #### 👥 Mehrere Klassen Card
-> - 📋 **Komplett neu geschrieben** — moderne kollabierbare Abschnitte pro Klasse
-> - ✅ **Einklappbar** — Zustand wird in localStorage gespeichert
-> - 🔢 **Statistik-Badges** — Stunden / Vertretungen / Ausfälle pro Klasse auf einen Blick
-> - 📅 **Nächste-Stunde-Anzeige** — pro Klasse direkt sichtbar
->
-> #### ⏱️ Aktueller Unterricht Card
-> - 🔄 **Komplett neu** — Echtzeit-Fortschrittsbalken, Countdown, Nächste Stunde, Tagesinfos
-> - 🏁 **Unterrichtsende** — berechnet automatisch aus echten (nicht-ausgefallenen) Stunden
->
-> #### 🔧 Integration Backend
-> - 🎓 **Parallelkurs-Filter** — `789WB12`, `7INb1` etc. erscheinen jetzt in der Fächerauswahl; nur ausgewählte Kurse werden angezeigt
-> - 🚫 **Fremde Ausfälle gefiltert** — Ausfall von `789WB2` erscheint nicht mehr wenn du `789WB12` hast
-> - 📅 **Übernächste Woche vorgeladen** — `next_next_week_table` im Sensor verfügbar
-> - 🐛 **Popup-Bug behoben** — kein Konfigurationsfehler mehr beim Öffnen von Stunden-Details
+> 🔗 **Release Notes:**
+> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
 
+---
+
+## 📅 Release-Zyklus
+
+> [!IMPORTANT]
+>
+> 🚀 **Reguläre Updates erscheinen immer am 15. eines Monats**
+>
+> Neue Funktionen, Verbesserungen und Optimierungen werden gesammelt und als stabiles Release veröffentlicht.
+>
+> 🛠️ **Kritische Fehler oder schwerwiegende Bugs**
+>
+> Diese werden sofort als **Hotfix** veröffentlicht und warten nicht bis zum nächsten regulären Update.
+>
+> **Beispiele:**
+>
+> * `v2.5.1` → Kritischer Bugfix
+> * `v2.5.2` → Sicherheits- oder Stabilitätsupdate
+>
+> 🔒 **Unser Ziel:** Eine stabile, moderne und zuverlässige Home Assistant Integration.
+
+---
+
+## 🔄 Probleme nach einem Update?
 
 > [!TIP]
-> 🔄 **Bei Problemen nach einem Update**
 >
-> Falls die Integration nach einem Update nicht korrekt funktioniert:
+> Falls die Integration nach einem Update nicht korrekt funktioniert, führe bitte die folgenden Schritte aus:
 >
-> 1. 🗑️ Die Integration in Home Assistant entfernen
-> 2. ➕ Die Integration erneut konfigurieren
-> 3. 🔄 Home Assistant vollständig neu starten
+> 1. 🗑️ **Die Integration aus Home Assistant entfernen**
+> 2. ➕ **Die Integration erneut konfigurieren**
+> 3. 🔄 **Home Assistant vollständig neu starten**
 >
-> In den meisten Fällen werden dadurch Konfigurations- oder Aktualisierungsprobleme behoben.
+> ✅ In den meisten Fällen werden dadurch Konfigurations- oder Aktualisierungsprobleme automatisch behoben.
+>
+> 💬 Falls das Problem weiterhin besteht, erstelle bitte ein GitHub-Issue oder besuche unseren Discord-Server.
+
 
 
 <br/>
@@ -301,52 +301,55 @@ Beiträge sind herzlich willkommen!
 
 ## 🇬🇧 English
 
+## 🚀 Latest Release
+
 > [!IMPORTANT]
+>
 > 🎉 **VpMobile24 v2.5.0 is now available**
 >
-> 🚀 **Released on June 8, 2026**
+> 📅 **Released on:** June 8, 2026
 >
 > 📥 **Update now via HACS**
 >
-> 👉 **Release Notes:** https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
->
-> ### New Features in v2.5.0
->
-> #### 🃏 Cards
-> - 📅 **Extended week navigation** — KW display, Next/Current Week with manual override (no more auto-reset)
-> - 📆 **Week after next** — button navigates unlimited weeks into the future
-> - 🔮 **Weekend preview** — card automatically shows next week on Sat/Sun
-> - 📊 **Smart Status Bar** — shows cancellations, substitutions and end of school today
-> - 🟢🟡🔴 **New status colors** — Green = normal, Yellow = substitution, Red = cancelled
-> - 💡 **Tooltips** — teacher & room on hover over a lesson
->
-> #### 👥 Multi-Class Card
-> - 📋 **Completely rewritten** — modern collapsible sections per class
-> - ✅ **Collapsible** — state saved in localStorage
-> - 🔢 **Statistics badges** — lessons / substitutions / cancellations per class at a glance
-> - 📅 **Next lesson display** — visible per class directly
->
-> #### ⏱️ Current Lesson Card
-> - 🔄 **Completely new** — real-time progress bar, countdown, next lesson, daily info
-> - 🏁 **End of school** — calculated automatically from real (non-cancelled) lessons
->
-> #### 🔧 Integration Backend
-> - 🎓 **Parallel course filter** — `789WB12`, `7INb1` etc. now appear in subject selection; only selected courses are shown
-> - 🚫 **Foreign cancellations filtered** — cancellation of `789WB2` no longer appears if you have `789WB12`
-> - 📅 **Week after next preloaded** — `next_next_week_table` available in sensor
-> - 🐛 **Popup bug fixed** — no more configuration error when opening lesson details
+> 🔗 **Release Notes:**
+> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
 
+---
+
+## 📅 Release Cycle
+
+> [!IMPORTANT]
+>
+> 🚀 **Regular updates are released on the 15th of each month**
+>
+> New features, improvements, and optimizations are collected and released as a stable version.
+>
+> 🛠️ **Critical errors or major bugs**
+>
+> These are released immediately as a **hotfix** and do not wait for the next regular update.
+>
+> **Examples:**
+>
+> * `v2.5.1` → Critical bug fix
+> * `v2.5.2` → Security or stability update
+>
+> 🔒 **Our goal:** A stable, modern, and reliable Home Assistant integration.
+
+---
+
+## 🔄 Issues after an update?
 
 > [!TIP]
-> 🔄 **If you experience issues after an update**
 >
-> If the integration does not work correctly after updating:
+> If the integration does not work correctly after an update, please follow these steps:
 >
-> 1. 🗑️ Remove the integration from Home Assistant
-> 2. ➕ Configure the integration again
-> 3. 🔄 Fully restart Home Assistant
+> 1. 🗑️ **Remove the integration from Home Assistant**
+> 2. ➕ **Reconfigure the integration**
+> 3. 🔄 **Restart Home Assistant completely**
 >
-> In most cases, this resolves configuration and update-related issues.
+> ✅ In most cases, this automatically resolves configuration or update issues.
+>
+> 💬 If the problem persists, please create a GitHub issue or visit our Discord server.
 
 
 <br/>
