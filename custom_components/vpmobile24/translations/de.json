@@ -3,62 +3,32 @@
     "step": {
       "user": {
         "title": "VpMobile24 einrichten",
-        "description": "Geben Sie Ihre VpMobile24 Zugangsdaten ein.",
+        "description": "Geben Sie Ihre Zugangsdaten ein.",
         "data": {
           "school_id": "Schulnummer",
           "username": "Benutzername",
           "password": "Passwort"
-        },
-        "data_description": {
-          "school_id": "Die Schulnummer aus der VpMobile24 URL",
-          "username": "Ihr Benutzername für VpMobile24",
-          "password": "Ihr Passwort für VpMobile24"
         }
       },
       "class": {
         "title": "Klasse auswählen",
-        "description": "Wählen Sie Ihre Klasse aus der Liste.",
+        "description": "Wählen Sie Ihre Klasse aus.",
         "data": {
           "class_name": "Klasse"
         }
       },
       "subjects": {
         "title": "Fächer auswählen",
-        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer."
+        "description": "Wählen Sie die anzuzeigenden Fächer."
       }
     },
     "error": {
-      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten.",
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen.",
+      "invalid_auth": "Benutzername oder Passwort ist falsch.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten."
     },
     "abort": {
-      "already_configured": "Diese Klasse ist für diese Schule bereits konfiguriert."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "VpMobile24 Einstellungen",
-        "description": "Aktuelle Klasse: **{current_class}**\n\nWas möchten Sie ändern?",
-        "data": {
-          "change_subjects": "Fächer wechseln",
-          "change_class": "Klasse wechseln"
-        }
-      },
-      "change_class": {
-        "title": "Klasse ändern",
-        "description": "Neue Klasse eingeben. Die Fächerliste wird danach neu geladen.",
-        "data": {
-          "class_name": "Klasse"
-        }
-      },
-      "subjects": {
-        "title": "Fächer auswählen",
-        "description": "Wählen Sie die Fächer aus, die angezeigt werden sollen. Gefunden: {subject_count} Fächer.\n\nDeaktivierte Fächer werden ausgeblendet."
-      }
-    },
-    "error": {
-      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen. Bitte überprüfen Sie Ihre Zugangsdaten."
+      "already_configured": "Diese Klasse ist bereits eingerichtet."
     }
   },
   "entity": {
