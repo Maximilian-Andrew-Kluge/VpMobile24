@@ -1,11 +1,10 @@
-🇩🇪 **[German Documentation](README_DE.md)**
+🇬🇧 **[English Documentation](README_EN.md)**
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/EN%20Banner.png" alt="VpMobile24" width="100%"/>
+<img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Github/DE%20Banner.png" alt="VpMobile24" width="100%"/>
 
-<br/>
-<br/>
+<br/><br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
@@ -15,154 +14,156 @@
 
 <br/>
 
-[**📦 Install via HACS**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
-  ·  
+[**📦 Via HACS installieren**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
+·
 [**🌐 Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/)
-  ·  
+·
 [**💬 Discord**](https://discord.gg/57uvCeRw43)
-  ·  
-[**🐛 Report a Bug**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
+·
+[**🐛 Bug melden**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
 
 </div>
 
 ---
 
-# 🚀 Latest Release
+# 🚀 Aktuelles Release
 
 > [!IMPORTANT]
 >
-> 🎉 **VpMobile24 v2.5.0 is now available**
+> 🎉 **VpMobile24 v2.5.0 ist jetzt verfügbar**
 >
-> 📅 Released on **June 8, 2026**
+> 📅 Veröffentlicht am **08.06.2026**
 >
-> 📥 Update now via HACS
+> 📥 Jetzt über HACS aktualisieren.
 >
 > 🔗 Release Notes:
 >
-> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
+> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases
 
 ---
 
-# 📅 Release Cycle
+# 📅 Release-Zyklus
 
 > [!IMPORTANT]
 >
-> 🚀 Regular updates are released on the **15th of every month**.
+> 🚀 Reguläre Updates erscheinen immer am **15. eines Monats**.
 >
-> New features, improvements and optimizations are bundled into stable releases.
+> Neue Funktionen, Verbesserungen und Optimierungen werden gesammelt und als stabiles Release veröffentlicht.
 >
-> Critical bugs and security issues are released immediately as hotfixes.
+> Kritische Fehler oder Sicherheitsprobleme werden sofort als Hotfix veröffentlicht.
 
-Examples:
+Beispiele:
 
-* `v2.5.1` → Critical bug fix
-* `v2.5.2` → Security update
-* `v2.6.0` → New features
+* `v2.5.1` → Kritischer Bugfix
+* `v2.5.2` → Sicherheitsupdate
+* `v2.6.0` → Neue Funktionen
 
 ---
 
-# 🔄 Issues after an update?
+# 🔄 Probleme nach einem Update?
 
 > [!TIP]
 >
-> If the integration is not working after an update:
+> Falls die Integration nach einem Update nicht funktioniert:
 >
-> 1. Remove the integration
-> 2. Reconfigure it
-> 3. Restart Home Assistant
+> 1. Integration entfernen
+> 2. Neu konfigurieren
+> 3. Home Assistant neu starten
 >
-> If the issue persists, please open a GitHub issue or visit our Discord server.
+> Sollte das Problem bestehen bleiben, erstelle bitte ein GitHub-Issue oder besuche den Discord-Server.
 
 ---
 
-# 📌 Description
+# 🇩🇪 Deutsche Dokumentation
 
-**VpMobile24** is a modern Home Assistant custom integration for **Stundenplan24.de / VpMobil24**.
+## 📌 Beschreibung
 
-The integration brings your school timetable directly into Home Assistant and automatically creates sensors for:
+**VpMobile24** ist eine moderne Home-Assistant-Integration für **Stundenplan24.de / VpMobil24**.
 
-* Current lesson
-* Next lesson
-* Today's timetable
-* Weekly timetable
-* Schedule changes
-* Additional information
+Die Integration bringt deinen Stundenplan direkt in Home Assistant und erstellt automatisch Sensoren für:
 
-Additionally, modern Lovelace cards are included.
+* Aktuelle Stunde
+* Nächste Stunde
+* Stundenplan heute
+* Wochentabelle
+* Änderungen
+* Zusatzinformationen
+
+Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ---
 
-# ✨ Features
+## ✨ Funktionen
 
-## 📡 Sensors
+### 📡 Sensoren
 
-| Sensor               | Description             |
-| -------------------- | ----------------------- |
-| week_table           | Full week timetable     |
-| naechste_stunde      | Next lesson             |
-| heutiger_stundenplan | Today's timetable       |
-| zusatzinfos          | Additional information  |
-| aenderungen          | Changes & substitutions |
-| aktueller_unterricht | Current lesson          |
+| Sensor               | Beschreibung              |
+| -------------------- | ------------------------- |
+| week_table           | Komplette Wochentabelle   |
+| naechste_stunde      | Nächste Unterrichtsstunde |
+| heutiger_stundenplan | Stundenplan heute         |
+| zusatzinfos          | Allgemeine Informationen  |
+| aenderungen          | Änderungen & Vertretungen |
+| aktueller_unterricht | Aktuell laufende Stunde   |
 
-## 🃏 Lovelace Cards
+### 🃏 Lovelace Card
 
-* Weekly overview
-* Multiple classes
-* Current lesson
-* Responsive design
+* Wochenansicht
+* Mehrere Klassen
+* Aktueller Unterricht
+* Responsive Design
 * DE / EN / FR
-* Parallel course support
-* Automatic updates
+* Parallelkurse
+* Automatische Aktualisierung
 
 ---
 
 ## 📸 Screenshots
 
-### 🗓️ Weekly Overview
+### 🗓️ Wochenübersicht
 
 <table>
 <tr>
   <td align="center" width="50%">
-    <b>Weekly Overview</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Weekly Overview" width="100%"/>
+    <b>Wochenübersicht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" alt="Wochenübersicht" width="100%"/>
   </td>
 
   <td align="center" width="50%">
     <b>Lovelace Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Lovelace Card" width="100%"/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" alt="Lovelace Card" width="100%"/>
   </td>
 </tr>
 </table>
 
-### ⚙️ Configuration
+### ⚙️ Konfiguration
 
 <table>
 <tr>
   <td align="center" width="50%">
-    <b>Setup</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Configuration" width="100%"/>
+    <b>Einrichtung</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/config.png" alt="Konfiguration" width="100%"/>
   </td>
 
   <td align="center" width="50%">
-    <b>Subject Selection (incl. Parallel Courses)</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/subject-select.png" alt="Subject Selection" width="100%"/>
+    <b>Fächerauswahl (inkl. Parallelkurse)</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/subject-select.png" alt="Fächerauswahl" width="100%"/>
   </td>
 </tr>
 </table>
 
-### 👥 Multi-Class Card · ⏱️ Current Lesson Card
+### 👥 Mehrere Klassen · ⏱️ Aktueller Unterricht
 
 <table>
 <tr>
   <td align="center" width="50%">
-    <b>Multi-Class Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/multi-card.png" alt="Multi-Class Card" width="100%"/>
+    <b>Mehrere Klassen</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/multi-card.png" alt="Mehrere Klassen" width="100%"/>
   </td>
 
   <td align="center" width="50%">
-    <b>Current Lesson Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/current-card.png" alt="Current Lesson Card" width="100%"/>
+    <b>Aktueller Unterricht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/current-card.png" alt="Aktueller Unterricht" width="100%"/>
   </td>
 </tr>
 </table>
@@ -170,73 +171,74 @@ Additionally, modern Lovelace cards are included.
 
 ---
 
-# 🚀 Installation
+## 🚀 Installation
 
-## Via HACS
+### Über HACS
 
-1. Open HACS
-2. Add a custom repository:
+1. HACS öffnen
+2. Benutzerdefiniertes Repository hinzufügen:
 
 ```text
 https://github.com/Maximilian-Andrew-Kluge/VpMobile24
 ```
 
-3. Select category:
+3. Kategorie:
 
 ```text
 Integration
 ```
 
-4. Install **VpMobile24**
-5. Restart Home Assistant
+4. VpMobile24 installieren
+
+5. Home Assistant neu starten
 
 ---
 
-## Manual Installation
+### Manuelle Installation
 
-Copy:
+Ordner:
 
 ```text
 custom_components/vpmobile24
 ```
 
-to:
+nach
 
 ```text
 config/custom_components/vpmobile24
 ```
 
-and restart Home Assistant.
+kopieren und Home Assistant neu starten.
 
 ---
 
-# ⚙️ Setup
+## ⚙️ Einrichtung
 
-1. Settings
-2. Devices & Services
-3. Add Integration
-4. Select **VpMobile24**
+1. Einstellungen
+2. Geräte & Dienste
+3. Integration hinzufügen
+4. VpMobile24 auswählen
 
-Then enter:
+Danach:
 
-* School ID
-* Username
-* Password
-* Select class
-* Select subjects
+* Schul-ID eingeben
+* Benutzername
+* Passwort
+* Klasse auswählen
+* Fächer auswählen
 
 ---
 
-# 🃏 Lovelace Card Examples
+## 🃏 Lovelace Card Beispiele
 
-### Timetable Card
+### Stundenplan
 
 ```yaml
 type: custom:vpmobile24-card
 entity: sensor.vpmobile24_week_table
 ```
 
-### Multi-Class Card
+### Mehrere Klassen
 
 ```yaml
 type: custom:vpmobile24-multi-card
@@ -245,7 +247,7 @@ entities:
   - sensor.vpmobile24_7b_week_table
 ```
 
-### Current Lesson Card
+### Aktueller Unterricht
 
 ```yaml
 type: custom:vpmobile24-current-card
@@ -256,86 +258,86 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 ---
 
-# 📡 Sensors
+## 📡 Sensoren
 
-| Sensor               | State   | Attributes             |
-| -------------------- | ------- | ---------------------- |
-| week_table           | Count   | week_table             |
-| naechste_stunde      | Subject | time, teacher, room    |
-| heutiger_stundenplan | Count   | lessons_today          |
-| zusatzinfos          | Count   | general_information    |
-| aenderungen          | Count   | all_changes            |
-| aktueller_unterricht | Subject | subject, teacher, room |
-
----
-
-# ❓ FAQ
-
-### Which schools are supported?
-
-All schools using Stundenplan24.de or VpMobil24.
-
-### Do I need YAML?
-
-No.
-
-Everything can be configured via the Home Assistant UI.
-
-### Does the integration support multiple classes?
-
-Yes.
-
-Multiple classes and parallel courses are supported.
+| Sensor               | State  | Attribute          |
+| -------------------- | ------ | ------------------ |
+| week_table           | Anzahl | week_table         |
+| naechste_stunde      | Fach   | zeit, lehrer, raum |
+| heutiger_stundenplan | Anzahl | stunden_heute      |
+| zusatzinfos          | Anzahl | allgemeine_infos   |
+| aenderungen          | Anzahl | alle_aenderungen   |
+| aktueller_unterricht | Fach   | fach, zeit, lehrer |
 
 ---
 
-# 🔧 Diagnostics
+## ❓ FAQ
 
-Diagnostics are supported.
+### Welche Schulen werden unterstützt?
 
-Available here:
+Alle Schulen die Stundenplan24.de bzw. VpMobil24 verwenden.
+
+### Muss ich YAML verwenden?
+
+Nein.
+
+Alles kann über die Oberfläche eingerichtet werden.
+
+### Unterstützt die Integration mehrere Klassen?
+
+Ja.
+
+Mehrere Klassen und Parallelkurse werden unterstützt.
+
+---
+
+## 🔧 Diagnosedaten
+
+Diagnosedaten werden unterstützt.
+
+Zu finden unter:
 
 ```text
-Settings
-→ Devices & Services
+Einstellungen
+→ Geräte & Dienste
 → VpMobile24
-→ Download Diagnostics
+→ Diagnosedaten herunterladen
 ```
 
-The following data is automatically removed:
+Folgende Daten werden automatisch entfernt:
 
-* Password
+* Passwort
 * Access Token
 * Refresh Token
 * Session IDs
 
 ---
 
-# 🗺️ Roadmap
+## 🗺️ Roadmap
 
-Planned:
+Geplant:
 
-* More sensors
-* Additional cards
-* Improved diagnostics
-* More languages
-* Additional filters
-* Better error handling
-
----
-
-# 🤝 Contributing
-
-Contributions are welcome.
-
-* 🐛 Report bugs
-* 💡 Suggest features
-* 🔧 Submit pull requests
-* 💬 Join our Discord community
+* Weitere Sensoren
+* Weitere Karten
+* Verbesserte Diagnosen
+* Mehrsprachigkeit erweitern
+* Weitere Filtermöglichkeiten
+* Bessere Fehlerbehandlung
 
 ---
 
-# 💬 Community
+## 🤝 Mitmachen
+
+Beiträge sind willkommen.
+
+* 🐛 Bugs melden
+* 💡 Features vorschlagen
+* 🔧 Pull Requests erstellen
+* 💬 Discord Community beitreten
+
+---
+
+## 💬 Community
 
 Discord:
 
@@ -351,11 +353,11 @@ https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
 
 ---
 
-# 🔒 Security
+## 🔒 Sicherheit
 
-Please do not report security issues publicly.
+Bitte Sicherheitsprobleme nicht öffentlich melden.
 
-See:
+Weitere Informationen:
 
 ```text
 SECURITY.md
@@ -363,9 +365,9 @@ SECURITY.md
 
 ---
 
-# 📜 Changelog
+## 📜 Changelog
 
-All changes:
+Alle Änderungen:
 
 ```text
 CHANGELOG.md
@@ -375,8 +377,8 @@ CHANGELOG.md
 
 <div align="center">
 
-**Made with ❤️ for the Home Assistant Community**
+**Mit ❤️ für die Home-Assistant Community entwickelt**
 
-⭐ Leave a star on GitHub if you like this project.
+⭐ Hinterlasse einen Stern auf GitHub, wenn dir das Projekt gefällt.
 
 </div>
