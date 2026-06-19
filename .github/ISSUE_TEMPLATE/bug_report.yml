@@ -1,0 +1,33 @@
+name: Bug Report
+description: Report a problem with VpMobile24
+title: "[Bug]: "
+labels:
+  - bug
+
+body:
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant Version
+      placeholder: 2026.6.0
+
+  - type: input
+    id: integration_version
+    attributes:
+      label: VpMobile24 Version
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the problem
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
