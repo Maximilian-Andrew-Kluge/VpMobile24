@@ -6,6 +6,7 @@
 
 <br/><br/>
 
+
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![Status](https://img.shields.io/badge/Status-Stable-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
@@ -74,7 +75,6 @@ Beispiele:
 
 ---
 
-# 🇩🇪 Deutsche Dokumentation
 
 ## 📌 Beschreibung
 
@@ -118,7 +118,7 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
 ### 🗓️ Wochenübersicht
 
@@ -171,26 +171,15 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ---
 
-## 🚀 Installation
+# 🚀 Installation
 
-### Über HACS
+### Installation via HACS
 
-1. HACS öffnen
-2. Benutzerdefiniertes Repository hinzufügen:
+<div>
 
-```text
-https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-```
+[![Open your Home Assistant instance and open the repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Maximilian-Andrew-Kluge&repository=VpMobile24&category=integration)
 
-3. Kategorie:
-
-```text
-Integration
-```
-
-4. VpMobile24 installieren
-
-5. Home Assistant neu starten
+</div>
 
 ---
 
@@ -212,7 +201,7 @@ kopieren und Home Assistant neu starten.
 
 ---
 
-## ⚙️ Einrichtung
+### ⚙️ Einrichtung
 
 1. Einstellungen
 2. Geräte & Dienste
@@ -313,19 +302,6 @@ Folgende Daten werden automatisch entfernt:
 
 ---
 
-## 🗺️ Roadmap
-
-Geplant:
-
-* Weitere Sensoren
-* Weitere Karten
-* Verbesserte Diagnosen
-* Mehrsprachigkeit erweitern
-* Weitere Filtermöglichkeiten
-* Bessere Fehlerbehandlung
-
----
-
 ## 🤝 Mitmachen
 
 Beiträge sind willkommen.
@@ -341,7 +317,7 @@ Beiträge sind willkommen.
 
 Discord:
 
-https://discord.gg/57uvCeRw43
+[![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
 GitHub:
 
