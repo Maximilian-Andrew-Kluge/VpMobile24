@@ -1473,9 +1473,8 @@ class VpMobile24CurrentCard extends HTMLElement {
     const now    = this._nowMins();
     const attr   = entity ? entity.attributes : {};
     const state  = entity ? (entity.state || '') : '';
-    const noData = !entity || state === 'Keine Daten' || state === 'No data';
 
-    const fach      = attr.fach        || '';
+    const fachSensor    = attr.fach        || '';
     const zeitStart = attr.zeit_start  || '';
     const zeitEnd   = attr.zeit_ende   || '';
     const zeit      = attr.zeit        || '';
@@ -1486,48 +1485,88 @@ class VpMobile24CurrentCard extends HTMLElement {
     const isSub     = attr.ist_vertretung || false;
     const info      = attr.zusatzinfo  || '';
 
-    const startMins = this._parseMins(zeitStart) ?? this._parseMins(zeit ? zeit.split('-')[0] : '');
-    const endMins   = this._parseMins(zeitEnd)   ?? this._parseMins(zeit ? zeit.split('-')[1] : '');
+    const startMinsSensor = this._parseMins(zeitStart) ?? this._parseMins(zeit ? zeit.split('-')[0] : '');
+    const endMinsSensor   = this._parseMins(zeitEnd)   ?? this._parseMins(zeit ? zeit.split('-')[1] : '');
 
-    // Next lesson
-    const nextAttr  = nextEntity ? nextEntity.attributes : {};
-    const nextFach  = nextAttr.fach   || '';
-    const nextZeit  = nextAttr.zeit   || '';
-    const nextLehrer= nextAttr.lehrer || '';
-    const nextRaum  = nextAttr.raum   || '';
-    const nextStart = this._parseMins(nextZeit ? nextZeit.split('-')[0] : '');
-
-    // Day info from week schedule entity — exclude cancelled lessons
+    // ── Build lesson list from week_entity for live time-based detection ──
+    let stundenHeute = [];
     let gesamt = 0, verbleibend = 0, unterrichtsEnde = '', nVertretung = 0;
     if (weekEntity && weekEntity.attributes) {
       const wa = weekEntity.attributes;
-      const stunden = wa.stunden_heute || [];
-      const nowM = this._nowMins();
-      stunden.forEach(s => {
+      stundenHeute = (wa.stunden_heute || []).filter(s => {
         const f = (s.fach || '').trim();
-        const isCan = !f || f === '---' || f === '—' || f === '-' || /^[-—–\s]+$/.test(f);
-        if (isCan) return; // skip cancelled
+        return f && f !== '---' && f !== '—' && f !== '-' && !/^[-—–\s]+$/.test(f);
+      });
+      stundenHeute.forEach(s => {
         gesamt++;
         if (s.ist_vertretung) nVertretung++;
-        // Get end time from zeit (format "HH:MM-HH:MM")
         const endT = (s.zeit || '').split('-')[1] || '';
         if (endT) {
           const endM = this._parseMins(endT);
-          if (endM !== null && (!unterrichtsEnde || endM > this._parseMins(unterrichtsEnde))) {
-            unterrichtsEnde = endT;
-          }
-          // Count remaining: lesson hasn't ended yet
-          if (endM !== null && nowM <= endM) verbleibend++;
-        } else if (!s.ist_vorbei) {
-          verbleibend++;
-        }
+          if (endM !== null && (!unterrichtsEnde || endM > this._parseMins(unterrichtsEnde))) unterrichtsEnde = endT;
+          if (endM !== null && now <= endM) verbleibend++;
+        } else if (!s.ist_vorbei) { verbleibend++; }
       });
     }
 
+    // ── Find current lesson from stunden_heute by time ────────────────────
+    let currentFromSchedule = null;
+    let nextFromSchedule    = null;
+    for (const s of stundenHeute) {
+      const parts = (s.zeit || '').split('-');
+      if (parts.length !== 2) continue;
+      const st = this._parseMins(parts[0]);
+      const en = this._parseMins(parts[1]);
+      if (st === null || en === null) continue;
+      if (now >= st && now <= en) {
+        currentFromSchedule = { ...s, startMins: st, endMins: en };
+      } else if (now < st && !nextFromSchedule) {
+        nextFromSchedule = { ...s, startMins: st, endMins: en };
+      }
+    }
+
+    // ── Determine fach/details — prefer sensor if active, else use schedule ─
+    let fach = fachSensor, startMins = startMinsSensor, endMins = endMinsSensor;
+    let lessonSub = isSub, lessonInfo = info, lessonLehrer = lehrer, lessonRaum = raum, lessonStunde = stunde;
+
+    if (currentFromSchedule && (!fach || isAusfall || now > (endMinsSensor ?? -1))) {
+      // Sensor is stale — use schedule data
+      fach         = currentFromSchedule.fach || '';
+      startMins    = currentFromSchedule.startMins;
+      endMins      = currentFromSchedule.endMins;
+      lessonSub    = !!currentFromSchedule.ist_vertretung;
+      lessonInfo   = currentFromSchedule.zusatzinfo || '';
+      lessonLehrer = currentFromSchedule.lehrer || '';
+      lessonRaum   = currentFromSchedule.raum   || '';
+      lessonStunde = currentFromSchedule.stunde  || '';
+    }
+
+    // Next lesson — from nextEntity sensor OR from schedule
+    let nextFach   = (nextEntity && nextEntity.attributes.fach)   || (nextFromSchedule ? nextFromSchedule.fach   : '');
+    let nextZeit   = (nextEntity && nextEntity.attributes.zeit)   || (nextFromSchedule ? nextFromSchedule.zeit   : '');
+    let nextLehrer = (nextEntity && nextEntity.attributes.lehrer) || (nextFromSchedule ? nextFromSchedule.lehrer : '');
+    let nextRaum   = (nextEntity && nextEntity.attributes.raum)   || (nextFromSchedule ? nextFromSchedule.raum   : '');
+    let nextStart  = this._parseMins(nextZeit ? nextZeit.split('-')[0] : '');
+
     // Determine current state
-    if (!noData && fach && !isAusfall && startMins !== null && endMins !== null && now >= startMins && now <= endMins) {
+    const hasCurrentLesson = fach && !isAusfall && startMins !== null && endMins !== null && now >= startMins && now <= endMins;
+
+    if (hasCurrentLesson || currentFromSchedule) {
+      const useFach = hasCurrentLesson ? fach : (currentFromSchedule ? currentFromSchedule.fach : '');
+      const sm = hasCurrentLesson ? startMins : currentFromSchedule.startMins;
+      const em = hasCurrentLesson ? endMins   : currentFromSchedule.endMins;
       return {
-        type: isSub ? 'sub' : 'lesson',
+        type: lessonSub ? 'sub' : 'lesson',
+        fach: useFach, lehrer: lessonLehrer, raum: lessonRaum,
+        stunde: lessonStunde, zeit: (hasCurrentLesson ? zeit : (currentFromSchedule.zeit || '')),
+        info: lessonInfo, isSub: lessonSub,
+        startMins: sm, endMins: em,
+        progress: this._progress(sm, em, now),
+        remaining: em - now,
+        nextFach, nextZeit, nextLehrer, nextRaum, nextStart,
+        gesamt, verbleibend, unterrichtsEnde, nVertretung,
+      };
+    }
         fach, lehrer, raum, stunde, zeit, info, isSub,
         startMins, endMins,
         progress: this._progress(startMins, endMins, now),
