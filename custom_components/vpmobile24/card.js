@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.6
-console.info('%c VpMobile24-CARD %c v2.5.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.1
+console.info('%c VpMobile24-CARD %c v2.5.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -328,12 +328,6 @@ class VpMobile24Card extends HTMLElement {
     const ent = (this._hass && infoEntId) ? this._hass.states[infoEntId] : null;
     const attr = ent ? (ent.attributes || {}) : {};
 
-    // DEBUG
-    console.log('[VPM24 Info]', 'entId=', infoEntId, 'ent=', !!ent, 'todayKey=', todayKey);
-    console.log('[VPM24 Info] attr keys=', Object.keys(attr));
-    if (attr.week_infos) console.log('[VPM24 Info] week_infos keys=', Object.keys(attr.week_infos), 'thursday=', attr.week_infos['thursday']);
-    console.log('[VPM24 Info] direct allgemeine_infos=', attr.allgemeine_infos);
-
     const toArr = (v) => {
       if (!v) return [];
       if (Array.isArray(v)) return v.map(String);
@@ -343,10 +337,8 @@ class VpMobile24Card extends HTMLElement {
 
     let allg = [];
     const wi = attr.week_infos;
-    if (wi && wi[todayKey]) {
-      allg = toArr(wi[todayKey].allgemeine_infos);
-    }
-    if (allg.length === 0) allg = toArr(attr.allgemeine_infos);
+    if (wi && wi[todayKey]) allg = toArr(wi[todayKey].allgemeine_infos);
+    if (allg.length === 0)  allg = toArr(attr.allgemeine_infos);
     if (allg.length === 0 && wi) {
       const seen = new Set();
       Object.values(wi).forEach(d => {
@@ -354,8 +346,6 @@ class VpMobile24Card extends HTMLElement {
         toArr(d.allgemeine_infos).forEach(x => { if (!seen.has(x)) { seen.add(x); allg.push(x); } });
       });
     }
-
-    console.log('[VPM24 Info] allg=', allg);
 
     let bodyHtml = '';
     if (allg.length > 0) {
@@ -2663,4 +2653,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.6 loaded');
+console.log('✅ VpMobile24 Card v2.5.1 loaded');
