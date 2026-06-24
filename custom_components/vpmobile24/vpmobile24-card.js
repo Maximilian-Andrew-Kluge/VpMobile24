@@ -1521,7 +1521,10 @@ class VpMobile24CurrentCard extends HTMLElement {
       if (now >= st && now <= en) {
         currentFromSchedule = { ...s, startMins: st, endMins: en };
       } else if (now < st && !nextFromSchedule) {
-        nextFromSchedule = { ...s, startMins: st, endMins: en };
+        // Skip cancelled lessons as "next lesson"
+        if (!s.ist_ausfall && !s.ist_entfall) {
+          nextFromSchedule = { ...s, startMins: st, endMins: en };
+        }
       }
     }
 
@@ -1541,36 +1544,32 @@ class VpMobile24CurrentCard extends HTMLElement {
       lessonStunde = currentFromSchedule.stunde  || '';
     }
 
-    // Next lesson — from nextEntity sensor OR from schedule
-    let nextFach   = (nextEntity && nextEntity.attributes.fach)   || (nextFromSchedule ? nextFromSchedule.fach   : '');
-    let nextZeit   = (nextEntity && nextEntity.attributes.zeit)   || (nextFromSchedule ? nextFromSchedule.zeit   : '');
-    let nextLehrer = (nextEntity && nextEntity.attributes.lehrer) || (nextFromSchedule ? nextFromSchedule.lehrer : '');
-    let nextRaum   = (nextEntity && nextEntity.attributes.raum)   || (nextFromSchedule ? nextFromSchedule.raum   : '');
+    // Next lesson — from nextEntity sensor (only if not cancelled) OR from schedule
+    const nextEntityValid = nextEntity && nextEntity.attributes.fach && !nextEntity.attributes.ist_ausfall;
+    let nextFach   = (nextEntityValid ? nextEntity.attributes.fach   : '') || (nextFromSchedule ? nextFromSchedule.fach   : '');
+    let nextZeit   = (nextEntityValid ? nextEntity.attributes.zeit   : '') || (nextFromSchedule ? nextFromSchedule.zeit   : '');
+    let nextLehrer = (nextEntityValid ? nextEntity.attributes.lehrer : '') || (nextFromSchedule ? nextFromSchedule.lehrer : '');
+    let nextRaum   = (nextEntityValid ? nextEntity.attributes.raum   : '') || (nextFromSchedule ? nextFromSchedule.raum   : '');
     let nextStart  = this._parseMins(nextZeit ? nextZeit.split('-')[0] : '');
 
     // Determine current state
     const hasCurrentLesson = fach && !isAusfall && startMins !== null && endMins !== null && now >= startMins && now <= endMins;
+    // If currentFromSchedule is a cancellation, treat as free period
+    const scheduleIsCancelled = currentFromSchedule && (currentFromSchedule.ist_ausfall || currentFromSchedule.ist_entfall);
 
-    if (hasCurrentLesson || currentFromSchedule) {
+    if (hasCurrentLesson || (currentFromSchedule && !scheduleIsCancelled)) {
       const useFach = hasCurrentLesson ? fach : (currentFromSchedule ? currentFromSchedule.fach : '');
       const sm = hasCurrentLesson ? startMins : currentFromSchedule.startMins;
       const em = hasCurrentLesson ? endMins   : currentFromSchedule.endMins;
+      const useType = (hasCurrentLesson ? lessonSub : !!currentFromSchedule.ist_vertretung) ? 'sub' : 'lesson';
       return {
-        type: lessonSub ? 'sub' : 'lesson',
+        type: useType,
         fach: useFach, lehrer: lessonLehrer, raum: lessonRaum,
         stunde: lessonStunde, zeit: (hasCurrentLesson ? zeit : (currentFromSchedule.zeit || '')),
-        info: lessonInfo, isSub: lessonSub,
+        info: lessonInfo, isSub: hasCurrentLesson ? lessonSub : !!currentFromSchedule.ist_vertretung,
         startMins: sm, endMins: em,
         progress: this._progress(sm, em, now),
         remaining: em - now,
-        nextFach, nextZeit, nextLehrer, nextRaum, nextStart,
-        gesamt, verbleibend, unterrichtsEnde, nVertretung,
-      };
-    }
-        fach, lehrer, raum, stunde, zeit, info, isSub,
-        startMins, endMins,
-        progress: this._progress(startMins, endMins, now),
-        remaining: endMins - now,
         nextFach, nextZeit, nextLehrer, nextRaum, nextStart,
         gesamt, verbleibend, unterrichtsEnde, nVertretung,
       };
