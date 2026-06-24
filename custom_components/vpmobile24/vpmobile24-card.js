@@ -310,25 +310,41 @@ class VpMobile24Card extends HTMLElement {
     const todayName = wdDE[todayIdx];
     const infoEnt = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
     const ent = this._hass && infoEnt ? this._hass.states[infoEnt] : null;
-    const weekInfos = ent && ent.attributes && ent.attributes.week_infos;
+
     let allg = [], stund = [];
-    if (weekInfos && weekInfos[todayKey]) {
-      allg = weekInfos[todayKey].allgemeine_infos || [];
-      stund = weekInfos[todayKey].stunden_infos || [];
-    } else if (ent && ent.attributes) {
-      const ra = ent.attributes.allgemeine_infos || [];
-      const rs = ent.attributes.stunden_infos || [];
-      const fd = (arr) => arr.filter(x => { const tx = String(x); return !wdDE.some(d => tx.includes(d)) || tx.includes(todayName); });
-      allg = fd(ra); stund = fd(rs);
+
+    if (ent && ent.attributes) {
+      const weekInfos = ent.attributes.week_infos;
+      if (weekInfos && weekInfos[todayKey]) {
+        allg  = weekInfos[todayKey].allgemeine_infos || [];
+        stund = weekInfos[todayKey].stunden_infos    || [];
+      }
+      // Fallback: use direct attributes (already filtered for today by sensor)
+      if (allg.length === 0 && stund.length === 0) {
+        allg  = ent.attributes.allgemeine_infos || [];
+        stund = ent.attributes.stunden_infos    || [];
+      }
+      // Fallback 2: collect from all days in week_infos if still empty
+      if (allg.length === 0 && stund.length === 0 && weekInfos) {
+        for (const key of Object.keys(weekInfos)) {
+          const d = weekInfos[key] || {};
+          allg  = allg.concat(d.allgemeine_infos  || []);
+          stund = stund.concat(d.stunden_infos || []);
+        }
+        // Deduplicate
+        allg  = [...new Set(allg)];
+        stund = [...new Set(stund)];
+      }
     }
+
     let html = '';
     if (allg.length > 0) {
       html += '<div class="vp-info-section"><div class="vp-info-section-label">' + t.genInfo + '</div>'
-        + allg.map(a => '<div class="vp-info-entry"><span>' + a + '</span></div>').join('') + '</div>';
+        + allg.map(a => '<div class="vp-info-entry"><span>' + String(a) + '</span></div>').join('') + '</div>';
     }
     if (stund.length > 0) {
-      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + (t.lessonInfo || 'Stunden-Infos') + '</div>'
-        + stund.map(s => '<div class="vp-info-entry"><span>' + s + '</span></div>').join('') + '</div>';
+      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + (t.lessonInfo || '📋 Stunden-Infos') + '</div>'
+        + stund.map(s => '<div class="vp-info-entry"><span>' + String(s) + '</span></div>').join('') + '</div>';
     }
     if (!html) html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
     else html += '<div style="height:8px"></div>';
@@ -761,7 +777,12 @@ class VpMobile24Card extends HTMLElement {
       if (infoEnt && infoEnt.attributes) {
         const allg  = infoEnt.attributes.allgemeine_infos  || [];
         const stund = infoEnt.attributes.stunden_infos     || [];
-        infoBtnHasInfo = (allg.length + stund.length) > 0;
+        const totalDirect = allg.length + stund.length;
+        // Also check week_infos for any day
+        const weekInfos = infoEnt.attributes.week_infos || {};
+        const totalWeek = Object.values(weekInfos).reduce((sum, d) =>
+          sum + (d.allgemeine_infos || []).length + (d.stunden_infos || []).length, 0);
+        infoBtnHasInfo = (totalDirect + totalWeek) > 0;
       }
     }
 
