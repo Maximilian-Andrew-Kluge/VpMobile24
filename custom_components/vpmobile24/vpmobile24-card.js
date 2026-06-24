@@ -294,7 +294,8 @@ class VpMobile24Card extends HTMLElement {
     if (!e) return;
     if ((this._weekOffset || 0) !== 0) return;
     this._infoPopupOpen = true;
-    this._renderInfoPopupContent();
+    // Ensure DOM is ready before trying to fill the popup
+    requestAnimationFrame(() => this._renderInfoPopupContent());
   }
 
   _renderInfoPopupContent() {
