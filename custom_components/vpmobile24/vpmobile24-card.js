@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.1
-console.info('%c VpMobile24-CARD %c v2.5.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.2
+console.info('%c VpMobile24-CARD %c v2.5.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -286,6 +286,25 @@ class VpMobile24Card extends HTMLElement {
   _handleReload() {
     const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
     if (!r) return;
+    // Spin animation on the reload button
+    const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
+    if (btn) {
+      btn.style.transition = 'background 0.4s, color 0.4s';
+      btn.style.animation = 'vpm-spin 0.7s linear';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.style.background = 'rgba(34,197,94,0.25)';
+        btn.style.color = '#22c55e';
+        btn.style.borderColor = 'rgba(34,197,94,0.5)';
+        setTimeout(() => {
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.borderColor = '';
+          btn.style.animation = '';
+          btn.disabled = false;
+        }, 800);
+      }, 700);
+    }
     this._hass.callService('button', 'press', { entity_id: r });
   }
 
@@ -1082,6 +1101,10 @@ ha-card {
 @keyframes vp-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
   50%      { box-shadow: 0 0 0 5px rgba(245,158,11,0); }
+}
+@keyframes vpm-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* ── Smart hints bar ── */
@@ -2635,4 +2658,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.1 loaded');
+console.log('✅ VpMobile24 Card v2.5.2 loaded');
