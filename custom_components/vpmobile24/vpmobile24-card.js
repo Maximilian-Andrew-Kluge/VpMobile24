@@ -1359,7 +1359,7 @@ customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
 
-// ── VpMobile24 Current Lesson Card v2.4.9 ────────────────────────────────
+// ── VpMobile24 Current Lesson Card v2.5.1 ────────────────────────────────
 class VpMobile24CurrentCard extends HTMLElement {
   constructor() {
     super();
@@ -1844,7 +1844,7 @@ ha-card {
 customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
 window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
 
-// ── VpMobile24 Multi-Class Card v2.4.9 ───────────────────────────────────
+// ── VpMobile24 Multi-Class Card v2.5.1 ───────────────────────────────────
 class VpMobile24MultiCard extends HTMLElement {
   constructor() {
     super();
@@ -2607,4 +2607,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.4.9 loaded');
+console.log('✅ VpMobile24 Card v2.5.1 loaded');
