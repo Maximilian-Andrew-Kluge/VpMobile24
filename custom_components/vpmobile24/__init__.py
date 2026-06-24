@@ -19,8 +19,8 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
-# The canonical URL for the card resource
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js"
+# The canonical URL for the card resource (versioned for cache-busting)
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.1"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
