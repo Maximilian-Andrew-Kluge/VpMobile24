@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.2
-console.info('%c VpMobile24-CARD %c v2.5.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.3
+console.info('%c VpMobile24-CARD %c v2.5.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -286,23 +286,20 @@ class VpMobile24Card extends HTMLElement {
   _handleReload() {
     const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
     if (!r) return;
-    // Spin animation on the reload button
+    // Spin animation: counter-clockwise, stays green during spin
     const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
     if (btn) {
-      btn.style.transition = 'background 0.4s, color 0.4s';
-      btn.style.animation = 'vpm-spin 0.7s linear';
       btn.disabled = true;
+      btn.style.background   = 'rgba(34,197,94,0.25)';
+      btn.style.color        = '#22c55e';
+      btn.style.borderColor  = 'rgba(34,197,94,0.6)';
+      btn.style.animation    = 'vpm-spin-ccw 0.7s linear';
       setTimeout(() => {
-        btn.style.background = 'rgba(34,197,94,0.25)';
-        btn.style.color = '#22c55e';
-        btn.style.borderColor = 'rgba(34,197,94,0.5)';
-        setTimeout(() => {
-          btn.style.background = '';
-          btn.style.color = '';
-          btn.style.borderColor = '';
-          btn.style.animation = '';
-          btn.disabled = false;
-        }, 800);
+        btn.style.animation   = '';
+        btn.style.background  = '';
+        btn.style.color       = '';
+        btn.style.borderColor = '';
+        btn.disabled = false;
       }, 700);
     }
     this._hass.callService('button', 'press', { entity_id: r });
@@ -1106,6 +1103,10 @@ ha-card {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+@keyframes vpm-spin-ccw {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
 
 /* ── Smart hints bar ── */
 .vp-hints {
@@ -1509,7 +1510,7 @@ class VpMobile24CurrentCard extends HTMLElement {
     return {
       de: {
         currentLesson: 'Aktueller Unterricht', sub: 'Vertretung',
-        freePause: 'Freistunde / Pause', done: 'Unterricht beendet',
+        freePause: 'Freistunde / Pause', beforeSchool: 'Noch kein Unterricht', done: 'Unterricht beendet',
         period: 'Stunde', nextLesson: 'Nächste Stunde',
         remaining: 'Noch', startsIn: 'Beginnt in',
         endedAt: 'Unterricht endete um', noLesson: 'Kein Unterricht mehr heute',
@@ -1519,7 +1520,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       },
       en: {
         currentLesson: 'Current Lesson', sub: 'Substitution',
-        freePause: 'Free Period / Break', done: 'School ended',
+        freePause: 'Free Period / Break', beforeSchool: 'No lessons yet', done: 'School ended',
         period: 'Period', nextLesson: 'Next Lesson',
         remaining: 'Remaining', startsIn: 'Starts in',
         endedAt: 'School ended at', noLesson: 'No more lessons today',
@@ -1529,7 +1530,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       },
       fr: {
         currentLesson: 'Cours actuel', sub: 'Remplacement',
-        freePause: 'Heure libre / Pause', done: 'Cours terminé',
+        freePause: 'Heure libre / Pause', beforeSchool: 'Pas encore de cours', done: 'Cours terminé',
         period: 'Heure', nextLesson: 'Prochain cours',
         remaining: 'Reste', startsIn: 'Commence dans',
         endedAt: 'Cours terminé à', noLesson: 'Plus de cours aujourd\'hui',
@@ -1704,10 +1705,16 @@ class VpMobile24CurrentCard extends HTMLElement {
     const s = this._getStatus(entity, nextEntity, weekEntity);
 
     // ── Colors & icons per type ───────────────────────────────────────────
+    // Determine if 'free' is actually before school (>60min until first lesson)
+    const isBeforeSchool = s.type === 'free' && s.remaining !== undefined && s.remaining > 60;
     const themes = {
       lesson: { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label: tc.currentLesson },
       sub:    { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label: tc.sub },
-      free:   { color:'#3b82f6', bg:'rgba(59,130,246,.13)', border:'rgba(59,130,246,.35)', icon:'⏸', label: tc.freePause },
+      free:   { color: isBeforeSchool ? '#64748b' : '#3b82f6',
+                bg:    isBeforeSchool ? 'rgba(100,116,139,.1)' : 'rgba(59,130,246,.13)',
+                border:isBeforeSchool ? 'rgba(100,116,139,.25)' : 'rgba(59,130,246,.35)',
+                icon:  isBeforeSchool ? '🌙' : '⏸',
+                label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
       done:   { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label: tc.done },
     };
     const th = themes[s.type] || themes.done;
@@ -2658,4 +2665,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.2 loaded');
+console.log('✅ VpMobile24 Card v2.5.3 loaded');
