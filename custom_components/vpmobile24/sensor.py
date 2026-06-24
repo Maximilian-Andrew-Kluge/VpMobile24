@@ -194,14 +194,22 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
     def _get_next_lesson(self) -> dict[str, Any] | None:
         if not self.coordinator.data:
             return None
-        lessons = self.coordinator.data.get("lessons", [])
+        # Include both regular lessons and substitutions (changes)
+        all_lessons = (
+            self.coordinator.data.get("lessons", []) +
+            self.coordinator.data.get("changes", [])
+        )
         now = datetime.now()
         today = now.date()
         candidates = []
-        for lesson in lessons:
+        for lesson in all_lessons:
             date_str = lesson.get("date", "")
             time_start = lesson.get("time_start", "")
+            subject = lesson.get("subject", "")
             if not date_str or not time_start or ":" not in time_start:
+                continue
+            # Skip cancelled lessons as "next lesson"
+            if not subject or subject.strip() in ["\u2014", "---", "", "-", " "]:
                 continue
             try:
                 if datetime.fromisoformat(date_str).date() != today:
@@ -815,7 +823,13 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
         now = datetime.now()
         now_mins = now.hour * 60 + now.minute
 
-        for lesson in self.coordinator.data.get("lessons", []):
+        # Check both regular lessons AND changes (Vertretungen land in changes)
+        all_lessons = (
+            self.coordinator.data.get("lessons", []) +
+            self.coordinator.data.get("changes", [])
+        )
+
+        for lesson in all_lessons:
             if lesson.get("date") != today:
                 continue
             ts = lesson.get("time_start", "")
