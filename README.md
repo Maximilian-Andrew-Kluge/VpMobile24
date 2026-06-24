@@ -201,6 +201,111 @@ kopieren und Home Assistant neu starten.
 
 ---
 
+# ⚙️ Einrichtung
+
+1. Einstellungen
+2. Geräte & Dienste
+3. Integration hinzufügen
+4. **VpMobile24** auswählen
+
+Dann eingeben:
+
+* Schul-ID
+* Benutzername
+* Passwort
+* Klasse auswählen
+* Fächer auswählen (Parallelkurse einzeln wählen)
+
+---
+
+# 🃏 Lovelace Card Beispiele
+
+### Stundenplan-Karte
+
+```yaml
+type: custom:vpmobile24-card
+entity: sensor.vpmobile24_week_table
+```
+
+### Mehrere Klassen-Karte
+
+```yaml
+type: custom:vpmobile24-multi-card
+entities:
+  - sensor.vpmobile24_7a_week_table
+  - sensor.vpmobile24_7b_week_table
+```
+
+### Aktueller Unterricht-Karte
+
+```yaml
+type: custom:vpmobile24-current-card
+entity: sensor.vpmobile24_aktueller_unterricht
+next_entity: sensor.vpmobile24_naechste_stunde
+week_entity: sensor.vpmobile24_heutiger_stundenplan
+```
+
+---
+
+# 📡 Sensoren
+
+| Sensor               | State        | Attribute                  |
+| -------------------- | ------------ | -------------------------- |
+| week_table           | Anzahl       | week_table, next_week_table |
+| naechste_stunde      | Fach         | zeit, lehrer, raum         |
+| heutiger_stundenplan | Anzahl       | stunden_heute              |
+| zusatzinfos          | Anzahl       | allgemeine_infos           |
+| aenderungen          | Anzahl       | alle_aenderungen           |
+| aktueller_unterricht | Fach         | fach, lehrer, raum         |
+
+---
+
+# ❓ FAQ
+
+### Welche Schulen werden unterstützt?
+
+Alle Schulen die Stundenplan24.de oder VpMobil24 verwenden.
+
+### Muss ich YAML schreiben?
+
+Nein.
+
+Alles kann über die Home Assistant UI konfiguriert werden.
+
+### Unterstützt die Integration mehrere Klassen?
+
+Ja.
+
+Mehrere Klassen und Parallelkurse werden unterstützt.
+
+### Was ist der Parallelkurs-Filter?
+
+In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`, `7INb1`).
+Wähle nur deinen eigenen Kurs aus — dann werden Ausfälle anderer Gruppen nicht angezeigt.
+
+---
+
+# 🔧 Diagnose
+
+Diagnose ist verfügbar unter:
+
+```text
+Einstellungen
+→ Geräte & Dienste
+→ VpMobile24
+→ Diagnose herunterladen
+```
+
+---
+
+# 🤝 Mitmachen
+
+* 🐛 Bug melden → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+* 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
+* 🔧 Pull Request → [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
 ### ⚙️ Einrichtung
 
 1. Einstellungen
