@@ -294,64 +294,92 @@ class VpMobile24Card extends HTMLElement {
     if (!e) return;
     if ((this._weekOffset || 0) !== 0) return;
     this._infoPopupOpen = true;
-    // Ensure DOM is ready before trying to fill the popup
-    requestAnimationFrame(() => this._renderInfoPopupContent());
+    this._renderInfoPopupContent();
   }
 
   _renderInfoPopupContent() {
-    const popup   = this.shadowRoot.getElementById('info-popup');
-    const overlay = this.shadowRoot.getElementById('info-popup-overlay');
-    const content = this.shadowRoot.getElementById('info-popup-content');
-    if (!popup || !overlay || !content) return;
     const t = this._t || this._buildTranslations();
     const wdKeys = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-    const wdDE = t.wdFull;
     const todayIdx = new Date().getDay();
     const todayKey = wdKeys[todayIdx];
-    const todayName = wdDE[todayIdx];
-    const infoEnt = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
-    const ent = this._hass && infoEnt ? this._hass.states[infoEnt] : null;
+    const todayName = (t.wdFull || ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'])[todayIdx];
 
+    const infoEntId = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
+    const ent = (this._hass && infoEntId) ? this._hass.states[infoEntId] : null;
+    const attr = ent ? (ent.attributes || {}) : {};
+
+    // Collect data — try all possible paths
     let allg = [], stund = [];
 
-    if (ent && ent.attributes) {
-      const weekInfos = ent.attributes.week_infos;
-      if (weekInfos && weekInfos[todayKey]) {
-        allg  = weekInfos[todayKey].allgemeine_infos || [];
-        stund = weekInfos[todayKey].stunden_infos    || [];
-      }
-      // Fallback: use direct attributes (already filtered for today by sensor)
-      if (allg.length === 0 && stund.length === 0) {
-        allg  = ent.attributes.allgemeine_infos || [];
-        stund = ent.attributes.stunden_infos    || [];
-      }
-      // Fallback 2: collect from all days in week_infos if still empty
-      if (allg.length === 0 && stund.length === 0 && weekInfos) {
-        for (const key of Object.keys(weekInfos)) {
-          const d = weekInfos[key] || {};
-          allg  = allg.concat(d.allgemeine_infos  || []);
-          stund = stund.concat(d.stunden_infos || []);
-        }
-        // Deduplicate
-        allg  = [...new Set(allg)];
-        stund = [...new Set(stund)];
-      }
+    // Path 1: week_infos[todayKey]
+    const wi = attr.week_infos;
+    if (wi && wi[todayKey]) {
+      allg  = Array.isArray(wi[todayKey].allgemeine_infos) ? wi[todayKey].allgemeine_infos : [];
+      stund = Array.isArray(wi[todayKey].stunden_infos)   ? wi[todayKey].stunden_infos    : [];
     }
 
-    let html = '';
+    // Path 2: direct allgemeine_infos / stunden_infos on today
+    if (allg.length === 0 && Array.isArray(attr.allgemeine_infos)) allg  = attr.allgemeine_infos;
+    if (stund.length === 0 && Array.isArray(attr.stunden_infos))   stund = attr.stunden_infos;
+
+    // Path 3: all days combined (when today's data is stored under different key)
+    if (allg.length === 0 && stund.length === 0 && wi) {
+      Object.values(wi).forEach(d => {
+        if (d && Array.isArray(d.allgemeine_infos)) allg  = allg.concat(d.allgemeine_infos);
+        if (d && Array.isArray(d.stunden_infos))   stund = stund.concat(d.stunden_infos);
+      });
+      allg  = [...new Set(allg)];
+      stund = [...new Set(stund)];
+    }
+
+    // Build HTML content
+    let bodyHtml = '';
     if (allg.length > 0) {
-      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + t.genInfo + '</div>'
-        + allg.map(a => '<div class="vp-info-entry"><span>' + String(a) + '</span></div>').join('') + '</div>';
+      bodyHtml += `<div class="vp-info-section">
+        <div class="vp-info-section-label">${t.genInfo || '📢 Allgemeine Informationen'}</div>
+        ${allg.map(a => `<div class="vp-info-entry"><span>${String(a)}</span></div>`).join('')}
+      </div>`;
     }
     if (stund.length > 0) {
-      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + (t.lessonInfo || '📋 Stunden-Infos') + '</div>'
-        + stund.map(s => '<div class="vp-info-entry"><span>' + String(s) + '</span></div>').join('') + '</div>';
+      bodyHtml += `<div class="vp-info-section">
+        <div class="vp-info-section-label">${t.lessonInfo || '📋 Stunden-Informationen'}</div>
+        ${stund.map(s => `<div class="vp-info-entry"><span>${String(s)}</span></div>`).join('')}
+      </div>`;
     }
-    if (!html) html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
-    else html += '<div style="height:8px"></div>';
-    content.innerHTML = html;
-    popup.classList.remove('hidden');
+    if (!bodyHtml) {
+      bodyHtml = `<div class="vp-info-none">${typeof t.noInfo === 'function' ? t.noInfo(todayName) : 'Keine Informationen verfügbar.'}</div>`;
+    }
+
+    // Inject popup directly into shadowRoot — create elements if needed
+    let overlay = this.shadowRoot.getElementById('info-popup-overlay');
+    let popup   = this.shadowRoot.getElementById('info-popup');
+
+    if (!overlay || !popup) {
+      // Fallback: build popup from scratch and append to shadowRoot
+      const o = document.createElement('div');
+      o.id = 'info-popup-overlay';
+      o.className = 'vp-popup-overlay';
+      o.addEventListener('click', () => this._closeInfoPopup());
+      this.shadowRoot.appendChild(o);
+
+      const p = document.createElement('div');
+      p.id = 'info-popup';
+      p.className = 'vp-popup';
+      p.innerHTML = `
+        <div class="vp-info-popup-title">${t.infoTitle || 'ℹ️ Zusatzinformationen'}</div>
+        <div id="info-popup-content"></div>
+        <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close || 'Schließen'}</button></div>
+      `;
+      this.shadowRoot.appendChild(p);
+      overlay = o;
+      popup   = p;
+    }
+
+    const content = this.shadowRoot.getElementById('info-popup-content');
+    if (content) content.innerHTML = bodyHtml + '<div style="height:8px"></div>';
+
     overlay.classList.remove('hidden');
+    popup.classList.remove('hidden');
   }
 
   _closeInfoPopup() {
