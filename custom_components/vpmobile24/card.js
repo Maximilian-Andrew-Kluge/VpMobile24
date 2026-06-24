@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.5
-console.info('%c VpMobile24-CARD %c v2.5.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.6
+console.info('%c VpMobile24-CARD %c v2.5.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -288,13 +288,18 @@ class VpMobile24Card extends HTMLElement {
     if (!r) return;
     const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
     if (btn) {
-      // Go green immediately, spin CCW for 700ms, then reset
-      btn.style.cssText = 'background:rgba(34,197,94,0.3)!important;color:#22c55e!important;border-color:rgba(34,197,94,0.7)!important;transform:rotate(0deg);transition:transform 0.7s linear;';
-      // Force reflow so transition fires
-      btn.getBoundingClientRect();
-      btn.style.transform = 'rotate(-360deg)';
+      // Find the icon span inside the button
+      const icon = btn.querySelector('.vp-reload-icon') || btn;
+      btn.style.cssText = 'background:rgba(34,197,94,0.3)!important;color:#22c55e!important;border-color:rgba(34,197,94,0.7)!important;';
+      icon.style.display = 'inline-block';
+      icon.style.transition = 'transform 0.7s linear';
+      icon.style.transform = 'rotate(0deg)';
+      icon.getBoundingClientRect(); // force reflow
+      icon.style.transform = 'rotate(-360deg)';
       setTimeout(() => {
         btn.style.cssText = '';
+        icon.style.transition = '';
+        icon.style.transform = '';
       }, 750);
     }
     this._hass.callService('button', 'press', { entity_id: r });
@@ -323,7 +328,12 @@ class VpMobile24Card extends HTMLElement {
     const ent = (this._hass && infoEntId) ? this._hass.states[infoEntId] : null;
     const attr = ent ? (ent.attributes || {}) : {};
 
-    // Helper: normalize to array of strings
+    // DEBUG
+    console.log('[VPM24 Info]', 'entId=', infoEntId, 'ent=', !!ent, 'todayKey=', todayKey);
+    console.log('[VPM24 Info] attr keys=', Object.keys(attr));
+    if (attr.week_infos) console.log('[VPM24 Info] week_infos keys=', Object.keys(attr.week_infos), 'thursday=', attr.week_infos['thursday']);
+    console.log('[VPM24 Info] direct allgemeine_infos=', attr.allgemeine_infos);
+
     const toArr = (v) => {
       if (!v) return [];
       if (Array.isArray(v)) return v.map(String);
@@ -331,23 +341,12 @@ class VpMobile24Card extends HTMLElement {
       return [];
     };
 
-    let allg = [], stund = [];
-
-    // Path 1: week_infos[todayKey]
+    let allg = [];
     const wi = attr.week_infos;
-    if (wi) {
-      const dayData = wi[todayKey];
-      if (dayData) {
-        allg  = toArr(dayData.allgemeine_infos);
-        stund = toArr(dayData.stunden_infos);
-      }
+    if (wi && wi[todayKey]) {
+      allg = toArr(wi[todayKey].allgemeine_infos);
     }
-
-    // Path 2: direct attributes (sensor writes today's data directly)
-    if (allg.length === 0)  allg  = toArr(attr.allgemeine_infos);
-    if (stund.length === 0) stund = toArr(attr.stunden_infos);
-
-    // Path 3: all days combined as last resort — only allgemeine_infos
+    if (allg.length === 0) allg = toArr(attr.allgemeine_infos);
     if (allg.length === 0 && wi) {
       const seen = new Set();
       Object.values(wi).forEach(d => {
@@ -356,22 +355,21 @@ class VpMobile24Card extends HTMLElement {
       });
     }
 
-    // Build HTML — only allgemeine_infos (Zusatzinfos), not stunden_infos
+    console.log('[VPM24 Info] allg=', allg);
+
     let bodyHtml = '';
     if (allg.length > 0) {
-      bodyHtml += `<div class="vp-info-section">
+      bodyHtml = `<div class="vp-info-section">
         <div class="vp-info-section-label">${t.genInfo || '📢 Allgemeine Informationen'}</div>
         ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
       </div>`;
-    }
-    if (!bodyHtml) {
+    } else {
       const noInfoMsg = haLang === 'en' ? `No additional info for ${todayName} available.`
                       : haLang === 'fr' ? `Aucune info pour ${todayName}.`
                       : `Keine Zusatzinformationen für ${todayName} verfügbar.`;
       bodyHtml = `<div class="vp-info-none">${noInfoMsg}</div>`;
     }
 
-    // Get or create popup elements
     let overlay = this.shadowRoot.getElementById('info-popup-overlay');
     let popup   = this.shadowRoot.getElementById('info-popup');
 
@@ -381,18 +379,15 @@ class VpMobile24Card extends HTMLElement {
       o.className = 'vp-popup-overlay';
       o.addEventListener('click', () => this._closeInfoPopup());
       this.shadowRoot.appendChild(o);
-
       const p = document.createElement('div');
       p.id = 'info-popup';
       p.className = 'vp-popup';
       p.innerHTML = `
         <div class="vp-info-popup-title">${t.infoTitle || 'ℹ️ Zusatzinformationen'}</div>
         <div id="info-popup-content"></div>
-        <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close || 'Schließen'}</button></div>
-      `;
+        <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close || 'Schließen'}</button></div>`;
       this.shadowRoot.appendChild(p);
-      overlay = o;
-      popup   = p;
+      overlay = o; popup = p;
     }
 
     const content = this.shadowRoot.getElementById('info-popup-content');
@@ -1366,7 +1361,7 @@ ha-card {
         ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
         : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
       ${reloadEntity
-        ? `<button class="vp-pill" data-vpm="reload">↺</button>`
+        ? `<button class="vp-pill" data-vpm="reload"><span class="vp-reload-icon" style="display:inline-block">↺</span></button>`
         : ''}
     </div>
   </div>
@@ -2668,4 +2663,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.5 loaded');
+console.log('✅ VpMobile24 Card v2.5.6 loaded');
