@@ -56,6 +56,7 @@ class VpMobile24Card extends HTMLElement {
            noDetail:'Keine weiteren Details verfügbar.',
            noInfo:(d)=>'Keine Zusatzinformationen für '+d+' verfügbar.',
            genInfo:'📢 Allgemeine Informationen',
+           lessonInfo:'📋 Stunden-Informationen',
            infoTitle:'ℹ️ Zusatzinformationen',
            refresh:'↺ Aktualisieren',
            nextWeek:'Nächste Woche \u2192',
@@ -73,6 +74,7 @@ class VpMobile24Card extends HTMLElement {
            noDetail:'No further details available.',
            noInfo:(d)=>'No additional info for '+d+' available.',
            genInfo:'📢 General Information',
+           lessonInfo:'📋 Lesson Information',
            infoTitle:'ℹ️ Additional Information',
            refresh:'↺ Refresh',
            nextWeek:'Next Week \u2192',
@@ -90,6 +92,7 @@ class VpMobile24Card extends HTMLElement {
            noDetail:'Aucun d\u00e9tail disponible.',
            noInfo:(d)=>'Aucune info pour '+d+'.',
            genInfo:'📢 Informations g\u00e9n\u00e9rales',
+           lessonInfo:'📋 Informations de cours',
            infoTitle:'ℹ️ Informations suppl\u00e9mentaires',
            refresh:'↺ Actualiser',
            nextWeek:'Semaine suivante \u2192',
@@ -322,6 +325,10 @@ class VpMobile24Card extends HTMLElement {
     if (allg.length > 0) {
       html += '<div class="vp-info-section"><div class="vp-info-section-label">' + t.genInfo + '</div>'
         + allg.map(a => '<div class="vp-info-entry"><span>' + a + '</span></div>').join('') + '</div>';
+    }
+    if (stund.length > 0) {
+      html += '<div class="vp-info-section"><div class="vp-info-section-label">' + (t.lessonInfo || 'Stunden-Infos') + '</div>'
+        + stund.map(s => '<div class="vp-info-entry"><span>' + s + '</span></div>').join('') + '</div>';
     }
     if (!html) html = '<div class="vp-info-none">' + t.noInfo(todayName) + '</div>';
     else html += '<div style="height:8px"></div>';
@@ -927,24 +934,30 @@ class VpMobile24Card extends HTMLElement {
       if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× ${t.sub}</span>`);
       if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 ${t.today}: ${lastEnd}</span>`);
     }
-    // Next lesson (when current lesson is active) — skip cancelled lessons
-    if (currentLessonNum >= 0 && todayIdx >= 0 && weekTable) {
+    // Next lesson — show during active lesson OR during pause/free time today
+    if (todayIdx >= 0 && weekTable) {
       const todayData = weekTable[dayKeys[todayIdx]] || {};
       const isCancelledFach = (f) => !f || f === '---' || f === '—' || f === '-' || (typeof f === 'string' && f.trim() === '');
-      // Find next non-cancelled lesson
-      const nextPeriodNum = slots.find(s => {
-        if (s.isPause || s.lessonNumber <= currentLessonNum) return false;
+      // Find next non-cancelled lesson after now
+      const nextSlot = slots.find(s => {
+        if (s.isPause || !s.time) return false;
+        const parts = s.time.split('-');
+        if (parts.length !== 2) return false;
+        const [sh, sm] = parts[0].split(':').map(Number);
+        const startM = sh * 60 + sm;
+        // Must start in the future (or currently active)
+        if (startM <= nowMins && s.lessonNumber !== currentLessonNum) return false;
+        if (s.lessonNumber <= currentLessonNum && currentLessonNum >= 0) return false;
         const les = todayData[String(s.lessonNumber)];
         return les && les.fach && !isCancelledFach(les.fach);
       });
-      if (nextPeriodNum) {
-        const nextLes = todayData[String(nextPeriodNum.lessonNumber)];
+      if (nextSlot) {
+        const nextLes = todayData[String(nextSlot.lessonNumber)];
         if (nextLes && nextLes.fach) {
-          const nextLabel = t.nextWeek ? t.today.replace('Heute','Nächste') : 'Nächste';
           const nl = { de:'Nächste', en:'Next', fr:'Prochain' };
           const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
           const nextStr = (nl[haLang] || nl.de);
-          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ ${nextStr}: ${nextLes.fach}${nextPeriodNum.time ? ' · ' + nextPeriodNum.time.split('-')[0] : ''}</span>`);
+          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ ${nextStr}: ${nextLes.fach}${nextSlot.time ? ' · ' + nextSlot.time.split('-')[0] : ''}</span>`);
         }
       }
     }
