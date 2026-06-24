@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.3
-console.info('%c VpMobile24-CARD %c v2.5.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.5
+console.info('%c VpMobile24-CARD %c v2.5.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -286,21 +286,16 @@ class VpMobile24Card extends HTMLElement {
   _handleReload() {
     const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
     if (!r) return;
-    // Spin animation: counter-clockwise, stays green during spin
     const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
     if (btn) {
-      btn.disabled = true;
-      btn.style.background   = 'rgba(34,197,94,0.25)';
-      btn.style.color        = '#22c55e';
-      btn.style.borderColor  = 'rgba(34,197,94,0.6)';
-      btn.style.animation    = 'vpm-spin-ccw 0.7s linear';
+      // Go green immediately, spin CCW for 700ms, then reset
+      btn.style.cssText = 'background:rgba(34,197,94,0.3)!important;color:#22c55e!important;border-color:rgba(34,197,94,0.7)!important;transform:rotate(0deg);transition:transform 0.7s linear;';
+      // Force reflow so transition fires
+      btn.getBoundingClientRect();
+      btn.style.transform = 'rotate(-360deg)';
       setTimeout(() => {
-        btn.style.animation   = '';
-        btn.style.background  = '';
-        btn.style.color       = '';
-        btn.style.borderColor = '';
-        btn.disabled = false;
-      }, 700);
+        btn.style.cssText = '';
+      }, 750);
     }
     this._hass.callService('button', 'press', { entity_id: r });
   }
@@ -318,60 +313,69 @@ class VpMobile24Card extends HTMLElement {
     const wdKeys = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     const todayIdx = new Date().getDay();
     const todayKey = wdKeys[todayIdx];
-    const todayName = (t.wdFull || ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'])[todayIdx];
+    const wdNames = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    const wdNamesEN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const wdNamesFR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+    const todayName = haLang === 'en' ? wdNamesEN[todayIdx] : haLang === 'fr' ? wdNamesFR[todayIdx] : wdNames[todayIdx];
 
     const infoEntId = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
     const ent = (this._hass && infoEntId) ? this._hass.states[infoEntId] : null;
     const attr = ent ? (ent.attributes || {}) : {};
 
-    // Collect data — try all possible paths
+    // Helper: normalize to array of strings
+    const toArr = (v) => {
+      if (!v) return [];
+      if (Array.isArray(v)) return v.map(String);
+      if (typeof v === 'string') return v.split('\n').map(s => s.trim()).filter(Boolean);
+      return [];
+    };
+
     let allg = [], stund = [];
 
     // Path 1: week_infos[todayKey]
     const wi = attr.week_infos;
-    if (wi && wi[todayKey]) {
-      allg  = Array.isArray(wi[todayKey].allgemeine_infos) ? wi[todayKey].allgemeine_infos : [];
-      stund = Array.isArray(wi[todayKey].stunden_infos)   ? wi[todayKey].stunden_infos    : [];
+    if (wi) {
+      const dayData = wi[todayKey];
+      if (dayData) {
+        allg  = toArr(dayData.allgemeine_infos);
+        stund = toArr(dayData.stunden_infos);
+      }
     }
 
-    // Path 2: direct allgemeine_infos / stunden_infos on today
-    if (allg.length === 0 && Array.isArray(attr.allgemeine_infos)) allg  = attr.allgemeine_infos;
-    if (stund.length === 0 && Array.isArray(attr.stunden_infos))   stund = attr.stunden_infos;
+    // Path 2: direct attributes (sensor writes today's data directly)
+    if (allg.length === 0)  allg  = toArr(attr.allgemeine_infos);
+    if (stund.length === 0) stund = toArr(attr.stunden_infos);
 
-    // Path 3: all days combined (when today's data is stored under different key)
-    if (allg.length === 0 && stund.length === 0 && wi) {
+    // Path 3: all days combined as last resort — only allgemeine_infos
+    if (allg.length === 0 && wi) {
+      const seen = new Set();
       Object.values(wi).forEach(d => {
-        if (d && Array.isArray(d.allgemeine_infos)) allg  = allg.concat(d.allgemeine_infos);
-        if (d && Array.isArray(d.stunden_infos))   stund = stund.concat(d.stunden_infos);
+        if (!d) return;
+        toArr(d.allgemeine_infos).forEach(x => { if (!seen.has(x)) { seen.add(x); allg.push(x); } });
       });
-      allg  = [...new Set(allg)];
-      stund = [...new Set(stund)];
     }
 
-    // Build HTML content
+    // Build HTML — only allgemeine_infos (Zusatzinfos), not stunden_infos
     let bodyHtml = '';
     if (allg.length > 0) {
       bodyHtml += `<div class="vp-info-section">
         <div class="vp-info-section-label">${t.genInfo || '📢 Allgemeine Informationen'}</div>
-        ${allg.map(a => `<div class="vp-info-entry"><span>${String(a)}</span></div>`).join('')}
-      </div>`;
-    }
-    if (stund.length > 0) {
-      bodyHtml += `<div class="vp-info-section">
-        <div class="vp-info-section-label">${t.lessonInfo || '📋 Stunden-Informationen'}</div>
-        ${stund.map(s => `<div class="vp-info-entry"><span>${String(s)}</span></div>`).join('')}
+        ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
       </div>`;
     }
     if (!bodyHtml) {
-      bodyHtml = `<div class="vp-info-none">${typeof t.noInfo === 'function' ? t.noInfo(todayName) : 'Keine Informationen verfügbar.'}</div>`;
+      const noInfoMsg = haLang === 'en' ? `No additional info for ${todayName} available.`
+                      : haLang === 'fr' ? `Aucune info pour ${todayName}.`
+                      : `Keine Zusatzinformationen für ${todayName} verfügbar.`;
+      bodyHtml = `<div class="vp-info-none">${noInfoMsg}</div>`;
     }
 
-    // Inject popup directly into shadowRoot — create elements if needed
+    // Get or create popup elements
     let overlay = this.shadowRoot.getElementById('info-popup-overlay');
     let popup   = this.shadowRoot.getElementById('info-popup');
 
     if (!overlay || !popup) {
-      // Fallback: build popup from scratch and append to shadowRoot
       const o = document.createElement('div');
       o.id = 'info-popup-overlay';
       o.className = 'vp-popup-overlay';
@@ -393,7 +397,6 @@ class VpMobile24Card extends HTMLElement {
 
     const content = this.shadowRoot.getElementById('info-popup-content');
     if (content) content.innerHTML = bodyHtml + '<div style="height:8px"></div>';
-
     overlay.classList.remove('hidden');
     popup.classList.remove('hidden');
   }
@@ -2665,4 +2668,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.3 loaded');
+console.log('✅ VpMobile24 Card v2.5.5 loaded');
