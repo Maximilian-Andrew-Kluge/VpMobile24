@@ -1089,6 +1089,8 @@ ha-card {
   background: rgba(34,197,94,0.25) !important;
   color: #22c55e !important;
   border-color: rgba(34,197,94,0.6) !important;
+}
+.vp-pill-reloading .vp-reload-icon {
   animation: vpm-spin-ccw 0.8s linear !important;
 }
 
