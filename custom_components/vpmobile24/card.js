@@ -286,11 +286,12 @@ class VpMobile24Card extends HTMLElement {
   _handleReload() {
     const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
     if (!r) return;
-    const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
-    if (btn) {
-      btn.classList.add('vp-pill-reloading');
-      setTimeout(() => btn.classList.remove('vp-pill-reloading'), 800);
-    }
+    this._reloading = true;
+    this._render(); // re-render with green spinning button
+    setTimeout(() => {
+      this._reloading = false;
+      if (!this._popupOpen && !this._infoPopupOpen) this._render();
+    }, 900);
     this._hass.callService('button', 'press', { entity_id: r });
   }
 
@@ -1346,7 +1347,7 @@ ha-card {
         ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
         : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
       ${reloadEntity
-        ? `<button class="vp-pill" data-vpm="reload"><span class="vp-reload-icon" style="display:inline-block">↺</span></button>`
+        ? `<button class="vp-pill${this._reloading ? ' vp-pill-reloading' : ''}" data-vpm="reload"><span class="vp-reload-icon" style="display:inline-block">↺</span></button>`
         : ''}
     </div>
   </div>
