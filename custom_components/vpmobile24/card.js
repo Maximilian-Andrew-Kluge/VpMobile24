@@ -288,19 +288,8 @@ class VpMobile24Card extends HTMLElement {
     if (!r) return;
     const btn = this.shadowRoot.querySelector('[data-vpm="reload"]');
     if (btn) {
-      // Find the icon span inside the button
-      const icon = btn.querySelector('.vp-reload-icon') || btn;
-      btn.style.cssText = 'background:rgba(34,197,94,0.3)!important;color:#22c55e!important;border-color:rgba(34,197,94,0.7)!important;';
-      icon.style.display = 'inline-block';
-      icon.style.transition = 'transform 0.7s linear';
-      icon.style.transform = 'rotate(0deg)';
-      icon.getBoundingClientRect(); // force reflow
-      icon.style.transform = 'rotate(-360deg)';
-      setTimeout(() => {
-        btn.style.cssText = '';
-        icon.style.transition = '';
-        icon.style.transform = '';
-      }, 750);
+      btn.classList.add('vp-pill-reloading');
+      setTimeout(() => btn.classList.remove('vp-pill-reloading'), 800);
     }
     this._hass.callService('button', 'press', { entity_id: r });
   }
@@ -1094,6 +1083,12 @@ ha-card {
 @keyframes vpm-spin-ccw {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(-360deg); }
+}
+.vp-pill-reloading {
+  background: rgba(34,197,94,0.25) !important;
+  color: #22c55e !important;
+  border-color: rgba(34,197,94,0.6) !important;
+  animation: vpm-spin-ccw 0.8s linear !important;
 }
 
 /* ── Smart hints bar ── */
