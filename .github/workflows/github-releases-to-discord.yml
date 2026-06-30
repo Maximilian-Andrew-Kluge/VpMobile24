@@ -1,22 +1,66 @@
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      release_name:
+        required: true
 
 jobs:
-  github-releases-to-discord:
+  discord-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: GitHub Releases to Discord
-        uses: SethCohen/github-releases-to-discord@v1
-        with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
-          color: "2105893"
-          username: "Release"
-          avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
-          content: "||@Custom Integration||"
-          footer_title: "NEW Release"
-          reduce_headings: true
+      - name: Send Discord Embed
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "username": "Release Bot",
+            "avatar_url": "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png",
+            "embeds": [
+              {
+                "title": "🚀 New Release: ${{ github.event.release.name }}",
+                "description": "${{ github.event.release.body }}",
+                "url": "${{ github.event.release.html_url }}",
+                "color": 2105893,
+                "thumbnail": {
+                  "url": "https://cdn-icons-png.flaticon.com/512/2111/2111425.png"
+                },
+                "image": {
+                  "url": "https://your-domain.com/banner.png"
+                },
+                "footer": {
+                  "text": "GitHub Release System"
+                }
+              }
+            ],
+            "components": [
+              {
+                "type": 1,
+                "components": [
+                  {
+                    "type": 2,
+                    "label": "📦 Download",
+                    "style": 5,
+                    "url": "${{ github.event.release.html_url }}"
+                  },
+                  {
+                    "type": 2,
+                    "label": "🔗 Release",
+                    "style": 5,
+                    "url": "${{ github.event.release.html_url }}"
+                  },
+                  {
+                    "type": 2,
+                    "label": "🌐 Website",
+                    "style": 5,
+                    "url": "https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
+                  }
+                ]
+              }
+            ]
+          }' \
+          $WEBHOOK
