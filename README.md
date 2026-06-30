@@ -31,7 +31,7 @@
 
 > [!IMPORTANT]
 >
-> 🎉 **VpMobile24 v2.5.0  ist jetzt verfügbar**
+> 🎉 **VpMobile24 v2.5.0 ist jetzt verfügbar**
 >
 > 📅 Veröffentlicht am **08.06.2026**
 >
