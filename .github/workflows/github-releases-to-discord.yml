@@ -5,34 +5,42 @@ on:
     inputs:
       release_name:
         required: true
+        default: "Manual Test Release"
 
 jobs:
   discord-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send Discord Embed
+      - name: Send Discord Release
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
         run: |
-          RELEASE_NAME="${{ github.event.release.name || inputs.release_name }}"
-          RELEASE_BODY="${{ github.event.release.body || 'Manual test run' }}"
-          RELEASE_URL="${{ github.event.release.html_url || inputs.release_url }}"
+          if [ -z "$RELEASE_NAME" ]; then
+            RELEASE_NAME="${{ inputs.release_name }}"
+          fi
+
+          if [ -z "$RELEASE_URL" ]; then
+            RELEASE_URL="https://github.com"
+          fi
+
+          if [ -z "$RELEASE_BODY" ]; then
+            RELEASE_BODY="Manual test run"
+          fi
 
           curl -H "Content-Type: application/json" \
           -X POST \
           -d "{
             \"username\": \"Release Bot\",
-            \"avatar_url\": \"https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png\",
             \"embeds\": [
               {
                 \"title\": \"🚀 New Release: $RELEASE_NAME\",
-                \"description\": \"$RELEASE_BODY\",
+                \"description\": \"$RELEASE_BODY\n\n📦 Download: $RELEASE_URL\n🌐 Website: https://maximilian-andrew-kluge.github.io/VpMobile24/website/\",
                 \"url\": \"$RELEASE_URL\",
                 \"color\": 2105893,
-                \"thumbnail\": {
-                  \"url\": \"https://cdn-icons-png.flaticon.com/512/2111/2111425.png\"
-                },
                 \"image\": {
                   \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/banner.png\"
                 },
@@ -40,31 +48,6 @@ jobs:
                   \"text\": \"GitHub Release System\"
                 }
               }
-            ],
-            \"components\": [
-              {
-                \"type\": 1,
-                \"components\": [
-                  {
-                    \"type\": 2,
-                    \"label\": \"📦 Download\",
-                    \"style\": 5,
-                    \"url\": \"$RELEASE_URL\"
-                  },
-                  {
-                    \"type\": 2,
-                    \"label\": \"🔗 Release\",
-                    \"style\": 5,
-                    \"url\": \"$RELEASE_URL\"
-                  },
-                  {
-                    \"type\": 2,
-                    \"label\": \"🌐 Website\",
-                    \"style\": 5,
-                    \"url\": \"https://maximilian-andrew-kluge.github.io/VpMobile24/website/\"
-                  }
-                ]
-              }
             ]
-          }' \
+          }" \
           $WEBHOOK
