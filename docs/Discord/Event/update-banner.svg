@@ -1,0 +1,53 @@
+<svg width="1200" height="76" viewBox="0 0 1200 76" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">VpMobile24 Update-Banner</title>
+  <desc id="desc">Banner: VpMobile24 v2.5.0 ist jetzt verfügbar, mit Link zu den Release Notes und Schließen-Button</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0f1e"/>
+      <stop offset="55%" stop-color="#10182e"/>
+      <stop offset="100%" stop-color="#0f1729"/>
+    </linearGradient>
+
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </linearGradient>
+
+    <radialGradient id="glow" cx="15%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="badgeFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="76" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="76" fill="url(#glow)"/>
+  <rect x="0" y="74" width="1200" height="2" fill="url(#accentLine)"/>
+
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <text x="40" y="44" font-size="22">🚀</text>
+
+    <rect x="75" y="24" width="80" height="24" rx="12" fill="url(#badgeFill)"/>
+    <text x="115" y="40" font-size="12" font-weight="700" fill="#f8fbff" text-anchor="middle" letter-spacing="0.5">v2.5.0</text>
+
+    <text x="170" y="44" font-size="16" font-weight="600" fill="#f5f7ff">
+      VpMobile24 ist jetzt verfügbar!
+    </text>
+
+    <a href="#">
+      <text x="470" y="44" font-size="15" font-weight="600" fill="#7dd3fc">Release Notes →</text>
+    </a>
+
+    <g transform="translate(1140,38)">
+      <circle r="14" fill="#ffffff" fill-opacity="0.06"/>
+      <line x1="-5" y1="-5" x2="5" y2="5" stroke="#aab3c8" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="5" y1="-5" x2="-5" y2="5" stroke="#aab3c8" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
