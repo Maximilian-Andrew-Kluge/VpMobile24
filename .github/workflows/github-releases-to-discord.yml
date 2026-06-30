@@ -5,10 +5,6 @@ on:
     inputs:
       release_name:
         required: true
-        default: "Manual Test Release"
-      release_url:
-        required: false
-        default: "https://github.com"
 
 jobs:
   discord-release:
