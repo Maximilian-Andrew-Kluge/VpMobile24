@@ -5,6 +5,10 @@ on:
     inputs:
       release_name:
         required: true
+        default: "Manual Test Release"
+      release_url:
+        required: false
+        default: "https://github.com"
 
 jobs:
   discord-release:
@@ -15,49 +19,53 @@ jobs:
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          RELEASE_NAME="${{ github.event.release.name || inputs.release_name }}"
+          RELEASE_BODY="${{ github.event.release.body || 'Manual test run' }}"
+          RELEASE_URL="${{ github.event.release.html_url || inputs.release_url }}"
+
           curl -H "Content-Type: application/json" \
           -X POST \
-          -d '{
-            "username": "Release Bot",
-            "avatar_url": "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png",
-            "embeds": [
+          -d "{
+            \"username\": \"Release Bot\",
+            \"avatar_url\": \"https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png\",
+            \"embeds\": [
               {
-                "title": "🚀 New Release: ${{ github.event.release.name }}",
-                "description": "${{ github.event.release.body }}",
-                "url": "${{ github.event.release.html_url }}",
-                "color": 2105893,
-                "thumbnail": {
-                  "url": "https://cdn-icons-png.flaticon.com/512/2111/2111425.png"
+                \"title\": \"🚀 New Release: $RELEASE_NAME\",
+                \"description\": \"$RELEASE_BODY\",
+                \"url\": \"$RELEASE_URL\",
+                \"color\": 2105893,
+                \"thumbnail\": {
+                  \"url\": \"https://cdn-icons-png.flaticon.com/512/2111/2111425.png\"
                 },
-                "image": {
-                  "url": "https://your-domain.com/banner.png"
+                \"image\": {
+                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/banner.png\"
                 },
-                "footer": {
-                  "text": "GitHub Release System"
+                \"footer\": {
+                  \"text\": \"GitHub Release System\"
                 }
               }
             ],
-            "components": [
+            \"components\": [
               {
-                "type": 1,
-                "components": [
+                \"type\": 1,
+                \"components\": [
                   {
-                    "type": 2,
-                    "label": "📦 Download",
-                    "style": 5,
-                    "url": "${{ github.event.release.html_url }}"
+                    \"type\": 2,
+                    \"label\": \"📦 Download\",
+                    \"style\": 5,
+                    \"url\": \"$RELEASE_URL\"
                   },
                   {
-                    "type": 2,
-                    "label": "🔗 Release",
-                    "style": 5,
-                    "url": "${{ github.event.release.html_url }}"
+                    \"type\": 2,
+                    \"label\": \"🔗 Release\",
+                    \"style\": 5,
+                    \"url\": \"$RELEASE_URL\"
                   },
                   {
-                    "type": 2,
-                    "label": "🌐 Website",
-                    "style": 5,
-                    "url": "https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
+                    \"type\": 2,
+                    \"label\": \"🌐 Website\",
+                    \"style\": 5,
+                    \"url\": \"https://maximilian-andrew-kluge.github.io/VpMobile24/website/\"
                   }
                 ]
               }
