@@ -6,6 +6,9 @@ on:
       release_name:
         required: true
         default: "Manual Test Release"
+      release_url:
+        required: false
+        default: "https://github.com"
 
 jobs:
   discord-release:
@@ -15,33 +18,52 @@ jobs:
       - name: Send Discord Release
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_BODY: ${{ github.event.release.body }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
-          IS_PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
-          # fallback for manual runs
+          # ----------------------------
+          # INPUTS SAFE HANDLING
+          # ----------------------------
+
+          RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
+          IS_PRERELEASE="${{ github.event.release.prerelease }}"
+
+          # fallback for manual run
           if [ -z "$RELEASE_NAME" ]; then
             RELEASE_NAME="${{ inputs.release_name }}"
           fi
 
           if [ -z "$RELEASE_URL" ]; then
-            RELEASE_URL="https://github.com"
+            RELEASE_URL="${{ inputs.release_url }}"
           fi
 
           if [ -z "$RELEASE_BODY" ]; then
             RELEASE_BODY="Manual test run"
           fi
 
+          # ----------------------------
+          # PRE-RELEASE CHECK
+          # ----------------------------
           if [ "$IS_PRERELEASE" = "true" ]; then
             TYPE="🧪 Pre-Release"
           else
             TYPE="🚀 Release"
           fi
 
-          # safe body (no line breaks crash bash)
-          RELEASE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ')
+          # ----------------------------
+          # SAFE TEXT (NO LINE BREAK CRASH)
+          # ----------------------------
+          RELEASE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ' | sed 's/"/\\"/g')
 
+          # ----------------------------
+          # DEBUG (optional but useful)
+          # ----------------------------
+          echo "Name: $RELEASE_NAME"
+          echo "URL: $RELEASE_URL"
+
+          # ----------------------------
+          # DISCORD SEND
+          # ----------------------------
           curl -H "Content-Type: application/json" \
           -X POST \
           -d "{
