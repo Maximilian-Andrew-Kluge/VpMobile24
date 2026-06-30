@@ -5,13 +5,15 @@ on:
 jobs:
   github-releases-to-discord:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: GitHub Releases to Discord
         uses: SethCohen/github-releases-to-discord@v1
         with:
-          webhook_url: ${{ https://discord.com/api/webhooks/1521619794447700158/BxNRszwN8tqIr_jNhOG8x7nvlkJswpHmrgh5xBUbn7SvQsV33nPzjXqXguSt8d3qd5E8 }}
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK }}
           color: "2105893"
           username: "Release"
           avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
