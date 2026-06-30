@@ -15,11 +15,12 @@ jobs:
       - name: Send Discord Release
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
         run: |
-          RELEASE_NAME="${{ github.event.release.name }}"
-          RELEASE_URL="${{ github.event.release.html_url }}"
-          RELEASE_BODY="${{ github.event.release.body }}"
-
+          # fallback for manual runs
           if [ -z "$RELEASE_NAME" ]; then
             RELEASE_NAME="${{ inputs.release_name }}"
           fi
@@ -32,13 +33,22 @@ jobs:
             RELEASE_BODY="Manual test run"
           fi
 
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            TYPE="🧪 Pre-Release"
+          else
+            TYPE="🚀 Release"
+          fi
+
+          # safe body (no line breaks crash bash)
+          RELEASE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ')
+
           curl -H "Content-Type: application/json" \
           -X POST \
           -d "{
             \"username\": \"Release Bot\",
             \"embeds\": [
               {
-                \"title\": \"🚀 New Release: $RELEASE_NAME\",
+                \"title\": \"$TYPE: $RELEASE_NAME\",
                 \"description\": \"$RELEASE_BODY\n\n📦 Download: $RELEASE_URL\n🌐 Website: https://maximilian-andrew-kluge.github.io/VpMobile24/website/\",
                 \"url\": \"$RELEASE_URL\",
                 \"color\": 2105893,
