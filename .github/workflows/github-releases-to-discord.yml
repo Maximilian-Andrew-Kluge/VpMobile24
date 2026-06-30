@@ -14,11 +14,12 @@ jobs:
     steps:
       - name: Send Discord Release
         env:
-          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          RELEASE_NAME: ${{ github.event.release.name }}
-          RELEASE_BODY: ${{ github.event.release.body }}
-          RELEASE_URL: ${{ github.event.release.html_url }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
+          RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
+
           if [ -z "$RELEASE_NAME" ]; then
             RELEASE_NAME="${{ inputs.release_name }}"
           fi
@@ -42,7 +43,7 @@ jobs:
                 \"url\": \"$RELEASE_URL\",
                 \"color\": 2105893,
                 \"image\": {
-                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Discord/Event/update-banner.svg"
+                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Discord/Event/update-banner.svg\"
                 },
                 \"footer\": {
                   \"text\": \"GitHub Release System\"
@@ -50,4 +51,4 @@ jobs:
               }
             ]
           }" \
-          $WEBHOOK
+          "$DISCORD_WEBHOOK"
