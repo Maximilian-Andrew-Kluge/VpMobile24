@@ -42,7 +42,7 @@ jobs:
                 \"url\": \"$RELEASE_URL\",
                 \"color\": 2105893,
                 \"image\": {
-                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/banner.png\"
+                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Discord/Event/update-banner.svg"
                 },
                 \"footer\": {
                   \"text\": \"GitHub Release System\"
