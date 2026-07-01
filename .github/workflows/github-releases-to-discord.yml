@@ -27,50 +27,48 @@ jobs:
           RELEASE_BODY: ${{ github.event.release.body || 'Manual test run' }}
           IS_PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
         run: |
-          if [ "$IS_PRERELEASE" = "true" ]; then
-            TYPE="🧪 Beta / Pre-Release"
-            COLOR=16776960
-          else
-            TYPE="🚀 Neues Release"
-            COLOR=3066993
-          fi
+          python3 - <<'PYEOF'
+          import os, json, urllib.request, sys
 
-          # Sanitize: single line, escape backslashes and quotes
-          SAFE_BODY=$(printf '%s' "$RELEASE_BODY" | tr '\n' ' ' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
-          SAFE_NAME=$(printf '%s' "$RELEASE_NAME" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
-          SAFE_URL=$(printf '%s' "$RELEASE_URL" | sed 's/"/\\"/g')
+          webhook   = os.environ["DISCORD_WEBHOOK"]
+          name      = os.environ["RELEASE_NAME"]
+          url       = os.environ["RELEASE_URL"]
+          body      = os.environ["RELEASE_BODY"]
+          prerelease = os.environ["IS_PRERELEASE"].lower() == "true"
 
-          DESCRIPTION="${SAFE_BODY}\\n\\n📦 **Download:** ${SAFE_URL}\\n🌐 **Website:** https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
+          if prerelease:
+              title_prefix = "🧪 Beta / Pre-Release"
+              color = 16776960  # yellow
+          else:
+              title_prefix = "🚀 Neues Release"
+              color = 3066993   # green
 
-          PAYLOAD=$(cat <<EOF
-          {
-            "username": "VpMobile24 Release Bot",
-            "embeds": [{
-              "title": "${TYPE}: ${SAFE_NAME}",
-              "description": "${DESCRIPTION}",
-              "url": "${SAFE_URL}",
-              "color": ${COLOR},
-              "footer": {
-                "text": "VpMobile24 · GitHub Release System"
-              }
-            }]
-          }
-          EOF
+          description = (
+              body + "\n\n"
+              "📦 **Download:** " + url + "\n"
+              "🌐 **Website:** https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
           )
 
-          echo "Sending to Discord..."
-          HTTP_STATUS=$(curl -s -o /tmp/discord_response.txt -w "%{http_code}" \
-            -H "Content-Type: application/json" \
-            -X POST \
-            -d "$PAYLOAD" \
-            "$DISCORD_WEBHOOK")
+          payload = {
+              "username": "VpMobile24 Release Bot",
+              "embeds": [{
+                  "title": f"{title_prefix}: {name}",
+                  "description": description,
+                  "url": url,
+                  "color": color,
+                  "footer": {"text": "VpMobile24 · GitHub Release System"}
+              }]
+          }
 
-          echo "HTTP Status: $HTTP_STATUS"
-          echo "Response: $(cat /tmp/discord_response.txt)"
+          data = json.dumps(payload).encode("utf-8")
+          req = urllib.request.Request(webhook, data=data, headers={"Content-Type": "application/json"}, method="POST")
 
-          if [ "$HTTP_STATUS" != "204" ] && [ "$HTTP_STATUS" != "200" ]; then
-            echo "Discord webhook failed with status $HTTP_STATUS"
-            exit 1
-          fi
-
-          echo "Discord notification sent successfully!"
+          try:
+              with urllib.request.urlopen(req) as resp:
+                  print(f"HTTP Status: {resp.status}")
+                  print("Discord notification sent successfully!")
+          except urllib.error.HTTPError as e:
+              print(f"HTTP Status: {e.code}")
+              print(f"Response: {e.read().decode()}")
+              sys.exit(1)
+          PYEOF
