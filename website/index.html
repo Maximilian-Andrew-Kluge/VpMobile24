@@ -26,31 +26,39 @@
           if (stable && beta) break;
         }
 
-        // Update stable badge
+        // Banner shows the NEWEST release (pre-release or stable — whichever is newer)
+        const newest = releases[0]; // API returns newest first
+        const banner = document.getElementById('announcement-banner');
+        const bannerVersion = document.getElementById('banner-version');
+        const bannerLink = document.getElementById('banner-link');
+        const bannerIcon = banner ? banner.querySelector('span') : null;
+
+        if (newest && bannerVersion) {
+          bannerVersion.textContent = newest.name || newest.tag_name;
+        }
+        if (newest && bannerLink) {
+          bannerLink.href = newest.html_url;
+        }
+        if (newest && banner) {
+          if (newest.prerelease) {
+            // Yellow banner for pre-release
+            banner.style.background = 'linear-gradient(135deg,#ca8a04,#a16207)';
+            if (bannerIcon) bannerIcon.textContent = '🧪';
+          } else {
+            // Green banner for stable
+            banner.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
+            if (bannerIcon) bannerIcon.textContent = '🚀';
+          }
+        }
+
+        // Update stable version badge
         if (stable) {
           document.querySelectorAll('.gh-version-stable').forEach(el => {
             el.textContent = stable.tag_name;
           });
-          // Update release banner with latest release name
-          const bannerVersion = document.getElementById('banner-version');
-          const bannerLink = document.getElementById('banner-link');
-          if (bannerVersion) {
-            const displayName = stable.name || stable.tag_name;
-            bannerVersion.textContent = displayName;
-          }
-          if (bannerLink) {
-            bannerLink.href = stable.html_url;
-          }
-          // Pre-release: yellow banner
-          const banner = document.getElementById('announcement-banner');
-          if (banner && stable.prerelease) {
-            banner.style.background = 'linear-gradient(135deg,#ca8a04,#a16207)';
-            const icon = banner.querySelector('span');
-            if (icon) icon.textContent = '🧪';
-          }
         }
 
-        // Only show beta badge if a DIFFERENT pre-release exists
+        // Show beta badge if a different pre-release exists
         if (beta && stable && beta.tag_name !== stable.tag_name) {
           document.querySelectorAll('.gh-version-beta').forEach(el => {
             el.textContent = beta.tag_name;
@@ -60,7 +68,6 @@
             el.style.display = 'inline-flex';
           });
         }
-        // else: version-beta-block stays hidden via inline style
       } catch(e) { /* keep fallback */ }
     }
     document.addEventListener('DOMContentLoaded', loadGithubVersions);
