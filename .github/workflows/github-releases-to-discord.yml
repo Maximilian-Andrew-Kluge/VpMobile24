@@ -1,86 +1,59 @@
+name: Discord Release Notification
+
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       release_name:
+        description: "Release name"
         required: true
         default: "Manual Test Release"
       release_url:
+        description: "Release URL"
         required: false
-        default: "https://github.com"
+        default: "https://github.com/Maximilian-Andrew-Kluge/VpMobile24"
 
 jobs:
   discord-release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send Discord Release
+      - name: Send Discord Release Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          RELEASE_NAME: ${{ github.event.release.name || inputs.release_name }}
+          RELEASE_URL: ${{ github.event.release.html_url || inputs.release_url }}
+          RELEASE_BODY: ${{ github.event.release.body || 'Manual test run' }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
         run: |
-          # ----------------------------
-          # INPUTS SAFE HANDLING
-          # ----------------------------
-
-          RELEASE_NAME="${{ github.event.release.name }}"
-          RELEASE_URL="${{ github.event.release.html_url }}"
-          RELEASE_BODY="${{ github.event.release.body }}"
-          IS_PRERELEASE="${{ github.event.release.prerelease }}"
-
-          # fallback for manual run
-          if [ -z "$RELEASE_NAME" ]; then
-            RELEASE_NAME="${{ inputs.release_name }}"
-          fi
-
-          if [ -z "$RELEASE_URL" ]; then
-            RELEASE_URL="${{ inputs.release_url }}"
-          fi
-
-          if [ -z "$RELEASE_BODY" ]; then
-            RELEASE_BODY="Manual test run"
-          fi
-
-          # ----------------------------
-          # PRE-RELEASE CHECK
-          # ----------------------------
+          # Pre-release or full release
           if [ "$IS_PRERELEASE" = "true" ]; then
-            TYPE="🧪 Pre-Release"
+            TYPE="🧪 Beta / Pre-Release"
+            COLOR=16776960
           else
-            TYPE="🚀 Release"
+            TYPE="🚀 Neues Release"
+            COLOR=3066993
           fi
 
-          # ----------------------------
-          # SAFE TEXT (NO LINE BREAK CRASH)
-          # ----------------------------
-          RELEASE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ' | sed 's/"/\\"/g')
+          # Sanitize body: remove newlines and escape quotes
+          SAFE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
 
-          # ----------------------------
-          # DEBUG (optional but useful)
-          # ----------------------------
-          echo "Name: $RELEASE_NAME"
-          echo "URL: $RELEASE_URL"
+          DESCRIPTION="$SAFE_BODY\n\n📦 **Download:** $RELEASE_URL\n🌐 **Website:** https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
 
-          # ----------------------------
-          # DISCORD SEND
-          # ----------------------------
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
-            \"username\": \"Release Bot\",
-            \"embeds\": [
-              {
+          curl -s -o /dev/null -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d "{
+              \"username\": \"VpMobile24 Release Bot\",
+              \"embeds\": [{
                 \"title\": \"$TYPE: $RELEASE_NAME\",
-                \"description\": \"$RELEASE_BODY\n\n📦 Download: $RELEASE_URL\n🌐 Website: https://maximilian-andrew-kluge.github.io/VpMobile24/website/\",
+                \"description\": \"$DESCRIPTION\",
                 \"url\": \"$RELEASE_URL\",
-                \"color\": 2105893,
-                \"image\": {
-                  \"url\": \"https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/Discord/Event/update-banner.svg\"
-                },
+                \"color\": $COLOR,
                 \"footer\": {
-                  \"text\": \"GitHub Release System\"
+                  \"text\": \"VpMobile24 · GitHub Release System\"
                 }
-              }
-            ]
-          }" \
-          "$DISCORD_WEBHOOK"
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"
