@@ -2,7 +2,7 @@ name: Discord Release Notification
 
 on:
   release:
-    types: [published, edited]
+    types: [published, edited, prereleased, released]
   workflow_dispatch:
     inputs:
       release_name:
