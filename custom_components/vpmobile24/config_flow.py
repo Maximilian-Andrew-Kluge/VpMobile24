@@ -280,21 +280,22 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1 — choose: change subjects and/or change class."""
+        """Step 1 — choose: change subjects and/or change class and/or change state."""
         if user_input is not None:
-            change_class = user_input.get("change_class", False)
+            change_class    = user_input.get("change_class", False)
             change_subjects = user_input.get("change_subjects", False)
+            change_holidays = user_input.get("change_holidays", False)
 
-            if not change_class and not change_subjects:
-                # Nothing selected — close the flow without changes
+            if not change_class and not change_subjects and not change_holidays:
                 return self.async_create_entry(title="", data={})
 
+            if change_holidays and not change_class and not change_subjects:
+                return await self.async_step_change_holidays()
+
             if change_class:
-                # Need to enter new class name first
                 self._change_subjects = change_subjects
                 return await self.async_step_change_class()
 
-            # Only change subjects, keep current class
             self._new_class_name = (
                 self._config_entry.options.get(CONF_CLASS_NAME)
                 or self._config_entry.data.get(CONF_CLASS_NAME, "")
@@ -305,13 +306,64 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._config_entry.options.get(CONF_CLASS_NAME)
             or self._config_entry.data.get(CONF_CLASS_NAME, "")
         )
+        current_state = (
+            self._config_entry.options.get(CONF_STATE_CODE)
+            or self._config_entry.data.get(CONF_STATE_CODE, "")
+        )
+        state_label = GERMAN_STATES.get(current_state, "Nicht gesetzt") if current_state else "Nicht gesetzt"
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
                 vol.Optional("change_subjects", default=False): bool,
                 vol.Optional("change_class", default=False): bool,
+                vol.Optional("change_holidays", default=False): bool,
             }),
-            description_placeholders={"current_class": current_class},
+            description_placeholders={
+                "current_class": current_class,
+                "current_state": state_label,
+            },
+        )
+
+    async def async_step_change_holidays(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Change the federal state for holiday detection."""
+        if user_input is not None:
+            state_code = user_input.get(CONF_STATE_CODE, "")
+            current_excluded = self._config_entry.options.get(
+                CONF_EXCLUDED_SUBJECTS,
+                self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
+            )
+            current_selected = self._config_entry.options.get(
+                CONF_SELECTED_COURSES,
+                self._config_entry.data.get(CONF_SELECTED_COURSES, []),
+            )
+            current_class = (
+                self._config_entry.options.get(CONF_CLASS_NAME)
+                or self._config_entry.data.get(CONF_CLASS_NAME, "")
+            )
+            return self.async_create_entry(
+                title="",
+                data={
+                    CONF_CLASS_NAME: current_class,
+                    CONF_EXCLUDED_SUBJECTS: current_excluded,
+                    CONF_SELECTED_COURSES: current_selected,
+                    CONF_STATE_CODE: state_code,
+                },
+            )
+
+        current_state = (
+            self._config_entry.options.get(CONF_STATE_CODE)
+            or self._config_entry.data.get(CONF_STATE_CODE, "")
+        )
+        state_options = {"": "— Kein Bundesland (deaktiviert) —"}
+        state_options.update({k: v for k, v in GERMAN_STATES.items()})
+
+        return self.async_show_form(
+            step_id="change_holidays",
+            data_schema=vol.Schema({
+                vol.Optional(CONF_STATE_CODE, default=current_state): vol.In(state_options),
+            }),
         )
     async def async_step_change_class(
         self, user_input: dict[str, Any] | None = None

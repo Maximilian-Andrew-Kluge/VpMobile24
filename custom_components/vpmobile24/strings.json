@@ -46,10 +46,11 @@
     "step": {
       "init": {
         "title": "VpMobile24 Settings",
-        "description": "Current class: **{current_class}**\n\nWhat would you like to change?",
+        "description": "Current class: **{current_class}** · State: **{current_state}**\n\nWhat would you like to change?",
         "data": {
           "change_subjects": "Change subjects",
-          "change_class": "Change class"
+          "change_class": "Change class",
+          "change_holidays": "Change federal state (holidays)"
         }
       },
       "change_class": {
@@ -62,6 +63,13 @@
       "subjects": {
         "title": "Select subjects",
         "description": "Choose the subjects to display. Found: {subject_count} subjects.\n\nUnchecked subjects will be hidden."
+      },
+      "change_holidays": {
+        "title": "Federal state for holidays",
+        "description": "Select your federal state for automatic school holiday detection.",
+        "data": {
+          "state_code": "Federal state"
+        }
       }
     },
     "error": {

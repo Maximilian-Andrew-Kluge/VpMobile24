@@ -38,6 +38,40 @@
       "already_configured": "Diese Klasse ist bereits eingerichtet."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VpMobile24 Einstellungen",
+        "description": "Aktuelle Klasse: **{current_class}** · Bundesland: **{current_state}**\n\nWas möchten Sie ändern?",
+        "data": {
+          "change_subjects": "Fächer ändern",
+          "change_class": "Klasse ändern",
+          "change_holidays": "Bundesland (Ferien) ändern"
+        }
+      },
+      "change_class": {
+        "title": "Klasse ändern",
+        "description": "Geben Sie den neuen Klassennamen ein.",
+        "data": {
+          "class_name": "Klasse"
+        }
+      },
+      "subjects": {
+        "title": "Fächer auswählen",
+        "description": "Wählen Sie die anzuzeigenden Fächer. Gefunden: {subject_count} Fächer."
+      },
+      "change_holidays": {
+        "title": "Bundesland für Ferien",
+        "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
+        "data": {
+          "state_code": "Bundesland"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen."
+    }
+  },
   "issues": {
     "reconfig_required": {
       "title": "VpMobile24: Neu-Einrichtung erforderlich",
