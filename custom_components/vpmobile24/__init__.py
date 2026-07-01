@@ -118,24 +118,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
 
     # ── Migration check: warn user to re-setup if coming from old version ──
-    from homeassistant.components.repairs import async_create_issue, IssueSeverity
-    from .repairs import VERSIONS_REQUIRING_RECONFIG
+    try:
+        from homeassistant.helpers.issue_registry import async_create_issue, IssueSeverity
+        from .repairs import VERSIONS_REQUIRING_RECONFIG
 
-    stored_version = entry.data.get("_version", "")
-    if stored_version in VERSIONS_REQUIRING_RECONFIG:
-        async_create_issue(
-            hass,
-            DOMAIN,
-            "reconfig_required",
-            is_fixable=True,
-            severity=IssueSeverity.WARNING,
-            translation_key="reconfig_required",
-            translation_placeholders={"version": stored_version},
-        )
-        _LOGGER.warning(
-            "VpMobile24: Migration from v%s detected — user should re-add the integration.",
-            stored_version,
-        )
+        stored_version = entry.data.get("_version", "")
+        if stored_version in VERSIONS_REQUIRING_RECONFIG:
+            async_create_issue(
+                hass,
+                DOMAIN,
+                "reconfig_required",
+                is_fixable=True,
+                severity=IssueSeverity.WARNING,
+                translation_key="reconfig_required",
+                translation_placeholders={"version": stored_version},
+            )
+            _LOGGER.warning(
+                "VpMobile24: Migration from v%s detected — user should re-add the integration.",
+                stored_version,
+            )
+    except Exception as _repair_err:
+        _LOGGER.debug("VpMobile24: repairs module not available: %s", _repair_err)
 
     api = Stundenplan24API(
         school_id=entry.data["school_id"],
