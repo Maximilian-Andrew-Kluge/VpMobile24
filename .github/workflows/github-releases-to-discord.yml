@@ -5,14 +5,10 @@ on:
     types: [published, edited, prereleased, released]
   workflow_dispatch:
     inputs:
-      release_name:
-        description: "Release name"
-        required: true
-        default: "Manual Test Release"
-      release_url:
-        description: "Release URL"
+      tag:
+        description: "Release tag to send (leave empty for latest)"
         required: false
-        default: "https://github.com/Maximilian-Andrew-Kluge/VpMobile24"
+        default: ""
 
 jobs:
   discord-release:
@@ -22,30 +18,65 @@ jobs:
       - name: Send Discord Release Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          RELEASE_NAME: ${{ github.event.release.name || inputs.release_name }}
-          RELEASE_URL: ${{ github.event.release.html_url || inputs.release_url }}
-          RELEASE_BODY: ${{ github.event.release.body || 'Manual test run' }}
-          IS_PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
-          GITHUB_EVENT_ACTION: ${{ github.event.action || 'published' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REPO: ${{ github.repository }}
+          # From release event
+          EVENT_NAME: ${{ github.event.release.name }}
+          EVENT_URL: ${{ github.event.release.html_url }}
+          EVENT_BODY: ${{ github.event.release.body }}
+          EVENT_PRERELEASE: ${{ github.event.release.prerelease }}
+          EVENT_ACTION: ${{ github.event.action }}
         run: |
           python3 - <<'PYEOF'
           import os, json, urllib.request, sys
 
-          webhook   = os.environ["DISCORD_WEBHOOK"]
-          name      = os.environ["RELEASE_NAME"]
-          url       = os.environ["RELEASE_URL"]
-          body      = os.environ["RELEASE_BODY"]
-          prerelease = os.environ["IS_PRERELEASE"].lower() == "true"
+          webhook = os.environ["DISCORD_WEBHOOK"]
+          token   = os.environ.get("GITHUB_TOKEN", "")
+          repo    = os.environ.get("REPO", "")
+          tag     = os.environ.get("INPUT_TAG", "").strip()
+
+          # Try to get data from release event first
+          name      = os.environ.get("EVENT_NAME", "").strip()
+          url       = os.environ.get("EVENT_URL", "").strip()
+          body      = os.environ.get("EVENT_BODY", "").strip()
+          prerelease_str = os.environ.get("EVENT_PRERELEASE", "").strip()
+          event_action   = os.environ.get("EVENT_ACTION", "published").strip()
+
+          # If no event data (manual run) → fetch from GitHub API
+          if not name or not url:
+              api_url = f"https://api.github.com/repos/{repo}/releases"
+              if tag:
+                  api_url = f"https://api.github.com/repos/{repo}/releases/tags/{tag}"
+              else:
+                  api_url = f"https://api.github.com/repos/{repo}/releases/latest"
+
+              headers = {"Accept": "application/vnd.github+json"}
+              if token:
+                  headers["Authorization"] = f"Bearer {token}"
+
+              req = urllib.request.Request(api_url, headers=headers)
+              try:
+                  with urllib.request.urlopen(req) as resp:
+                      release = json.loads(resp.read().decode())
+                      name           = release.get("name") or release.get("tag_name", "")
+                      url            = release.get("html_url", "")
+                      body           = release.get("body", "")
+                      prerelease_str = str(release.get("prerelease", False)).lower()
+                      event_action   = "manual"
+              except Exception as e:
+                  print(f"Failed to fetch release: {e}")
+                  sys.exit(1)
+
+          prerelease = prerelease_str.lower() in ("true", "1", "yes")
 
           if prerelease:
               title_prefix = "🧪 Beta / Pre-Release"
-              color = 16776960  # yellow
+              color = 16776960
           else:
               title_prefix = "🚀 Neues Release"
-              color = 3066993   # green
+              color = 3066993
 
-          # Mark as update if release was edited
-          event_action = os.environ.get("GITHUB_EVENT_ACTION", "published")
           if event_action == "edited":
               title_prefix += " (aktualisiert)"
 
@@ -79,6 +110,7 @@ jobs:
           try:
               with urllib.request.urlopen(req) as resp:
                   print(f"HTTP Status: {resp.status}")
+                  print(f"Sent: {title_prefix}: {name}")
                   print("Discord notification sent successfully!")
           except urllib.error.HTTPError as e:
               print(f"HTTP Status: {e.code}")
