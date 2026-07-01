@@ -6,10 +6,9 @@
 
 <br/><br/>
 
-
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.5.0-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.5.1-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.5.2-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -43,7 +42,12 @@
 >
 > 🧪 **v2.5.2** — Beta / Pre-Release verfügbar
 >
-> Enthält Bug Fixes und Verbesserungen. Für Tester geeignet.
+> Enthält Bug Fixes, Verbesserungen und neue Funktionen. Für Tester geeignet.
+>
+> **Neue Features in v2.5.2:**
+> - Der Aktualisieren-Button wird grün und dreht sich beim Drücken
+> - Neuer Ferien-Sensor — Ferien werden automatisch in den Karten angezeigt
+> - Aktueller Unterricht zeigt wieder korrekt den laufenden Unterricht an
 >
 > 🔗 [Beta Release →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
@@ -62,8 +66,8 @@
 Beispiele:
 
 * `v2.5.1` → Kritischer Bugfix
-* `v2.5.2` → Sicherheitsupdate
-* `v2.6.0` → Neue Funktionen
+* `v2.5.2` → Neue Funktionen + Bugfixes
+* `v2.6.0` → Größeres Feature-Update
 
 ---
 
@@ -81,7 +85,6 @@ Beispiele:
 
 ---
 
-
 ## 📌 Beschreibung
 
 **VpMobile24** ist eine moderne Home-Assistant-Integration für **Stundenplan24.de / VpMobil24**.
@@ -94,6 +97,7 @@ Die Integration bringt deinen Stundenplan direkt in Home Assistant und erstellt 
 * Wochentabelle
 * Änderungen
 * Zusatzinformationen
+* Schulferien (automatisch via Bundesland)
 
 Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
@@ -103,20 +107,22 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ### 📡 Sensoren
 
-| Sensor               | Beschreibung              |
-| -------------------- | ------------------------- |
-| week_table           | Komplette Wochentabelle   |
-| naechste_stunde      | Nächste Unterrichtsstunde |
-| heutiger_stundenplan | Stundenplan heute         |
-| zusatzinfos          | Allgemeine Informationen  |
-| aenderungen          | Änderungen & Vertretungen |
-| aktueller_unterricht | Aktuell laufende Stunde   |
+| Sensor               | Beschreibung                          |
+| -------------------- | ------------------------------------- |
+| week_table           | Komplette Wochentabelle               |
+| naechste_stunde      | Nächste Unterrichtsstunde             |
+| heutiger_stundenplan | Stundenplan heute                     |
+| zusatzinfos          | Allgemeine Informationen              |
+| aenderungen          | Änderungen & Vertretungen             |
+| aktueller_unterricht | Aktuell laufende Stunde               |
+| ferien               | Schulferien (automatisch per Bundesland) |
 
 ### 🃏 Lovelace Card
 
 * Wochenansicht mit KW-Anzeige und Wochennavigation
 * Mehrere Klassen (kollabierbare Abschnitte, Statistik-Badges)
 * Aktueller Unterricht (Live-Fortschrittsbalken, Countdown, Nächste Stunde)
+* **Ferien-Anzeige** — automatisch wenn Ferien sind (🏖️)
 * Responsive Design (Desktop + Mobile)
 * Mehrsprachig: DE / EN / FR
 * Parallelkurs-Filter
@@ -125,15 +131,17 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 * CSP-sicher (nginx, DuckDNS, Reverse Proxy)
 * Automatische Aktualisierung alle 15 Minuten
 
-### 🆕 Neue Features in v2.5.0 / v2.5.1
+### 🆕 Neue Features in v2.5.0 / v2.5.2
 
 * **Aktueller Unterricht** — Echtzeit-Erkennung auch bei Vertretungen
 * **SmartHint** — Nächste Stunde wird auch während der Pause angezeigt, keine Ausfälle mehr
 * **Vor Schulbeginn** — Karte zeigt `🌙 Noch kein Unterricht` statt `⏸ Pause`
 * **Info-Popup** — Zusatzinformationen des Tages korrekt angezeigt
-* **Reload-Button** — Pfeil dreht sich beim Aktualisieren
+* **Reload-Button** — Pfeil dreht sich grün beim Aktualisieren
 * **Parallelkurs-Filter** — Ausfälle fremder Kurse werden automatisch gefiltert
 * **Sensoren** — `aktueller_unterricht` und `naechste_stunde` erkennen jetzt auch Vertretungsstunden
+* **Ferien-Sensor** — automatische Ferienerkennung via openholidaysapi.org (Bundesland auswählbar)
+* **Ferien in Karten** — alle drei Karten zeigen `🏖️ Ferienname` wenn Ferien sind
 
 ---
 
@@ -187,7 +195,6 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 </tr>
 </table>
 
-
 ---
 
 # 🚀 Installation
@@ -234,6 +241,7 @@ Dann eingeben:
 * Passwort
 * Klasse auswählen
 * Fächer auswählen (Parallelkurse einzeln wählen)
+* Bundesland auswählen (für automatische Ferienerkennung)
 
 ---
 
@@ -268,14 +276,15 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 # 📡 Sensoren
 
-| Sensor               | State        | Attribute                  |
-| -------------------- | ------------ | -------------------------- |
-| week_table           | Anzahl       | week_table, next_week_table |
-| naechste_stunde      | Fach         | zeit, lehrer, raum         |
-| heutiger_stundenplan | Anzahl       | stunden_heute              |
-| zusatzinfos          | Anzahl       | allgemeine_infos           |
-| aenderungen          | Anzahl       | alle_aenderungen           |
-| aktueller_unterricht | Fach         | fach, lehrer, raum         |
+| Sensor               | State        | Attribute                       |
+| -------------------- | ------------ | ------------------------------- |
+| week_table           | Anzahl       | week_table, next_week_table     |
+| naechste_stunde      | Fach         | zeit, lehrer, raum              |
+| heutiger_stundenplan | Anzahl       | stunden_heute                   |
+| zusatzinfos          | Anzahl       | allgemeine_infos                |
+| aenderungen          | Anzahl       | alle_aenderungen                |
+| aktueller_unterricht | Fach         | fach, lehrer, raum              |
+| ferien               | Ferienname   | ist_ferien, start, end, bundesland |
 
 ---
 
@@ -301,6 +310,11 @@ Mehrere Klassen und Parallelkurse werden unterstützt.
 
 In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`, `7INb1`).
 Wähle nur deinen eigenen Kurs aus — dann werden Ausfälle anderer Gruppen nicht angezeigt.
+
+### Wie funktioniert die Ferienerkennung?
+
+Beim Einrichten oder über Einstellungen → VpMobile24 → Konfigurieren ein Bundesland auswählen.
+Die Integration fragt automatisch [openholidaysapi.org](https://openholidaysapi.org) ab und zeigt Ferien in allen Karten an.
 
 ---
 
