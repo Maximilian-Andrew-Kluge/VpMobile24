@@ -31,6 +31,23 @@
           document.querySelectorAll('.gh-version-stable').forEach(el => {
             el.textContent = stable.tag_name;
           });
+          // Update release banner with latest release name
+          const bannerVersion = document.getElementById('banner-version');
+          const bannerLink = document.getElementById('banner-link');
+          if (bannerVersion) {
+            const displayName = stable.name || stable.tag_name;
+            bannerVersion.textContent = displayName;
+          }
+          if (bannerLink) {
+            bannerLink.href = stable.html_url;
+          }
+          // Pre-release: yellow banner
+          const banner = document.getElementById('announcement-banner');
+          if (banner && stable.prerelease) {
+            banner.style.background = 'linear-gradient(135deg,#ca8a04,#a16207)';
+            const icon = banner.querySelector('span');
+            if (icon) icon.textContent = '🧪';
+          }
         }
 
         // Only show beta badge if a DIFFERENT pre-release exists
@@ -51,12 +68,12 @@
 </head>
 <body>
 
-  <!-- ===== RELEASE BANNER v2.5.0 ===== -->
+  <!-- ===== RELEASE BANNER – dynamisch via GitHub API ===== -->
   <div id="announcement-banner" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;text-align:center;padding:12px 20px;font-family:'Inter',sans-serif;font-size:.9em;font-weight:600;position:relative;z-index:100;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
     <span>🚀</span>
-    <span><strong>VpMobile24 v2.5.0</strong> ist jetzt verfügbar!</span>
+    <span id="banner-text"><strong id="banner-version">VpMobile24</strong> ist jetzt verfügbar!</span>
     <span style="opacity:.7">·</span>
-    <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest" target="_blank" rel="noopener" style="color:#bbf7d0;text-decoration:underline;text-underline-offset:2px;font-weight:700;">Release Notes →</a>
+    <a id="banner-link" href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest" target="_blank" rel="noopener" style="color:#bbf7d0;text-decoration:underline;text-underline-offset:2px;font-weight:700;">Release Notes →</a>
     <button onclick="document.getElementById('announcement-banner').style.display='none'" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.7);font-size:1.2em;cursor:pointer;padding:4px 8px;" title="Schließen">✕</button>
   </div>
   <header class="hero">
