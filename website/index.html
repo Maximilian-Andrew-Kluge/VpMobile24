@@ -26,8 +26,8 @@
           if (stable && beta) break;
         }
 
-        // Banner shows the NEWEST release (pre-release or stable — whichever is newer)
-        const newest = releases[0]; // API returns newest first
+        // Banner shows the latest STABLE release only
+        const newest = stable;
         const banner = document.getElementById('announcement-banner');
         const bannerVersion = document.getElementById('banner-version');
         const bannerLink = document.getElementById('banner-link');
