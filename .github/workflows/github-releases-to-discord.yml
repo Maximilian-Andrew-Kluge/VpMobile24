@@ -27,7 +27,6 @@ jobs:
           RELEASE_BODY: ${{ github.event.release.body || 'Manual test run' }}
           IS_PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
         run: |
-          # Pre-release or full release
           if [ "$IS_PRERELEASE" = "true" ]; then
             TYPE="🧪 Beta / Pre-Release"
             COLOR=16776960
@@ -36,24 +35,42 @@ jobs:
             COLOR=3066993
           fi
 
-          # Sanitize body: remove newlines and escape quotes
-          SAFE_BODY=$(echo "$RELEASE_BODY" | tr '\n' ' ' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+          # Sanitize: single line, escape backslashes and quotes
+          SAFE_BODY=$(printf '%s' "$RELEASE_BODY" | tr '\n' ' ' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+          SAFE_NAME=$(printf '%s' "$RELEASE_NAME" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+          SAFE_URL=$(printf '%s' "$RELEASE_URL" | sed 's/"/\\"/g')
 
-          DESCRIPTION="$SAFE_BODY\n\n📦 **Download:** $RELEASE_URL\n🌐 **Website:** https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
+          DESCRIPTION="${SAFE_BODY}\\n\\n📦 **Download:** ${SAFE_URL}\\n🌐 **Website:** https://maximilian-andrew-kluge.github.io/VpMobile24/website/"
 
-          curl -s -o /dev/null -w "%{http_code}" \
+          PAYLOAD=$(cat <<EOF
+          {
+            "username": "VpMobile24 Release Bot",
+            "embeds": [{
+              "title": "${TYPE}: ${SAFE_NAME}",
+              "description": "${DESCRIPTION}",
+              "url": "${SAFE_URL}",
+              "color": ${COLOR},
+              "footer": {
+                "text": "VpMobile24 · GitHub Release System"
+              }
+            }]
+          }
+          EOF
+          )
+
+          echo "Sending to Discord..."
+          HTTP_STATUS=$(curl -s -o /tmp/discord_response.txt -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -X POST \
-            -d "{
-              \"username\": \"VpMobile24 Release Bot\",
-              \"embeds\": [{
-                \"title\": \"$TYPE: $RELEASE_NAME\",
-                \"description\": \"$DESCRIPTION\",
-                \"url\": \"$RELEASE_URL\",
-                \"color\": $COLOR,
-                \"footer\": {
-                  \"text\": \"VpMobile24 · GitHub Release System\"
-                }
-              }]
-            }" \
-            "$DISCORD_WEBHOOK"
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK")
+
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response: $(cat /tmp/discord_response.txt)"
+
+          if [ "$HTTP_STATUS" != "204" ] && [ "$HTTP_STATUS" != "200" ]; then
+            echo "Discord webhook failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+          echo "Discord notification sent successfully!"
