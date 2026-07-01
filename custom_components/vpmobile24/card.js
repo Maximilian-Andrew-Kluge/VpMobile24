@@ -742,26 +742,8 @@ class VpMobile24Card extends HTMLElement {
     const isHolidayFromSensor = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
     const holidayNameFromSensor = isHolidayFromSensor ? (holidayEnt.state || 'Ferien') : '';
 
-    // Auto-detect holidays from empty week_table (all days empty = Ferien)
-    const _isWeekEmpty = (wt) => {
-      if (!wt) return false;
-      const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
-      return dayKeys.every(dk => {
-        const day = wt[dk] || {};
-        return Object.keys(day).length === 0 || Object.values(day).every(l => !l || !l.fach);
-      });
-    };
-
-    // Determine holiday state
-    const weekTableForHolidayCheck = entity.attributes.week_table;
-    const isWeekEmpty = weekOffset === 0 && _isWeekEmpty(weekTableForHolidayCheck);
-    const isHoliday = isHolidayFromSensor || isWeekEmpty;
-    // Name: from sensor, or next holiday name, or generic
+    const isHoliday = isHolidayFromSensor;
     let holidayName = holidayNameFromSensor;
-    if (!holidayName && isWeekEmpty) {
-      const nextName = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.naechste_ferien_name;
-      holidayName = nextName || (t.holiday || 'Ferien');
-    }
 
     // ── Full holiday screen ─────────────────────────────────────────────
     if (isHoliday) {
