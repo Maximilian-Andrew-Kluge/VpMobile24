@@ -53,6 +53,7 @@ class VpMobile24Card extends HTMLElement {
            cancel:'AUSFALL', close:'Schließen', period:'Stunde',
            teacher:'Lehrer', room:'Raum', info:'Info',
            cancelled:'Ausfall', substitution:'Vertretung',
+           holiday:'Schulferien',
            noDetail:'Keine weiteren Details verfügbar.',
            noInfo:(d)=>'Keine Zusatzinformationen für '+d+' verfügbar.',
            genInfo:'📢 Allgemeine Informationen',
@@ -71,6 +72,7 @@ class VpMobile24Card extends HTMLElement {
            cancel:'CANCELLED', close:'Close', period:'Period',
            teacher:'Teacher', room:'Room', info:'Info',
            cancelled:'Cancelled', substitution:'Substitution',
+           holiday:'School Holidays',
            noDetail:'No further details available.',
            noInfo:(d)=>'No additional info for '+d+' available.',
            genInfo:'📢 General Information',
@@ -89,6 +91,7 @@ class VpMobile24Card extends HTMLElement {
            cancel:'ANNUL\u00c9', close:'Fermer', period:'Heure',
            teacher:'Prof', room:'Salle', info:'Info',
            cancelled:'Annul\u00e9', substitution:'Remplacement',
+           holiday:'Vacances scolaires',
            noDetail:'Aucun d\u00e9tail disponible.',
            noInfo:(d)=>'Aucune info pour '+d+'.',
            genInfo:'📢 Informations g\u00e9n\u00e9rales',
@@ -736,8 +739,30 @@ class VpMobile24Card extends HTMLElement {
 
     // ── Holiday check ──────────────────────────────────────────────────
     const holidayEnt = holidayEntity ? this._hass.states[holidayEntity] : null;
-    const isHoliday  = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
-    const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
+    const isHolidayFromSensor = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
+    const holidayNameFromSensor = isHolidayFromSensor ? (holidayEnt.state || 'Ferien') : '';
+
+    // Auto-detect holidays from empty week_table (all days empty = Ferien)
+    const _isWeekEmpty = (wt) => {
+      if (!wt) return false;
+      const dayKeys = ['monday','tuesday','wednesday','thursday','friday'];
+      return dayKeys.every(dk => {
+        const day = wt[dk] || {};
+        return Object.keys(day).length === 0 || Object.values(day).every(l => !l || !l.fach);
+      });
+    };
+
+    // Determine holiday state
+    const weekTableForHolidayCheck = entity.attributes.week_table;
+    const isWeekEmpty = weekOffset === 0 && _isWeekEmpty(weekTableForHolidayCheck);
+    const isHoliday = isHolidayFromSensor || isWeekEmpty;
+    // Name: from sensor, or next holiday name, or generic
+    let holidayName = holidayNameFromSensor;
+    if (!holidayName && isWeekEmpty) {
+      // Try next holiday name from sensor
+      const nextName = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.naechste_ferien_name;
+      holidayName = nextName || (t.holiday || 'Ferien');
+    }
 
     // Pick correct week table
     const weekTable = weekOffset === 2
