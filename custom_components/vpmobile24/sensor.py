@@ -104,6 +104,7 @@ async def async_setup_entry(
         VpMobile24AdditionalInfoSensor(coordinator, config_entry, language),
         VpMobile24ChangesSensor(coordinator, config_entry, language),
         VpMobile24CurrentLessonSensor(coordinator, config_entry, language),
+        VpMobile24HolidaySensor(coordinator, config_entry, language),
     ])
 
 
@@ -846,3 +847,161 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
             except (ValueError, TypeError):
                 continue
         return None
+
+
+class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
+    """Sensor für Schulferien – erkennt automatisch Ferien via openholidaysapi.org."""
+
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = "VpMobile24 Ferien"
+        self._attr_unique_id = f"{config_entry.entry_id}_ferien"
+        self._attr_icon = "mdi:beach"
+        self._holiday_cache: dict = {}
+        self._cache_date: str = ""
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
+
+    @property
+    def state(self) -> str:
+        data = self._get_holiday_data()
+        if data and data.get("is_holiday"):
+            return data["name"]
+        return "Kein Ferien"
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        data = self._get_holiday_data()
+        if not data:
+            return {
+                "ist_ferien": False,
+                "name": None,
+                "start": None,
+                "end": None,
+                "naechste_ferien_name": None,
+                "naechste_ferien_start": None,
+                "naechste_ferien_end": None,
+                "bundesland": self._state_code(),
+            }
+        return {
+            "ist_ferien": data.get("is_holiday", False),
+            "name": data.get("name"),
+            "start": data.get("start"),
+            "end": data.get("end"),
+            "naechste_ferien_name": data.get("next_name"),
+            "naechste_ferien_start": data.get("next_start"),
+            "naechste_ferien_end": data.get("next_end"),
+            "bundesland": self._state_code(),
+            "manuell": data.get("manual", False),
+        }
+
+    def _state_code(self) -> str:
+        return (
+            self._config_entry.options.get("state_code")
+            or self._config_entry.data.get("state_code", "")
+        )
+
+    def _custom_holidays(self) -> list:
+        return (
+            self._config_entry.options.get("custom_holidays")
+            or self._config_entry.data.get("custom_holidays", [])
+        )
+
+    def _get_holiday_data(self) -> dict | None:
+        today = datetime.now().date()
+        today_str = today.isoformat()
+
+        if self._cache_date == today_str and self._holiday_cache:
+            return self._holiday_cache
+
+        # Check manual holidays first
+        for h in self._custom_holidays():
+            try:
+                h_start = datetime.fromisoformat(h["start"]).date()
+                h_end   = datetime.fromisoformat(h["end"]).date()
+                if h_start <= today <= h_end:
+                    self._holiday_cache = {
+                        "is_holiday": True,
+                        "name": h.get("name", "Ferien"),
+                        "start": h["start"],
+                        "end": h["end"],
+                        "manual": True,
+                    }
+                    self._cache_date = today_str
+                    return self._holiday_cache
+            except (KeyError, ValueError):
+                continue
+
+        # Check API cache (populated by coordinator update)
+        api_data = getattr(self.coordinator, "_holiday_data", None)
+        if api_data:
+            for h in api_data:
+                try:
+                    h_start = datetime.fromisoformat(h.get("startDate", "")).date()
+                    h_end   = datetime.fromisoformat(h.get("endDate", "")).date()
+                    if h_start <= today <= h_end:
+                        name = ""
+                        for n in h.get("name", []):
+                            if n.get("language") == "DE":
+                                name = n.get("text", "Ferien")
+                                break
+                        if not name and h.get("name"):
+                            name = h["name"][0].get("text", "Ferien")
+                        self._holiday_cache = {
+                            "is_holiday": True,
+                            "name": name,
+                            "start": h.get("startDate"),
+                            "end": h.get("endDate"),
+                            "manual": False,
+                        }
+                        # Find next holiday
+                        for nh in api_data:
+                            try:
+                                nh_start = datetime.fromisoformat(nh.get("startDate", "")).date()
+                                if nh_start > today:
+                                    nn = ""
+                                    for n in nh.get("name", []):
+                                        if n.get("language") == "DE":
+                                            nn = n.get("text", "")
+                                            break
+                                    self._holiday_cache["next_name"]  = nn
+                                    self._holiday_cache["next_start"] = nh.get("startDate")
+                                    self._holiday_cache["next_end"]   = nh.get("endDate")
+                                    break
+                            except (ValueError, TypeError):
+                                continue
+                        self._cache_date = today_str
+                        return self._holiday_cache
+                except (ValueError, TypeError):
+                    continue
+
+            # Not in holiday — find next
+            next_h = None
+            for h in sorted(api_data, key=lambda x: x.get("startDate", "")):
+                try:
+                    h_start = datetime.fromisoformat(h.get("startDate", "")).date()
+                    if h_start > today:
+                        next_h = h
+                        break
+                except (ValueError, TypeError):
+                    continue
+
+            result: dict = {"is_holiday": False, "manual": False}
+            if next_h:
+                nn = ""
+                for n in next_h.get("name", []):
+                    if n.get("language") == "DE":
+                        nn = n.get("text", "")
+                        break
+                result["next_name"]  = nn
+                result["next_start"] = next_h.get("startDate")
+                result["next_end"]   = next_h.get("endDate")
+            self._holiday_cache = result
+            self._cache_date = today_str
+            return result
+
+        return {"is_holiday": False}

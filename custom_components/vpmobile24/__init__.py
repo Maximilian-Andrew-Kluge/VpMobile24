@@ -117,6 +117,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up vpmobile24 from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
+    # ── Migration check: warn user to re-setup if coming from old version ──
+    from homeassistant.components.repairs import async_create_issue, IssueSeverity
+    from .repairs import VERSIONS_REQUIRING_RECONFIG
+
+    stored_version = entry.data.get("_version", "")
+    if stored_version in VERSIONS_REQUIRING_RECONFIG:
+        async_create_issue(
+            hass,
+            DOMAIN,
+            "reconfig_required",
+            is_fixable=True,
+            severity=IssueSeverity.WARNING,
+            translation_key="reconfig_required",
+            translation_placeholders={"version": stored_version},
+        )
+        _LOGGER.warning(
+            "VpMobile24: Migration from v%s detected — user should re-add the integration.",
+            stored_version,
+        )
+
     api = Stundenplan24API(
         school_id=entry.data["school_id"],
         username=entry.data["username"],
@@ -247,6 +267,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
+        self._holiday_data: list = []
         super().__init__(
             hass,
             _LOGGER,
@@ -562,6 +583,10 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             }
 
             _LOGGER.debug("Data update completed successfully")
+
+            # ── Fetch school holidays from openholidaysapi.org ──────────────
+            await self._async_update_holidays()
+
             return today_data
 
         except Exception as e:

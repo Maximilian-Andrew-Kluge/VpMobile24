@@ -25,6 +25,13 @@
       "subjects": {
         "title": "Select subjects",
         "description": "Choose the subjects to display. Found: {subject_count} subjects."
+      },
+      "holidays": {
+        "title": "School holidays (optional)",
+        "description": "Select your federal state to automatically detect school holidays.",
+        "data": {
+          "state_code": "Federal state"
+        }
       }
     },
     "error": {
@@ -61,6 +68,12 @@
       "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials."
     }
   },
+  "issues": {
+    "reconfig_required": {
+      "title": "VpMobile24: Re-setup required",
+      "description": "You are updating from version {version}. Due to new features (school holidays, improved sensors), please **delete and re-add** the VpMobile24 integration once.\n\n1. Go to Settings → Devices & Services\n2. Remove VpMobile24\n3. Add VpMobile24 again\n\nYour data will not be lost."
+    }
+  },
   "entity": {
     "sensor": {
       "naechste_stunde": {
@@ -77,6 +90,9 @@
       },
       "aenderungen": {
         "name": "Changes"
+      },
+      "ferien": {
+        "name": "School Holidays"
       }
     }
   }

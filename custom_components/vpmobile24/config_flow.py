@@ -18,8 +18,11 @@ from .const import (
     CONF_CLASS_NAME,
     CONF_EXCLUDED_SUBJECTS,
     CONF_SELECTED_COURSES,
+    CONF_STATE_CODE,
+    CONF_CUSTOM_HOLIDAYS,
     DEFAULT_BASE_URL,
     DOMAIN,
+    GERMAN_STATES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -197,7 +200,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title=entry_title,
                 data=self._config_data,
             )
-
         if not self._available_subjects:
             return self.async_show_form(
                 step_id="subjects",
@@ -232,6 +234,35 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     len(self._available_subjects)
                 ),
             },
+        )
+
+    async def async_step_holidays(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step 4 — optional: select federal state for automatic holiday detection."""
+        if user_input is not None:
+            state_code = user_input.get(CONF_STATE_CODE, "")
+            if state_code:
+                self._config_data[CONF_STATE_CODE] = state_code
+
+            class_name = self._config_data.get(CONF_CLASS_NAME, "")
+            school_id = self._config_data.get(CONF_SCHOOL_ID, "")
+            entry_title = f"VpMobile24 – {class_name} ({school_id})"
+
+            await self.async_set_unique_id(f"{school_id}_{class_name}")
+            self._abort_if_unique_id_configured()
+
+            return self.async_create_entry(title=entry_title, data=self._config_data)
+
+        state_options = {"": "— Kein Bundesland (deaktiviert) —"}
+        state_options.update({k: v for k, v in GERMAN_STATES.items()})
+
+        return self.async_show_form(
+            step_id="holidays",
+            data_schema=vol.Schema({
+                vol.Optional(CONF_STATE_CODE, default=""): vol.In(state_options),
+            }),
         )
 
 

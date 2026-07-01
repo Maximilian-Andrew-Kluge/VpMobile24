@@ -20,6 +20,13 @@
       "subjects": {
         "title": "Select Subjects",
         "description": "Choose the subjects to display."
+      },
+      "holidays": {
+        "title": "School Holidays (optional)",
+        "description": "Select your federal state for automatic school holiday detection.",
+        "data": {
+          "state_code": "Federal State"
+        }
       }
     },
     "error": {
@@ -29,6 +36,12 @@
     },
     "abort": {
       "already_configured": "This class is already configured."
+    }
+  },
+  "issues": {
+    "reconfig_required": {
+      "title": "VpMobile24: Re-setup required",
+      "description": "You are updating from version **{version}**. Due to new features (school holidays, improved sensors), please **delete and re-add** the VpMobile24 integration once.\n\n1. Settings → Devices & Services\n2. Remove VpMobile24\n3. Add VpMobile24 again\n\nYour data will not be lost."
     }
   },
   "entity": {
@@ -47,6 +60,9 @@
       },
       "aenderungen": {
         "name": "Changes"
+      },
+      "ferien": {
+        "name": "School Holidays"
       }
     }
   }

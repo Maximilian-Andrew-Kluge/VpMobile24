@@ -20,6 +20,13 @@
       "subjects": {
         "title": "Fächer auswählen",
         "description": "Wählen Sie die anzuzeigenden Fächer."
+      },
+      "holidays": {
+        "title": "Schulferien (optional)",
+        "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
+        "data": {
+          "state_code": "Bundesland"
+        }
       }
     },
     "error": {
@@ -29,6 +36,12 @@
     },
     "abort": {
       "already_configured": "Diese Klasse ist bereits eingerichtet."
+    }
+  },
+  "issues": {
+    "reconfig_required": {
+      "title": "VpMobile24: Neu-Einrichtung erforderlich",
+      "description": "Du aktualisierst von Version **{version}**. Wegen neuer Funktionen (Schulferien, verbesserte Sensoren) bitte die Integration **einmal löschen und neu hinzufügen**.\n\n1. Einstellungen → Geräte & Dienste\n2. VpMobile24 entfernen\n3. VpMobile24 neu hinzufügen\n\nDeine Daten gehen dabei nicht verloren."
     }
   },
   "entity": {
@@ -47,6 +60,9 @@
       },
       "aenderungen": {
         "name": "Änderungen"
+      },
+      "ferien": {
+        "name": "Schulferien"
       }
     }
   }
