@@ -287,10 +287,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             change_holidays = user_input.get("change_holidays", False)
 
             if not change_class and not change_subjects and not change_holidays:
+                # Check if only custom holidays was selected
+                change_custom = user_input.get("change_custom_holidays", False)
+                if change_custom:
+                    return await self.async_step_custom_holidays()
                 return self.async_create_entry(title="", data={})
 
             if change_holidays and not change_class and not change_subjects:
-                # Check if user also wants custom holidays
                 change_custom = user_input.get("change_custom_holidays", False)
                 if change_custom:
                     return await self.async_step_custom_holidays()
