@@ -41,7 +41,7 @@
 
 > [!NOTE]
 >
-> 🧪 **v2.5.1** — Beta / Pre-Release verfügbar
+> 🧪 **v2.5.2** — Beta / Pre-Release verfügbar
 >
 > Enthält Bug Fixes und Verbesserungen. Für Tester geeignet.
 >
