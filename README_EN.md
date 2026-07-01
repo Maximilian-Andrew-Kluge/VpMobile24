@@ -8,8 +8,8 @@
 <br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Stable-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
+[![Version](https://img.shields.io/badge/Stable-v2.5.0-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+[![Beta](https://img.shields.io/badge/Beta-v2.5.1-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -31,15 +31,21 @@
 
 > [!IMPORTANT]
 >
-> 🎉 **VpMobile24 v2.5.0 is now available**
+> 🎉 **VpMobile24 v2.5.0** — Stable Release
 >
 > 📅 Released on **June 8, 2026**
 >
-> 📥 Update now via HACS
+> 📥 Update now via HACS.
 >
-> 🔗 Release Notes:
+> 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+
+> [!NOTE]
 >
-> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.5.0
+> 🧪 **v2.5.1** — Beta / Pre-Release available
+>
+> Contains bug fixes and improvements. Suitable for testers.
+>
+> 🔗 [Beta Release →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
 ---
 
@@ -107,11 +113,26 @@ Additionally, modern Lovelace cards are included.
 
 ## 🃏 Lovelace Cards
 
-* Weekly overview
-* Multiple classes
-* Current lesson
-* Responsive design
-* DE / EN / FR
+* Weekly overview with KW display and week navigation
+* Multiple classes (collapsible sections, statistics badges)
+* Current lesson (live progress bar, countdown, next lesson)
+* Responsive design (desktop + mobile)
+* Multilingual: DE / EN / FR
+* Parallel course filter
+* Smart status bar (cancellations, substitutions, end of school day)
+* Tooltips with teacher & room
+* CSP-safe (nginx, DuckDNS, reverse proxy)
+* Automatic updates every 15 minutes
+
+## 🆕 New in v2.5.0 / v2.5.1
+
+* **Current lesson** — real-time detection including substitutions
+* **SmartHint** — next lesson shown during breaks, cancelled lessons filtered out
+* **Before school** — card shows `🌙 No lessons yet` instead of `⏸ Break`
+* **Info popup** — additional info for the day displayed correctly
+* **Reload button** — arrow spins when refreshing
+* **Parallel course filter** — cancellations of other course groups filtered automatically
+* **Sensors** — `aktueller_unterricht` and `naechste_stunde` now detect substitutions
 * Parallel course support
 * Automatic updates
 

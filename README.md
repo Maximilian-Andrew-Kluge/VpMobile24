@@ -8,8 +8,8 @@
 
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Version-2.5.0-3b82f6?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
-[![Status](https://img.shields.io/badge/Status-Stable-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24)
+[![Version](https://img.shields.io/badge/Stable-v2.5.0-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+[![Beta](https://img.shields.io/badge/Beta-v2.5.1-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -31,15 +31,21 @@
 
 > [!IMPORTANT]
 >
-> 🎉 **VpMobile24 v2.5.0 ist jetzt verfügbar**
+> 🎉 **VpMobile24 v2.5.0** — Stable Release
 >
 > 📅 Veröffentlicht am **08.06.2026**
 >
 > 📥 Jetzt über HACS aktualisieren.
 >
-> 🔗 Release Notes:
+> 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+
+> [!NOTE]
 >
-> https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases
+> 🧪 **v2.5.1** — Beta / Pre-Release verfügbar
+>
+> Enthält Bug Fixes und Verbesserungen. Für Tester geeignet.
+>
+> 🔗 [Beta Release →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
 ---
 
@@ -108,13 +114,26 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ### 🃏 Lovelace Card
 
-* Wochenansicht
-* Mehrere Klassen
-* Aktueller Unterricht
-* Responsive Design
-* DE / EN / FR
-* Parallelkurse
-* Automatische Aktualisierung
+* Wochenansicht mit KW-Anzeige und Wochennavigation
+* Mehrere Klassen (kollabierbare Abschnitte, Statistik-Badges)
+* Aktueller Unterricht (Live-Fortschrittsbalken, Countdown, Nächste Stunde)
+* Responsive Design (Desktop + Mobile)
+* Mehrsprachig: DE / EN / FR
+* Parallelkurs-Filter
+* Smart Status Bar (Ausfälle, Vertretungen, Unterrichtsende)
+* Tooltips mit Lehrer & Raum
+* CSP-sicher (nginx, DuckDNS, Reverse Proxy)
+* Automatische Aktualisierung alle 15 Minuten
+
+### 🆕 Neue Features in v2.5.0 / v2.5.1
+
+* **Aktueller Unterricht** — Echtzeit-Erkennung auch bei Vertretungen
+* **SmartHint** — Nächste Stunde wird auch während der Pause angezeigt, keine Ausfälle mehr
+* **Vor Schulbeginn** — Karte zeigt `🌙 Noch kein Unterricht` statt `⏸ Pause`
+* **Info-Popup** — Zusatzinformationen des Tages korrekt angezeigt
+* **Reload-Button** — Pfeil dreht sich beim Aktualisieren
+* **Parallelkurs-Filter** — Ausfälle fremder Kurse werden automatisch gefiltert
+* **Sensoren** — `aktueller_unterricht` und `naechste_stunde` erkennen jetzt auch Vertretungsstunden
 
 ---
 
