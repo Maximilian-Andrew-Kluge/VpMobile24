@@ -759,9 +759,74 @@ class VpMobile24Card extends HTMLElement {
     // Name: from sensor, or next holiday name, or generic
     let holidayName = holidayNameFromSensor;
     if (!holidayName && isWeekEmpty) {
-      // Try next holiday name from sensor
       const nextName = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.naechste_ferien_name;
       holidayName = nextName || (t.holiday || 'Ferien');
+    }
+
+    // ── Full holiday screen ─────────────────────────────────────────────
+    if (isHoliday) {
+      const endDate = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.end;
+      const nextStart = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.naechste_ferien_start;
+      const nextName  = holidayEnt && holidayEnt.attributes && holidayEnt.attributes.naechste_ferien_name;
+      const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+      const fmtDate = (ds) => ds ? new Date(ds).toLocaleDateString(haLang === 'en' ? 'en-GB' : haLang === 'fr' ? 'fr-FR' : 'de-DE', {day:'2-digit', month:'2-digit', year:'numeric'}) : '';
+      const untilStr = haLang === 'en' ? 'Until' : haLang === 'fr' ? 'Jusqu\'au' : 'Bis';
+      const nextStr  = haLang === 'en' ? 'Next' : haLang === 'fr' ? 'Prochain' : 'Nächste';
+      this.shadowRoot.innerHTML = `
+<style>
+:host { display: block; }
+ha-card {
+  background: linear-gradient(135deg, #0f1729 0%, #1a2a1a 100%) !important;
+  border-radius: 16px !important; overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
+  border: 1px solid rgba(245,158,11,.3) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #e2e8f0 !important;
+}
+.hol-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+  padding: 40px 24px; min-height: 220px; gap: 12px;
+}
+.hol-icon { font-size: 3.5em; margin-bottom: 4px; }
+.hol-title { font-size: 1.6em; font-weight: 800; color: #fde68a; }
+.hol-sub { font-size: .9em; color: #94a3b8; }
+.hol-next { font-size: .82em; color: #64748b; margin-top: 8px; }
+.hol-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 16px 10px;
+  border-bottom: 1px solid rgba(245,158,11,.15);
+  background: rgba(245,158,11,.05);
+}
+.hol-hdr-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: linear-gradient(135deg,#f59e0b,#d97706);
+  border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.2em;
+}
+.hol-hdr-title { font-size: 1.1em; font-weight: 800; color: #fff; }
+.hol-hdr-class {
+  font-size: .72em; font-weight: 700; color: #f59e0b;
+  background: rgba(245,158,11,.13); border: 1px solid rgba(245,158,11,.25);
+  border-radius: 6px; padding: 2px 8px;
+}
+</style>
+<ha-card>
+  <div class="hol-hdr">
+    <div class="hol-hdr-icon">🗓️</div>
+    <div>
+      <div class="hol-hdr-title">${title}</div>
+      ${className ? `<span class="hol-hdr-class">${t.classLabel || 'Klasse'} ${className}</span>` : ''}
+    </div>
+  </div>
+  <div class="hol-wrap">
+    <div class="hol-icon">🏖️</div>
+    <div class="hol-title">${holidayName}</div>
+    ${endDate ? `<div class="hol-sub">${untilStr} ${fmtDate(endDate)}</div>` : ''}
+    ${nextName && nextStart && !isHolidayFromSensor ? `<div class="hol-next">${nextStr}: ${nextName} ab ${fmtDate(nextStart)}</div>` : ''}
+  </div>
+</ha-card>`;
+      return;
     }
 
     // Pick correct week table
