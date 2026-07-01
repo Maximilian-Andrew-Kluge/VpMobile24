@@ -730,7 +730,9 @@ class VpMobile24Card extends HTMLElement {
     const sensors = this._config.sensors || {};
     const additionalInfoEntity = this._config.additional_info_entity || sensors.additional_info_entity || null;
     const reloadEntity         = this._config.reload_entity          || sensors.reload_entity          || null;
-    const holidayEntity        = this._config.holiday_entity         || sensors.holiday_entity         || null;
+    const holidayEntity        = this._config.holiday_entity         || sensors.holiday_entity
+      // Auto-detect: replace last segment of entity ID with 'ferien'
+      || (entity && entity.entity_id ? entity.entity_id.replace(/_week_table$/, '_ferien').replace(/_wochentabelle$/, '_ferien') : null);
 
     // ── Holiday check ──────────────────────────────────────────────────
     const holidayEnt = holidayEntity ? this._hass.states[holidayEntity] : null;
@@ -1703,7 +1705,10 @@ class VpMobile24CurrentCard extends HTMLElement {
     const entity     = this._hass.states[this._config.entity];
     const nextEntity = this._config.next_entity    ? this._hass.states[this._config.next_entity]    : null;
     const weekEntity = this._config.week_entity    ? this._hass.states[this._config.week_entity]    : null;
-    const holidayEnt = this._config.holiday_entity ? this._hass.states[this._config.holiday_entity] : null;
+    // Auto-detect holiday entity from entity ID pattern, or use explicit config
+    const holidayEntityId = this._config.holiday_entity
+      || (this._config.entity ? this._config.entity.replace(/_aktueller_unterricht$/, '_ferien').replace(/_week_table$/, '_ferien') : null);
+    const holidayEnt = holidayEntityId ? this._hass.states[holidayEntityId] : null;
     const isHoliday  = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
     const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
 
@@ -2186,15 +2191,15 @@ class VpMobile24MultiCard extends HTMLElement {
       de: { sub:'Vtg.', cancel:'Ausfall', lesson:'Unterricht', subFull:'Vertretung',
             nextLesson:'Nächste Stunde', period:'Stunde',
             curWeek:'‹ Aktuelle Woche', nextWeek:'Nächste Woche ›',
-            noClasses:'Keine Klassen gefunden', kw:'KW' },
+            noClasses:'Keine Klassen gefunden', kw:'KW', until:'bis' },
       en: { sub:'Sub.', cancel:'Cancel.', lesson:'Lesson', subFull:'Substitution',
             nextLesson:'Next Lesson', period:'Period',
             curWeek:'‹ Current Week', nextWeek:'Next Week ›',
-            noClasses:'No classes found', kw:'CW' },
+            noClasses:'No classes found', kw:'CW', until:'until' },
       fr: { sub:'Remp.', cancel:'Annulé', lesson:'Cours', subFull:'Remplacement',
             nextLesson:'Prochain cours', period:'Heure',
             curWeek:'‹ Semaine actuelle', nextWeek:'Semaine suivante ›',
-            noClasses:'Aucune classe trouvée', kw:'SC' },
+            noClasses:'Aucune classe trouvée', kw:'SC', until:'jusqu\'au' },
     }[l];
   }
 
@@ -2284,8 +2289,16 @@ class VpMobile24MultiCard extends HTMLElement {
     const dayFull       = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
     const mc = this._getMcT();
 
+    // ── Auto-detect holiday entity from first entity's ID ─────────────
+    const firstEntityId = (this._config.entities || [])[0] || '';
+    const holidayEntityId = this._config.holiday_entity
+      || (firstEntityId ? firstEntityId.replace(/_week_table$/, '_ferien').replace(/_wochentabelle$/, '_ferien') : null);
+    const holidayEnt  = holidayEntityId ? this._hass.states[holidayEntityId] : null;
+    const isHoliday   = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
+    const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
+
     const now       = new Date();
-    const todayDow  = now.getDay(); // 0=Sun,1=Mon..
+    const todayDow  = now.getDay();
     const nowMins   = now.getHours() * 60 + now.getMinutes();
     const todayIdx  = (this._weekOffset === 0 && todayDow >= 1 && todayDow <= 5) ? todayDow - 1 : -1;
     const dates     = this._dayDates(this._weekOffset);
@@ -2680,6 +2693,9 @@ ha-card {
       : `<button class="mc-pill mc-pill-green" data-mc="cur-week">${mc.curWeek}</button>`)
       : ''}
   </div>
+
+  <!-- Holiday banner -->
+  ${isHoliday ? `<div style="margin:8px 16px 0;padding:10px 14px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:#fde68a;font-size:.9em">🏖️ ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
 
   <!-- Class sections grid -->
   <div class="mc-sections-grid">
