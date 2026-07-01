@@ -730,6 +730,12 @@ class VpMobile24Card extends HTMLElement {
     const sensors = this._config.sensors || {};
     const additionalInfoEntity = this._config.additional_info_entity || sensors.additional_info_entity || null;
     const reloadEntity         = this._config.reload_entity          || sensors.reload_entity          || null;
+    const holidayEntity        = this._config.holiday_entity         || sensors.holiday_entity         || null;
+
+    // ── Holiday check ──────────────────────────────────────────────────
+    const holidayEnt = holidayEntity ? this._hass.states[holidayEntity] : null;
+    const isHoliday  = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
+    const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
 
     // Pick correct week table
     const weekTable = weekOffset === 2
@@ -951,7 +957,12 @@ class VpMobile24Card extends HTMLElement {
 
     // Smart hints: count today's substitutions & cancellations
     let smartHints = [];
-    if (todayIdx >= 0 && weekTable) {
+    // ── Holiday banner takes priority ──────────────────────────────────
+    if (isHoliday) {
+      const hlLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+      const nextStart = holidayEnt && holidayEnt.attributes.naechste_ferien_start;
+      smartHints.push(`<span class="vp-hint vp-hint-holiday">🏖️ ${holidayName}</span>`);
+    } else if (todayIdx >= 0 && weekTable) {
       const todayData = weekTable[dayKeys[todayIdx]] || {};
       let nSub = 0, nCancel = 0, lastEnd = '';
       slots.forEach(slot => {
@@ -1103,6 +1114,7 @@ ha-card {
 .vp-hint-yellow { background: rgba(234,179,8,.12);  color: #fde68a; border: 1px solid rgba(234,179,8,.2); }
 .vp-hint-blue   { background: rgba(59,130,246,.12); color: #93c5fd; border: 1px solid rgba(59,130,246,.2); }
 .vp-hint-green  { background: rgba(34,197,94,.12);  color: #86efac; border: 1px solid rgba(34,197,94,.2); }
+.vp-hint-holiday { background: rgba(251,191,36,.15); color: #fde68a; border: 1px solid rgba(251,191,36,.35); font-weight: 700; }
 
 /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
 .vp-table { width: 100%; border-collapse: separate; border-spacing: 0; padding: 6px 10px 10px; }
@@ -1510,6 +1522,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       de: {
         currentLesson: 'Aktueller Unterricht', sub: 'Vertretung',
         freePause: 'Freistunde / Pause', beforeSchool: 'Noch kein Unterricht', done: 'Unterricht beendet',
+        holiday: 'Schulferien',
         period: 'Stunde', nextLesson: 'Nächste Stunde',
         remaining: 'Noch', startsIn: 'Beginnt in',
         endedAt: 'Unterricht endete um', noLesson: 'Kein Unterricht mehr heute',
@@ -1520,6 +1533,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       en: {
         currentLesson: 'Current Lesson', sub: 'Substitution',
         freePause: 'Free Period / Break', beforeSchool: 'No lessons yet', done: 'School ended',
+        holiday: 'School Holidays',
         period: 'Period', nextLesson: 'Next Lesson',
         remaining: 'Remaining', startsIn: 'Starts in',
         endedAt: 'School ended at', noLesson: 'No more lessons today',
@@ -1530,6 +1544,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       fr: {
         currentLesson: 'Cours actuel', sub: 'Remplacement',
         freePause: 'Heure libre / Pause', beforeSchool: 'Pas encore de cours', done: 'Cours terminé',
+        holiday: 'Vacances scolaires',
         period: 'Heure', nextLesson: 'Prochain cours',
         remaining: 'Reste', startsIn: 'Commence dans',
         endedAt: 'Cours terminé à', noLesson: 'Plus de cours aujourd\'hui',
@@ -1686,10 +1701,13 @@ class VpMobile24CurrentCard extends HTMLElement {
     if (!this._hass || !this._config) return;
 
     const entity     = this._hass.states[this._config.entity];
-    const nextEntity = this._config.next_entity  ? this._hass.states[this._config.next_entity]  : null;
-    const weekEntity = this._config.week_entity  ? this._hass.states[this._config.week_entity]  : null;
+    const nextEntity = this._config.next_entity    ? this._hass.states[this._config.next_entity]    : null;
+    const weekEntity = this._config.week_entity    ? this._hass.states[this._config.week_entity]    : null;
+    const holidayEnt = this._config.holiday_entity ? this._hass.states[this._config.holiday_entity] : null;
+    const isHoliday  = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
+    const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
+
     const tc         = this._getT();
-    // If title is empty, default German, or not set → use translated default
     const rawTitle   = this._config.title || '';
     const title      = (rawTitle === '' || rawTitle === 'Aktueller Unterricht' || rawTitle === 'Current Lesson' || rawTitle === 'Cours actuel')
       ? tc.currentLesson
@@ -1707,21 +1725,37 @@ class VpMobile24CurrentCard extends HTMLElement {
     // Determine if 'free' is actually before school (>60min until first lesson)
     const isBeforeSchool = s.type === 'free' && s.remaining !== undefined && s.remaining > 60;
     const themes = {
-      lesson: { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label: tc.currentLesson },
-      sub:    { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label: tc.sub },
-      free:   { color: isBeforeSchool ? '#64748b' : '#3b82f6',
-                bg:    isBeforeSchool ? 'rgba(100,116,139,.1)' : 'rgba(59,130,246,.13)',
-                border:isBeforeSchool ? 'rgba(100,116,139,.25)' : 'rgba(59,130,246,.35)',
-                icon:  isBeforeSchool ? '🌙' : '⏸',
-                label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
-      done:   { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label: tc.done },
+      lesson:  { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label: tc.currentLesson },
+      sub:     { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label: tc.sub },
+      free:    { color: isBeforeSchool ? '#64748b' : '#3b82f6',
+                 bg:    isBeforeSchool ? 'rgba(100,116,139,.1)' : 'rgba(59,130,246,.13)',
+                 border:isBeforeSchool ? 'rgba(100,116,139,.25)' : 'rgba(59,130,246,.35)',
+                 icon:  isBeforeSchool ? '🌙' : '⏸',
+                 label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
+      done:    { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label: tc.done },
+      holiday: { color:'#f59e0b', bg:'rgba(245,158,11,.13)', border:'rgba(245,158,11,.35)', icon:'🏖️', label: tc.holiday || 'Ferien' },
     };
-    const th = themes[s.type] || themes.done;
+    const effectiveType = isHoliday ? 'holiday' : s.type;
+    const th = themes[effectiveType] || themes.done;
 
     // ── Main content ──────────────────────────────────────────────────────
     let mainHtml = '';
 
-    if (s.type === 'lesson' || s.type === 'sub') {
+    if (isHoliday) {
+      mainHtml += `<div class="vc-subject">${holidayName}</div>`;
+      const nextHolStart = holidayEnt && holidayEnt.attributes.naechste_ferien_start;
+      const nextHolName  = holidayEnt && holidayEnt.attributes.naechste_ferien_name;
+      if (nextHolStart) {
+        const d = new Date(nextHolStart);
+        const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+        const endAttr = holidayEnt.attributes.end;
+        if (endAttr) {
+          const endD = new Date(endAttr);
+          const endStr = endD.toLocaleDateString(haLang === 'en' ? 'en-GB' : haLang === 'fr' ? 'fr-FR' : 'de-DE', {day:'2-digit',month:'2-digit'});
+          mainHtml += `<div class="vc-meta"><span class="vc-chip">📅 ${haLang === 'en' ? 'Until' : haLang === 'fr' ? 'Jusqu\'au' : 'Bis'} ${endStr}</span></div>`;
+        }
+      }
+    } else if (s.type === 'lesson' || s.type === 'sub') {
       mainHtml += `<div class="vc-subject">${s.fach}</div>`;
       mainHtml += `<div class="vc-meta">`;
       if (s.stunde) mainHtml += `<span class="vc-chip">${s.stunde}. ${tc.period}</span>`;
