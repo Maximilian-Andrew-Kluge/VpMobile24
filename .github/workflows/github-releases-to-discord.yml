@@ -61,7 +61,14 @@ jobs:
           }
 
           data = json.dumps(payload).encode("utf-8")
-          req = urllib.request.Request(webhook, data=data, headers={"Content-Type": "application/json"}, method="POST")
+          req = urllib.request.Request(
+              webhook, data=data,
+              headers={
+                  "Content-Type": "application/json",
+                  "User-Agent": "DiscordBot (https://github.com/Maximilian-Andrew-Kluge/VpMobile24, 1.0)"
+              },
+              method="POST"
+          )
 
           try:
               with urllib.request.urlopen(req) as resp:
