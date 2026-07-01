@@ -2,7 +2,7 @@ name: Discord Release Notification
 
 on:
   release:
-    types: [published]
+    types: [published, edited]
   workflow_dispatch:
     inputs:
       release_name:
@@ -26,6 +26,7 @@ jobs:
           RELEASE_URL: ${{ github.event.release.html_url || inputs.release_url }}
           RELEASE_BODY: ${{ github.event.release.body || 'Manual test run' }}
           IS_PRERELEASE: ${{ github.event.release.prerelease || 'false' }}
+          GITHUB_EVENT_ACTION: ${{ github.event.action || 'published' }}
         run: |
           python3 - <<'PYEOF'
           import os, json, urllib.request, sys
@@ -42,6 +43,11 @@ jobs:
           else:
               title_prefix = "🚀 Neues Release"
               color = 3066993   # green
+
+          # Mark as update if release was edited
+          event_action = os.environ.get("GITHUB_EVENT_ACTION", "published")
+          if event_action == "edited":
+              title_prefix += " (aktualisiert)"
 
           description = (
               body + "\n\n"
