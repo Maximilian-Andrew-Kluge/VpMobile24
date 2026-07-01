@@ -40,14 +40,15 @@
 
 > [!NOTE]
 >
-> 🧪 **v2.5.3** — Beta / Pre-Release verfügbar
+> 🧪 **v2.5.3** – Beta / Pre-Release verfügbar
 >
-> Enthält Bug Fixes, Verbesserungen und neue Funktionen. Für Tester geeignet.
+> Diese Version enthält Fehlerbehebungen, Optimierungen und neue Funktionen. Sie richtet sich an alle, die neue Features vor der finalen Veröffentlichung testen möchten.
 >
-> **Neue Features in v2.5.2:**
-> - Der Aktualisieren-Button wird grün und dreht sich beim Drücken
-> - Neuer Ferien-Sensor — Ferien werden automatisch in den Karten angezeigt
-> - Aktueller Unterricht zeigt wieder korrekt den laufenden Unterricht an
+> **Neuerungen in v2.5.3:**
+>
+> * 🔄 Der **Aktualisieren-Button** wird beim Klicken grün und zeigt den Ladevorgang mit einer Drehanimation an.
+> * 🏖️ Neuer **Ferien-Sensor** – Zeigt die aktuellen Schulferien automatisch in den Karten an. Für die Nutzung muss im Einrichtungsassistenten das **Bundesland** ausgewählt werden.
+> * 📚 Die Karte **„Aktueller Unterricht"** zeigt den laufenden Unterricht wieder zuverlässig und korrekt an.
 >
 > 🔗 [Beta Release →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
@@ -66,7 +67,7 @@
 Beispiele:
 
 * `v2.5.1` → Kritischer Bugfix
-* `v2.5.2` → Neue Funktionen + Bugfixes
+* `v2.5.3` → Neue Funktionen + Bugfixes
 * `v2.6.0` → Größeres Feature-Update
 
 ---
@@ -107,14 +108,14 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 
 ### 📡 Sensoren
 
-| Sensor               | Beschreibung                          |
-| -------------------- | ------------------------------------- |
-| week_table           | Komplette Wochentabelle               |
-| naechste_stunde      | Nächste Unterrichtsstunde             |
-| heutiger_stundenplan | Stundenplan heute                     |
-| zusatzinfos          | Allgemeine Informationen              |
-| aenderungen          | Änderungen & Vertretungen             |
-| aktueller_unterricht | Aktuell laufende Stunde               |
+| Sensor               | Beschreibung                             |
+| -------------------- | ---------------------------------------- |
+| week_table           | Komplette Wochentabelle                  |
+| naechste_stunde      | Nächste Unterrichtsstunde                |
+| heutiger_stundenplan | Stundenplan heute                        |
+| zusatzinfos          | Allgemeine Informationen                 |
+| aenderungen          | Änderungen & Vertretungen                |
+| aktueller_unterricht | Aktuell laufende Stunde                  |
 | ferien               | Schulferien (automatisch per Bundesland) |
 
 ### 🃏 Lovelace Card
@@ -131,7 +132,7 @@ Zusätzlich werden moderne Lovelace-Karten bereitgestellt.
 * CSP-sicher (nginx, DuckDNS, Reverse Proxy)
 * Automatische Aktualisierung alle 15 Minuten
 
-### 🆕 Neue Features in v2.5.0 / v2.5.2
+### 🆕 Neue Features in v2.5.0 / v2.5.3
 
 * **Aktueller Unterricht** — Echtzeit-Erkennung auch bei Vertretungen
 * **SmartHint** — Nächste Stunde wird auch während der Pause angezeigt, keine Ausfälle mehr
@@ -276,14 +277,14 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 # 📡 Sensoren
 
-| Sensor               | State        | Attribute                       |
-| -------------------- | ------------ | ------------------------------- |
-| week_table           | Anzahl       | week_table, next_week_table     |
-| naechste_stunde      | Fach         | zeit, lehrer, raum              |
-| heutiger_stundenplan | Anzahl       | stunden_heute                   |
-| zusatzinfos          | Anzahl       | allgemeine_infos                |
-| aenderungen          | Anzahl       | alle_aenderungen                |
-| aktueller_unterricht | Fach         | fach, lehrer, raum              |
+| Sensor               | State        | Attribute                          |
+| -------------------- | ------------ | ---------------------------------- |
+| week_table           | Anzahl       | week_table, next_week_table        |
+| naechste_stunde      | Fach         | zeit, lehrer, raum                 |
+| heutiger_stundenplan | Anzahl       | stunden_heute                      |
+| zusatzinfos          | Anzahl       | allgemeine_infos                   |
+| aenderungen          | Anzahl       | alle_aenderungen                   |
+| aktueller_unterricht | Fach         | fach, lehrer, raum                 |
 | ferien               | Ferienname   | ist_ferien, start, end, bundesland |
 
 ---
