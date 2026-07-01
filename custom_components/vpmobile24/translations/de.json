@@ -46,7 +46,8 @@
         "data": {
           "change_subjects": "Fächer ändern",
           "change_class": "Klasse ändern",
-          "change_holidays": "Bundesland (Ferien) ändern"
+          "change_holidays": "Bundesland (Ferien) ändern",
+          "change_custom_holidays": "Manuelle Ferien bearbeiten"
         }
       },
       "change_class": {
@@ -65,6 +66,13 @@
         "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
         "data": {
           "state_code": "Bundesland"
+        }
+      },
+      "custom_holidays": {
+        "title": "Manuelle Ferien eintragen",
+        "description": "Eine Zeile pro Ferienzeitraum im Format:\n`Name,YYYY-MM-DD,YYYY-MM-DD`\n\nBeispiel:\nSommerferien,2026-07-04,2026-08-14\nHerbstferien,2026-10-12,2026-10-23",
+        "data": {
+          "custom_holidays_text": "Ferieneinträge"
         }
       }
     },

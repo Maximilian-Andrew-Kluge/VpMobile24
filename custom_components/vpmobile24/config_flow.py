@@ -290,6 +290,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title="", data={})
 
             if change_holidays and not change_class and not change_subjects:
+                # Check if user also wants custom holidays
+                change_custom = user_input.get("change_custom_holidays", False)
+                if change_custom:
+                    return await self.async_step_custom_holidays()
                 return await self.async_step_change_holidays()
 
             if change_class:
@@ -317,6 +321,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional("change_subjects", default=False): bool,
                 vol.Optional("change_class", default=False): bool,
                 vol.Optional("change_holidays", default=False): bool,
+                vol.Optional("change_custom_holidays", default=False): bool,
             }),
             description_placeholders={
                 "current_class": current_class,
@@ -364,6 +369,87 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema({
                 vol.Optional(CONF_STATE_CODE, default=current_state): vol.In(state_options),
             }),
+        )
+
+    async def async_step_custom_holidays(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Enter manual holidays as text: Name,YYYY-MM-DD,YYYY-MM-DD (one per line)."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            raw = user_input.get("custom_holidays_text", "").strip()
+            holidays = []
+            for line in raw.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                parts = [p.strip() for p in line.split(",")]
+                if len(parts) == 3:
+                    name, start, end = parts
+                    try:
+                        from datetime import date as _date
+                        _date.fromisoformat(start)
+                        _date.fromisoformat(end)
+                        holidays.append({"name": name, "start": start, "end": end})
+                    except ValueError:
+                        errors["custom_holidays_text"] = "invalid_date"
+                        break
+                elif len(parts) == 2:
+                    # Name,YYYY-MM-DD (single day)
+                    name, start = parts
+                    try:
+                        from datetime import date as _date
+                        _date.fromisoformat(start)
+                        holidays.append({"name": name, "start": start, "end": start})
+                    except ValueError:
+                        errors["custom_holidays_text"] = "invalid_date"
+                        break
+
+            if not errors:
+                current_excluded = self._config_entry.options.get(
+                    CONF_EXCLUDED_SUBJECTS,
+                    self._config_entry.data.get(CONF_EXCLUDED_SUBJECTS, []),
+                )
+                current_selected = self._config_entry.options.get(
+                    CONF_SELECTED_COURSES,
+                    self._config_entry.data.get(CONF_SELECTED_COURSES, []),
+                )
+                current_class = (
+                    self._config_entry.options.get(CONF_CLASS_NAME)
+                    or self._config_entry.data.get(CONF_CLASS_NAME, "")
+                )
+                current_state = (
+                    self._config_entry.options.get(CONF_STATE_CODE)
+                    or self._config_entry.data.get(CONF_STATE_CODE, "")
+                )
+                return self.async_create_entry(
+                    title="",
+                    data={
+                        CONF_CLASS_NAME: current_class,
+                        CONF_EXCLUDED_SUBJECTS: current_excluded,
+                        CONF_SELECTED_COURSES: current_selected,
+                        CONF_STATE_CODE: current_state,
+                        CONF_CUSTOM_HOLIDAYS: holidays,
+                    },
+                )
+
+        # Build current text from existing custom holidays
+        existing = (
+            self._config_entry.options.get(CONF_CUSTOM_HOLIDAYS)
+            or self._config_entry.data.get(CONF_CUSTOM_HOLIDAYS, [])
+        )
+        default_text = "\n".join(
+            f"{h.get('name','Ferien')},{h.get('start','')},{h.get('end','')}"
+            for h in existing
+        )
+
+        return self.async_show_form(
+            step_id="custom_holidays",
+            data_schema=vol.Schema({
+                vol.Optional("custom_holidays_text", default=default_text): str,
+            }),
+            errors=errors,
         )
     async def async_step_change_class(
         self, user_input: dict[str, Any] | None = None

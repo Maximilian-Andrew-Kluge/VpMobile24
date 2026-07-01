@@ -70,6 +70,13 @@
         "data": {
           "state_code": "Federal state"
         }
+      },
+      "custom_holidays": {
+        "title": "Manual holiday entries",
+        "description": "One entry per line in format:\n`Name,YYYY-MM-DD,YYYY-MM-DD`\n\nExample:\nSummer holidays,2026-07-04,2026-08-14",
+        "data": {
+          "custom_holidays_text": "Holiday entries"
+        }
       }
     },
     "error": {
