@@ -329,13 +329,6 @@ class VpMobile24Card extends HTMLElement {
     const wi = attr.week_infos;
     if (wi && wi[todayKey]) allg = toArr(wi[todayKey].allgemeine_infos);
     if (allg.length === 0)  allg = toArr(attr.allgemeine_infos);
-    if (allg.length === 0 && wi) {
-      const seen = new Set();
-      Object.values(wi).forEach(d => {
-        if (!d) return;
-        toArr(d.allgemeine_infos).forEach(x => { if (!seen.has(x)) { seen.add(x); allg.push(x); } });
-      });
-    }
 
     let bodyHtml = '';
     if (allg.length > 0) {
