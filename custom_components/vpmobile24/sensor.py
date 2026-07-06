@@ -940,8 +940,8 @@ class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
         api_data = getattr(self.coordinator, "_holiday_data", None)
         if api_data:
             from datetime import timedelta
-            # Allow up to 3 days before official start (API date discrepancies)
-            today_flexible = today + timedelta(days=3)
+            # Allow up to 5 days before official start (covers API date discrepancies)
+            today_flexible = today + timedelta(days=5)
             for h in api_data:
                 try:
                     h_start = datetime.fromisoformat(h.get("startDate", "")).date()
