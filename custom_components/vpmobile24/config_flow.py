@@ -188,18 +188,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_EXCLUDED_SUBJECTS
                 ] = excluded_subjects
 
-            class_name = self._config_data.get(CONF_CLASS_NAME, "")
-            school_id = self._config_data.get(CONF_SCHOOL_ID, "")
-            entry_title = f"VpMobile24 – {class_name} ({school_id})"
-
-            # Prevent duplicate entries for same school+class combination
-            await self.async_set_unique_id(f"{school_id}_{class_name}")
-            self._abort_if_unique_id_configured()
-
-            return self.async_create_entry(
-                title=entry_title,
-                data=self._config_data,
+            # Go to holiday/state selection step
+            await self.async_set_unique_id(
+                f"{self._config_data.get(CONF_SCHOOL_ID, '')}_{self._config_data.get(CONF_CLASS_NAME, '')}"
             )
+            self._abort_if_unique_id_configured()
+            return await self.async_step_holidays()
+
         if not self._available_subjects:
             return self.async_show_form(
                 step_id="subjects",

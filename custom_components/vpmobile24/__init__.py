@@ -225,6 +225,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         coord.excluded_subjects = new_excluded
         coord.selected_courses  = new_selected
+        # If state_code changed, refresh holiday data immediately
+        await coord._async_update_holidays()
         await coord.async_request_refresh()
 
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
