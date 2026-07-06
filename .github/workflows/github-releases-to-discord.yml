@@ -87,7 +87,8 @@ jobs:
           )
 
           payload = {
-              "username": "VpMobile24 Release Bot",
+              "username": "VpMobile24 Release",
+              "avatar_url": "https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/custom_components/vpmobile24/brand/icon.png",
               "embeds": [{
                   "title": f"{title_prefix}: {name}",
                   "description": description,
