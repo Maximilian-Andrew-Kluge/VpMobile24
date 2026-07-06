@@ -939,11 +939,15 @@ class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
         # Check API cache (populated by coordinator update)
         api_data = getattr(self.coordinator, "_holiday_data", None)
         if api_data:
+            from datetime import timedelta
+            # Allow up to 3 days before official start (API date discrepancies)
+            today_flexible = today + timedelta(days=3)
             for h in api_data:
                 try:
                     h_start = datetime.fromisoformat(h.get("startDate", "")).date()
                     h_end   = datetime.fromisoformat(h.get("endDate", "")).date()
-                    if h_start <= today <= h_end:
+                    # Active if today is within range OR up to 3 days before start
+                    if h_start <= today_flexible and today <= h_end:
                         name = ""
                         for n in h.get("name", []):
                             if n.get("language") == "DE":
