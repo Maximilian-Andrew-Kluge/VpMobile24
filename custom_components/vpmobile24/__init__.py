@@ -609,7 +609,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             }
 
     async def _async_update_holidays(self) -> None:
-        """Fetch school holidays from openholidaysapi.org for the configured state."""
+        """Fetch school holidays from ferien-api.de for the configured state."""
         try:
             # Find state_code from any config entry that uses this coordinator
             state_code = ""
@@ -626,39 +626,46 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             if not state_code:
                 return  # No state configured → skip
 
+            # Convert DE-SN → SN for ferien-api.de
+            if state_code.startswith("DE-"):
+                state_code = state_code[3:]
+
             from datetime import date
             today = date.today()
             year = today.year
-            # Fetch holidays for current and next year
-            valid_from = f"{year}-01-01"
-            valid_to   = f"{year + 1}-12-31"
 
-            url = (
-                f"https://openholidaysapi.org/SchoolHolidays"
-                f"?countryIsoCode=DE"
-                f"&languageIsoCode=DE"
-                f"&subdivisionCode={state_code}"
-                f"&validFrom={valid_from}"
-                f"&validTo={valid_to}"
-            )
-
-            _LOGGER.debug("VpMobile24: fetching holidays for %s", state_code)
-
+            # Fetch current year and next year
+            all_holidays = []
             import aiohttp
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        self._holiday_data = data if isinstance(data, list) else []
-                        _LOGGER.debug(
-                            "VpMobile24: loaded %d holiday entries for %s",
-                            len(self._holiday_data), state_code
-                        )
-                    else:
-                        resp_text = await resp.text()
-                        _LOGGER.warning(
-                            "VpMobile24: holiday API returned %s for %s: %s",
-                            resp.status, state_code, resp_text[:200]
-                        )
+                for y in [year, year + 1]:
+                    url = f"https://ferien-api.de/api/v1/holidays/{state_code}/{y}"
+                    _LOGGER.debug("VpMobile24: fetching holidays from %s", url)
+                    try:
+                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                            if resp.status == 200:
+                                data = await resp.json()
+                                if isinstance(data, list):
+                                    # Convert to openholidays-compatible format
+                                    for h in data:
+                                        all_holidays.append({
+                                            "startDate": h.get("start", ""),
+                                            "endDate": h.get("end", ""),
+                                            "name": [{"language": "DE", "text": h.get("name", "Ferien").title()}],
+                                        })
+                            else:
+                                _LOGGER.warning(
+                                    "VpMobile24: ferien-api.de returned %s for %s/%s",
+                                    resp.status, state_code, y
+                                )
+                    except Exception as err:
+                        _LOGGER.debug("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
+
+            if all_holidays:
+                self._holiday_data = all_holidays
+                _LOGGER.debug(
+                    "VpMobile24: loaded %d holiday entries for %s",
+                    len(self._holiday_data), state_code
+                )
         except Exception as err:
             _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)

@@ -900,10 +900,14 @@ class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
         }
 
     def _state_code(self) -> str:
-        return (
+        code = (
             self._config_entry.options.get("state_code")
             or self._config_entry.data.get("state_code", "")
         )
+        # Convert DE-SN → SN for ferien-api.de compatibility
+        if code.startswith("DE-"):
+            code = code[3:]
+        return code
 
     def _custom_holidays(self) -> list:
         return (
@@ -939,15 +943,12 @@ class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
         # Check API cache (populated by coordinator update)
         api_data = getattr(self.coordinator, "_holiday_data", None)
         if api_data:
-            from datetime import timedelta
-            # Allow up to 5 days before official start (covers API date discrepancies)
-            today_flexible = today + timedelta(days=5)
+            # No buffer needed — ferien-api.de has correct official dates
             for h in api_data:
                 try:
                     h_start = datetime.fromisoformat(h.get("startDate", "")).date()
                     h_end   = datetime.fromisoformat(h.get("endDate", "")).date()
-                    # Active if today is within range OR up to 3 days before start
-                    if h_start <= today_flexible and today <= h_end:
+                    if h_start <= today <= h_end:
                         name = ""
                         for n in h.get("name", []):
                             if n.get("language") == "DE":

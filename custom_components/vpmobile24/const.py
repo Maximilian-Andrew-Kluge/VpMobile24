@@ -17,22 +17,22 @@ DEFAULT_UPDATE_INTERVAL = 15  # minutes
 DEFAULT_NAME = "VpMobile24"
 DEFAULT_BASE_URL = "https://www.stundenplan24.de"
 
-# German federal states for holiday lookup
+# German federal states for holiday lookup (ferien-api.de state codes)
 GERMAN_STATES = {
-    "DE-BW": "Baden-Württemberg",
-    "DE-BY": "Bayern",
-    "DE-BE": "Berlin",
-    "DE-BB": "Brandenburg",
-    "DE-HB": "Bremen",
-    "DE-HH": "Hamburg",
-    "DE-HE": "Hessen",
-    "DE-MV": "Mecklenburg-Vorpommern",
-    "DE-NI": "Niedersachsen",
-    "DE-NW": "Nordrhein-Westfalen",
-    "DE-RP": "Rheinland-Pfalz",
-    "DE-SL": "Saarland",
-    "DE-SN": "Sachsen",
-    "DE-ST": "Sachsen-Anhalt",
-    "DE-SH": "Schleswig-Holstein",
-    "DE-TH": "Thüringen",
+    "BW": "Baden-Württemberg",
+    "BY": "Bayern",
+    "BE": "Berlin",
+    "BB": "Brandenburg",
+    "HB": "Bremen",
+    "HH": "Hamburg",
+    "HE": "Hessen",
+    "MV": "Mecklenburg-Vorpommern",
+    "NI": "Niedersachsen",
+    "NW": "Nordrhein-Westfalen",
+    "RP": "Rheinland-Pfalz",
+    "SL": "Saarland",
+    "SN": "Sachsen",
+    "ST": "Sachsen-Anhalt",
+    "SH": "Schleswig-Holstein",
+    "TH": "Thüringen",
 }
