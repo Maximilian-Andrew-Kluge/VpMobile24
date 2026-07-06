@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.3"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.4"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -185,7 +185,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.3",
+        sw_version="2.5.4",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart
@@ -642,28 +642,23 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                 f"&validTo={valid_to}"
             )
 
-            _LOGGER.warning("VpMobile24: fetching holidays from %s", url)
+            _LOGGER.debug("VpMobile24: fetching holidays for %s", state_code)
 
             import aiohttp
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                    resp_text = await resp.text()
-                    _LOGGER.warning(
-                        "VpMobile24: holiday API status=%s body=%s",
-                        resp.status, resp_text[:500]
-                    )
                     if resp.status == 200:
-                        import json as _json
-                        data = _json.loads(resp_text)
+                        data = await resp.json()
                         self._holiday_data = data if isinstance(data, list) else []
-                        _LOGGER.warning(
+                        _LOGGER.debug(
                             "VpMobile24: loaded %d holiday entries for %s",
                             len(self._holiday_data), state_code
                         )
                     else:
+                        resp_text = await resp.text()
                         _LOGGER.warning(
-                            "VpMobile24: holiday API returned %s for %s",
-                            resp.status, state_code
+                            "VpMobile24: holiday API returned %s for %s: %s",
+                            resp.status, state_code, resp_text[:200]
                         )
         except Exception as err:
-            _LOGGER.warning("VpMobile24: could not fetch holidays: %s", err)
+            _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)
