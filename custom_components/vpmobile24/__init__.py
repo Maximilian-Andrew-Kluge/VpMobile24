@@ -642,13 +642,21 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                 f"&validTo={valid_to}"
             )
 
+            _LOGGER.warning("VpMobile24: fetching holidays from %s", url)
+
             import aiohttp
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                    resp_text = await resp.text()
+                    _LOGGER.warning(
+                        "VpMobile24: holiday API status=%s body=%s",
+                        resp.status, resp_text[:500]
+                    )
                     if resp.status == 200:
-                        data = await resp.json()
+                        import json as _json
+                        data = _json.loads(resp_text)
                         self._holiday_data = data if isinstance(data, list) else []
-                        _LOGGER.debug(
+                        _LOGGER.warning(
                             "VpMobile24: loaded %d holiday entries for %s",
                             len(self._holiday_data), state_code
                         )
@@ -658,4 +666,4 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             resp.status, state_code
                         )
         except Exception as err:
-            _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)
+            _LOGGER.warning("VpMobile24: could not fetch holidays: %s", err)
