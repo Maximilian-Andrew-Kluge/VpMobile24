@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.4"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.5"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -186,7 +186,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.4",
+        sw_version="2.5.5",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart

@@ -8,19 +8,18 @@
 <br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Stable-v2.5.0-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.5.1-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Version](https://img.shields.io/badge/Stable-v2.5.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
 <br/>
 
 [**📦 Install via HACS**](https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge)
-  ·  
+·
 [**🌐 Website**](https://maximilian-andrew-kluge.github.io/VpMobile24/website/)
-  ·  
+·
 [**💬 Discord**](https://discord.gg/57uvCeRw43)
-  ·  
+·
 [**🐛 Report a Bug**](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new)
 
 </div>
@@ -31,21 +30,13 @@
 
 > [!IMPORTANT]
 >
-> 🎉 **VpMobile24 v2.5.0** — Stable Release
+> 🎉 **VpMobile24 v2.5.5** — Stable Release
 >
-> 📅 Released on **June 8, 2026**
+> 📅 Released on **July 14, 2026**
 >
 > 📥 Update now via HACS.
 >
 > 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-
-> [!NOTE]
->
-> 🧪 **v2.5.1** — Beta / Pre-Release available
->
-> Contains bug fixes and improvements. Suitable for testers.
->
-> 🔗 [Beta Release →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
 ---
 
@@ -55,15 +46,7 @@
 >
 > 🚀 Regular updates are released on the **15th of every month**.
 >
-> New features, improvements and optimizations are bundled into stable releases.
->
-> Critical bugs and security issues are released immediately as hotfixes.
-
-Examples:
-
-* `v2.5.1` → Critical bug fix
-* `v2.5.2` → Security update
-* `v2.6.0` → New features
+> Critical bugs or security issues are released immediately as hotfixes.
 
 ---
 
@@ -71,19 +54,19 @@ Examples:
 
 > [!TIP]
 >
-> If the integration is not working after an update:
+> If the integration doesn't work after an update:
 >
 > 1. Remove the integration
-> 2. Reconfigure it
+> 2. Re-configure
 > 3. Restart Home Assistant
 >
-> If the issue persists, please open a GitHub issue or visit our Discord server.
+> If the problem persists, open a GitHub issue or visit the Discord server.
 
 ---
 
-# 📌 Description
+## 📌 Description
 
-**VpMobile24** is a modern Home Assistant custom integration for **Stundenplan24.de / VpMobil24**.
+**VpMobile24** is a modern Home Assistant integration for **Stundenplan24.de / VpMobil24**.
 
 The integration brings your school timetable directly into Home Assistant and automatically creates sensors for:
 
@@ -91,54 +74,58 @@ The integration brings your school timetable directly into Home Assistant and au
 * Next lesson
 * Today's timetable
 * Weekly timetable
-* Schedule changes
+* Changes & substitutions
 * Additional information
+* **School holidays** (automatically by federal state)
 
 Additionally, modern Lovelace cards are included.
 
 ---
 
-# ✨ Features
+## ✨ Features
 
-## 📡 Sensors
+### 📡 Sensors
 
-| Sensor               | Description             |
-| -------------------- | ----------------------- |
-| week_table           | Full week timetable     |
-| naechste_stunde      | Next lesson             |
-| heutiger_stundenplan | Today's timetable       |
-| zusatzinfos          | Additional information  |
-| aenderungen          | Changes & substitutions |
-| aktueller_unterricht | Current lesson          |
+| Sensor               | Description                                  |
+| -------------------- | -------------------------------------------- |
+| week_table           | Full week timetable                          |
+| naechste_stunde      | Next lesson                                  |
+| heutiger_stundenplan | Today's timetable                            |
+| zusatzinfos          | Additional information                       |
+| aenderungen          | Changes & substitutions                      |
+| aktueller_unterricht | Current lesson                               |
+| ferien               | School holidays (automatic by federal state) |
 
-## 🃏 Lovelace Cards
+### 🃏 Lovelace Cards
 
 * Weekly overview with KW display and week navigation
 * Multiple classes (collapsible sections, statistics badges)
 * Current lesson (live progress bar, countdown, next lesson)
+* **Holiday display** — all three cards show 🏖️ during school holidays
 * Responsive design (desktop + mobile)
 * Multilingual: DE / EN / FR
 * Parallel course filter
-* Smart status bar (cancellations, substitutions, end of school day)
+* Smart status bar (cancellations, substitutions, end of day)
 * Tooltips with teacher & room
 * CSP-safe (nginx, DuckDNS, reverse proxy)
 * Automatic updates every 15 minutes
 
-## 🆕 New in v2.5.0 / v2.5.1
+### 🆕 New Features in v2.5.0 – v2.5.5
 
+* **Holiday sensor** — automatic school holiday detection for all 16 German federal states (official KMK data)
+* **Holidays in cards** — schedule card shows holiday screen, current lesson + multi-class show banner
+* **Federal state selectable** — during setup or later via Configure
 * **Current lesson** — real-time detection including substitutions
-* **SmartHint** — next lesson shown during breaks, cancelled lessons filtered out
-* **Before school** — card shows `🌙 No lessons yet` instead of `⏸ Break`
-* **Info popup** — additional info for the day displayed correctly
-* **Reload button** — arrow spins when refreshing
+* **SmartHint** — next lesson shown during breaks, cancelled lessons filtered
+* **Before school** — card shows `🌙 No lessons yet`
+* **Info popup** — shows today's additional information correctly
+* **Reload button** — spins green when refreshing
 * **Parallel course filter** — cancellations of other course groups filtered automatically
-* **Sensors** — `aktueller_unterricht` and `naechste_stunde` now detect substitutions
-* Parallel course support
-* Automatic updates
+* **Sensors** — now detect substitution lessons
 
 ---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
 ### 🗓️ Weekly Overview
 
@@ -148,7 +135,6 @@ Additionally, modern Lovelace cards are included.
     <b>Weekly Overview</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/overview.png" alt="Weekly Overview" width="100%"/>
   </td>
-
   <td align="center" width="50%">
     <b>Lovelace Card</b><br/><br/>
     <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/card.png" alt="Lovelace Card" width="100%"/>
@@ -156,101 +142,39 @@ Additionally, modern Lovelace cards are included.
 </tr>
 </table>
 
-### ⚙️ Configuration
-
-<table>
-<tr>
-  <td align="center" width="50%">
-    <b>Setup</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/config.png" alt="Configuration" width="100%"/>
-  </td>
-
-  <td align="center" width="50%">
-    <b>Subject Selection (incl. Parallel Courses)</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/subject-select.png" alt="Subject Selection" width="100%"/>
-  </td>
-</tr>
-</table>
-
-### 👥 Multi-Class Card · ⏱️ Current Lesson Card
-
-<table>
-<tr>
-  <td align="center" width="50%">
-    <b>Multi-Class Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/multi-card.png" alt="Multi-Class Card" width="100%"/>
-  </td>
-
-  <td align="center" width="50%">
-    <b>Current Lesson Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/en/current-card.png" alt="Current Lesson Card" width="100%"/>
-  </td>
-</tr>
-</table>
-
-
 ---
 
 # 🚀 Installation
 
-## Via HACS
+### Install via HACS
 
-1. Open HACS
-2. Add a custom repository:
+<div>
 
-```text
-https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-```
+[![Open your Home Assistant instance and open the repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Maximilian-Andrew-Kluge&repository=VpMobile24&category=integration)
 
-3. Select category:
-
-```text
-Integration
-```
-
-4. Install **VpMobile24**
-5. Restart Home Assistant
+</div>
 
 ---
 
-## Manual Installation
+### Manual Installation
 
-Copy:
-
-```text
-custom_components/vpmobile24
-```
-
-to:
-
-```text
-config/custom_components/vpmobile24
-```
-
-and restart Home Assistant.
+Copy folder `custom_components/vpmobile24` to `config/custom_components/vpmobile24` and restart Home Assistant.
 
 ---
 
 # ⚙️ Setup
 
-1. Settings
-2. Devices & Services
-3. Add Integration
-4. Select **VpMobile24**
-
-Then enter:
-
-* School ID
-* Username
-* Password
-* Select class
-* Select subjects
+1. Settings → Devices & Services → Add Integration → **VpMobile24**
+2. Enter School ID, Username, Password
+3. Select your class
+4. Select subjects (select parallel course groups individually)
+5. **Select your federal state** (for automatic holiday detection)
 
 ---
 
 # 🃏 Lovelace Card Examples
 
-### Timetable Card
+### Schedule Card
 
 ```yaml
 type: custom:vpmobile24-card
@@ -279,14 +203,15 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 # 📡 Sensors
 
-| Sensor               | State   | Attributes             |
-| -------------------- | ------- | ---------------------- |
-| week_table           | Count   | week_table             |
-| naechste_stunde      | Subject | time, teacher, room    |
-| heutiger_stundenplan | Count   | lessons_today          |
-| zusatzinfos          | Count   | general_information    |
-| aenderungen          | Count   | all_changes            |
-| aktueller_unterricht | Subject | subject, teacher, room |
+| Sensor               | State      | Attributes                         |
+| -------------------- | ---------- | ---------------------------------- |
+| week_table           | Count      | week_table, next_week_table        |
+| naechste_stunde      | Subject    | zeit, lehrer, raum                 |
+| heutiger_stundenplan | Count      | stunden_heute                      |
+| zusatzinfos          | Count      | allgemeine_infos                   |
+| aenderungen          | Count      | alle_aenderungen                   |
+| aktueller_unterricht | Subject    | fach, lehrer, raum                 |
+| ferien               | HolidayName| ist_ferien, start, end, bundesland |
 
 ---
 
@@ -296,107 +221,41 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 All schools using Stundenplan24.de or VpMobil24.
 
-### Do I need YAML?
+### Do I need to write YAML?
 
-No.
-
-Everything can be configured via the Home Assistant UI.
+No — everything can be configured through the Home Assistant UI.
 
 ### Does the integration support multiple classes?
 
-Yes.
+Yes — multiple classes and parallel course groups are supported.
 
-Multiple classes and parallel courses are supported.
+### What is the parallel course filter?
+
+In the subject selection, all course groups appear (e.g. `789WB10`, `7INb1`). Select only your own course — then cancellations from other groups won't be shown.
+
+### How does holiday detection work?
+
+Select your federal state during setup or via Configure. Data comes from the official KMK holiday schedules, kept up-to-date via [ferien-api.de](https://ferien-api.de).
 
 ---
 
 # 🔧 Diagnostics
 
-Diagnostics are supported.
-
-Available here:
-
-```text
-Settings
-→ Devices & Services
-→ VpMobile24
-→ Download Diagnostics
-```
-
-The following data is automatically removed:
-
-* Password
-* Access Token
-* Refresh Token
-* Session IDs
-
----
-
-# 🗺️ Roadmap
-
-Planned:
-
-* More sensors
-* Additional cards
-* Improved diagnostics
-* More languages
-* Additional filters
-* Better error handling
+Settings → Devices & Services → VpMobile24 → Download Diagnostics
 
 ---
 
 # 🤝 Contributing
 
-Contributions are welcome.
-
-* 🐛 Report bugs
-* 💡 Suggest features
-* 🔧 Submit pull requests
-* 💬 Join our Discord community
-
----
-
-# 💬 Community
-
-Discord:
-
-https://discord.gg/57uvCeRw43
-
-GitHub:
-
-https://github.com/Maximilian-Andrew-Kluge/VpMobile24
-
-Issues:
-
-https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues
-
----
-
-# 🔒 Security
-
-Please do not report security issues publicly.
-
-See:
-
-```text
-SECURITY.md
-```
-
----
-
-# 📜 Changelog
-
-All changes:
-
-```text
-CHANGELOG.md
-```
+* 🐛 Report a bug → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+* 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
+* 🔧 Pull Request → [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for the Home Assistant Community**
+**Developed with ❤️ for the Home Assistant Community**
 
 ⭐ Leave a star on GitHub if you like this project.
 
