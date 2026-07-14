@@ -861,6 +861,7 @@ class VpMobile24HolidaySensor(SensorEntity):
         self._attr_should_poll = True
         self._current_holiday: dict | None = None
         self._next_holiday: dict | None = None
+        self._last_fetch_date: str = ""
 
     @property
     def device_info(self):
@@ -904,9 +905,16 @@ class VpMobile24HolidaySensor(SensorEntity):
         }
 
     async def async_update(self) -> None:
-        """Fetch holiday data directly from ferien-api.de."""
+        """Fetch holiday data directly from ferien-api.de — once per day."""
         state_code = self._state_code()
         if not state_code:
+            return
+
+        from datetime import date
+        today_str = date.today().isoformat()
+
+        # Only fetch once per day to avoid rate limiting
+        if self._last_fetch_date == today_str and (self._current_holiday is not None or self._next_holiday is not None):
             return
 
         try:
@@ -916,17 +924,22 @@ class VpMobile24HolidaySensor(SensorEntity):
             year = today.year
             all_holidays = []
 
-            async with aiohttp.ClientSession() as session:
+            headers = {"User-Agent": "VpMobile24-HA-Integration/2.5 (github.com/Maximilian-Andrew-Kluge/VpMobile24)"}
+
+            async with aiohttp.ClientSession(headers=headers) as session:
                 for y in [year, year + 1]:
                     url = f"https://ferien-api.de/api/v1/holidays/{state_code}/{y}"
                     try:
-                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                             if resp.status == 200:
                                 data = await resp.json()
                                 if isinstance(data, list):
                                     all_holidays.extend(data)
-                    except Exception:
-                        pass
+                            elif resp.status == 429:
+                                _LOGGER.warning("VpMobile24HolidaySensor: rate limited by ferien-api.de, will retry later")
+                                return  # Don't update cache, try again next poll
+                    except Exception as err:
+                        _LOGGER.warning("VpMobile24HolidaySensor: request failed for %s/%s: %s", state_code, y, err)
 
             self._holiday_data = all_holidays
             self._current_holiday = None
@@ -945,6 +958,7 @@ class VpMobile24HolidaySensor(SensorEntity):
                     continue
 
             self._data_loaded = True
+            self._last_fetch_date = today_str
 
         except Exception as err:
             _LOGGER.warning("VpMobile24HolidaySensor: error fetching holidays: %s", err)
