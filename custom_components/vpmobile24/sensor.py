@@ -849,20 +849,22 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
         return None
 
 
-class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
+class VpMobile24HolidaySensor(SensorEntity):
     """Sensor für Schulferien – lädt Daten direkt von ferien-api.de."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
-        super().__init__(coordinator)
         self._config_entry = config_entry
         self._language = language
         self._attr_name = "VpMobile24 Ferien"
         self._attr_unique_id = f"{config_entry.entry_id}_ferien"
         self._attr_icon = "mdi:beach"
-        self._holiday_data: list = []
-        self._data_loaded: bool = False
+        self._attr_should_poll = True
         self._current_holiday: dict | None = None
         self._next_holiday: dict | None = None
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
 
     @property
     def device_info(self):
