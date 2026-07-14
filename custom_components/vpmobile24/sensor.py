@@ -1,4 +1,4 @@
-﻿"""Sensor platform fÃ¼r VpMobile24."""
+"""Sensor platform für VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -25,11 +25,11 @@ SENSOR_NAMES = {
         "current_lesson": "VpMobile24 Current Lesson",
     },
     "de": {
-        "next_lesson": "VpMobile24 NÃ¤chste Stunde",
+        "next_lesson": "VpMobile24 Nächste Stunde",
         "week_schedule": "VpMobile24 Heutiger Stundenplan",
         "week_table": "VpMobile24 Wochentabelle",
         "additional_info": "VpMobile24 Zusatzinfos",
-        "changes": "VpMobile24 Ã„nderungen",
+        "changes": "VpMobile24 Änderungen",
         "current_lesson": "VpMobile24 Aktueller Unterricht",
     },
     "fr": {
@@ -65,9 +65,9 @@ STATE_MESSAGES = {
         "no_additional_info": "Keine Zusatzinfos",
         "additional_info": "Zusatzinfo",
         "additional_infos": "Zusatzinfos",
-        "no_changes": "Keine Ã„nderungen",
-        "change": "Ã„nderung",
-        "changes": "Ã„nderungen",
+        "no_changes": "Keine Änderungen",
+        "change": "Änderung",
+        "changes": "Änderungen",
     },
     "fr": {
         "no_data": "Aucune donnÃ©e",
@@ -129,7 +129,7 @@ def _device_info(config_entry) -> dict:
 
 
 class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r die nÃ¤chste Unterrichtsstunde."""
+    """Sensor für die nächste Unterrichtsstunde."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -228,7 +228,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r den heutigen Stundenplan."""
+    """Sensor für den heutigen Stundenplan."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -316,7 +316,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
         }
 
     def _complete_double_lessons(self, lessons: list) -> list:
-        """ErgÃ¤nze fehlende Stunden fÃ¼r Doppelstunden."""
+        """Ergänze fehlende Stunden für Doppelstunden."""
         if not lessons:
             return lessons
         by_period: dict[int, dict] = {}
@@ -385,7 +385,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r die komplette Wochenstundenplan-Tabelle."""
+    """Sensor für die komplette Wochenstundenplan-Tabelle."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -512,7 +512,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r zusÃ¤tzliche Informationen â€“ gesamte Woche."""
+    """Sensor für zusätzliche Informationen â€“ gesamte Woche."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -617,7 +617,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r StundenplanÃ¤nderungen und Vertretungen."""
+    """Sensor für Stundenplanänderungen und Vertretungen."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -652,7 +652,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
         all_changes = []
         for change in changes:
             entry: dict[str, Any] = {
-                "typ": "Ã„nderung",
+                "typ": "Änderung",
                 "zeit": change.get("time", ""),
                 "fach": change.get("subject", ""),
                 "datum": change.get("date", ""),
@@ -692,7 +692,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r die nÃ¤chste freie Stunde heute."""
+    """Sensor für die nächste freie Stunde heute."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -771,7 +771,7 @@ class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
-    """Sensor fÃ¼r den aktuell laufenden Unterricht."""
+    """Sensor für den aktuell laufenden Unterricht."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
