@@ -153,6 +153,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name"),
         entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, [])),
         entry.options.get(CONF_SELECTED_COURSES, entry.data.get(CONF_SELECTED_COURSES, [])),
+        entry_id=entry.entry_id,
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -263,12 +264,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None) -> None:
+    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None, entry_id: str | None = None) -> None:
         """Initialize."""
         self.api = api
         self.class_name = class_name
         self.excluded_subjects = excluded_subjects or []
         self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
+        self._entry_id = entry_id  # store entry_id for holiday lookups
         self._week_data = None
         self._week_data_cache = {}
         self._current_week_monday = None
@@ -611,61 +613,55 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_holidays(self) -> None:
         """Fetch school holidays from ferien-api.de for the configured state."""
         try:
-            # Find state_code from any config entry that uses this coordinator
             state_code = ""
-            for entry_id, coord in self.hass.data.get(DOMAIN, {}).items():
-                if coord is self:
-                    entry = self.hass.config_entries.async_get_entry(entry_id)
-                    if entry:
-                        state_code = (
-                            entry.options.get("state_code")
-                            or entry.data.get("state_code", "")
-                        )
-                    break
+            if self._entry_id:
+                entry = self.hass.config_entries.async_get_entry(self._entry_id)
+                if entry:
+                    state_code = (
+                        entry.options.get("state_code")
+                        or entry.data.get("state_code", "")
+                    )
 
             if not state_code:
-                return  # No state configured → skip
+                _LOGGER.debug("VpMobile24: no state_code configured, skipping holiday fetch")
+                return
 
             # Convert DE-SN → SN for ferien-api.de
             if state_code.startswith("DE-"):
                 state_code = state_code[3:]
 
+            _LOGGER.debug("VpMobile24: fetching holidays for state %s", state_code)
+
             from datetime import date
             today = date.today()
             year = today.year
 
-            # Fetch current year and next year
             all_holidays = []
             import aiohttp
             async with aiohttp.ClientSession() as session:
                 for y in [year, year + 1]:
                     url = f"https://ferien-api.de/api/v1/holidays/{state_code}/{y}"
-                    _LOGGER.debug("VpMobile24: fetching holidays from %s", url)
                     try:
                         async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                             if resp.status == 200:
                                 data = await resp.json()
                                 if isinstance(data, list):
-                                    # Convert to openholidays-compatible format
                                     for h in data:
                                         all_holidays.append({
                                             "startDate": h.get("start", ""),
                                             "endDate": h.get("end", ""),
                                             "name": [{"language": "DE", "text": h.get("name", "Ferien").title()}],
                                         })
+                                    _LOGGER.debug("VpMobile24: loaded %d entries for %s/%s", len(data), state_code, y)
                             else:
-                                _LOGGER.warning(
-                                    "VpMobile24: ferien-api.de returned %s for %s/%s",
-                                    resp.status, state_code, y
-                                )
+                                _LOGGER.warning("VpMobile24: ferien-api.de returned %s for %s/%s", resp.status, state_code, y)
                     except Exception as err:
-                        _LOGGER.debug("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
+                        _LOGGER.warning("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
 
             if all_holidays:
                 self._holiday_data = all_holidays
-                _LOGGER.debug(
-                    "VpMobile24: loaded %d holiday entries for %s",
-                    len(self._holiday_data), state_code
-                )
+                _LOGGER.debug("VpMobile24: total %d holiday entries loaded for %s", len(self._holiday_data), state_code)
+            else:
+                _LOGGER.warning("VpMobile24: no holiday data loaded for %s", state_code)
         except Exception as err:
             _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)
