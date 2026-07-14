@@ -899,6 +899,8 @@ class VpMobile24HolidaySensor(SensorEntity):
             "naechste_ferien_end":   nh.get("end")   if nh else None,
             "bundesland": self._state_code(),
             "manuell": False,
+            "debug_today": datetime.now().date().isoformat(),
+            "debug_api_url": f"https://ferien-api.de/api/v1/holidays/{self._state_code()}/2026",
         }
 
     async def async_update(self) -> None:
@@ -945,5 +947,5 @@ class VpMobile24HolidaySensor(SensorEntity):
             self._data_loaded = True
 
         except Exception as err:
-            _LOGGER.debug("VpMobile24HolidaySensor: error fetching holidays: %s", err)
+            _LOGGER.warning("VpMobile24HolidaySensor: error fetching holidays: %s", err)
 
