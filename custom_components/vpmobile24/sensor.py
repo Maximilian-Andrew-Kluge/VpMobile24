@@ -1,4 +1,4 @@
-"""Sensor platform für VpMobile24."""
+﻿"""Sensor platform fÃ¼r VpMobile24."""
 from __future__ import annotations
 
 import logging
@@ -25,18 +25,18 @@ SENSOR_NAMES = {
         "current_lesson": "VpMobile24 Current Lesson",
     },
     "de": {
-        "next_lesson": "VpMobile24 Nächste Stunde",
+        "next_lesson": "VpMobile24 NÃ¤chste Stunde",
         "week_schedule": "VpMobile24 Heutiger Stundenplan",
         "week_table": "VpMobile24 Wochentabelle",
         "additional_info": "VpMobile24 Zusatzinfos",
-        "changes": "VpMobile24 Änderungen",
+        "changes": "VpMobile24 Ã„nderungen",
         "current_lesson": "VpMobile24 Aktueller Unterricht",
     },
     "fr": {
         "next_lesson": "VpMobile24 Prochain Cours",
         "week_schedule": "VpMobile24 Programme du jour",
         "week_table": "VpMobile24 Tableau Hebdomadaire",
-        "additional_info": "VpMobile24 Informations complémentaires",
+        "additional_info": "VpMobile24 Informations complÃ©mentaires",
         "changes": "VpMobile24 Changements",
         "current_lesson": "VpMobile24 Cours actuel",
     },
@@ -65,19 +65,19 @@ STATE_MESSAGES = {
         "no_additional_info": "Keine Zusatzinfos",
         "additional_info": "Zusatzinfo",
         "additional_infos": "Zusatzinfos",
-        "no_changes": "Keine Änderungen",
-        "change": "Änderung",
-        "changes": "Änderungen",
+        "no_changes": "Keine Ã„nderungen",
+        "change": "Ã„nderung",
+        "changes": "Ã„nderungen",
     },
     "fr": {
-        "no_data": "Aucune donnée",
+        "no_data": "Aucune donnÃ©e",
         "no_lessons_today": "Plus d'heures aujourd'hui",
         "no_lessons": "Pas de cours aujourd'hui.",
         "lesson_today": "Horaires aujourd'hui",
         "lessons_today": "Horaires aujourd'hui",
-        "no_additional_info": "Aucune information supplémentaire",
-        "additional_info": "Informations Complémentaires",
-        "additional_infos": "Informations Complémentaires",
+        "no_additional_info": "Aucune information supplÃ©mentaire",
+        "additional_info": "Informations ComplÃ©mentaires",
+        "additional_infos": "Informations ComplÃ©mentaires",
         "no_changes": "Aucun changement",
         "change": "changement",
         "changes": "changements",
@@ -129,7 +129,7 @@ def _device_info(config_entry) -> dict:
 
 
 class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für die nächste Unterrichtsstunde."""
+    """Sensor fÃ¼r die nÃ¤chste Unterrichtsstunde."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -228,7 +228,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für den heutigen Stundenplan."""
+    """Sensor fÃ¼r den heutigen Stundenplan."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -316,7 +316,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
         }
 
     def _complete_double_lessons(self, lessons: list) -> list:
-        """Ergänze fehlende Stunden für Doppelstunden."""
+        """ErgÃ¤nze fehlende Stunden fÃ¼r Doppelstunden."""
         if not lessons:
             return lessons
         by_period: dict[int, dict] = {}
@@ -385,7 +385,7 @@ class VpMobile24WeekScheduleSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für die komplette Wochenstundenplan-Tabelle."""
+    """Sensor fÃ¼r die komplette Wochenstundenplan-Tabelle."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -512,7 +512,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für zusätzliche Informationen – gesamte Woche."""
+    """Sensor fÃ¼r zusÃ¤tzliche Informationen â€“ gesamte Woche."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -617,7 +617,7 @@ class VpMobile24AdditionalInfoSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für Stundenplanänderungen und Vertretungen."""
+    """Sensor fÃ¼r StundenplanÃ¤nderungen und Vertretungen."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -652,7 +652,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
         all_changes = []
         for change in changes:
             entry: dict[str, Any] = {
-                "typ": "Änderung",
+                "typ": "Ã„nderung",
                 "zeit": change.get("time", ""),
                 "fach": change.get("subject", ""),
                 "datum": change.get("date", ""),
@@ -692,7 +692,7 @@ class VpMobile24ChangesSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für die nächste freie Stunde heute."""
+    """Sensor fÃ¼r die nÃ¤chste freie Stunde heute."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -735,11 +735,11 @@ class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
                 if str(p).isdigit():
                     today_lessons[int(p)] = lesson
 
-        # Walk periods 1–10, find first future free/cancelled slot
+        # Walk periods 1â€“10, find first future free/cancelled slot
         for period in range(1, 11):
             lesson = today_lessons.get(period)
             if lesson is None:
-                continue  # no entry at all — not a known free period
+                continue  # no entry at all â€” not a known free period
             subj = lesson.get("subject", "").strip()
             is_cancelled = not subj or subj in ["\u2014", "---", "", "-", " "]
             if not is_cancelled:
@@ -771,7 +771,7 @@ class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
 
 
 class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
-    """Sensor für den aktuell laufenden Unterricht."""
+    """Sensor fÃ¼r den aktuell laufenden Unterricht."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         super().__init__(coordinator)
@@ -849,8 +849,119 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
         return None
 
 
+
+# ── Hardcoded KMK holiday data as reliable fallback ──────────────────────────
+_KMK_HOLIDAYS: dict = {
+    "SN": [
+        {"start": "2026-02-09", "end": "2026-02-21", "name": "Winterferien Sachsen"},
+        {"start": "2026-04-03", "end": "2026-04-11", "name": "Osterferien Sachsen"},
+        {"start": "2026-07-04", "end": "2026-08-14", "name": "Sommerferien Sachsen"},
+        {"start": "2026-10-12", "end": "2026-10-24", "name": "Herbstferien Sachsen"},
+        {"start": "2026-12-23", "end": "2027-01-02", "name": "Weihnachtsferien Sachsen"},
+        {"start": "2027-02-08", "end": "2027-02-20", "name": "Winterferien Sachsen 2027"},
+        {"start": "2027-07-01", "end": "2027-08-13", "name": "Sommerferien Sachsen 2027"},
+    ],
+    "BY": [
+        {"start": "2026-02-23", "end": "2026-02-27", "name": "Winterferien Bayern"},
+        {"start": "2026-04-09", "end": "2026-04-17", "name": "Osterferien Bayern"},
+        {"start": "2026-07-31", "end": "2026-09-11", "name": "Sommerferien Bayern"},
+        {"start": "2026-11-02", "end": "2026-11-06", "name": "Herbstferien Bayern"},
+        {"start": "2026-12-24", "end": "2027-01-05", "name": "Weihnachtsferien Bayern"},
+    ],
+    "NW": [
+        {"start": "2026-03-30", "end": "2026-04-11", "name": "Osterferien NRW"},
+        {"start": "2026-06-22", "end": "2026-08-04", "name": "Sommerferien NRW"},
+        {"start": "2026-10-05", "end": "2026-10-17", "name": "Herbstferien NRW"},
+        {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien NRW"},
+    ],
+    "BB": [
+        {"start": "2026-02-02", "end": "2026-02-07", "name": "Winterferien Brandenburg"},
+        {"start": "2026-04-03", "end": "2026-04-17", "name": "Osterferien Brandenburg"},
+        {"start": "2026-06-25", "end": "2026-08-07", "name": "Sommerferien Brandenburg"},
+        {"start": "2026-10-12", "end": "2026-10-23", "name": "Herbstferien Brandenburg"},
+        {"start": "2026-12-23", "end": "2027-01-02", "name": "Weihnachtsferien Brandenburg"},
+    ],
+    "BE": [
+        {"start": "2026-01-26", "end": "2026-01-31", "name": "Winterferien Berlin"},
+        {"start": "2026-03-30", "end": "2026-04-11", "name": "Osterferien Berlin"},
+        {"start": "2026-06-25", "end": "2026-08-07", "name": "Sommerferien Berlin"},
+        {"start": "2026-10-12", "end": "2026-10-23", "name": "Herbstferien Berlin"},
+        {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Berlin"},
+    ],
+    "TH": [
+        {"start": "2026-02-16", "end": "2026-02-21", "name": "Winterferien Thüringen"},
+        {"start": "2026-04-03", "end": "2026-04-11", "name": "Osterferien Thüringen"},
+        {"start": "2026-07-04", "end": "2026-08-14", "name": "Sommerferien Thüringen"},
+        {"start": "2026-10-03", "end": "2026-10-11", "name": "Herbstferien Thüringen"},
+        {"start": "2026-12-22", "end": "2027-01-02", "name": "Weihnachtsferien Thüringen"},
+    ],
+    "ST": [
+        {"start": "2026-02-02", "end": "2026-02-14", "name": "Winterferien Sachsen-Anhalt"},
+        {"start": "2026-04-03", "end": "2026-04-14", "name": "Osterferien Sachsen-Anhalt"},
+        {"start": "2026-06-25", "end": "2026-08-05", "name": "Sommerferien Sachsen-Anhalt"},
+        {"start": "2026-10-02", "end": "2026-10-11", "name": "Herbstferien Sachsen-Anhalt"},
+        {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Sachsen-Anhalt"},
+    ],
+    "BW": [
+        {"start": "2026-04-09", "end": "2026-04-17", "name": "Osterferien Baden-Württemberg"},
+        {"start": "2026-07-30", "end": "2026-09-12", "name": "Sommerferien Baden-Württemberg"},
+        {"start": "2026-10-26", "end": "2026-10-31", "name": "Herbstferien Baden-Württemberg"},
+        {"start": "2026-12-23", "end": "2027-01-08", "name": "Weihnachtsferien Baden-Württemberg"},
+    ],
+    "HE": [
+        {"start": "2026-03-30", "end": "2026-04-11", "name": "Osterferien Hessen"},
+        {"start": "2026-07-13", "end": "2026-08-21", "name": "Sommerferien Hessen"},
+        {"start": "2026-10-05", "end": "2026-10-16", "name": "Herbstferien Hessen"},
+        {"start": "2026-12-22", "end": "2027-01-08", "name": "Weihnachtsferien Hessen"},
+    ],
+    "NI": [
+        {"start": "2026-03-05", "end": "2026-03-14", "name": "Winterferien Niedersachsen"},
+        {"start": "2026-06-18", "end": "2026-07-29", "name": "Sommerferien Niedersachsen"},
+        {"start": "2026-10-01", "end": "2026-10-16", "name": "Herbstferien Niedersachsen"},
+        {"start": "2026-12-22", "end": "2027-01-04", "name": "Weihnachtsferien Niedersachsen"},
+    ],
+    "SH": [
+        {"start": "2026-04-06", "end": "2026-04-17", "name": "Osterferien Schleswig-Holstein"},
+        {"start": "2026-06-22", "end": "2026-08-01", "name": "Sommerferien Schleswig-Holstein"},
+        {"start": "2026-10-05", "end": "2026-10-17", "name": "Herbstferien Schleswig-Holstein"},
+        {"start": "2026-12-21", "end": "2027-01-05", "name": "Weihnachtsferien Schleswig-Holstein"},
+    ],
+    "MV": [
+        {"start": "2026-02-02", "end": "2026-02-14", "name": "Winterferien Mecklenburg-Vorpommern"},
+        {"start": "2026-04-03", "end": "2026-04-11", "name": "Osterferien Mecklenburg-Vorpommern"},
+        {"start": "2026-06-25", "end": "2026-08-05", "name": "Sommerferien Mecklenburg-Vorpommern"},
+        {"start": "2026-10-05", "end": "2026-10-17", "name": "Herbstferien Mecklenburg-Vorpommern"},
+        {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Mecklenburg-Vorpommern"},
+    ],
+    "RP": [
+        {"start": "2026-03-30", "end": "2026-04-10", "name": "Osterferien Rheinland-Pfalz"},
+        {"start": "2026-07-20", "end": "2026-08-28", "name": "Sommerferien Rheinland-Pfalz"},
+        {"start": "2026-10-12", "end": "2026-10-23", "name": "Herbstferien Rheinland-Pfalz"},
+        {"start": "2026-12-23", "end": "2027-01-08", "name": "Weihnachtsferien Rheinland-Pfalz"},
+    ],
+    "SL": [
+        {"start": "2026-03-30", "end": "2026-04-10", "name": "Osterferien Saarland"},
+        {"start": "2026-07-20", "end": "2026-08-28", "name": "Sommerferien Saarland"},
+        {"start": "2026-10-19", "end": "2026-10-30", "name": "Herbstferien Saarland"},
+        {"start": "2026-12-23", "end": "2027-01-08", "name": "Weihnachtsferien Saarland"},
+    ],
+    "HH": [
+        {"start": "2026-03-05", "end": "2026-03-14", "name": "Frühjahrsferien Hamburg"},
+        {"start": "2026-06-18", "end": "2026-07-29", "name": "Sommerferien Hamburg"},
+        {"start": "2026-10-01", "end": "2026-10-16", "name": "Herbstferien Hamburg"},
+        {"start": "2026-12-18", "end": "2027-01-02", "name": "Weihnachtsferien Hamburg"},
+    ],
+    "HB": [
+        {"start": "2026-03-05", "end": "2026-03-14", "name": "Frühjahrsferien Bremen"},
+        {"start": "2026-06-18", "end": "2026-07-29", "name": "Sommerferien Bremen"},
+        {"start": "2026-10-01", "end": "2026-10-16", "name": "Herbstferien Bremen"},
+        {"start": "2026-12-18", "end": "2027-01-02", "name": "Weihnachtsferien Bremen"},
+    ],
+}
+
+
 class VpMobile24HolidaySensor(SensorEntity):
-    """Sensor für Schulferien – lädt Daten direkt von ferien-api.de."""
+    """Sensor für Schulferien – nutzt hardcodierte KMK-Daten mit API-Update."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
         self._config_entry = config_entry
@@ -862,10 +973,8 @@ class VpMobile24HolidaySensor(SensorEntity):
         self._current_holiday: dict | None = None
         self._next_holiday: dict | None = None
         self._last_fetch_date: str = ""
-
-    @property
-    def device_info(self):
-        return _device_info(self._config_entry)
+        # Initialize immediately from fallback data
+        self._compute_holidays_from_data(_KMK_HOLIDAYS.get(self._state_code(), []))
 
     @property
     def device_info(self):
@@ -879,6 +988,24 @@ class VpMobile24HolidaySensor(SensorEntity):
         if code.startswith("DE-"):
             code = code[3:]
         return code
+
+    def _compute_holidays_from_data(self, holidays: list) -> None:
+        """Compute current and next holiday from a list of {start, end, name} dicts."""
+        from datetime import date as _date
+        today = _date.today()
+        self._current_holiday = None
+        self._next_holiday = None
+        for h in sorted(holidays, key=lambda x: x.get("start", "")):
+            try:
+                h_start = datetime.fromisoformat(h["start"]).date()
+                h_end   = datetime.fromisoformat(h["end"]).date()
+                name    = h.get("name", "Ferien")
+                if h_start <= today <= h_end:
+                    self._current_holiday = {"name": name, "start": h["start"], "end": h["end"]}
+                elif h_start > today and self._next_holiday is None:
+                    self._next_holiday = {"name": name, "start": h["start"], "end": h["end"]}
+            except (KeyError, ValueError, TypeError):
+                continue
 
     @property
     def state(self) -> str:
@@ -900,66 +1027,49 @@ class VpMobile24HolidaySensor(SensorEntity):
             "naechste_ferien_end":   nh.get("end")   if nh else None,
             "bundesland": self._state_code(),
             "manuell": False,
-            "debug_today": datetime.now().date().isoformat(),
-            "debug_api_url": f"https://ferien-api.de/api/v1/holidays/{self._state_code()}/2026",
         }
 
     async def async_update(self) -> None:
-        """Fetch holiday data directly from ferien-api.de — once per day."""
+        """Try to update from ferien-api.de, fall back to KMK data."""
         state_code = self._state_code()
         if not state_code:
             return
 
         from datetime import date
-        today_str = date.today().isoformat()
+        today = date.today()
+        today_str = today.isoformat()
 
-        # Only fetch once per day to avoid rate limiting
-        if self._last_fetch_date == today_str and (self._current_holiday is not None or self._next_holiday is not None):
+        # Always compute from fallback first so sensor is never empty
+        fallback = _KMK_HOLIDAYS.get(state_code, [])
+        self._compute_holidays_from_data(fallback)
+
+        # Only try API once per day
+        if self._last_fetch_date == today_str:
             return
 
         try:
             import aiohttp
-            from datetime import date
-            today = date.today()
             year = today.year
-            all_holidays = []
-
-            headers = {"User-Agent": "VpMobile24-HA-Integration/2.5 (github.com/Maximilian-Andrew-Kluge/VpMobile24)"}
+            all_holidays: list = []
+            headers = {"User-Agent": "VpMobile24-HA/2.5 (github.com/Maximilian-Andrew-Kluge/VpMobile24)"}
 
             async with aiohttp.ClientSession(headers=headers) as session:
                 for y in [year, year + 1]:
                     url = f"https://ferien-api.de/api/v1/holidays/{state_code}/{y}"
                     try:
-                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
                             if resp.status == 200:
                                 data = await resp.json()
                                 if isinstance(data, list):
                                     all_holidays.extend(data)
-                            elif resp.status == 429:
-                                _LOGGER.warning("VpMobile24HolidaySensor: rate limited by ferien-api.de, will retry later")
-                                return  # Don't update cache, try again next poll
-                    except Exception as err:
-                        _LOGGER.warning("VpMobile24HolidaySensor: request failed for %s/%s: %s", state_code, y, err)
+                            # On 429 or error: fallback already set above
+                    except Exception:
+                        pass
 
-            self._holiday_data = all_holidays
-            self._current_holiday = None
-            self._next_holiday = None
+            if all_holidays:
+                self._compute_holidays_from_data(all_holidays)
 
-            for h in all_holidays:
-                try:
-                    h_start = datetime.fromisoformat(h.get("start", "")).date()
-                    h_end   = datetime.fromisoformat(h.get("end", "")).date()
-                    name    = h.get("name", "Ferien").title()
-                    if h_start <= today <= h_end:
-                        self._current_holiday = {"name": name, "start": h.get("start"), "end": h.get("end")}
-                    elif h_start > today and self._next_holiday is None:
-                        self._next_holiday = {"name": name, "start": h.get("start"), "end": h.get("end")}
-                except (ValueError, TypeError):
-                    continue
-
-            self._data_loaded = True
             self._last_fetch_date = today_str
 
         except Exception as err:
-            _LOGGER.warning("VpMobile24HolidaySensor: error fetching holidays: %s", err)
-
+            _LOGGER.debug("VpMobile24HolidaySensor: API error, using KMK fallback: %s", err)
