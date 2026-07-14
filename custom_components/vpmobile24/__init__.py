@@ -592,6 +592,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("Data update completed successfully")
 
             # ── Fetch school holidays from openholidaysapi.org ──────────────
+            _LOGGER.warning("VpMobile24: calling _async_update_holidays")
             await self._async_update_holidays()
 
             return today_data
@@ -621,6 +622,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         entry.options.get("state_code")
                         or entry.data.get("state_code", "")
                     )
+
+            _LOGGER.warning("VpMobile24 holidays: entry_id=%s state_code=%s", self._entry_id, state_code)
 
             if not state_code:
                 _LOGGER.debug("VpMobile24: no state_code configured, skipping holiday fetch")
