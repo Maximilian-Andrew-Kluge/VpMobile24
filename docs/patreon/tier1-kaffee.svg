@@ -1,0 +1,22 @@
+<svg width="460" height="200" viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="460" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+  </defs>
+  <rect width="460" height="200" rx="16" fill="url(#bg1)"/>
+  <!-- Coffee accent line -->
+  <rect x="0" y="0" width="460" height="4" rx="2" fill="#c2813a"/>
+  <!-- Icon -->
+  <text x="50" y="115" font-size="64" font-family="serif">☕</text>
+  <!-- Title -->
+  <text x="140" y="80" font-size="28" font-weight="700" fill="#ffffff" font-family="Inter,sans-serif">Kaffee-Spende</text>
+  <!-- Subtitle -->
+  <text x="140" y="110" font-size="16" fill="#94a3b8" font-family="Inter,sans-serif">2 € / Monat</text>
+  <!-- Tag -->
+  <rect x="140" y="130" width="120" height="28" rx="14" fill="rgba(194,129,58,0.2)" stroke="rgba(194,129,58,0.5)" stroke-width="1"/>
+  <text x="200" y="149" text-anchor="middle" font-size="13" fill="#c2813a" font-family="Inter,sans-serif" font-weight="600">VpMobile24</text>
+  <!-- Bottom text -->
+  <text x="230" y="185" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.3)" font-family="Inter,sans-serif">Unterstütze die Entwicklung</text>
+</svg>

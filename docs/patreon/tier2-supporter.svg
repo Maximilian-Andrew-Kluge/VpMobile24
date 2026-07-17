@@ -1,0 +1,25 @@
+<svg width="460" height="200" viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="460" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f1729"/>
+      <stop offset="100%" stop-color="#1a2744"/>
+    </linearGradient>
+  </defs>
+  <rect width="460" height="200" rx="16" fill="url(#bg2)"/>
+  <!-- Blue accent line -->
+  <rect x="0" y="0" width="460" height="4" rx="2" fill="#3b82f6"/>
+  <!-- Star decoration -->
+  <circle cx="420" cy="40" r="30" fill="rgba(59,130,246,0.08)"/>
+  <circle cx="420" cy="40" r="20" fill="rgba(59,130,246,0.12)"/>
+  <!-- Icon -->
+  <text x="50" y="115" font-size="64" font-family="serif">🌟</text>
+  <!-- Title -->
+  <text x="140" y="80" font-size="28" font-weight="700" fill="#ffffff" font-family="Inter,sans-serif">Supporter</text>
+  <!-- Subtitle -->
+  <text x="140" y="110" font-size="16" fill="#94a3b8" font-family="Inter,sans-serif">5 € / Monat</text>
+  <!-- Tag -->
+  <rect x="140" y="130" width="140" height="28" rx="14" fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+  <text x="210" y="149" text-anchor="middle" font-size="13" fill="#3b82f6" font-family="Inter,sans-serif" font-weight="600">VpMobile24</text>
+  <!-- Bottom text -->
+  <text x="230" y="185" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.3)" font-family="Inter,sans-serif">Beta-Zugang &amp; CHANGELOG-Nennung</text>
+</svg>
