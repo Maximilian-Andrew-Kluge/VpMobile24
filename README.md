@@ -282,6 +282,7 @@ Einstellungen → Geräte & Dienste → VpMobile24 → Diagnose herunterladen
 # 🤝 Mitmachen
 
 * 🐛 Bug melden → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+* 📋 XML-Daten für Bug-Reports → [Tutorial](docs/xml-tutorial.md)
 * 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
 * 🔧 Pull Request → [CONTRIBUTING.md](CONTRIBUTING.md)
 

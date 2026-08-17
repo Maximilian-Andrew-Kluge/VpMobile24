@@ -248,6 +248,7 @@ Settings → Devices & Services → VpMobile24 → Download Diagnostics
 # 🤝 Contributing
 
 * 🐛 Report a bug → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+* 📋 XML data for bug reports → [Tutorial](docs/xml-tutorial.md)
 * 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
 * 🔧 Pull Request → [CONTRIBUTING.md](CONTRIBUTING.md)
 
