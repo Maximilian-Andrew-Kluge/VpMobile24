@@ -22,17 +22,17 @@ CONF_SERVER = "server"
 
 # Available download servers (value = base URL)
 DOWNLOAD_SERVERS: dict[str, str] = {
-    "www": "https://www.stundenplan24.de",
-    "zusatz1":  "https://z1.stundenplan24.de/schulen",
-    "zusatz2":  "https://z2.stundenplan24.de/schulen",
-    "zusatz3":  "https://z3.stundenplan24.de/schulen",
-    "zusatz4":  "https://z4.stundenplan24.de/schulen",
-    "zusatz5":  "https://z5.stundenplan24.de/schulen",
-    "zusatz6":  "https://z6.stundenplan24.de/schulen",
-    "zusatz7":  "https://z7.stundenplan24.de/schulen",
-    "zusatz8":  "https://z8.stundenplan24.de/schulen",
-    "zusatz9":  "https://z9.stundenplan24.de/schulen",
-    "zusatz10": "https://z10.stundenplan24.de/schulen",
+    "www":      "https://www.stundenplan24.de",
+    "zusatz1":  "https://z1.stundenplan24.de",
+    "zusatz2":  "https://z2.stundenplan24.de",
+    "zusatz3":  "https://z3.stundenplan24.de",
+    "zusatz4":  "https://z4.stundenplan24.de",
+    "zusatz5":  "https://z5.stundenplan24.de",
+    "zusatz6":  "https://z6.stundenplan24.de",
+    "zusatz7":  "https://z7.stundenplan24.de",
+    "zusatz8":  "https://z8.stundenplan24.de",
+    "zusatz9":  "https://z9.stundenplan24.de",
+    "zusatz10": "https://z10.stundenplan24.de",
 }
 
 # German federal states for holiday lookup (ferien-api.de state codes)
