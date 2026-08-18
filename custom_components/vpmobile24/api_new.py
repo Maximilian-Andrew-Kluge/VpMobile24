@@ -44,8 +44,7 @@ class Stundenplan24API:
         """Test the connection to stundenplan24.
 
         Returns True if the server is reachable and credentials are accepted.
-        If the configured server returns 404, automatically tries www as fallback
-        and updates base_url if www works.
+        Falls back to www only if the configured server has no data at all.
         """
         try:
             session = await self.async_get_session()
@@ -57,7 +56,8 @@ class Stundenplan24API:
             if status == "auth_fail":
                 return False
 
-            # 404 on configured server — try www as fallback
+            # 404 on configured server — only fall back to www if it's not already www
+            # and the user didn't explicitly pick a zusatz server
             if self.base_url != "https://www.stundenplan24.de":
                 _LOGGER.info(
                     "VpMobile24: server %s returned 404, trying www fallback",
