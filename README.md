@@ -25,8 +25,21 @@
 
 ---
 
+## 🚀 Was ist neu in v2.5.5?
+
 > [!IMPORTANT]
-> 🎉 **VpMobile24 v2.5.5** ist jetzt verfügbar — [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+> **VpMobile24 v2.5.5** ist das aktuelle Stable Release — veröffentlicht am **14.07.2026**
+>
+> 🔗 [Alle Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+
+| Neu | Beschreibung |
+|-----|-------------|
+| 🏖️ Ferien-Sensor | Automatische Ferienerkennung für alle 16 Bundesländer |
+| 🔄 Reload-Animation | Pfeil dreht sich grün beim Aktualisieren |
+| 📚 Echtzeit-Erkennung | Aktueller Unterricht erkennt auch Vertretungsstunden |
+| 🌙 Vor Schulbeginn | Karte zeigt „Noch kein Unterricht" statt „Pause" |
+| ℹ️ Info-Popup Fix | Zeigt nur Infos des aktuellen Tages |
+| 🔵 Parallelkurs-Filter | Ausfälle fremder Kurse werden ausgeblendet |
 
 ---
 
@@ -37,7 +50,8 @@
 - [🚀 Installation](#-installation)
 - [⚙️ Einrichtung](#️-einrichtung)
 - [🃏 Lovelace Card Beispiele](#-lovelace-card-beispiele)
-- [📡 Sensoren](#-sensoren)
+- [📸 Screenshots](#-screenshots)
+- [📋 Hilfe & Tutorial](#-hilfe--tutorial)
 - [❓ FAQ](#-faq)
 - [🤝 Mitmachen](#-mitmachen)
 
@@ -47,7 +61,7 @@
 
 **VpMobile24** bringt deinen Schulstundenplan direkt in Home Assistant — mit automatischen Sensoren, modernen Lovelace-Karten und Schulferien-Erkennung für alle 16 Bundesländer.
 
-**Unterstützte Plattformen:** Stundenplan24.de · VpMobil24
+**Unterstützt:** Stundenplan24.de · VpMobil24
 
 ---
 
@@ -58,6 +72,7 @@
 <td width="50%" valign="top">
 
 **📡 Sensoren**
+
 | Sensor | Beschreibung |
 |--------|-------------|
 | `week_table` | Wochentabelle |
@@ -71,19 +86,16 @@
 </td>
 <td width="50%" valign="top">
 
-**🃏 Karten**
-- Stundenplan (Desktop + Mobile)
-- Mehrere Klassen
-- Aktueller Unterricht
-- 🏖️ Ferien-Screen
-- Smart Status Bar
-- DE / EN / FR
+**🃏 Lovelace Karten**
 
-**🆕 Neu in v2.5.5**
-- Ferien-Sensor (alle 16 Bundesländer)
-- Reload-Button mit Animation
-- Echtzeit Vertretungs-Erkennung
-- Parallelkurs-Filter
+- 📅 Wochenansicht (Desktop + Mobile)
+- 👥 Mehrere Klassen
+- ⏱️ Aktueller Unterricht
+- 🏖️ Ferien-Screen
+- 📊 Smart Status Bar
+- 🌍 Mehrsprachig: DE / EN / FR
+- 🔵 Parallelkurs-Filter
+- 🛡️ CSP-sicher (nginx, DuckDNS)
 
 </td>
 </tr>
@@ -93,13 +105,15 @@
 
 ## 🚀 Installation
 
-### Via HACS (empfohlen)
+### Via HACS *(empfohlen)*
 
-[![Open your Home Assistant instance and open the repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Maximilian-Andrew-Kluge&repository=VpMobile24&category=integration)
+[![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Maximilian-Andrew-Kluge&repository=VpMobile24&category=integration)
 
 ### Manuell
 
-`custom_components/vpmobile24` → `config/custom_components/vpmobile24` kopieren → HA neu starten.
+1. Ordner `custom_components/vpmobile24` herunterladen
+2. Nach `config/custom_components/vpmobile24` kopieren
+3. Home Assistant neu starten
 
 ---
 
@@ -112,7 +126,7 @@
 5. **Bundesland auswählen** *(für automatische Ferienerkennung)*
 
 > [!TIP]
-> Bundesland lässt sich nachträglich unter **Konfigurieren** ändern.
+> Das Bundesland lässt sich nachträglich unter **Einstellungen → VpMobile24 → Konfigurieren** ändern.
 
 ---
 
@@ -151,17 +165,43 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 ---
 
-## 📡 Sensoren
+## 📸 Screenshots
 
-| Sensor | State | Wichtige Attribute |
-|--------|-------|--------------------|
-| `week_table` | Anzahl | `week_table`, `next_week_table` |
-| `naechste_stunde` | Fach | `zeit`, `lehrer`, `raum` |
-| `heutiger_stundenplan` | Anzahl | `stunden_heute` |
-| `zusatzinfos` | Anzahl | `allgemeine_infos` |
-| `aenderungen` | Anzahl | `alle_aenderungen` |
-| `aktueller_unterricht` | Fach | `fach`, `lehrer`, `raum` |
-| `ferien` | Ferienname | `ist_ferien`, `start`, `end`, `bundesland` |
+<table>
+<tr>
+  <td align="center" width="50%"><b>📅 Wochenübersicht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" width="100%"/>
+  </td>
+  <td align="center" width="50%"><b>🃏 Lovelace Card</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" width="100%"/>
+  </td>
+</tr>
+<tr>
+  <td align="center" width="50%"><b>👥 Mehrere Klassen</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/multi-card.png" width="100%"/>
+  </td>
+  <td align="center" width="50%"><b>⏱️ Aktueller Unterricht</b><br/><br/>
+    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/current-card.png" width="100%"/>
+  </td>
+</tr>
+</table>
+
+---
+
+## 📋 Hilfe & Tutorial
+
+> [!NOTE]
+> 🐛 **Bug melden?** Bitte füge die XML-Rohdaten von stundenplan24.de bei — das hilft uns das Problem schnell zu lösen.
+>
+> 📋 **[→ Anleitung: XML-Daten abrufen](docs/xml-tutorial.md)**
+
+| Ressource | Link |
+|-----------|------|
+| 📋 XML-Tutorial | [docs/xml-tutorial.md](docs/xml-tutorial.md) |
+| 🐛 Bug melden | [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues/new) |
+| 💬 Community | [Discord](https://discord.gg/57uvCeRw43) |
+| 🌐 Website | [Zur Website](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) |
+| 🔧 Diagnose | Einstellungen → VpMobile24 → Diagnose herunterladen |
 
 ---
 
@@ -170,25 +210,25 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 <details>
 <summary>Welche Schulen werden unterstützt?</summary>
 
-Alle Schulen die Stundenplan24.de oder VpMobil24 verwenden.
+Alle Schulen die **Stundenplan24.de** oder **VpMobil24** verwenden.
 </details>
 
 <details>
 <summary>Muss ich YAML schreiben?</summary>
 
-Nein — alles über die Home Assistant UI konfigurierbar.
+Nein — alles ist über die Home Assistant UI konfigurierbar.
 </details>
 
 <details>
 <summary>Wie funktioniert die Ferienerkennung?</summary>
 
-Bundesland beim Einrichten oder unter Konfigurieren auswählen. Daten kommen aus den offiziellen KMK-Ferienplänen.
+Bundesland beim Einrichten oder unter Konfigurieren auswählen. Die Daten kommen aus den offiziellen KMK-Ferienplänen.
 </details>
 
 <details>
 <summary>Was ist der Parallelkurs-Filter?</summary>
 
-In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`). Wähle nur deinen Kurs — Ausfälle anderer Gruppen werden ausgeblendet.
+In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`, `7INb1`). Wähle nur deinen Kurs — Ausfälle anderer Gruppen werden dann ausgeblendet.
 </details>
 
 <details>
@@ -198,48 +238,22 @@ In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`). Wähle nur d
 2. Neu konfigurieren
 3. Home Assistant neu starten
 
-Bei anhaltenden Problemen → [GitHub Issue](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder [Discord](https://discord.gg/57uvCeRw43).
+Bei weiteren Problemen → [GitHub Issue erstellen](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) oder [Discord](https://discord.gg/57uvCeRw43).
 </details>
 
----
+<details>
+<summary>Unterstützt die Integration mehrere Klassen?</summary>
 
-## 📸 Screenshots
-
-<table>
-<tr>
-  <td align="center" width="50%"><b>Wochenübersicht</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/overview.png" width="100%"/>
-  </td>
-  <td align="center" width="50%"><b>Lovelace Card</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/card.png" width="100%"/>
-  </td>
-</tr>
-<tr>
-  <td align="center" width="50%"><b>Mehrere Klassen</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/multi-card.png" width="100%"/>
-  </td>
-  <td align="center" width="50%"><b>Aktueller Unterricht</b><br/><br/>
-    <img src="https://raw.githubusercontent.com/Maximilian-Andrew-Kluge/VpMobile24/main/docs/current-card.png" width="100%"/>
-  </td>
-</tr>
-</table>
+Ja — mehrere Klassen und Parallelkurse werden unterstützt. Jede Klasse wird als separate Integration eingerichtet.
+</details>
 
 ---
 
 ## 🤝 Mitmachen
 
-> [!NOTE]
-> 🐛 **Bug melden?** Bitte füge die XML-Rohdaten von stundenplan24.de bei — das hilft uns das Problem schnell zu lösen.
->
-> 📋 **[→ Anleitung: XML-Daten abrufen](docs/xml-tutorial.md)**
-
-| | |
-|---|---|
-| 🐛 Bug melden | [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues) |
-| 💬 Community | [Discord](https://discord.gg/57uvCeRw43) |
-| 🌐 Website | [maximilian-andrew-kluge.github.io/VpMobile24](https://maximilian-andrew-kluge.github.io/VpMobile24/website/) |
-| 🔧 Pull Request | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| 🔧 Diagnose | Einstellungen → Geräte & Dienste → VpMobile24 → Diagnose |
+* 🐛 Bug melden → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
+* 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
+* 🔧 Pull Request → [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
 
