@@ -69,7 +69,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors["base"] = "cannot_connect"
                 else:
                     self._config_data.update(user_input)
-                    self._config_data[CONF_SERVER] = server_key
+                    # If API auto-corrected base_url (e.g. zusatz1 → www), persist that
+                    corrected_key = next(
+                        (k for k, v in DOWNLOAD_SERVERS.items() if v == self._api.base_url),
+                        server_key,
+                    )
+                    self._config_data[CONF_SERVER] = corrected_key
                     # Try to load class list from XML
                     try:
                         self._available_classes = await self._api.async_get_classes()
@@ -347,6 +352,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     base_url=base_url,
                 )
                 connection_ok = await api.async_test_connection()
+                # Read back potentially auto-corrected base_url
+                corrected_key = next(
+                    (k for k, v in DOWNLOAD_SERVERS.items() if v == api.base_url),
+                    server_key,
+                )
                 await api.async_close()
                 if not connection_ok:
                     errors["base"] = "cannot_connect"
@@ -356,7 +366,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     new_data[CONF_SCHOOL_ID] = user_input[CONF_SCHOOL_ID]
                     new_data[CONF_USERNAME]  = user_input[CONF_USERNAME]
                     new_data[CONF_PASSWORD]  = user_input[CONF_PASSWORD]
-                    new_data[CONF_SERVER]    = server_key
+                    new_data[CONF_SERVER]    = corrected_key
                     self.hass.config_entries.async_update_entry(
                         self._config_entry, data=new_data
                     )

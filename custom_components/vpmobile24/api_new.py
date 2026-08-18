@@ -44,32 +44,65 @@ class Stundenplan24API:
         """Test the connection to stundenplan24.
 
         Returns True if the server is reachable and credentials are accepted.
-        - 200: OK
-        - 401/403: server reachable but wrong credentials → False (invalid_auth)
-        - 404: server reachable, school ID not found yet — try Klassen.xml as fallback
-        - connection error: server not reachable → False (cannot_connect)
+        If the configured server returns 404, automatically tries www as fallback
+        and updates base_url if www works.
         """
         try:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
-            test_url = f"{self.base_url}/{self.school_id}/mobil/plankl.html"
-            async with session.get(test_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
-                if response.status == 200:
-                    return True
-                if response.status in (401, 403):
-                    _LOGGER.debug("Auth failed (HTTP %s) for %s", response.status, test_url)
-                    return False
-                if response.status == 404:
-                    # plankl.html not found — try Klassen.xml which always exists for valid schools
-                    fallback_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
-                    async with session.get(fallback_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as r2:
-                        _LOGGER.debug("Fallback test %s -> HTTP %s", fallback_url, r2.status)
-                        return r2.status == 200
-                _LOGGER.debug("Unexpected HTTP %s for %s", response.status, test_url)
+
+            status = await self._test_url(session, auth, self.base_url)
+            if status == "ok":
+                return True
+            if status == "auth_fail":
                 return False
+
+            # 404 on configured server — try www as fallback
+            if self.base_url != "https://www.stundenplan24.de":
+                _LOGGER.info(
+                    "VpMobile24: server %s returned 404, trying www fallback",
+                    self.base_url,
+                )
+                www_status = await self._test_url(
+                    session, auth, "https://www.stundenplan24.de"
+                )
+                if www_status == "ok":
+                    _LOGGER.info(
+                        "VpMobile24: www fallback succeeded, switching base_url"
+                    )
+                    self.base_url = "https://www.stundenplan24.de"
+                    return True
+                if www_status == "auth_fail":
+                    return False
+
+            return False
         except Exception as ex:
             _LOGGER.error("Error testing connection: %s", ex)
             return False
+
+    async def _test_url(
+        self,
+        session: aiohttp.ClientSession,
+        auth: BasicAuth,
+        base_url: str,
+    ) -> str:
+        """Try plankl.html then Klassen.xml. Returns 'ok', 'auth_fail', or 'not_found'."""
+        for path in [
+            f"{base_url}/{self.school_id}/mobil/plankl.html",
+            f"{base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml",
+        ]:
+            try:
+                async with session.get(
+                    path, auth=auth, timeout=aiohttp.ClientTimeout(total=10)
+                ) as resp:
+                    if resp.status == 200:
+                        return "ok"
+                    if resp.status in (401, 403):
+                        return "auth_fail"
+                    # 404 → try next path
+            except Exception:
+                return "not_found"
+        return "not_found"
 
     async def async_get_classes(self) -> list[str]:
         """Get list of available classes."""
