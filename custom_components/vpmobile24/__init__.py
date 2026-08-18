@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, DEFAULT_BASE_URL
+from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS
 from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
@@ -140,11 +140,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except Exception as _repair_err:
         _LOGGER.debug("VpMobile24: repairs module not available: %s", _repair_err)
 
+    server_key = entry.options.get(CONF_SERVER) or entry.data.get(CONF_SERVER, "www")
+    base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
     api = Stundenplan24API(
         school_id=entry.data["school_id"],
         username=entry.data["username"],
         password=entry.data["password"],
-        base_url=DEFAULT_BASE_URL
+        base_url=base_url,
     )
 
     coordinator = VpMobile24DataUpdateCoordinator(

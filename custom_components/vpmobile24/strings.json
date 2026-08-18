@@ -7,12 +7,14 @@
         "data": {
           "school_id": "School ID",
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "server": "Download server"
         },
         "data_description": {
           "school_id": "The school ID from the VpMobile24 URL",
           "username": "Your username for VpMobile24",
-          "password": "Your password for VpMobile24"
+          "password": "Your password for VpMobile24",
+          "server": "Select 'www' (standard) or an alternative server if your school uses one (stated in your parent letter)"
         }
       },
       "class": {

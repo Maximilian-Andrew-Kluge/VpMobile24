@@ -20,7 +20,9 @@ from .const import (
     CONF_SELECTED_COURSES,
     CONF_STATE_CODE,
     CONF_CUSTOM_HOLIDAYS,
+    CONF_SERVER,
     DEFAULT_BASE_URL,
+    DOWNLOAD_SERVERS,
     DOMAIN,
     GERMAN_STATES,
 )
@@ -54,17 +56,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
+                server_key = user_input.get(CONF_SERVER, "www")
+                base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
                 self._api = Stundenplan24API(
                     school_id=user_input[CONF_SCHOOL_ID],
                     username=user_input[CONF_USERNAME],
                     password=user_input[CONF_PASSWORD],
-                    base_url=DEFAULT_BASE_URL,
+                    base_url=base_url,
                 )
                 connection_ok = await self._api.async_test_connection()
                 if not connection_ok:
                     errors["base"] = "cannot_connect"
                 else:
                     self._config_data.update(user_input)
+                    self._config_data[CONF_SERVER] = server_key
                     # Try to load class list from XML
                     try:
                         self._available_classes = await self._api.async_get_classes()
@@ -84,6 +89,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_SCHOOL_ID): str,
                 vol.Required(CONF_USERNAME): str,
                 vol.Required(CONF_PASSWORD): str,
+                vol.Optional(CONF_SERVER, default="www"): vol.In(list(DOWNLOAD_SERVERS.keys())),
             }),
             errors=errors,
         )
@@ -391,12 +397,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if not self._available_classes:
             try:
                 from .api_new import Stundenplan24API
-                from .const import DEFAULT_BASE_URL
+                from .const import DEFAULT_BASE_URL, CONF_SERVER, DOWNLOAD_SERVERS
+                server_key = (
+                    self._config_entry.options.get(CONF_SERVER)
+                    or self._config_entry.data.get(CONF_SERVER, "www")
+                )
+                base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
                 api = Stundenplan24API(
                     school_id=self._config_entry.data[CONF_SCHOOL_ID],
                     username=self._config_entry.data[CONF_USERNAME],
                     password=self._config_entry.data[CONF_PASSWORD],
-                    base_url=DEFAULT_BASE_URL,
+                    base_url=base_url,
                 )
                 self._available_classes = await api.async_get_classes()
                 await api.async_close()
@@ -427,11 +438,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         """Fetch subjects for the selected class, then show subject step."""
         api = None
         try:
+            server_key = (
+                self._config_entry.options.get(CONF_SERVER)
+                or self._config_entry.data.get(CONF_SERVER, "www")
+            )
+            base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
             api = Stundenplan24API(
                 school_id=self._config_entry.data[CONF_SCHOOL_ID],
                 username=self._config_entry.data[CONF_USERNAME],
                 password=self._config_entry.data[CONF_PASSWORD],
-                base_url=DEFAULT_BASE_URL,
+                base_url=base_url,
             )
             all_subjects: set[str] = set()
             today = date.today()

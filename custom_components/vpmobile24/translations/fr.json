@@ -7,7 +7,11 @@
         "data": {
           "school_id": "ID de l'école",
           "username": "Nom d'utilisateur",
-          "password": "Mot de passe"
+          "password": "Mot de passe",
+          "server": "Serveur de téléchargement"
+        },
+        "data_description": {
+          "server": "Sélectionnez 'www' (standard) ou un serveur alternatif si votre école en utilise un (indiqué dans la lettre aux parents)."
         }
       }
     },
