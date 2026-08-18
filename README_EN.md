@@ -247,6 +247,13 @@ Settings → Devices & Services → VpMobile24 → Download Diagnostics
 
 # 🤝 Contributing
 
+> [!NOTE]
+>
+> 🐛 **Reporting a bug?** Please include the XML raw data from stundenplan24.de.
+> This helps us find the problem quickly.
+>
+> 📋 **[→ Guide: How to get the XML data?](docs/xml-tutorial.md)**
+
 * 🐛 Report a bug → [GitHub Issues](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues)
 * 📋 XML data for bug reports → [Tutorial](docs/xml-tutorial.md)
 * 💬 Community → [Discord](https://discord.gg/57uvCeRw43)
