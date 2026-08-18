@@ -41,13 +41,32 @@ class Stundenplan24API:
         return self.session
 
     async def async_test_connection(self) -> bool:
-        """Test the connection to stundenplan24."""
+        """Test the connection to stundenplan24.
+
+        Returns True if the server is reachable and credentials are accepted.
+        - 200: OK
+        - 401/403: server reachable but wrong credentials → False (invalid_auth)
+        - 404: server reachable, school ID not found yet — try Klassen.xml as fallback
+        - connection error: server not reachable → False (cannot_connect)
+        """
         try:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
             test_url = f"{self.base_url}/{self.school_id}/mobil/plankl.html"
             async with session.get(test_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
-                return response.status == 200
+                if response.status == 200:
+                    return True
+                if response.status in (401, 403):
+                    _LOGGER.debug("Auth failed (HTTP %s) for %s", response.status, test_url)
+                    return False
+                if response.status == 404:
+                    # plankl.html not found — try Klassen.xml which always exists for valid schools
+                    fallback_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
+                    async with session.get(fallback_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as r2:
+                        _LOGGER.debug("Fallback test %s -> HTTP %s", fallback_url, r2.status)
+                        return r2.status == 200
+                _LOGGER.debug("Unexpected HTTP %s for %s", response.status, test_url)
+                return False
         except Exception as ex:
             _LOGGER.error("Error testing connection: %s", ex)
             return False
