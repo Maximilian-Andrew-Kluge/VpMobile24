@@ -14,7 +14,7 @@
           "school_id": "Die 8-stellige Schulnummer",
           "username": "Ihr Benutzername für VpMobile24",
           "password": "Ihr Passwort für VpMobile24",
-          "server": "„www" = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswählen."
+          "server": "„www\" = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswählen."
         }
       },
       "class": {
@@ -53,7 +53,8 @@
         "data": {
           "change_subjects": "Fächer ändern",
           "change_class": "Klasse ändern",
-          "change_holidays": "Bundesland (Ferien) ändern"
+          "change_holidays": "Bundesland (Ferien) ändern",
+          "change_credentials": "Zugangsdaten / Server ändern"
         }
       },
       "change_class": {
@@ -67,8 +68,18 @@
         "title": "Fächer auswählen",
         "description": "Wählen Sie die anzuzeigenden Fächer. Gefunden: {subject_count} Fächer."
       },
+      "change_credentials": {
+        "title": "Zugangsdaten ändern",
+        "description": "Neue Schulnummer, Benutzername, Passwort und Server eingeben.",
+        "data": {
+          "school_id": "Schulnummer",
+          "username": "Benutzername",
+          "password": "Neues Passwort",
+          "server": "Downloadserver"
+        }
+      },
       "change_holidays": {
-        "title": "Bundesland für Ferien",
+        "title": "Bundesland (Ferien) ändern",
         "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
         "data": {
           "state_code": "Bundesland"

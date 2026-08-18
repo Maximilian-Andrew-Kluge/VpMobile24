@@ -281,14 +281,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Step 1 — choose: change subjects and/or change class and/or change state."""
+        """Step 1 — choose what to change."""
         if user_input is not None:
-            change_class    = user_input.get("change_class", False)
-            change_subjects = user_input.get("change_subjects", False)
-            change_holidays = user_input.get("change_holidays", False)
+            change_class       = user_input.get("change_class", False)
+            change_subjects    = user_input.get("change_subjects", False)
+            change_holidays    = user_input.get("change_holidays", False)
+            change_credentials = user_input.get("change_credentials", False)
 
-            if not change_class and not change_subjects and not change_holidays:
+            if not any([change_class, change_subjects, change_holidays, change_credentials]):
                 return self.async_create_entry(title="", data={})
+
+            if change_credentials:
+                return await self.async_step_change_credentials()
 
             if change_holidays and not change_class and not change_subjects:
                 return await self.async_step_change_holidays()
@@ -318,11 +322,64 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional("change_subjects", default=False): bool,
                 vol.Optional("change_class", default=False): bool,
                 vol.Optional("change_holidays", default=False): bool,
+                vol.Optional("change_credentials", default=False): bool,
             }),
             description_placeholders={
                 "current_class": current_class,
                 "current_state": state_label,
             },
+        )
+
+    async def async_step_change_credentials(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Change school ID, username, password and/or server."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            try:
+                server_key = user_input.get(CONF_SERVER, "www")
+                base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
+                api = Stundenplan24API(
+                    school_id=user_input[CONF_SCHOOL_ID],
+                    username=user_input[CONF_USERNAME],
+                    password=user_input[CONF_PASSWORD],
+                    base_url=base_url,
+                )
+                connection_ok = await api.async_test_connection()
+                await api.async_close()
+                if not connection_ok:
+                    errors["base"] = "cannot_connect"
+                else:
+                    # Save new credentials to config entry data
+                    new_data = dict(self._config_entry.data)
+                    new_data[CONF_SCHOOL_ID] = user_input[CONF_SCHOOL_ID]
+                    new_data[CONF_USERNAME]  = user_input[CONF_USERNAME]
+                    new_data[CONF_PASSWORD]  = user_input[CONF_PASSWORD]
+                    new_data[CONF_SERVER]    = server_key
+                    self.hass.config_entries.async_update_entry(
+                        self._config_entry, data=new_data
+                    )
+                    return self.async_create_entry(title="", data={})
+            except Exception:
+                errors["base"] = "unknown"
+
+        current_school_id = self._config_entry.data.get(CONF_SCHOOL_ID, "")
+        current_username  = self._config_entry.data.get(CONF_USERNAME, "")
+        current_server    = (
+            self._config_entry.options.get(CONF_SERVER)
+            or self._config_entry.data.get(CONF_SERVER, "www")
+        )
+
+        return self.async_show_form(
+            step_id="change_credentials",
+            data_schema=vol.Schema({
+                vol.Required(CONF_SCHOOL_ID, default=current_school_id): str,
+                vol.Required(CONF_USERNAME, default=current_username): str,
+                vol.Required(CONF_PASSWORD): str,
+                vol.Optional(CONF_SERVER, default=current_server): vol.In(list(DOWNLOAD_SERVERS.keys())),
+            }),
+            errors=errors,
         )
 
     async def async_step_change_holidays(
