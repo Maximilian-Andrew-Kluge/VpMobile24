@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.5
-console.info('%c VpMobile24-CARD %c v2.5.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.6
+console.info('%c VpMobile24-CARD %c v2.5.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -416,7 +416,10 @@ class VpMobile24Card extends HTMLElement {
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
     if (isActuallyCancelled) {
       title.innerHTML = ''; title.style.display = 'none';
-      content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>';
+      const infoHtml = info
+        ? '<div class="vp-ausfall-info">' + info + '</div>'
+        : '';
+      content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>' + infoHtml;
       popup.classList.add('vp-popup-ausfall');
       popup.classList.remove('hidden');
       overlay.classList.remove('hidden');
@@ -523,12 +526,13 @@ class VpMobile24Card extends HTMLElement {
             else                   cls += ' vp-normal';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
-            text = '—';
+            const tileInfo = lesson && lesson.zusatzinfo;
+            text = tileInfo ? tileInfo : '—';
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -926,12 +930,13 @@ ha-card {
             else                   cls += ' vp-normal';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
-            text = '—';
+            const tileInfo2 = lesson && lesson.zusatzinfo;
+            text = tileInfo2 ? tileInfo2 : '—';
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -1382,12 +1387,16 @@ ha-card {
   display: flex !important; flex-direction: column !important; min-height: 220px;
 }
 .vp-popup-ausfall .vp-popup-title { display: none !important; }
-.vp-popup-ausfall #popup-content  { flex: 1; display: flex; align-items: center; justify-content: center; }
+.vp-popup-ausfall #popup-content  { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
 .vp-ausfall-block {
   color: #fca5a5; font-size: 2.6em; font-weight: 900;
   letter-spacing: 5px; text-align: center; padding: 20px;
   text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
+}
+.vp-ausfall-info {
+  color: #fca5a5; font-size: 0.95em; font-weight: 500;
+  text-align: center; padding: 4px 16px 16px; opacity: 0.85;
 }
 /* Info popup */
 .vp-info-popup-title {
@@ -1496,7 +1505,7 @@ customElements.define('vpmobile24-card', VpMobile24Card);
 window.customCards = window.customCards || [];
 window.customCards.push({ type:'vpmobile24-card', name:'VpMobile24 Card', description:'Wochenstundenplan', preview:true });
 
-// ── VpMobile24 Current Lesson Card v2.5.5 ────────────────────────────────
+// ── VpMobile24 Current Lesson Card v2.5.6 ────────────────────────────────
 class VpMobile24CurrentCard extends HTMLElement {
   constructor() {
     super();
@@ -2012,7 +2021,7 @@ ha-card {
 customElements.define('vpmobile24-current-card', VpMobile24CurrentCard);
 window.customCards.push({ type:'vpmobile24-current-card', name:'VpMobile24 Aktueller Unterricht', description:'Zeigt den aktuell laufenden Unterricht', preview:true });
 
-// ── VpMobile24 Multi-Class Card v2.5.5 ───────────────────────────────────
+// ── VpMobile24 Multi-Class Card v2.5.6 ───────────────────────────────────
 class VpMobile24MultiCard extends HTMLElement {
   constructor() {
     super();
@@ -2786,4 +2795,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.5 loaded');
+console.log('✅ VpMobile24 Card v2.5.6 loaded');
