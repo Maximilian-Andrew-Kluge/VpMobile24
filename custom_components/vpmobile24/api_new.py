@@ -295,6 +295,16 @@ class Stundenplan24API:
                 lesson["info"] = info.text
                 lesson["is_change"] = True
 
+            # If subject is empty but info text AND teacher are present,
+            # treat it as a special lesson (e.g. "Klassenleiterstunde").
+            # Use the info text as subject so it's NOT shown as cancellation (—).
+            if (
+                not lesson["subject"]
+                and lesson["info"]
+                and lesson["teacher"]
+            ):
+                lesson["subject"] = lesson["info"]
+
             if lesson["time_start"] and lesson["time_end"]:
                 lesson["time"] = f"{lesson['time_start']}-{lesson['time_end']}"
             elif lesson["time_start"]:
