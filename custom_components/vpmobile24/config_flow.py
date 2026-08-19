@@ -400,21 +400,31 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_change_credentials(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
-        """Change school ID, username, password and/or server."""
+        """Change school ID, user type, password and/or server."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            user_type = user_input.get("user_type", "schueler")
+            if user_type == "custom":
+                # Save partial data and go to custom username step
+                self._cred_data = {
+                    CONF_SCHOOL_ID: user_input[CONF_SCHOOL_ID],
+                    CONF_PASSWORD: user_input[CONF_PASSWORD],
+                    CONF_SERVER: user_input.get(CONF_SERVER, "www"),
+                }
+                return await self.async_step_change_credentials_custom()
+
+            resolved_username = user_type  # "schueler" or "lehrer"
             try:
                 server_key = user_input.get(CONF_SERVER, "www")
                 base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
                 api = Stundenplan24API(
                     school_id=user_input[CONF_SCHOOL_ID],
-                    username=user_input[CONF_USERNAME],
+                    username=resolved_username,
                     password=user_input[CONF_PASSWORD],
                     base_url=base_url,
                 )
                 connection_ok = await api.async_test_connection()
-                # Read back potentially auto-corrected base_url
                 corrected_key = next(
                     (k for k, v in DOWNLOAD_SERVERS.items() if v == api.base_url),
                     server_key,
@@ -423,10 +433,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 if not connection_ok:
                     errors["base"] = "cannot_connect"
                 else:
-                    # Save new credentials to config entry data
                     new_data = dict(self._config_entry.data)
                     new_data[CONF_SCHOOL_ID] = user_input[CONF_SCHOOL_ID]
-                    new_data[CONF_USERNAME]  = user_input[CONF_USERNAME]
+                    new_data[CONF_USERNAME]  = resolved_username
                     new_data[CONF_PASSWORD]  = user_input[CONF_PASSWORD]
                     new_data[CONF_SERVER]    = corrected_key
                     self.hass.config_entries.async_update_entry(
@@ -437,7 +446,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 errors["base"] = "unknown"
 
         current_school_id = self._config_entry.data.get(CONF_SCHOOL_ID, "")
-        current_username  = self._config_entry.data.get(CONF_USERNAME, "")
         current_server    = (
             self._config_entry.options.get(CONF_SERVER)
             or self._config_entry.data.get(CONF_SERVER, "www")
@@ -447,9 +455,63 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             step_id="change_credentials",
             data_schema=vol.Schema({
                 vol.Required(CONF_SCHOOL_ID, default=current_school_id): str,
-                vol.Required(CONF_USERNAME, default=current_username): str,
+                vol.Required("user_type", default="schueler"): vol.In({
+                    "schueler": "Schüler",
+                    "lehrer": "Lehrer",
+                    "custom": "Benutzerdefiniert …",
+                }),
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(CONF_SERVER, default=current_server): vol.In(list(DOWNLOAD_SERVERS.keys())),
+            }),
+            errors=errors,
+        )
+
+    async def async_step_change_credentials_custom(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Enter custom username when changing credentials."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            custom_username = user_input.get(CONF_USERNAME, "").strip()
+            if not custom_username:
+                errors[CONF_USERNAME] = "cannot_connect"
+            else:
+                try:
+                    cred = getattr(self, "_cred_data", {})
+                    server_key = cred.get(CONF_SERVER, "www")
+                    base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
+                    api = Stundenplan24API(
+                        school_id=cred[CONF_SCHOOL_ID],
+                        username=custom_username,
+                        password=cred[CONF_PASSWORD],
+                        base_url=base_url,
+                    )
+                    connection_ok = await api.async_test_connection()
+                    corrected_key = next(
+                        (k for k, v in DOWNLOAD_SERVERS.items() if v == api.base_url),
+                        server_key,
+                    )
+                    await api.async_close()
+                    if not connection_ok:
+                        errors["base"] = "cannot_connect"
+                    else:
+                        new_data = dict(self._config_entry.data)
+                        new_data[CONF_SCHOOL_ID] = cred[CONF_SCHOOL_ID]
+                        new_data[CONF_USERNAME]  = custom_username
+                        new_data[CONF_PASSWORD]  = cred[CONF_PASSWORD]
+                        new_data[CONF_SERVER]    = corrected_key
+                        self.hass.config_entries.async_update_entry(
+                            self._config_entry, data=new_data
+                        )
+                        return self.async_create_entry(title="", data={})
+                except Exception:
+                    errors["base"] = "unknown"
+
+        return self.async_show_form(
+            step_id="change_credentials_custom",
+            data_schema=vol.Schema({
+                vol.Required(CONF_USERNAME): str,
             }),
             errors=errors,
         )
