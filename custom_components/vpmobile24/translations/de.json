@@ -19,6 +19,13 @@
           "server": "www = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswaehlen."
         }
       },
+      "custom_username": {
+        "title": "Benutzerdefinierter Benutzername",
+        "description": "Gib deinen eigenen Benutzernamen ein.",
+        "data": {
+          "username": "Benutzername"
+        }
+      },
       "class": {
         "title": "Klasse auswählen",
         "description": "Wählen Sie Ihre Klasse aus.",

@@ -51,20 +51,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step 1 — credentials + school ID (no class yet)."""
+        """Step 1 — school ID, user type, password and server."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            try:
-                # Resolve username from user_type selection
-                user_type = user_input.get("user_type", "custom")
-                if user_type == "schueler":
-                    resolved_username = "schueler"
-                elif user_type == "lehrer":
-                    resolved_username = "lehrer"
-                else:
-                    resolved_username = user_input.get(CONF_USERNAME, "").strip()
+            user_type = user_input.get("user_type", "schueler")
+            if user_type == "custom":
+                # Save partial data and go to custom username step
+                self._config_data["school_id"] = user_input[CONF_SCHOOL_ID]
+                self._config_data[CONF_PASSWORD] = user_input[CONF_PASSWORD]
+                self._config_data[CONF_SERVER] = user_input.get(CONF_SERVER, "www")
+                return await self.async_step_custom_username()
 
+            # Schüler or Lehrer — username is preset
+            resolved_username = user_type  # "schueler" or "lehrer"
+            try:
                 server_key = user_input.get(CONF_SERVER, "www")
                 base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
                 self._api = Stundenplan24API(
@@ -79,11 +80,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 else:
                     self._config_data.update(user_input)
                     self._config_data[CONF_USERNAME] = resolved_username
-                    server_key = next(
+                    self._config_data[CONF_SERVER] = next(
                         (k for k, v in DOWNLOAD_SERVERS.items() if v == self._api.base_url),
                         server_key,
                     )
-                    self._config_data[CONF_SERVER] = server_key
                     try:
                         self._available_classes = await self._api.async_get_classes()
                     except Exception:
@@ -101,13 +101,62 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema({
                 vol.Required(CONF_SCHOOL_ID): str,
                 vol.Required("user_type", default="schueler"): vol.In({
-                    "schueler": "Schüler (schueler)",
-                    "lehrer": "Lehrer (lehrer)",
-                    "custom": "Benutzerdefiniert",
+                    "schueler": "Schüler",
+                    "lehrer": "Lehrer",
+                    "custom": "Benutzerdefiniert …",
                 }),
-                vol.Optional(CONF_USERNAME, default=""): str,
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(CONF_SERVER, default="www"): vol.In(list(DOWNLOAD_SERVERS.keys())),
+            }),
+            errors=errors,
+        )
+
+    async def async_step_custom_username(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step 1b — custom username input."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            custom_username = user_input.get(CONF_USERNAME, "").strip()
+            if not custom_username:
+                errors[CONF_USERNAME] = "cannot_connect"
+            else:
+                try:
+                    server_key = self._config_data.get(CONF_SERVER, "www")
+                    base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
+                    self._api = Stundenplan24API(
+                        school_id=self._config_data["school_id"],
+                        username=custom_username,
+                        password=self._config_data[CONF_PASSWORD],
+                        base_url=base_url,
+                    )
+                    connection_ok = await self._api.async_test_connection()
+                    if not connection_ok:
+                        errors["base"] = "cannot_connect"
+                    else:
+                        self._config_data[CONF_USERNAME] = custom_username
+                        self._config_data[CONF_SERVER] = next(
+                            (k for k, v in DOWNLOAD_SERVERS.items() if v == self._api.base_url),
+                            server_key,
+                        )
+                        try:
+                            self._available_classes = await self._api.async_get_classes()
+                        except Exception:
+                            self._available_classes = []
+                        return await self.async_step_class()
+                except Exception:
+                    _LOGGER.exception("Unexpected exception")
+                    errors["base"] = "unknown"
+                finally:
+                    if self._api and errors:
+                        await self._api.async_close()
+
+        return self.async_show_form(
+            step_id="custom_username",
+            data_schema=vol.Schema({
+                vol.Required(CONF_USERNAME): str,
             }),
             errors=errors,
         )
