@@ -412,7 +412,9 @@ class VpMobile24Card extends HTMLElement {
     const raum   = (lesson && lesson.raum)   || '';
     const zeit   = (lesson && lesson.zeit)   || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
-    const isActuallyCancelled = isCancelled || fach === '—';
+    // If lesson has a real fach value, never treat as cancelled — even if isCancelled flag was set
+    const hasFach = fach !== '—';
+    const isActuallyCancelled = !hasFach && (isCancelled || fach === '—');
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
     if (isActuallyCancelled) {
       title.innerHTML = ''; title.style.display = 'none';
@@ -1233,6 +1235,9 @@ ha-card {
   transition: filter .12s, transform .12s, box-shadow .12s;
   background: #1a2a50;
   line-height: 1.2; text-align: center;
+  overflow: hidden;
+  word-break: break-word;
+  hyphens: auto;
 }
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
