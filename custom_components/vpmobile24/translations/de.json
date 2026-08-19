@@ -6,15 +6,17 @@
         "description": "Geben Sie Ihre Zugangsdaten ein.",
         "data": {
           "school_id": "Schulnummer",
-          "username": "Benutzername",
+          "user_type": "Benutzertyp",
+          "username": "Benutzername (nur bei benutzerdefiniert)",
           "password": "Passwort",
           "server": "Downloadserver"
         },
         "data_description": {
           "school_id": "Die 8-stellige Schulnummer",
-          "username": "Ihr Benutzername für VpMobile24",
-          "password": "Ihr Passwort für VpMobile24",
-          "server": "„www\" = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswählen."
+          "user_type": "Schueler oder Lehrer waehlen. Bei benutzerdefiniert den Benutzernamen selbst eingeben.",
+          "username": "Nur ausfuellen wenn Benutzerdefiniert gewaehlt wurde.",
+          "password": "Ihr Passwort fuer VpMobile24",
+          "server": "www = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswaehlen."
         }
       },
       "class": {
@@ -93,7 +95,7 @@
   "issues": {
     "reconfig_required": {
       "title": "VpMobile24: Neu-Einrichtung erforderlich",
-      "description": "Du aktualisierst von Version **{version}**. Wegen neuer Funktionen (Schulferien, verbesserte Sensoren) bitte die Integration **einmal löschen und neu hinzufügen**.\n\n1. Einstellungen → Geräte & Dienste\n2. VpMobile24 entfernen\n3. VpMobile24 neu hinzufügen\n\nDeine Daten gehen dabei nicht verloren."
+      "description": "Du aktualisierst von Version **{version}**. Wegen neuer Funktionen bitte die Integration einmal loeschen und neu hinzufuegen."
     }
   },
   "entity": {

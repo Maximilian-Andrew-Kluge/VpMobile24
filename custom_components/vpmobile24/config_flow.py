@@ -56,11 +56,20 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             try:
+                # Resolve username from user_type selection
+                user_type = user_input.get("user_type", "custom")
+                if user_type == "schueler":
+                    resolved_username = "schueler"
+                elif user_type == "lehrer":
+                    resolved_username = "lehrer"
+                else:
+                    resolved_username = user_input.get(CONF_USERNAME, "").strip()
+
                 server_key = user_input.get(CONF_SERVER, "www")
                 base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
                 self._api = Stundenplan24API(
                     school_id=user_input[CONF_SCHOOL_ID],
-                    username=user_input[CONF_USERNAME],
+                    username=resolved_username,
                     password=user_input[CONF_PASSWORD],
                     base_url=base_url,
                 )
@@ -69,13 +78,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors["base"] = "cannot_connect"
                 else:
                     self._config_data.update(user_input)
-                    # If API auto-corrected base_url (e.g. zusatz1 → www), persist that
-                    corrected_key = next(
+                    self._config_data[CONF_USERNAME] = resolved_username
+                    server_key = next(
                         (k for k, v in DOWNLOAD_SERVERS.items() if v == self._api.base_url),
                         server_key,
                     )
-                    self._config_data[CONF_SERVER] = corrected_key
-                    # Try to load class list from XML
+                    self._config_data[CONF_SERVER] = server_key
                     try:
                         self._available_classes = await self._api.async_get_classes()
                     except Exception:
@@ -92,7 +100,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=vol.Schema({
                 vol.Required(CONF_SCHOOL_ID): str,
-                vol.Required(CONF_USERNAME): str,
+                vol.Required("user_type", default="schueler"): vol.In({
+                    "schueler": "Schüler (schueler)",
+                    "lehrer": "Lehrer (lehrer)",
+                    "custom": "Benutzerdefiniert",
+                }),
+                vol.Optional(CONF_USERNAME, default=""): str,
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(CONF_SERVER, default="www"): vol.In(list(DOWNLOAD_SERVERS.keys())),
             }),
