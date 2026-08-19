@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="VpMobile24 – Home Assistant Integration für Stundenpläne. Stundenplan24 direkt in HA, mit Lovelace Card, Mehrsprachigkeit (DE/EN/FR), mehreren Klassen und automatischem Update alle 15 Minuten." />
+  <meta name="description" content="VpMobile24 – Home Assistant Integration für Stundenpläne. Stundenplan24 direkt in HA, mit Ferien-Erkennung für alle 16 Bundesländer, Lovelace Card, Mehrsprachigkeit (DE/EN/FR), mehreren Klassen und automatischem Update alle 15 Minuten." />
   <meta name="theme-color" content="#0a0f1e" />
   <title>VpMobile24 – Home Assistant Integration</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 56 56' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' y1='0' x2='56' y2='56'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2360a5fa'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='56' height='56' rx='14' fill='url(%23a)'/%3E%3Crect x='9' y='16' width='30' height='26' rx='4' fill='white' fill-opacity='.15'/%3E%3Crect x='9' y='16' width='30' height='26' rx='4' stroke='white' stroke-width='1.5' fill='none'/%3E%3Crect x='9' y='16' width='30' height='8' rx='4' fill='white' fill-opacity='.25'/%3E%3Crect x='9' y='20' width='30' height='4' fill='white' fill-opacity='.25'/%3E%3Crect x='17' y='12' width='3' height='8' rx='1.5' fill='white' fill-opacity='.9'/%3E%3Crect x='28' y='12' width='3' height='8' rx='1.5' fill='white' fill-opacity='.9'/%3E%3Crect x='14' y='29' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='21' y='29' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='14' y='35' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Crect x='21' y='35' width='4' height='3' rx='1' fill='white' fill-opacity='.7'/%3E%3Ccircle cx='40' cy='40' r='10' fill='%230f1729'/%3E%3Ccircle cx='40' cy='40' r='9' fill='url(%23b)'/%3E%3Ccircle cx='40' cy='40' r='6.5' fill='none' stroke='white' stroke-width='1.2' stroke-opacity='.6'/%3E%3Cline x1='40' y1='40' x2='40' y2='35.5' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='40' y1='40' x2='43' y2='42' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='40' cy='40' r='1' fill='white'/%3E%3C/svg%3E">
@@ -131,7 +131,7 @@
           </div>
           <h1 class="hero-title">VpMobile<span class="accent">24</span></h1>
           <div class="hero-version-row">
-            <span class="version-tag ver-stable gh-version-stable">v2.5.0</span>
+            <span class="version-tag ver-stable gh-version-stable">v2.5.5</span>
             <span class="version-beta-block" style="display:none !important;">
               <span class="version-tag ver-beta gh-version-beta">Beta</span>
             </span>
@@ -371,7 +371,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-num">8</span>
+        <span class="stat-num">9</span>
         <span class="stat-label">Sensoren pro Klasse</span>
       </div>
       <div class="stat-divider"></div>
@@ -541,6 +541,10 @@
                 <div><strong>Countdown bis nächste Stunde</strong> – Sensor zeigt „in 23 Min." für Automationen</div>
               </div>
               <div class="feat-item">
+                <span class="feat-dot" style="background:#4ade80"></span>
+                <div><strong>Ferien-Erkennung</strong> – automatisch für alle 16 Bundesländer per KMK-Daten</div>
+              </div>
+              <div class="feat-item">
                 <span class="feat-dot" style="background:#94a3b8"></span>
                 <div><strong>Eigene Uhrzeiten</strong> – Stunden- und Pausenzeiten visuell konfigurierbar</div>
               </div>
@@ -631,8 +635,20 @@
                     <span class="cf-desc">Dein VpMobile24-Passwort</span>
                   </div>
                   <div class="config-field">
+                    <span class="cf-label">Downloadserver</span>
+                    <span class="cf-desc">Standard: <strong>www</strong> — falls im Elternbrief ein anderer Server (z.B. <code>zusatz1</code>) genannt wird, diesen hier auswählen</span>
+                  </div>
+                  <div class="config-field">
                     <span class="cf-label">Klasse</span>
                     <span class="cf-desc">Klassenname, z.B. <code>10b</code></span>
+                  </div>
+                  <div class="config-field">
+                    <span class="cf-label">Fächer</span>
+                    <span class="cf-desc">Kurse auswählen – Parallelkurse einzeln wählen</span>
+                  </div>
+                  <div class="config-field">
+                    <span class="cf-label">Bundesland</span>
+                    <span class="cf-desc">Für automatische Ferienerkennung (z.B. Bayern, NRW …)</span>
                   </div>
                 </div>
               </div>
@@ -800,7 +816,7 @@ use_custom_times: false</code></pre>
           </div>
           <div class="sensor-card">
             <div class="sensor-icon">📆</div>
-            <div class="sensor-name"><code>sensor.vpmobile24_wochenstundenplan</code></div>
+            <div class="sensor-name"><code>sensor.vpmobile24_heutiger_stundenplan</code></div>
             <div class="sensor-desc">Heutiger Stundenplan mit allen Stunden</div>
           </div>
           <div class="sensor-card">
@@ -812,6 +828,16 @@ use_custom_times: false</code></pre>
             <div class="sensor-icon">🔄</div>
             <div class="sensor-name"><code>sensor.vpmobile24_aenderungen</code></div>
             <div class="sensor-desc">Aktuelle Vertretungen und Stundenplanänderungen</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">⏱️</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_aktueller_unterricht</code></div>
+            <div class="sensor-desc">Aktuelle laufende Stunde – mit Fach, Lehrer &amp; Raum</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-icon">🏖️</div>
+            <div class="sensor-name"><code>sensor.vpmobile24_ferien</code></div>
+            <div class="sensor-desc">Schulferien-Erkennung – automatisch per Bundesland (KMK-Daten)</div>
           </div>
           <div class="sensor-card">
             <div class="sensor-icon">📅</div>
@@ -944,7 +970,7 @@ use_custom_times: false</code></pre>
         </div>
         <div class="version-badge">
           <span class="ver-pill ver-pill-stable">
-            🟢 Stable: <strong class="gh-version-stable">v2.5.0</strong>
+            🟢 Stable: <strong class="gh-version-stable">v2.5.5</strong>
           </span>
           <span class="version-beta-block ver-pill ver-pill-beta" style="display:none !important;">
             🟡 Beta: <strong class="gh-version-beta">–</strong>
