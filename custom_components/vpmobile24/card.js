@@ -533,9 +533,9 @@ class VpMobile24Card extends HTMLElement {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const meta = isTeacherMode && lesson.klasse ? lesson.klasse : '';
-            const metaLabel = meta ? '<div class="vp-tile-class">' + meta + '</div>' : '';
-            text = lesson.fach + metaLabel;
+            const klasseLabel = isTeacherMode && lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
+            const raumLabel   = isTeacherMode && lesson.raum   ? '<div class="vp-tile-room">'  + lesson.raum   + '</div>' : '';
+            text = lesson.fach + klasseLabel + raumLabel;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -645,8 +645,11 @@ class VpMobile24Card extends HTMLElement {
         if (isCancelled) {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
         } else if (subj) {
-          const mobMeta = (isTeacherModeRender && lesson) ? (lesson.klasse || '') : '';
-          const mobMetaHtml = mobMeta ? '<div class="vp-mob-meta">' + mobMeta + '</div>' : '';
+          const mobKlasse = (isTeacherModeRender && lesson && lesson.klasse) ? lesson.klasse : '';
+          const mobRaum   = (isTeacherModeRender && lesson && lesson.raum)   ? lesson.raum   : '';
+          const mobMetaHtml = mobKlasse
+            ? '<div class="vp-mob-meta">' + mobKlasse + (mobRaum ? ' · ' + mobRaum : '') + '</div>'
+            : '';
           subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + mobMetaHtml + '</div>';
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
@@ -950,9 +953,9 @@ ha-card {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const meta2 = isTeacherModeRender && lesson.klasse ? lesson.klasse : '';
-            const metaLabel2 = meta2 ? '<div class="vp-tile-class">' + meta2 + '</div>' : '';
-            text = lesson.fach + metaLabel2;
+            const klasseLabel2 = isTeacherModeRender && lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
+            const raumLabel2   = isTeacherModeRender && lesson.raum   ? '<div class="vp-tile-room">'  + lesson.raum   + '</div>' : '';
+            text = lesson.fach + klasseLabel2 + raumLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -1256,7 +1259,7 @@ ha-card {
 
 /* ── Tiles ── */
 .vp-tile {
-  border-radius: 9px; padding: 0 4px;
+  border-radius: 9px; padding: 2px 4px;
   font-size: .84em; font-weight: 600; color: #e2e8f0;
   height: 48px; min-height: 48px;
   display: flex; align-items: center; justify-content: center;
@@ -1269,17 +1272,23 @@ ha-card {
   hyphens: auto;
 }
 .vp-tile.vp-teacher-tile {
-  height: 56px; min-height: 56px;
+  height: 64px; min-height: 64px;
+  font-size: .78em;
+  justify-content: center; gap: 1px;
 }
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
   color: transparent;
 }
 .vp-tile-class {
-  font-size: .62em; font-weight: 600; opacity: 1;
-  margin-top: 2px; line-height: 1;
-  color: rgba(255,255,255,0.6);
-  letter-spacing: 0.02em;
+  font-size: .62em; font-weight: 500;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.1; margin-top: 1px;
+}
+.vp-tile-room {
+  font-size: .58em; font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.1;
 }
 .vp-today-col .vp-tile.vp-empty {
   background: rgba(37,99,235,0.05);
