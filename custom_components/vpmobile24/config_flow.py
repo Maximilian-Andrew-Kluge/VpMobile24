@@ -54,23 +54,41 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step 1 — school ID, user type, password and server."""
-        errors: dict[str, str] = {}
-
+        """Step 1 — choose user type."""
         if user_input is not None:
             user_type = user_input.get("user_type", "schueler")
+            self._config_data["user_type"] = user_type
+            if user_type == "demo":
+                return await self.async_step_demo()
+            return await self.async_step_credentials()
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=vol.Schema({
+                vol.Required("user_type", default="schueler"): vol.In({
+                    "schueler": "Schüler",
+                    "lehrer": "Lehrer",
+                    "custom": "Benutzerdefiniert …",
+                    "demo": "🎭 Demo (kein Login nötig)",
+                }),
+            }),
+        )
+
+    async def async_step_credentials(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step 1b — school ID, password and server."""
+        errors: dict[str, str] = {}
+        user_type = self._config_data.get("user_type", "schueler")
+
+        if user_input is not None:
             if user_type == "custom":
-                # Save partial data and go to custom username step
-                self._config_data["school_id"] = user_input[CONF_SCHOOL_ID]
+                self._config_data[CONF_SCHOOL_ID] = user_input[CONF_SCHOOL_ID]
                 self._config_data[CONF_PASSWORD] = user_input[CONF_PASSWORD]
                 self._config_data[CONF_SERVER] = user_input.get(CONF_SERVER, "www")
                 return await self.async_step_custom_username()
 
-            if user_type == "demo":
-                # Demo mode — no credentials needed, go straight to demo step
-                return await self.async_step_demo()
-
-            # Schüler or Lehrer — username is preset
             resolved_username = user_type  # "schueler" or "lehrer"
             try:
                 server_key = user_input.get(CONF_SERVER, "www")
@@ -92,7 +110,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         server_key,
                     )
                     if user_type == "lehrer":
-                        # Teacher mode — skip class selection, ask for teacher abbreviation
                         self._config_data[CONF_USER_MODE] = "teacher"
                         return await self.async_step_teacher()
                     else:
@@ -110,15 +127,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     await self._api.async_close()
 
         return self.async_show_form(
-            step_id="user",
+            step_id="credentials",
             data_schema=vol.Schema({
                 vol.Required(CONF_SCHOOL_ID): str,
-                vol.Required("user_type", default="schueler"): vol.In({
-                    "schueler": "Schüler",
-                    "lehrer": "Lehrer",
-                    "custom": "Benutzerdefiniert …",
-                    "demo": "🎭 Demo (kein Login nötig)",
-                }),
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(CONF_SERVER, default="www"): vol.In(list(DOWNLOAD_SERVERS.keys())),
             }),

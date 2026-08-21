@@ -3,20 +3,26 @@
     "step": {
       "user": {
         "title": "Set up VpMobile24",
-        "description": "Enter your VpMobile24 credentials.",
+        "description": "Choose your user type.",
+        "data": {
+          "user_type": "User type"
+        },
+        "data_description": {
+          "user_type": "Student / Teacher: login with school credentials. Demo: test mode without login."
+        }
+      },
+      "credentials": {
+        "title": "Enter credentials",
+        "description": "Enter your school ID, password and server.",
         "data": {
           "school_id": "School ID",
-          "user_type": "User type",
-          "username": "Username",
           "password": "Password",
           "server": "Download server"
         },
         "data_description": {
           "school_id": "The 8-digit school ID",
-          "user_type": "Select Student or Teacher. For custom, enter username manually.",
-          "username": "Only fill in if Custom is selected.",
           "password": "Your password for VpMobile24",
-          "server": "'www' = standard. Select an alternative server (e.g. zusatz1) if your school's parent letter specifies one."
+          "server": "'www' = standard. Select an alternative server (e.g. zusatz1) if stated in your parent letter."
         }
       },
       "custom_username": {

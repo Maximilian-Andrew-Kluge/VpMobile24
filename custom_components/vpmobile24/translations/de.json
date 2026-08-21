@@ -3,20 +3,26 @@
     "step": {
       "user": {
         "title": "VpMobile24 einrichten",
-        "description": "Geben Sie Ihre Zugangsdaten ein.",
+        "description": "Wähle deinen Benutzertyp.",
+        "data": {
+          "user_type": "Benutzertyp"
+        },
+        "data_description": {
+          "user_type": "Schüler / Lehrer: Login mit Schulzugangsdaten. Demo: Testmodus ohne Login."
+        }
+      },
+      "credentials": {
+        "title": "Zugangsdaten eingeben",
+        "description": "Gib deine Schulnummer, Passwort und Server ein.",
         "data": {
           "school_id": "Schulnummer",
-          "user_type": "Benutzertyp",
-          "username": "Benutzername (nur bei benutzerdefiniert)",
           "password": "Passwort",
           "server": "Downloadserver"
         },
         "data_description": {
           "school_id": "Die 8-stellige Schulnummer",
-          "user_type": "Schueler oder Lehrer waehlen. Bei benutzerdefiniert den Benutzernamen selbst eingeben.",
-          "username": "Nur ausfuellen wenn Benutzerdefiniert gewaehlt wurde.",
-          "password": "Ihr Passwort fuer VpMobile24",
-          "server": "www = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswaehlen."
+          "password": "Dein Passwort für VpMobile24",
+          "server": "www = Standard. Falls im Elternbrief ein anderer Server (z. B. zusatz1) genannt wurde, diesen hier auswählen."
         }
       },
       "custom_username": {

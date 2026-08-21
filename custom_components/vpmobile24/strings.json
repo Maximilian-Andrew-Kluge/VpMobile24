@@ -3,20 +3,26 @@
     "step": {
       "user": {
         "title": "Set up VpMobile24",
-        "description": "Enter your VpMobile24 credentials.",
+        "description": "Choose your user type.",
+        "data": {
+          "user_type": "User type"
+        },
+        "data_description": {
+          "user_type": "Student / Teacher: login with school credentials. Demo: test mode without login."
+        }
+      },
+      "credentials": {
+        "title": "Enter credentials",
+        "description": "Enter your school ID, password and server.",
         "data": {
           "school_id": "School ID",
-          "user_type": "User type",
-          "username": "Username",
           "password": "Password",
           "server": "Download server"
         },
         "data_description": {
           "school_id": "The 8-digit school ID",
-          "user_type": "Select Student or Teacher. For custom, enter username manually.",
-          "username": "Only fill in if Custom is selected.",
           "password": "Your password for VpMobile24",
-          "server": "www = standard. Select an alternative server if stated in your parent letter (e.g. zusatz1)."
+          "server": "'www' = standard. Select an alternative server (e.g. zusatz1) if stated in your parent letter."
         }
       },
       "custom_username": {
@@ -36,6 +42,14 @@
           "teacher_short": "Your abbreviation exactly as it appears in the substitution plan (case insensitive)."
         }
       },
+      "demo": {
+        "title": "Demo mode",
+        "description": "Enter the demo password and select a profile.",
+        "data": {
+          "demo_password": "Demo password",
+          "demo_type": "Demo profile"
+        }
+      },
       "class": {
         "title": "Select class",
         "description": "Choose your class from the list.",
@@ -49,7 +63,7 @@
       },
       "holidays": {
         "title": "School holidays (optional)",
-        "description": "Select your federal state to automatically detect school holidays.",
+        "description": "Select your federal state for automatic school holiday detection.",
         "data": {
           "state_code": "Federal state"
         }
@@ -57,6 +71,7 @@
     },
     "error": {
       "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
+      "invalid_auth": "Invalid password.",
       "unknown": "An unknown error occurred."
     },
     "abort": {
@@ -127,7 +142,7 @@
   "issues": {
     "reconfig_required": {
       "title": "VpMobile24: Re-setup required",
-      "description": "You are updating from version {version}. Due to new features, please delete and re-add the VpMobile24 integration once."
+      "description": "You are updating from version **{version}**. Due to new features, please delete and re-add the VpMobile24 integration once."
     }
   },
   "entity": {
