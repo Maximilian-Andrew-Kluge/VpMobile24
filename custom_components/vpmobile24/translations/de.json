@@ -33,8 +33,8 @@
         }
       },
       "teacher": {
-        "title": "Lehrerkürzel eingeben",
-        "description": "Gib dein Lehrerkürzel ein (z.B. MUS, SCH). Alle Stunden und Vertretungen mit diesem Kürzel werden automatisch angezeigt.",
+        "title": "Lehrerkürzel auswählen",
+        "description": "Wähle dein Lehrerkürzel aus der Liste. Alle Stunden und Vertretungen mit diesem Kürzel werden automatisch angezeigt.",
         "data": {
           "teacher_short": "Lehrerkürzel"
         },
@@ -52,18 +52,18 @@
       },
       "class": {
         "title": "Klasse auswählen",
-        "description": "Wählen Sie Ihre Klasse aus.",
+        "description": "Wähle deine Klasse aus.",
         "data": {
           "class_name": "Klasse"
         }
       },
       "subjects": {
         "title": "Fächer auswählen",
-        "description": "Wählen Sie die anzuzeigenden Fächer."
+        "description": "Wähle die anzuzeigenden Fächer aus."
       },
       "holidays": {
         "title": "Schulferien (optional)",
-        "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
+        "description": "Wähle dein Bundesland für die automatische Ferienerkennung.",
         "data": {
           "state_code": "Bundesland"
         }
@@ -71,7 +71,7 @@
     },
     "error": {
       "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen.",
-      "invalid_auth": "Benutzername oder Passwort ist falsch.",
+      "invalid_auth": "Passwort falsch.",
       "unknown": "Ein unbekannter Fehler ist aufgetreten."
     },
     "abort": {
@@ -82,7 +82,7 @@
     "step": {
       "init": {
         "title": "VpMobile24 Einstellungen",
-        "description": "Aktuelle Klasse: **{current_class}** · Bundesland: **{current_state}**\n\nWas möchten Sie ändern?",
+        "description": "Aktuelle Klasse: **{current_class}** · Bundesland: **{current_state}**\n\nWas möchtest du ändern?",
         "data": {
           "change_subjects": "Fächer ändern",
           "change_class": "Klasse ändern",
@@ -93,14 +93,14 @@
       },
       "change_class": {
         "title": "Klasse ändern",
-        "description": "Geben Sie den neuen Klassennamen ein.",
+        "description": "Gib den neuen Klassennamen ein.",
         "data": {
           "class_name": "Klasse"
         }
       },
       "subjects": {
         "title": "Fächer auswählen",
-        "description": "Wählen Sie die anzuzeigenden Fächer. Gefunden: {subject_count} Fächer."
+        "description": "Wähle die anzuzeigenden Fächer aus. Gefunden: {subject_count} Fächer."
       },
       "change_credentials": {
         "title": "Zugangsdaten ändern",
@@ -129,7 +129,7 @@
       },
       "change_holidays": {
         "title": "Bundesland (Ferien) ändern",
-        "description": "Wählen Sie Ihr Bundesland für die automatische Ferienerkennung.",
+        "description": "Wähle dein Bundesland für die automatische Ferienerkennung.",
         "data": {
           "state_code": "Bundesland"
         }
@@ -142,7 +142,7 @@
   "issues": {
     "reconfig_required": {
       "title": "VpMobile24: Neu-Einrichtung erforderlich",
-      "description": "Du aktualisierst von Version **{version}**. Wegen neuer Funktionen bitte die Integration einmal loeschen und neu hinzufuegen."
+      "description": "Du aktualisierst von Version **{version}**. Wegen neuer Funktionen bitte die Integration einmal löschen und neu hinzufügen."
     }
   },
   "entity": {

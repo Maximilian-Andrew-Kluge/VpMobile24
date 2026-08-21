@@ -63,7 +63,7 @@
     },
     "error": {
       "cannot_connect": "Failed to connect to VpMobile24.",
-      "invalid_auth": "Invalid username or password.",
+      "invalid_auth": "Wrong password.",
       "unknown": "An unknown error occurred."
     },
     "abort": {
