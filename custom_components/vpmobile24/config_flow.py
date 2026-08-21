@@ -230,8 +230,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="demo",
             data_schema=vol.Schema({
                 vol.Required("demo_type", default="schueler"): vol.In({
-                    "schueler": "🎒 Demo Schüler (Klasse 10b)",
-                    "lehrer": "📚 Demo Lehrer (Kürzel DEM)",
+                    "schueler": "Demo Schüler",
+                    "lehrer": "Demo Lehrer",
                 }),
             }),
         )
