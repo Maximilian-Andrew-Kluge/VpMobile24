@@ -18,6 +18,86 @@ class VpMobile24Card extends HTMLElement {
     this.shadowRoot.addEventListener('click', this._bound_click);
   }
 
+  static get _THEMES() {
+    return {
+      navy: {
+        name: 'Navy Dark (Standard)',
+        bg: '#0f1729',
+        tile_bg: '#1a2a50',
+        tile_normal: 'rgba(34,197,94,.1)',
+        tile_normal_color: '#86efac',
+        tile_normal_border: 'rgba(34,197,94,.2)',
+        tile_sub: 'rgba(234,179,8,0.18)',
+        tile_sub_color: '#fde68a',
+        tile_cancelled: 'rgba(239,68,68,0.18)',
+        tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#14532d,#166534)',
+        tile_current_color: '#bbf7d0',
+      },
+      dark: {
+        name: 'Dark',
+        bg: '#111827',
+        tile_bg: '#1f2937',
+        tile_normal: 'rgba(34,197,94,.12)',
+        tile_normal_color: '#6ee7b7',
+        tile_normal_border: 'rgba(34,197,94,.25)',
+        tile_sub: 'rgba(251,191,36,.15)',
+        tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(248,113,113,.15)',
+        tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)',
+        tile_current_color: '#a7f3d0',
+      },
+      blue: {
+        name: 'Blue',
+        bg: '#0c1a2e',
+        tile_bg: '#1e3a5f',
+        tile_normal: 'rgba(59,130,246,.15)',
+        tile_normal_color: '#93c5fd',
+        tile_normal_border: 'rgba(59,130,246,.3)',
+        tile_sub: 'rgba(234,179,8,0.2)',
+        tile_sub_color: '#fde68a',
+        tile_cancelled: 'rgba(239,68,68,0.2)',
+        tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#1e40af,#1d4ed8)',
+        tile_current_color: '#bfdbfe',
+      },
+      purple: {
+        name: 'Purple',
+        bg: '#1a0a2e',
+        tile_bg: '#2d1b4e',
+        tile_normal: 'rgba(168,85,247,.15)',
+        tile_normal_color: '#d8b4fe',
+        tile_normal_border: 'rgba(168,85,247,.3)',
+        tile_sub: 'rgba(251,191,36,.15)',
+        tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(239,68,68,0.2)',
+        tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#5b21b6,#6d28d9)',
+        tile_current_color: '#e9d5ff',
+      },
+      light: {
+        name: 'Light',
+        bg: '#f1f5f9',
+        tile_bg: '#e2e8f0',
+        tile_normal: 'rgba(34,197,94,.15)',
+        tile_normal_color: '#166534',
+        tile_normal_border: 'rgba(34,197,94,.3)',
+        tile_sub: 'rgba(234,179,8,0.2)',
+        tile_sub_color: '#92400e',
+        tile_cancelled: 'rgba(239,68,68,0.15)',
+        tile_cancelled_color: '#991b1b',
+        tile_current: 'linear-gradient(135deg,#14532d,#166534)',
+        tile_current_color: '#f0fdf4',
+      },
+    };
+  }
+
+  _getTheme() {
+    const themeName = (this._config && this._config.theme) || 'navy';
+    return VpMobile24Card._THEMES[themeName] || VpMobile24Card._THEMES.navy;
+  }
+
   _handleClick(e) {
     const el = e.target;
     // Popup overlay
@@ -127,18 +207,18 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
-        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
-        fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
+        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",theme:"Farbschema",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",theme:"Color Theme",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",theme:"Th\u00e8me de couleur",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
       return (L[hl]||L.de);
     };
     const _cfgHelpers = (hass) => {
       const hl = _hl(hass);
       const H = {
-        de:{entity:"Wähle den sensor.vpmobile24_week_table Sensor",additional_info_entity:"Zusatzinfo-Sensor für ⓘ-Button",reload_entity:"Button-Entity zum Neuladen (z.B. button.vpmobile24_reload)",title:"Titel der Card",class_name:"Klassenname (z.B. 5a, 10b)",show_time:"Zeigt Uhrzeiten unter der Stundennummer",show_header:"Zeigt den Header mit Titel und Klassenname",highlight_today:"Hebt die heutige Spalte blau hervor",use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen"},
-        en:{entity:"Select the sensor.vpmobile24_week_table sensor",additional_info_entity:"Info sensor for ⓘ button",reload_entity:"Button entity for manual reload (e.g. button.vpmobile24_reload)",title:"Card title",class_name:"Class name (e.g. 5a, 10b)",show_time:"Show times below period number",show_header:"Show header with title and class name",highlight_today:"Highlight today column in blue",use_custom_times:"Enable to enter custom times"},
-        fr:{entity:"S\u00e9lectionner le capteur sensor.vpmobile24_week_table",additional_info_entity:"Capteur infos pour bouton info",reload_entity:"Entit\u00e9 bouton pour actualisation (ex. button.vpmobile24_reload)",title:"Titre de la carte",class_name:"Nom de classe (ex. 5a, 10b)",show_time:"Afficher les horaires sous le num\u00e9ro",show_header:"Afficher en-t\u00eate avec titre et classe",highlight_today:"Mettre en avant la colonne du jour",use_custom_times:"Activer pour saisir des horaires personnalis\u00e9s"}
+        de:{entity:"Wähle den sensor.vpmobile24_week_table Sensor",additional_info_entity:"Zusatzinfo-Sensor für ⓘ-Button",reload_entity:"Button-Entity zum Neuladen (z.B. button.vpmobile24_reload)",title:"Titel der Card",class_name:"Klassenname (z.B. 5a, 10b)",show_time:"Zeigt Uhrzeiten unter der Stundennummer",show_header:"Zeigt den Header mit Titel und Klassenname",highlight_today:"Hebt die heutige Spalte blau hervor",use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen",theme:"Wähle ein Farbschema für die Card"},
+        en:{entity:"Select the sensor.vpmobile24_week_table sensor",additional_info_entity:"Info sensor for ⓘ button",reload_entity:"Button entity for manual reload (e.g. button.vpmobile24_reload)",title:"Card title",class_name:"Class name (e.g. 5a, 10b)",show_time:"Show times below period number",show_header:"Show header with title and class name",highlight_today:"Highlight today column in blue",use_custom_times:"Enable to enter custom times",theme:"Choose a color theme for the card"},
+        fr:{entity:"S\u00e9lectionner le capteur sensor.vpmobile24_week_table",additional_info_entity:"Capteur infos pour bouton info",reload_entity:"Entit\u00e9 bouton pour actualisation (ex. button.vpmobile24_reload)",title:"Titre de la carte",class_name:"Nom de classe (ex. 5a, 10b)",show_time:"Afficher les horaires sous le num\u00e9ro",show_header:"Afficher en-t\u00eate avec titre et classe",highlight_today:"Mettre en avant la colonne du jour",use_custom_times:"Activer pour saisir des horaires personnalis\u00e9s",theme:"Choisir un th\u00e8me de couleur"}
       };
       return (H[hl]||H.de);
     };
@@ -181,6 +261,13 @@ class VpMobile24Card extends HTMLElement {
 
         // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
         { name: "show_header", default: true, selector: { boolean: {} } },
+        { name: "theme", default: "navy", selector: { select: { options: [
+          { value: "navy",   label: "🌑 Navy Dark (Standard)" },
+          { value: "dark",   label: "⬛ Dark" },
+          { value: "blue",   label: "🔵 Blue" },
+          { value: "purple", label: "🟣 Purple" },
+          { value: "light",  label: "☀️ Light" },
+        ] } } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
             { name: "title",           default: "Stundenplan", selector: { text: { type: "text" } } },
@@ -449,6 +536,20 @@ class VpMobile24Card extends HTMLElement {
   // Update only table body without destroying popup
   _updateTableOnly() {
     if (!this._hass || !this._config) return;
+    // Keep CSS variables in sync with current theme
+    const th = this._getTheme();
+    const hostEl = this.shadowRoot.host || this;
+    this.style.setProperty('--vpm-bg', th.bg);
+    this.style.setProperty('--vpm-tile-bg', th.tile_bg);
+    this.style.setProperty('--vpm-tile-normal', th.tile_normal);
+    this.style.setProperty('--vpm-tile-normal-color', th.tile_normal_color);
+    this.style.setProperty('--vpm-tile-normal-border', th.tile_normal_border);
+    this.style.setProperty('--vpm-tile-sub', th.tile_sub);
+    this.style.setProperty('--vpm-tile-sub-color', th.tile_sub_color);
+    this.style.setProperty('--vpm-tile-cancelled', th.tile_cancelled);
+    this.style.setProperty('--vpm-tile-cancelled-color', th.tile_cancelled_color);
+    this.style.setProperty('--vpm-tile-current', th.tile_current);
+    this.style.setProperty('--vpm-tile-current-color', th.tile_current_color);
     const entity = this._hass.states[this._config.entity];
     if (!entity) return;
     const weekOffset = this._weekOffset || 0;
@@ -734,6 +835,7 @@ class VpMobile24Card extends HTMLElement {
   _render() {
     if (!this._hass || !this._config) return;
     const t = this._buildTranslations();
+    const th = this._getTheme();
 
     const entity = this._hass.states[this._config.entity];
     if (!entity) {
@@ -1130,9 +1232,22 @@ ha-card {
 
     this.shadowRoot.innerHTML = `
 <style>
-:host { display: block; }
+:host {
+  display: block;
+  --vpm-bg: ${th.bg};
+  --vpm-tile-bg: ${th.tile_bg};
+  --vpm-tile-normal: ${th.tile_normal};
+  --vpm-tile-normal-color: ${th.tile_normal_color};
+  --vpm-tile-normal-border: ${th.tile_normal_border};
+  --vpm-tile-sub: ${th.tile_sub};
+  --vpm-tile-sub-color: ${th.tile_sub_color};
+  --vpm-tile-cancelled: ${th.tile_cancelled};
+  --vpm-tile-cancelled-color: ${th.tile_cancelled_color};
+  --vpm-tile-current: ${th.tile_current};
+  --vpm-tile-current-color: ${th.tile_current_color};
+}
 ha-card {
-  background: #0f1729 !important;
+  background: var(--vpm-bg) !important;
   border-radius: 16px !important;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
@@ -1271,7 +1386,7 @@ ha-card {
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   transition: filter .12s, transform .12s, box-shadow .12s;
-  background: #1a2a50;
+  background: var(--vpm-tile-bg);
   line-height: 1.2; text-align: center;
   overflow: hidden;
   word-break: break-word;
@@ -1311,15 +1426,15 @@ ha-card {
   background: rgba(37,99,235,0.05);
   border: 1px dashed rgba(37,99,235,0.2);
 }
-.vp-tile.vp-normal     { background: rgba(34,197,94,.1); color: #86efac; border: 1px solid rgba(34,197,94,.2); }
+.vp-tile.vp-normal     { background: var(--vpm-tile-normal); color: var(--vpm-tile-normal-color); border: 1px solid var(--vpm-tile-normal-border); }
 .vp-tile.vp-today-tile { background: #1e3a6e; color: #bfdbfe; }
-.vp-tile.vp-sub        { background: rgba(234,179,8,0.18) !important; color: #fde68a !important; border: 1px solid rgba(234,179,8,0.3); font-weight: 700; }
-.vp-tile.vp-cancelled  { background: rgba(239,68,68,0.18) !important; color: #fca5a5 !important; border: 1px solid rgba(239,68,68,0.3); font-weight: 700; }
-.vp-today-col .vp-tile.vp-normal  { background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.3); }
+.vp-tile.vp-sub        { background: var(--vpm-tile-sub) !important; color: var(--vpm-tile-sub-color) !important; border: 1px solid rgba(234,179,8,0.3); font-weight: 700; }
+.vp-tile.vp-cancelled  { background: var(--vpm-tile-cancelled) !important; color: var(--vpm-tile-cancelled-color) !important; border: 1px solid rgba(239,68,68,0.3); font-weight: 700; }
+.vp-today-col .vp-tile.vp-normal  { background: var(--vpm-tile-normal); border-color: var(--vpm-tile-normal-border); }
 .vp-today-col .vp-tile.vp-cancelled { background: rgba(239,68,68,0.25) !important; box-shadow: 0 0 0 1px rgba(239,68,68,0.4); }
 .vp-tile.vp-current    {
-  background: linear-gradient(135deg, #14532d, #166534) !important;
-  color: #bbf7d0 !important; font-weight: 800;
+  background: var(--vpm-tile-current) !important;
+  color: var(--vpm-tile-current-color) !important; font-weight: 800;
   box-shadow: 0 0 0 2px #22c55e, 0 0 16px rgba(34,197,94,0.35) !important;
 }
 .vp-tile-clickable { cursor: pointer; }
@@ -1397,13 +1512,13 @@ ha-card {
 .vp-mob-time { font-size: .6em;  color: #334155; margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
   flex: 1; font-size: .92em; font-weight: 600; color: #e2e8f0;
-  background: #1a2a50; border-radius: 8px;
+  background: var(--vpm-tile-bg); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
 .vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
-.vp-mob-subj-sub      { background: rgba(234,179,8,.18) !important; color: #fde68a !important; }
-.vp-mob-subj-cancelled{ background: rgba(239,68,68,.18) !important; color: #fca5a5 !important; font-weight: 700; }
-.vp-mob-subj-current  { background: linear-gradient(135deg,#14532d,#166534) !important; color: #bbf7d0 !important; font-weight: 800; box-shadow: 0 0 0 2px #22c55e; }
+.vp-mob-subj-sub      { background: var(--vpm-tile-sub) !important; color: var(--vpm-tile-sub-color) !important; }
+.vp-mob-subj-cancelled{ background: var(--vpm-tile-cancelled) !important; color: var(--vpm-tile-cancelled-color) !important; font-weight: 700; }
+.vp-mob-subj-current  { background: var(--vpm-tile-current) !important; color: var(--vpm-tile-current-color) !important; font-weight: 800; box-shadow: 0 0 0 2px #22c55e; }
 .vp-mob-subj-empty    { background: rgba(255,255,255,.03) !important; color: #334155 !important; }
 .vp-mob-pause-row {
   text-align: center; padding: 7px 14px;
