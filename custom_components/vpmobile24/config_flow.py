@@ -179,50 +179,63 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Demo mode — choose between student or teacher demo profile."""
+        """Demo mode — password check + profile selection."""
+        import hashlib
+        # Only the hash is stored — the password itself is never in source code
+        _DEMO_HASH = "0254fe91c5f58b071b44252cf5fdde9a71ca88ccaed9c0d6cd6d84a630c73260"
+
+        errors: dict[str, str] = {}
+
         if user_input is not None:
-            demo_type = user_input.get("demo_type", "schueler")
-            if demo_type == "lehrer":
-                self._config_data = {
-                    CONF_SCHOOL_ID: "00000000",
-                    CONF_USER_MODE: "teacher",
-                    CONF_TEACHER_SHORT: "DEM",
-                    CONF_DEMO_MODE: True,
-                    "username": "demo",
-                    "password": "demo",
-                    CONF_SERVER: "www",
-                }
-                await self.async_set_unique_id("demo_lehrer_DEM")
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title="VpMobile24 – Demo Lehrer (DEM)",
-                    data=self._config_data,
-                )
+            entered = user_input.get("demo_password", "")
+            entered_hash = hashlib.sha256(entered.encode()).hexdigest()
+            if entered_hash != _DEMO_HASH:
+                errors["demo_password"] = "invalid_auth"
             else:
-                self._config_data = {
-                    CONF_SCHOOL_ID: "00000000",
-                    CONF_USER_MODE: "student",
-                    CONF_CLASS_NAME: "10b",
-                    CONF_DEMO_MODE: True,
-                    "username": "demo",
-                    "password": "demo",
-                    CONF_SERVER: "www",
-                }
-                await self.async_set_unique_id("demo_schueler_10b")
-                self._abort_if_unique_id_configured()
-                return self.async_create_entry(
-                    title="VpMobile24 – Demo Schüler (10b)",
-                    data=self._config_data,
-                )
+                demo_type = user_input.get("demo_type", "schueler")
+                if demo_type == "lehrer":
+                    self._config_data = {
+                        CONF_SCHOOL_ID: "00000000",
+                        CONF_USER_MODE: "teacher",
+                        CONF_TEACHER_SHORT: "DEM",
+                        CONF_DEMO_MODE: True,
+                        "username": "demo",
+                        "password": "demo",
+                        CONF_SERVER: "www",
+                    }
+                    await self.async_set_unique_id("demo_lehrer_DEM")
+                    self._abort_if_unique_id_configured()
+                    return self.async_create_entry(
+                        title="VpMobile24 – Demo Lehrer (DEM)",
+                        data=self._config_data,
+                    )
+                else:
+                    self._config_data = {
+                        CONF_SCHOOL_ID: "00000000",
+                        CONF_USER_MODE: "student",
+                        CONF_CLASS_NAME: "10b",
+                        CONF_DEMO_MODE: True,
+                        "username": "demo",
+                        "password": "demo",
+                        CONF_SERVER: "www",
+                    }
+                    await self.async_set_unique_id("demo_schueler_10b")
+                    self._abort_if_unique_id_configured()
+                    return self.async_create_entry(
+                        title="VpMobile24 – Demo Schüler (10b)",
+                        data=self._config_data,
+                    )
 
         return self.async_show_form(
             step_id="demo",
             data_schema=vol.Schema({
+                vol.Required("demo_password"): str,
                 vol.Required("demo_type", default="schueler"): vol.In({
                     "schueler": "🎒 Demo Schüler (Klasse 10b)",
                     "lehrer": "📚 Demo Lehrer (Kürzel DEM)",
                 }),
             }),
+            errors=errors,
         )
 
     async def async_step_teacher(
