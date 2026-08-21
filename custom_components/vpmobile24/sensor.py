@@ -105,26 +105,31 @@ async def async_setup_entry(
         VpMobile24ChangesSensor(coordinator, config_entry, language),
         VpMobile24CurrentLessonSensor(coordinator, config_entry, language),
         VpMobile24HolidaySensor(coordinator, config_entry, language),
+        VpMobile24TeacherClassesSensor(coordinator, config_entry, language),
     ])
 
 
 def _device_info(config_entry) -> dict:
     """Return shared device info dict."""
     school_id = config_entry.data["school_id"]
-    # options override data when class was changed via options flow
-    class_name = config_entry.options.get("class_name") or config_entry.data.get("class_name", "")
-    device_id = f"{school_id}_{class_name}" if class_name else school_id
-    name = (
-        f"VpMobile24 \u2013 {class_name} ({school_id})"
-        if class_name
-        else f"VpMobile24 ({school_id})"
-    )
+    teacher_short = config_entry.data.get("teacher_short")
+    if teacher_short:
+        device_id = f"{school_id}_lehrer_{teacher_short}"
+        name = f"VpMobile24 \u2013 {teacher_short} ({school_id})"
+    else:
+        class_name = config_entry.options.get("class_name") or config_entry.data.get("class_name", "")
+        device_id = f"{school_id}_{class_name}" if class_name else school_id
+        name = (
+            f"VpMobile24 \u2013 {class_name} ({school_id})"
+            if class_name
+            else f"VpMobile24 ({school_id})"
+        )
     return {
         "identifiers": {(DOMAIN, device_id)},
         "name": name,
         "manufacturer": "VpMobile24",
         "model": "Stundenplan Integration",
-        "sw_version": "2.5.0",
+        "sw_version": "2.5.6.1",
     }
 
 
@@ -179,6 +184,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "lehrer": lesson.get("teacher", ""),
             "raum": lesson.get("room", ""),
             "stunde": lesson.get("period", ""),
+            "klasse": lesson.get("class", ""),
             "zusatzinfo": lesson.get("info", ""),
             "ist_vertretung": lesson.get("is_change", False),
         }
@@ -503,6 +509,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                         "raum": lesson.get("room", ""),
                         "zeit": lesson.get("time", ""),
                         "datum": date_str,
+                        "klasse": lesson.get("class", ""),
                         "ist_vertretung": lesson.get("is_change", False),
                         "zusatzinfo": lesson.get("info", ""),
                     }
@@ -810,6 +817,7 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
             "lehrer": lesson.get("teacher", ""),
             "raum": lesson.get("room", ""),
             "stunde": lesson.get("period", ""),
+            "klasse": lesson.get("class", ""),
             "ist_ausfall": is_cancelled,
             "ist_vertretung": lesson.get("is_change", False) and not is_cancelled,
             "zusatzinfo": lesson.get("info", ""),
@@ -1073,3 +1081,72 @@ class VpMobile24HolidaySensor(SensorEntity):
 
         except Exception as err:
             _LOGGER.debug("VpMobile24HolidaySensor: API error, using KMK fallback: %s", err)
+
+
+class VpMobile24TeacherClassesSensor(CoordinatorEntity, SensorEntity):
+    """Sensor – welche Klassen unterrichtet der Lehrer heute/diese Woche."""
+
+    def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = "VpMobile24 Lehrer Klassen"
+        self._attr_unique_id = f"{config_entry.entry_id}_lehrer_klassen"
+        self._attr_icon = "mdi:account-group"
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
+
+    @property
+    def state(self) -> str | None:
+        today = datetime.now().date().isoformat()
+        classes = self._get_classes_for_date(today)
+        if not classes:
+            return "Keine Klassen heute"
+        return ", ".join(sorted(set(classes)))
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        today = datetime.now().date().isoformat()
+        today_classes = sorted(set(self._get_classes_for_date(today)))
+
+        # Build week overview: {class: [periods]}
+        week_overview: dict[str, list] = {}
+        cache = getattr(self.coordinator, "_week_data_cache", {})
+        for date_str, day_data in cache.items():
+            for lesson in day_data.get("lessons", []) + day_data.get("changes", []):
+                cls = lesson.get("class", "")
+                period = lesson.get("period", "")
+                subj = lesson.get("subject", "")
+                if cls and period and subj and not self._is_cancelled(subj):
+                    if cls not in week_overview:
+                        week_overview[cls] = []
+                    week_overview[cls].append(f"{date_str} Std.{period}")
+
+        return {
+            "klassen_heute": today_classes,
+            "anzahl_heute": len(today_classes),
+            "klassen_woche": sorted(week_overview.keys()),
+            "anzahl_woche": len(week_overview),
+            "woche_details": week_overview,
+            "datum": today,
+        }
+
+    def _get_classes_for_date(self, date_str: str) -> list[str]:
+        if not self.coordinator.data:
+            return []
+        classes = []
+        for lesson in (
+            self.coordinator.data.get("lessons", []) +
+            self.coordinator.data.get("changes", [])
+        ):
+            if lesson.get("date", "") == date_str:
+                cls = lesson.get("class", "")
+                subj = lesson.get("subject", "")
+                if cls and subj and not self._is_cancelled(subj):
+                    classes.append(cls)
+        return classes
+
+    def _is_cancelled(self, fach: str) -> bool:
+        return not fach or fach.strip() in ["—", "---", "", "-"]

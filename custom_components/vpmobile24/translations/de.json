@@ -73,7 +73,8 @@
           "change_subjects": "Fächer ändern",
           "change_class": "Klasse ändern",
           "change_holidays": "Bundesland (Ferien) ändern",
-          "change_credentials": "Zugangsdaten / Server ändern"
+          "change_credentials": "Zugangsdaten / Server ändern",
+          "change_teacher": "Lehrerkürzel ändern"
         }
       },
       "change_class": {
@@ -95,6 +96,13 @@
           "username": "Benutzername",
           "password": "Neues Passwort",
           "server": "Downloadserver"
+        }
+      },
+      "change_teacher": {
+        "title": "Lehrerkürzel ändern",
+        "description": "Wähle dein Lehrerkürzel aus der Liste.",
+        "data": {
+          "teacher_short": "Lehrerkürzel"
         }
       },
       "change_holidays": {

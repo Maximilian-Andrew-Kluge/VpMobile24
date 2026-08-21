@@ -405,12 +405,16 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             change_subjects    = user_input.get("change_subjects", False)
             change_holidays    = user_input.get("change_holidays", False)
             change_credentials = user_input.get("change_credentials", False)
+            change_teacher     = user_input.get("change_teacher", False)
 
-            if not any([change_class, change_subjects, change_holidays, change_credentials]):
+            if not any([change_class, change_subjects, change_holidays, change_credentials, change_teacher]):
                 return self.async_create_entry(title="", data={})
 
             if change_credentials:
                 return await self.async_step_change_credentials()
+
+            if change_teacher:
+                return await self.async_step_change_teacher()
 
             if change_holidays and not change_class and not change_subjects:
                 return await self.async_step_change_holidays()
@@ -433,19 +437,29 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             self._config_entry.options.get(CONF_STATE_CODE)
             or self._config_entry.data.get(CONF_STATE_CODE, "")
         )
+        current_teacher = self._config_entry.data.get(CONF_TEACHER_SHORT, "")
         state_label = GERMAN_STATES.get(current_state, "Nicht gesetzt") if current_state else "Nicht gesetzt"
+        is_teacher_mode = bool(current_teacher)
+
+        schema_dict: dict = {
+            vol.Optional("change_holidays", default=False): bool,
+            vol.Optional("change_credentials", default=False): bool,
+        }
+        if is_teacher_mode:
+            schema_dict[vol.Optional("change_teacher", default=False)] = bool
+        else:
+            schema_dict[vol.Optional("change_subjects", default=False)] = bool
+            schema_dict[vol.Optional("change_class", default=False)] = bool
+
+        placeholders = {
+            "current_class": current_teacher if is_teacher_mode else current_class,
+            "current_state": state_label,
+        }
+
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema({
-                vol.Optional("change_subjects", default=False): bool,
-                vol.Optional("change_class", default=False): bool,
-                vol.Optional("change_holidays", default=False): bool,
-                vol.Optional("change_credentials", default=False): bool,
-            }),
-            description_placeholders={
-                "current_class": current_class,
-                "current_state": state_label,
-            },
+            data_schema=vol.Schema(schema_dict),
+            description_placeholders=placeholders,
         )
 
     async def async_step_change_credentials(
@@ -564,6 +578,63 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             data_schema=vol.Schema({
                 vol.Required(CONF_USERNAME): str,
             }),
+            errors=errors,
+        )
+
+    async def async_step_change_teacher(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Change the teacher abbreviation."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            teacher_short = user_input.get(CONF_TEACHER_SHORT, "").strip().upper()
+            if not teacher_short:
+                errors[CONF_TEACHER_SHORT] = "cannot_connect"
+            else:
+                new_data = dict(self._config_entry.data)
+                new_data[CONF_TEACHER_SHORT] = teacher_short
+                school_id = new_data.get(CONF_SCHOOL_ID, "")
+                new_title = f"VpMobile24 \u2013 {teacher_short} ({school_id})"
+                self.hass.config_entries.async_update_entry(
+                    self._config_entry, data=new_data, title=new_title
+                )
+                return self.async_create_entry(title="", data={})
+
+        # Try to load teacher list for dropdown
+        try:
+            from .const import DEFAULT_BASE_URL, DOWNLOAD_SERVERS
+            server_key = (
+                self._config_entry.options.get(CONF_SERVER)
+                or self._config_entry.data.get(CONF_SERVER, "www")
+            )
+            base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
+            from .api_new import Stundenplan24API
+            api = Stundenplan24API(
+                school_id=self._config_entry.data[CONF_SCHOOL_ID],
+                username=self._config_entry.data[CONF_USERNAME],
+                password=self._config_entry.data[CONF_PASSWORD],
+                base_url=base_url,
+            )
+            teachers = await api.async_get_teachers()
+            await api.async_close()
+        except Exception:
+            teachers = []
+
+        current_teacher = self._config_entry.data.get(CONF_TEACHER_SHORT, "")
+
+        if teachers:
+            schema = vol.Schema({
+                vol.Required(CONF_TEACHER_SHORT, default=current_teacher): vol.In(teachers),
+            })
+        else:
+            schema = vol.Schema({
+                vol.Required(CONF_TEACHER_SHORT, default=current_teacher): str,
+            })
+
+        return self.async_show_form(
+            step_id="change_teacher",
+            data_schema=schema,
             errors=errors,
         )
 

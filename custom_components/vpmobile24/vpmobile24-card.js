@@ -412,6 +412,7 @@ class VpMobile24Card extends HTMLElement {
     const raum   = (lesson && lesson.raum)   || '';
     const zeit   = (lesson && lesson.zeit)   || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
+    const klasse = (lesson && lesson.klasse)  || '';
     // If lesson has a real fach value, never treat as cancelled — even if isCancelled flag was set
     const hasFach = fach !== '—';
     const isActuallyCancelled = !hasFach && (isCancelled || fach === '—');
@@ -437,6 +438,7 @@ class VpMobile24Card extends HTMLElement {
       + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
     if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span><span class="vp-detail-label">' + t.teacher + '</span><span class="vp-detail-val">' + lehrer + '</span></div>';
     if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span><span class="vp-detail-label">' + t.room + '</span><span class="vp-detail-val">' + raum + '</span></div>';
+    if (klasse) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🏫</span><span class="vp-detail-label">' + t.classLabel + '</span><span class="vp-detail-val">' + klasse + '</span></div>';
     if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-label">' + t.info + '</span><span class="vp-detail-val">' + info + '</span></div>';
     if (!lehrer && !raum && !info) rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
     content.innerHTML = rows;
@@ -521,7 +523,8 @@ class VpMobile24Card extends HTMLElement {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            text = lesson.fach;
+            const klasseLabel = lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
+            text = lesson.fach + klasseLabel;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -534,7 +537,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -925,7 +928,8 @@ ha-card {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            text = lesson.fach;
+            const klasseLabel2 = lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
+            text = lesson.fach + klasseLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -938,7 +942,7 @@ ha-card {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -1242,6 +1246,10 @@ ha-card {
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
   color: transparent;
+}
+.vp-tile-class {
+  font-size: .68em; font-weight: 400; opacity: 0.75;
+  margin-top: 2px; line-height: 1;
 }
 .vp-today-col .vp-tile.vp-empty {
   background: rgba(37,99,235,0.05);
