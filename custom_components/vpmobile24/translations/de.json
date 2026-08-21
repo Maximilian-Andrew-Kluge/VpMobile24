@@ -90,12 +90,20 @@
       },
       "change_credentials": {
         "title": "Zugangsdaten ändern",
-        "description": "Neue Schulnummer, Benutzername, Passwort und Server eingeben.",
+        "description": "Neue Schulnummer, Benutzertyp, Passwort und Server eingeben.",
         "data": {
           "school_id": "Schulnummer",
+          "user_type": "Benutzertyp",
           "username": "Benutzername",
           "password": "Neues Passwort",
           "server": "Downloadserver"
+        }
+      },
+      "change_credentials_custom": {
+        "title": "Benutzerdefinierter Benutzername",
+        "description": "Gib deinen eigenen Benutzernamen ein.",
+        "data": {
+          "username": "Benutzername"
         }
       },
       "change_teacher": {

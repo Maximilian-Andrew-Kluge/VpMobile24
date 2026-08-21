@@ -6,12 +6,48 @@
         "description": "Entrez vos identifiants.",
         "data": {
           "school_id": "ID de l'école",
+          "user_type": "Type d'utilisateur",
           "username": "Nom d'utilisateur",
           "password": "Mot de passe",
           "server": "Serveur de téléchargement"
         },
         "data_description": {
+          "school_id": "L'identifiant à 8 chiffres de l'école",
+          "user_type": "Sélectionnez Élève ou Enseignant. Pour personnalisé, saisissez le nom manuellement.",
+          "password": "Votre mot de passe VpMobile24",
           "server": "Sélectionnez 'www' (standard) ou un serveur alternatif si votre école en utilise un (indiqué dans la lettre aux parents)."
+        }
+      },
+      "custom_username": {
+        "title": "Nom d'utilisateur personnalisé",
+        "description": "Entrez votre nom d'utilisateur personnalisé.",
+        "data": {
+          "username": "Nom d'utilisateur"
+        }
+      },
+      "teacher": {
+        "title": "Abréviation de l'enseignant",
+        "description": "Entrez votre abréviation (ex. MUS, SCH). Tous vos cours et remplacements seront affichés automatiquement.",
+        "data": {
+          "teacher_short": "Abréviation enseignant"
+        }
+      },
+      "class": {
+        "title": "Sélectionner la classe",
+        "description": "Choisissez votre classe dans la liste.",
+        "data": {
+          "class_name": "Classe"
+        }
+      },
+      "subjects": {
+        "title": "Sélectionner les matières",
+        "description": "Choisissez les matières à afficher."
+      },
+      "holidays": {
+        "title": "Vacances scolaires (optionnel)",
+        "description": "Sélectionnez votre Land pour la détection automatique des vacances.",
+        "data": {
+          "state_code": "Land"
         }
       }
     },
@@ -19,6 +55,69 @@
       "cannot_connect": "Connexion échouée.",
       "invalid_auth": "Nom d'utilisateur ou mot de passe incorrect.",
       "unknown": "Une erreur inconnue s'est produite."
+    },
+    "abort": {
+      "already_configured": "Cette classe est déjà configurée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Paramètres VpMobile24",
+        "description": "Classe actuelle: **{current_class}** · Land: **{current_state}**\n\nQue souhaitez-vous modifier?",
+        "data": {
+          "change_subjects": "Modifier les matières",
+          "change_class": "Modifier la classe",
+          "change_holidays": "Modifier le Land (vacances)",
+          "change_credentials": "Modifier les identifiants / serveur",
+          "change_teacher": "Modifier l'abréviation enseignant"
+        }
+      },
+      "change_class": {
+        "title": "Modifier la classe",
+        "description": "Entrez le nouveau nom de classe.",
+        "data": {
+          "class_name": "Classe"
+        }
+      },
+      "subjects": {
+        "title": "Sélectionner les matières",
+        "description": "Choisissez les matières à afficher. Trouvées: {subject_count} matières."
+      },
+      "change_credentials": {
+        "title": "Modifier les identifiants",
+        "description": "Entrez le nouvel ID école, type d'utilisateur, mot de passe et serveur.",
+        "data": {
+          "school_id": "ID de l'école",
+          "user_type": "Type d'utilisateur",
+          "username": "Nom d'utilisateur",
+          "password": "Nouveau mot de passe",
+          "server": "Serveur de téléchargement"
+        }
+      },
+      "change_teacher": {
+        "title": "Modifier l'abréviation enseignant",
+        "description": "Sélectionnez votre abréviation dans la liste.",
+        "data": {
+          "teacher_short": "Abréviation enseignant"
+        }
+      },
+      "change_holidays": {
+        "title": "Land pour les vacances",
+        "description": "Sélectionnez votre Land pour la détection automatique des vacances scolaires.",
+        "data": {
+          "state_code": "Land"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Connexion à VpMobile24 échouée."
+    }
+  },
+  "issues": {
+    "reconfig_required": {
+      "title": "VpMobile24: Reconfiguration requise",
+      "description": "Vous mettez à jour depuis la version **{version}**. En raison de nouvelles fonctionnalités, veuillez supprimer et re-ajouter l'intégration VpMobile24."
     }
   },
   "entity": {
@@ -37,6 +136,9 @@
       },
       "aenderungen": {
         "name": "Changements"
+      },
+      "ferien": {
+        "name": "Vacances scolaires"
       }
     }
   }
