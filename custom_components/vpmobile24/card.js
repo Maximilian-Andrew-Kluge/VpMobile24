@@ -542,6 +542,7 @@ class VpMobile24Card extends HTMLElement {
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
             else                   cls += ' vp-normal';
+            if (isTeacherMode)     cls += ' vp-teacher-tile';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             const tileInfo = lesson && lesson.zusatzinfo;
@@ -960,6 +961,7 @@ ha-card {
             if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
             else                   cls += ' vp-normal';
+            if (isTeacherModeRender) cls += ' vp-teacher-tile';
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             const tileInfo2 = lesson && lesson.zusatzinfo;
@@ -1262,6 +1264,7 @@ ha-card {
   font-size: .84em; font-weight: 600; color: #e2e8f0;
   height: 48px; min-height: 48px;
   display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
   transition: filter .12s, transform .12s, box-shadow .12s;
   background: #1a2a50;
   line-height: 1.2; text-align: center;
@@ -1269,13 +1272,19 @@ ha-card {
   word-break: break-word;
   hyphens: auto;
 }
+.vp-tile.vp-teacher-tile {
+  height: 60px; min-height: 60px;
+  font-size: .78em;
+}
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
   color: transparent;
 }
 .vp-tile-class {
-  font-size: .68em; font-weight: 400; opacity: 0.75;
-  margin-top: 2px; line-height: 1;
+  font-size: .66em; font-weight: 500; opacity: 0.9;
+  margin-top: 3px; line-height: 1.1;
+  background: rgba(0,0,0,0.25); border-radius: 4px;
+  padding: 1px 5px; white-space: nowrap;
 }
 .vp-today-col .vp-tile.vp-empty {
   background: rgba(37,99,235,0.05);
