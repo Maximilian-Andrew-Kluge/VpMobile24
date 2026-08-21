@@ -125,6 +125,45 @@ class Stundenplan24API:
             _LOGGER.error("Error fetching classes: %s", ex)
             raise
 
+    async def async_get_teachers(self) -> list[str]:
+        """Get list of all teacher abbreviations from today's schedule XML.
+
+        Scans all classes in the current day's plan and collects unique teacher
+        abbreviations from <Le> elements. Falls back to next/prev days if today
+        has no data (weekend, holiday).
+        """
+        try:
+            session = await self.async_get_session()
+            auth = BasicAuth(self.username, self.password)
+            teachers: set[str] = set()
+
+            # Try today ± a few days to get a day with actual data
+            today = date.today()
+            candidates = [today + timedelta(days=i) for i in range(0, 7)] + \
+                         [today - timedelta(days=i) for i in range(1, 4)]
+
+            for check_date in candidates:
+                date_str = check_date.strftime("%Y%m%d")
+                xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
+                try:
+                    async with session.get(xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                        if response.status != 200:
+                            continue
+                        xml_content = await response.text()
+                        root = ET.fromstring(xml_content)
+                        for le in root.findall(".//Le"):
+                            if le.text and le.text.strip():
+                                teachers.add(le.text.strip())
+                        if teachers:
+                            break  # found data — stop searching
+                except Exception:
+                    continue
+
+            return sorted(teachers)
+        except Exception as ex:
+            _LOGGER.error("Error fetching teachers: %s", ex)
+            return []
+
     async def async_get_schedule(
         self,
         target_date: date | None = None,

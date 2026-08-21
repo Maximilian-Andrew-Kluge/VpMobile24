@@ -173,7 +173,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step 2b — teacher mode: enter teacher abbreviation."""
+        """Step 2b — teacher mode: select teacher abbreviation from dropdown."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -182,20 +182,33 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors[CONF_TEACHER_SHORT] = "cannot_connect"
             else:
                 self._config_data[CONF_TEACHER_SHORT] = teacher_short
-                # No class selection needed in teacher mode
                 school_id = self._config_data.get(CONF_SCHOOL_ID, "")
-                entry_title = f"VpMobile24 – {teacher_short} ({school_id})"
                 await self.async_set_unique_id(f"{school_id}_lehrer_{teacher_short}")
                 self._abort_if_unique_id_configured()
                 if self._api:
                     await self._api.async_close()
                 return await self.async_step_holidays()
 
+        # Load teacher list if not yet loaded
+        if not hasattr(self, "_available_teachers"):
+            try:
+                self._available_teachers = await self._api.async_get_teachers()
+            except Exception:
+                self._available_teachers = []
+
+        if self._available_teachers:
+            schema = vol.Schema({
+                vol.Required(CONF_TEACHER_SHORT): vol.In(self._available_teachers),
+            })
+        else:
+            # Fallback to text input if no teachers found
+            schema = vol.Schema({
+                vol.Required(CONF_TEACHER_SHORT): str,
+            })
+
         return self.async_show_form(
             step_id="teacher",
-            data_schema=vol.Schema({
-                vol.Required(CONF_TEACHER_SHORT): str,
-            }),
+            data_schema=schema,
             errors=errors,
         )
 
