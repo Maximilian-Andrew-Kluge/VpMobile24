@@ -1272,23 +1272,24 @@ ha-card {
   hyphens: auto;
 }
 .vp-tile.vp-teacher-tile {
-  height: 64px; min-height: 64px;
-  font-size: .88em;
-  justify-content: center; gap: 1px;
+  height: 52px; min-height: 52px;
+  font-size: 1em;
+  justify-content: center; gap: 0px;
+  padding: 2px 3px;
 }
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
   color: transparent;
 }
 .vp-tile-class {
-  font-size: .58em; font-weight: 500;
+  font-size: .56em; font-weight: 500;
   color: rgba(255,255,255,0.55);
-  line-height: 1.1; margin-top: 1px;
+  line-height: 1; margin-top: 2px;
 }
 .vp-tile-room {
-  font-size: .52em; font-weight: 400;
+  font-size: .50em; font-weight: 400;
   color: rgba(255,255,255,0.35);
-  line-height: 1.1;
+  line-height: 1;
 }
 .vp-today-col .vp-tile.vp-empty {
   background: rgba(37,99,235,0.05);
