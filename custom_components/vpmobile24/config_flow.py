@@ -182,7 +182,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Demo mode — password check + profile selection."""
         import hashlib
         # Only the hash is stored — the password itself is never in source code
-        _DEMO_HASH = "0254fe91c5f58b071b44252cf5fdde9a71ca88ccaed9c0d6cd6d84a630c73260"
+        _DEMO_HASH = "881588b0043ec022df6a78fcff69ca5919ba5a7713cd80952771fed9bd94e745"
 
         errors: dict[str, str] = {}
 
