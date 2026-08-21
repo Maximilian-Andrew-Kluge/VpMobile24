@@ -535,7 +535,10 @@ class VpMobile24Card extends HTMLElement {
           if (lesson && lesson.fach && !isCancelled) {
             const klasseLabel = isTeacherMode && lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
             const raumLabel   = isTeacherMode && lesson.raum   ? '<div class="vp-tile-room">'  + lesson.raum   + '</div>' : '';
-            text = lesson.fach + klasseLabel + raumLabel;
+            const fachSpan = isTeacherMode
+              ? '<span class="vp-tile-fach">' + lesson.fach + '</span>'
+              : lesson.fach;
+            text = fachSpan + klasseLabel + raumLabel;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -955,7 +958,10 @@ ha-card {
           if (lesson && lesson.fach && !isCancelled) {
             const klasseLabel2 = isTeacherModeRender && lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
             const raumLabel2   = isTeacherModeRender && lesson.raum   ? '<div class="vp-tile-room">'  + lesson.raum   + '</div>' : '';
-            text = lesson.fach + klasseLabel2 + raumLabel2;
+            const fachSpan2 = isTeacherModeRender
+              ? '<span class="vp-tile-fach">' + lesson.fach + '</span>'
+              : lesson.fach;
+            text = fachSpan2 + klasseLabel2 + raumLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -1272,24 +1278,34 @@ ha-card {
   hyphens: auto;
 }
 .vp-tile.vp-teacher-tile {
-  height: 52px; min-height: 52px;
-  font-size: 1em;
-  justify-content: center; gap: 0px;
-  padding: 2px 3px;
+  height: 58px; min-height: 58px;
+  padding: 3px 2px;
+  hyphens: none;
+  word-break: normal;
+}
+.vp-tile.vp-teacher-tile > span.vp-tile-fach {
+  font-size: 1em; font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .vp-tile.vp-empty {
   background: rgba(255,255,255,0.025);
   color: transparent;
 }
 .vp-tile-class {
-  font-size: .56em; font-weight: 500;
-  color: rgba(255,255,255,0.55);
-  line-height: 1; margin-top: 2px;
+  font-size: .6em; font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.1; margin-top: 1px;
+  white-space: nowrap;
 }
 .vp-tile-room {
-  font-size: .50em; font-weight: 400;
-  color: rgba(255,255,255,0.35);
-  line-height: 1;
+  font-size: .55em; font-weight: 400;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.1;
+  white-space: nowrap;
 }
 .vp-today-col .vp-tile.vp-empty {
   background: rgba(37,99,235,0.05);
