@@ -499,6 +499,16 @@ class VpMobile24Card extends HTMLElement {
       return;
     }
 
+    // ── Detect teacher mode: multiple different classes in the week table ──
+    const allClasses = new Set();
+    dayKeys.forEach(dk => {
+      const dayData = weekTable[dk] || {};
+      Object.values(dayData).forEach(les => {
+        if (les && les.klasse) allClasses.add(les.klasse);
+      });
+    });
+    const isTeacherMode = allClasses.size > 1;
+
     let bodyHtml = '';
     slots.forEach(slot => {
       if (slot.isPause) {
@@ -523,7 +533,9 @@ class VpMobile24Card extends HTMLElement {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const meta = [lesson.klasse, lesson.raum].filter(Boolean).join(' · ');
+            const meta = isTeacherMode
+              ? [lesson.klasse, lesson.raum].filter(Boolean).join(' · ')
+              : '';
             const metaLabel = meta ? '<div class="vp-tile-class">' + meta + '</div>' : '';
             text = lesson.fach + metaLabel;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
@@ -538,7 +550,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, isTeacherMode && lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -634,7 +646,7 @@ class VpMobile24Card extends HTMLElement {
         if (isCancelled) {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
         } else if (subj) {
-          const mobMeta = lesson ? [lesson.klasse, lesson.raum].filter(Boolean).join(' · ') : '';
+          const mobMeta = (isTeacherModeRender && lesson) ? [lesson.klasse, lesson.raum].filter(Boolean).join(' · ') : '';
           const mobMetaHtml = mobMeta ? '<div class="vp-mob-meta">' + mobMeta + '</div>' : '';
           subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + mobMetaHtml + '</div>';
         } else {
@@ -896,6 +908,14 @@ ha-card {
 
     // ── TABLE HTML ──
     let tableHtml = '<table class="vp-table"><thead><tr><th class="vp-th-num">#</th>';
+
+    // Detect teacher mode: multiple different classes in week table
+    const allClassesRender = new Set();
+    dayKeys.forEach(dk => {
+      const dayData = weekTable[dk] || {};
+      Object.values(dayData).forEach(les => { if (les && les.klasse) allClassesRender.add(les.klasse); });
+    });
+    const isTeacherModeRender = allClassesRender.size > 1;
     days.forEach((d, i) => {
       const dateNum = dayDates[i];
       if (i === todayIdx) {
@@ -931,7 +951,9 @@ ha-card {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const meta2 = [lesson.klasse, lesson.raum].filter(Boolean).join(' · ');
+            const meta2 = isTeacherModeRender
+              ? [lesson.klasse, lesson.raum].filter(Boolean).join(' · ')
+              : '';
             const metaLabel2 = meta2 ? '<div class="vp-tile-class">' + meta2 + '</div>' : '';
             text = lesson.fach + metaLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
@@ -946,7 +968,7 @@ ha-card {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, isTeacherModeRender && lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
           const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
