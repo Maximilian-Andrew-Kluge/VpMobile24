@@ -44,9 +44,8 @@
       },
       "demo": {
         "title": "🎭 Demo-Modus",
-        "description": "Gib das Demo-Passwort ein um den Test-Modus zu aktivieren.",
+        "description": "Wähle ein Demo-Profil zum Testen. Es werden keine echten Schuldaten abgerufen.",
         "data": {
-          "demo_password": "Demo-Passwort",
           "demo_type": "Demo-Profil"
         }
       },

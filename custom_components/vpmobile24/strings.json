@@ -44,9 +44,8 @@
       },
       "demo": {
         "title": "Demo mode",
-        "description": "Enter the demo password and select a profile.",
+        "description": "Choose a demo profile. No real school data is used.",
         "data": {
-          "demo_password": "Demo password",
           "demo_type": "Demo profile"
         }
       },
