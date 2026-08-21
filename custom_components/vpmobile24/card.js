@@ -523,8 +523,9 @@ class VpMobile24Card extends HTMLElement {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const klasseLabel = lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
-            text = lesson.fach + klasseLabel;
+            const meta = [lesson.klasse, lesson.raum].filter(Boolean).join(' · ');
+            const metaLabel = meta ? '<div class="vp-tile-class">' + meta + '</div>' : '';
+            text = lesson.fach + metaLabel;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -633,7 +634,9 @@ class VpMobile24Card extends HTMLElement {
         if (isCancelled) {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-cancelled">—</div>';
         } else if (subj) {
-          subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + '</div>';
+          const mobMeta = lesson ? [lesson.klasse, lesson.raum].filter(Boolean).join(' · ') : '';
+          const mobMetaHtml = mobMeta ? '<div class="vp-mob-meta">' + mobMeta + '</div>' : '';
+          subjPart = '<div class="vp-mob-subj' + (isCurrent ? ' vp-mob-subj-current' : isSub ? ' vp-mob-subj-sub' : '') + '">' + subj + mobMetaHtml + '</div>';
         } else {
           subjPart = '<div class="vp-mob-subj vp-mob-subj-empty">—</div>';
         }
@@ -928,8 +931,9 @@ ha-card {
           );
           const isVertretung = lesson && lesson.ist_vertretung && !isCancelled;
           if (lesson && lesson.fach && !isCancelled) {
-            const klasseLabel2 = lesson.klasse ? '<div class="vp-tile-class">' + lesson.klasse + '</div>' : '';
-            text = lesson.fach + klasseLabel2;
+            const meta2 = [lesson.klasse, lesson.raum].filter(Boolean).join(' · ');
+            const metaLabel2 = meta2 ? '<div class="vp-tile-class">' + meta2 + '</div>' : '';
+            text = lesson.fach + metaLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)       cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -1344,6 +1348,7 @@ ha-card {
   background: #1a2a50; border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
+.vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
 .vp-mob-subj-sub      { background: rgba(234,179,8,.18) !important; color: #fde68a !important; }
 .vp-mob-subj-cancelled{ background: rgba(239,68,68,.18) !important; color: #fca5a5 !important; font-weight: 700; }
 .vp-mob-subj-current  { background: linear-gradient(135deg,#14532d,#166534) !important; color: #bbf7d0 !important; font-weight: 800; box-shadow: 0 0 0 2px #22c55e; }
