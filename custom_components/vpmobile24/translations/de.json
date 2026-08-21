@@ -36,6 +36,13 @@
           "teacher_short": "Dein Kürzel genau so wie es im Vertretungsplan steht (Groß-/Kleinschreibung egal)."
         }
       },
+      "demo": {
+        "title": "🎭 Demo-Modus",
+        "description": "Wähle ein Demo-Profil zum Testen. Es werden keine echten Schuldaten abgerufen.",
+        "data": {
+          "demo_type": "Demo-Profil"
+        }
+      },
       "class": {
         "title": "Klasse auswählen",
         "description": "Wählen Sie Ihre Klasse aus.",

@@ -23,6 +23,7 @@ from .const import (
     CONF_SERVER,
     CONF_TEACHER_SHORT,
     CONF_USER_MODE,
+    CONF_DEMO_MODE,
     DEFAULT_BASE_URL,
     DOWNLOAD_SERVERS,
     DOMAIN,
@@ -64,6 +65,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._config_data[CONF_PASSWORD] = user_input[CONF_PASSWORD]
                 self._config_data[CONF_SERVER] = user_input.get(CONF_SERVER, "www")
                 return await self.async_step_custom_username()
+
+            if user_type == "demo":
+                # Demo mode — no credentials needed, go straight to demo step
+                return await self.async_step_demo()
 
             # Schüler or Lehrer — username is preset
             resolved_username = user_type  # "schueler" or "lehrer"
@@ -112,6 +117,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "schueler": "Schüler",
                     "lehrer": "Lehrer",
                     "custom": "Benutzerdefiniert …",
+                    "demo": "🎭 Demo (kein Login nötig)",
                 }),
                 vol.Required(CONF_PASSWORD): str,
                 vol.Optional(CONF_SERVER, default="www"): vol.In(list(DOWNLOAD_SERVERS.keys())),
@@ -167,6 +173,56 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_USERNAME): str,
             }),
             errors=errors,
+        )
+
+    async def async_step_demo(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Demo mode — choose between student or teacher demo profile."""
+        if user_input is not None:
+            demo_type = user_input.get("demo_type", "schueler")
+            if demo_type == "lehrer":
+                self._config_data = {
+                    CONF_SCHOOL_ID: "00000000",
+                    CONF_USER_MODE: "teacher",
+                    CONF_TEACHER_SHORT: "DEM",
+                    CONF_DEMO_MODE: True,
+                    "username": "demo",
+                    "password": "demo",
+                    CONF_SERVER: "www",
+                }
+                await self.async_set_unique_id("demo_lehrer_DEM")
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(
+                    title="VpMobile24 – Demo Lehrer (DEM)",
+                    data=self._config_data,
+                )
+            else:
+                self._config_data = {
+                    CONF_SCHOOL_ID: "00000000",
+                    CONF_USER_MODE: "student",
+                    CONF_CLASS_NAME: "10b",
+                    CONF_DEMO_MODE: True,
+                    "username": "demo",
+                    "password": "demo",
+                    CONF_SERVER: "www",
+                }
+                await self.async_set_unique_id("demo_schueler_10b")
+                self._abort_if_unique_id_configured()
+                return self.async_create_entry(
+                    title="VpMobile24 – Demo Schüler (10b)",
+                    data=self._config_data,
+                )
+
+        return self.async_show_form(
+            step_id="demo",
+            data_schema=vol.Schema({
+                vol.Required("demo_type", default="schueler"): vol.In({
+                    "schueler": "🎒 Demo Schüler (Klasse 10b)",
+                    "lehrer": "📚 Demo Lehrer (Kürzel DEM)",
+                }),
+            }),
         )
 
     async def async_step_teacher(

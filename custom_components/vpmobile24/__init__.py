@@ -13,7 +13,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS
+from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE
 from .api_new import Stundenplan24API
 
 _LOGGER = logging.getLogger(__name__)
@@ -160,6 +160,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.options.get(CONF_SELECTED_COURSES, entry.data.get(CONF_SELECTED_COURSES, [])),
         entry_id=entry.entry_id,
         teacher_short=entry.data.get("teacher_short"),
+        is_demo=entry.data.get(CONF_DEMO_MODE, False),
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -275,11 +276,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None, entry_id: str | None = None, teacher_short: str | None = None) -> None:
+    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None, entry_id: str | None = None, teacher_short: str | None = None, is_demo: bool = False) -> None:
         """Initialize."""
         self.api = api
         self.class_name = class_name
         self.teacher_short = teacher_short  # teacher abbreviation for teacher mode
+        self.is_demo = is_demo
         self.excluded_subjects = excluded_subjects or []
         self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
         self._entry_id = entry_id  # store entry_id for holiday lookups
@@ -330,6 +332,28 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         """Update data via library."""
         try:
             _LOGGER.debug("Starting data update...")
+
+            # ── Demo mode: return static test data ───────────────────────────
+            if getattr(self, "is_demo", False):
+                from .demo import get_demo_data_student, get_demo_data_teacher
+                if getattr(self, "teacher_short", None):
+                    data = get_demo_data_teacher(self.teacher_short or "DEM")
+                else:
+                    data = get_demo_data_student(self.class_name or "10b")
+                # Also populate week cache for week table sensor
+                from datetime import date as _date
+                monday = _date.today() - __import__('datetime').timedelta(days=_date.today().weekday())
+                all_w = data.get("week_lessons", []) + data.get("week_changes", [])
+                self._week_data_cache = {}
+                for lesson in all_w:
+                    d = lesson.get("date", "")
+                    if d not in self._week_data_cache:
+                        self._week_data_cache[d] = {"lessons": [], "changes": [], "additional_info": [], "timestamp": data.get("timestamp", "")}
+                    if lesson.get("is_change"):
+                        self._week_data_cache[d]["changes"].append(lesson)
+                    else:
+                        self._week_data_cache[d]["lessons"].append(lesson)
+                return data
 
             from datetime import date
             today = date.today()
