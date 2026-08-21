@@ -1273,7 +1273,7 @@ ha-card {
 }
 .vp-tile.vp-teacher-tile {
   height: 64px; min-height: 64px;
-  font-size: .78em;
+  font-size: .88em;
   justify-content: center; gap: 1px;
 }
 .vp-tile.vp-empty {
@@ -1281,13 +1281,13 @@ ha-card {
   color: transparent;
 }
 .vp-tile-class {
-  font-size: .62em; font-weight: 500;
-  color: rgba(255,255,255,0.65);
+  font-size: .58em; font-weight: 500;
+  color: rgba(255,255,255,0.55);
   line-height: 1.1; margin-top: 1px;
 }
 .vp-tile-room {
-  font-size: .58em; font-weight: 400;
-  color: rgba(255,255,255,0.45);
+  font-size: .52em; font-weight: 400;
+  color: rgba(255,255,255,0.35);
   line-height: 1.1;
 }
 .vp-today-col .vp-tile.vp-empty {
