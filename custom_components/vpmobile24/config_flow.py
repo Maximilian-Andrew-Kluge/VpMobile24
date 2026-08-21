@@ -69,7 +69,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "schueler": "Schüler",
                     "lehrer": "Lehrer",
                     "custom": "Benutzerdefiniert …",
-                    "demo": "🎭 Demo (kein Login nötig)",
+                    "demo": "Demo Modus",
                 }),
             }),
         )
