@@ -11,6 +11,8 @@ CONF_EXCLUDED_SUBJECTS = "excluded_subjects"
 CONF_SELECTED_COURSES = "selected_courses"  # whitelist of Ku2 course groups
 CONF_STATE_CODE = "state_code"              # German federal state code (e.g. DE-BY)
 CONF_CUSTOM_HOLIDAYS = "custom_holidays"    # list of {name, start, end} dicts
+CONF_TEACHER_SHORT = "teacher_short"        # teacher abbreviation for teacher mode (e.g. "MUS")
+CONF_USER_MODE = "user_mode"                # "student" or "teacher"
 
 # Default values
 DEFAULT_UPDATE_INTERVAL = 15  # minutes

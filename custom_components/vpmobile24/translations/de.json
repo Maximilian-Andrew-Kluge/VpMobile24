@@ -26,6 +26,16 @@
           "username": "Benutzername"
         }
       },
+      "teacher": {
+        "title": "Lehrerkürzel eingeben",
+        "description": "Gib dein Lehrerkürzel ein (z.B. MUS, SCH). Alle Stunden und Vertretungen mit diesem Kürzel werden automatisch angezeigt.",
+        "data": {
+          "teacher_short": "Lehrerkürzel"
+        },
+        "data_description": {
+          "teacher_short": "Dein Kürzel genau so wie es im Vertretungsplan steht (Groß-/Kleinschreibung egal)."
+        }
+      },
       "class": {
         "title": "Klasse auswählen",
         "description": "Wählen Sie Ihre Klasse aus.",

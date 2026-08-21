@@ -159,6 +159,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         entry.options.get(CONF_EXCLUDED_SUBJECTS, entry.data.get(CONF_EXCLUDED_SUBJECTS, [])),
         entry.options.get(CONF_SELECTED_COURSES, entry.data.get(CONF_SELECTED_COURSES, [])),
         entry_id=entry.entry_id,
+        teacher_short=entry.data.get("teacher_short"),
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -167,12 +168,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register device — always use the effective class (options override data)
     device_registry = dr.async_get(hass)
     school_id = entry.data["school_id"]
+    teacher_short = entry.data.get("teacher_short")
     effective_class = entry.options.get(CONF_CLASS_NAME) or entry.data.get("class_name", "")
-    device_id = f"{school_id}_{effective_class}" if effective_class else school_id
-    device_name = (
-        f"VpMobile24 \u2013 {effective_class} ({school_id})"
-        if effective_class
-        else f"VpMobile24 ({school_id})"
+    if teacher_short:
+        device_id = f"{school_id}_lehrer_{teacher_short}"
+        device_name = f"VpMobile24 – {teacher_short} ({school_id})"
+    else:
+        device_id = f"{school_id}_{effective_class}" if effective_class else school_id
+        device_name = (
+            f"VpMobile24 \u2013 {effective_class} ({school_id})"
+            if effective_class
+            else f"VpMobile24 ({school_id})"
     )
 
     # Remove any stale devices for this config entry that have a different identifier
@@ -269,10 +275,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None, entry_id: str | None = None) -> None:
+    def __init__(self, hass: HomeAssistant, api: Stundenplan24API, class_name: str | None = None, excluded_subjects: list[str] | None = None, selected_courses: list[str] | None = None, entry_id: str | None = None, teacher_short: str | None = None) -> None:
         """Initialize."""
         self.api = api
         self.class_name = class_name
+        self.teacher_short = teacher_short  # teacher abbreviation for teacher mode
         self.excluded_subjects = excluded_subjects or []
         self.selected_courses = selected_courses or []  # whitelist of Ku2 groups
         self._entry_id = entry_id  # store entry_id for holiday lookups
@@ -367,7 +374,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                 try:
                     date_str = target_date.isoformat()
                     _LOGGER.debug(f"Fetching schedule for {date_str}")
-                    day_data = await self.api.async_get_schedule(target_date, self.class_name)
+                    day_data = await self.api.async_get_schedule(target_date, self.class_name, self.teacher_short)
                     self._week_data_cache[date_str] = {
                         "lessons": day_data.get("lessons", []),
                         "changes": day_data.get("changes", []),
@@ -397,7 +404,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             for date_str in prefetch_dates:
                 try:
                     target = date.fromisoformat(date_str)
-                    day_data = await self.api.async_get_schedule(target, self.class_name)
+                    day_data = await self.api.async_get_schedule(target, self.class_name, self.teacher_short)
                     self._week_data_cache[date_str] = {
                         "lessons": day_data.get("lessons", []),
                         "changes": day_data.get("changes", []),

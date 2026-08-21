@@ -21,6 +21,8 @@ from .const import (
     CONF_STATE_CODE,
     CONF_CUSTOM_HOLIDAYS,
     CONF_SERVER,
+    CONF_TEACHER_SHORT,
+    CONF_USER_MODE,
     DEFAULT_BASE_URL,
     DOWNLOAD_SERVERS,
     DOMAIN,
@@ -84,11 +86,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         (k for k, v in DOWNLOAD_SERVERS.items() if v == self._api.base_url),
                         server_key,
                     )
-                    try:
-                        self._available_classes = await self._api.async_get_classes()
-                    except Exception:
-                        self._available_classes = []
-                    return await self.async_step_class()
+                    if user_type == "lehrer":
+                        # Teacher mode — skip class selection, ask for teacher abbreviation
+                        self._config_data[CONF_USER_MODE] = "teacher"
+                        return await self.async_step_teacher()
+                    else:
+                        self._config_data[CONF_USER_MODE] = "student"
+                        try:
+                            self._available_classes = await self._api.async_get_classes()
+                        except Exception:
+                            self._available_classes = []
+                        return await self.async_step_class()
             except Exception:
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
@@ -157,6 +165,36 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="custom_username",
             data_schema=vol.Schema({
                 vol.Required(CONF_USERNAME): str,
+            }),
+            errors=errors,
+        )
+
+    async def async_step_teacher(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Step 2b — teacher mode: enter teacher abbreviation."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            teacher_short = user_input.get(CONF_TEACHER_SHORT, "").strip().upper()
+            if not teacher_short:
+                errors[CONF_TEACHER_SHORT] = "cannot_connect"
+            else:
+                self._config_data[CONF_TEACHER_SHORT] = teacher_short
+                # No class selection needed in teacher mode
+                school_id = self._config_data.get(CONF_SCHOOL_ID, "")
+                entry_title = f"VpMobile24 – {teacher_short} ({school_id})"
+                await self.async_set_unique_id(f"{school_id}_lehrer_{teacher_short}")
+                self._abort_if_unique_id_configured()
+                if self._api:
+                    await self._api.async_close()
+                return await self.async_step_holidays()
+
+        return self.async_show_form(
+            step_id="teacher",
+            data_schema=vol.Schema({
+                vol.Required(CONF_TEACHER_SHORT): str,
             }),
             errors=errors,
         )

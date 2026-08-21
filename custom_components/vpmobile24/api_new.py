@@ -129,6 +129,7 @@ class Stundenplan24API:
         self,
         target_date: date | None = None,
         class_name: str | None = None,
+        teacher_short: str | None = None,
     ) -> dict[str, Any]:
         """Get schedule data from stundenplan24."""
         try:
@@ -144,7 +145,7 @@ class Stundenplan24API:
             async with session.get(xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=15)) as response:
                 if response.status == 200:
                     xml_content = await response.text()
-                    return self._parse_xml_schedule(xml_content, target_date, class_name)
+                    return self._parse_xml_schedule(xml_content, target_date, class_name, teacher_short)
                 raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
 
         except Exception as ex:
@@ -160,6 +161,7 @@ class Stundenplan24API:
         xml_content: str,
         target_date: date,
         class_name: str | None = None,
+        teacher_short: str | None = None,
     ) -> dict[str, Any]:
         """Parse XML schedule data."""
         try:
@@ -192,7 +194,9 @@ class Stundenplan24API:
             for kl in root.findall(".//Kl"):
                 kurz = kl.find("Kurz")
                 if kurz is not None and kurz.text:
-                    if class_name is None or kurz.text == class_name:
+                    # Teacher mode: process ALL classes (filter by teacher later)
+                    # Student mode: only process the selected class
+                    if teacher_short is not None or class_name is None or kurz.text == class_name:
                         classes_to_process.append((kurz.text, kl))
                         schedule_data["classes"].append(kurz.text)
 
@@ -201,23 +205,31 @@ class Stundenplan24API:
                 # Each <UeNr> has a lesson number; <Nr> in <Std> references it.
                 # This tells us which lessons actually belong to THIS class/student.
                 unterricht_nrs: set[str] = set()
-                unterricht_el = kl_element.find("Unterricht")
-                if unterricht_el is not None:
-                    for ue in unterricht_el.findall("Ue"):
-                        ue_nr = ue.find("UeNr")
-                        if ue_nr is not None and ue_nr.text:
-                            unterricht_nrs.add(ue_nr.text.strip())
+                # In teacher mode skip the Unterricht filter — teachers see all lessons
+                if not teacher_short:
+                    unterricht_el = kl_element.find("Unterricht")
+                    if unterricht_el is not None:
+                        for ue in unterricht_el.findall("Ue"):
+                            ue_nr = ue.find("UeNr")
+                            if ue_nr is not None and ue_nr.text:
+                                unterricht_nrs.add(ue_nr.text.strip())
 
                 pl_element = kl_element.find("Pl")
                 if pl_element is not None:
                     for std in pl_element.findall("Std"):
                         lesson = self._parse_lesson(std, class_short)
                         if lesson:
-                            # Filter by Unterricht membership when possible
-                            lesson_nr = lesson.get("nr", "")
-                            if unterricht_nrs and lesson_nr and lesson_nr not in unterricht_nrs:
-                                # This lesson belongs to a parallel group not in the student's Unterricht
-                                continue
+                            # ── Teacher mode: only keep lessons for this teacher ──
+                            if teacher_short:
+                                lesson_teacher = lesson.get("teacher", "").strip()
+                                if lesson_teacher.upper() != teacher_short.upper():
+                                    continue
+                            else:
+                                # Filter by Unterricht membership when possible
+                                lesson_nr = lesson.get("nr", "")
+                                if unterricht_nrs and lesson_nr and lesson_nr not in unterricht_nrs:
+                                    # This lesson belongs to a parallel group not in the student's Unterricht
+                                    continue
                             if lesson.get("is_change", False):
                                 schedule_data["changes"].append(lesson)
                             else:
