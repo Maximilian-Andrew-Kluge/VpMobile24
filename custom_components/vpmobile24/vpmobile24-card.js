@@ -1,4 +1,4 @@
-// VpMobile24 Card v2.5.7
+﻿// VpMobile24 Card v2.5.7
 console.info('%c VpMobile24-CARD %c v2.5.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
@@ -58,6 +58,22 @@ class VpMobile24Card extends HTMLElement {
         tile_normal: 'rgba(34,197,94,.15)', tile_normal_color: '#166534', tile_normal_border: 'rgba(34,197,94,.3)',
         tile_sub: 'rgba(234,179,8,0.2)', tile_sub_color: '#92400e',
         tile_cancelled: 'rgba(239,68,68,0.15)', tile_cancelled_color: '#991b1b',
+        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
+      },
+      light_blue: {
+        name: 'Light Blue',
+        bg: '#eff6ff', tile_bg: '#dbeafe',
+        tile_normal: 'rgba(37,99,235,.15)', tile_normal_color: '#1e40af', tile_normal_border: 'rgba(37,99,235,.3)',
+        tile_sub: 'rgba(234,179,8,0.25)', tile_sub_color: '#78350f',
+        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#7f1d1d',
+        tile_current: 'linear-gradient(135deg,#1e3a8a,#1e40af)', tile_current_color: '#eff6ff',
+      },
+      light_green: {
+        name: 'Light Green',
+        bg: '#f0fdf4', tile_bg: '#dcfce7',
+        tile_normal: 'rgba(22,163,74,.18)', tile_normal_color: '#14532d', tile_normal_border: 'rgba(22,163,74,.35)',
+        tile_sub: 'rgba(234,179,8,0.25)', tile_sub_color: '#78350f',
+        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
       },
       red: {
