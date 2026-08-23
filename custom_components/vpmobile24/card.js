@@ -1,4 +1,4 @@
-﻿// VpMobile24 Card v2.5.7.1
+// VpMobile24 Card v2.5.7.1
 console.info('%c VpMobile24-CARD %c v2.5.7.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
@@ -320,13 +320,21 @@ class VpMobile24Card extends HTMLElement {
         // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
         { name: "show_header", default: true, selector: { boolean: {} } },
         { name: "theme", default: "navy", selector: { select: { options: [
-          { value: "navy",   label: "🌑 Navy Dark (Standard)" },
-          { value: "dark",   label: "⬛ Dark" },
-          { value: "blue",   label: "🔵 Blue" },
-          { value: "purple", label: "🟣 Purple" },
-          { value: "light",  label: "☀️ Light" },
-          { value: "red",    label: "🔴 Red" },
-          { value: "forest", label: "🌿 Forest" },
+          { value: "navy",        label: "🌑 Navy Dark (Standard)" },
+          { value: "dark",        label: "⬛ Dark" },
+          { value: "dark_blue",   label: "🔵 Dark Blue" },
+          { value: "dark_purple", label: "🟣 Dark Purple" },
+          { value: "dark_green",  label: "🌿 Dark Green" },
+          { value: "dark_red",    label: "🔴 Dark Red" },
+          { value: "dark_orange", label: "🟠 Dark Orange" },
+          { value: "dark_teal",   label: "🩵 Dark Teal" },
+          { value: "dark_pink",   label: "🩷 Dark Pink" },
+          { value: "light",       label: "☀️ Light" },
+          { value: "light_blue",  label: "🔵 Light Blue" },
+          { value: "light_green", label: "🟢 Light Green" },
+          { value: "light_purple",label: "🟣 Light Purple" },
+          { value: "light_pink",  label: "🩷 Light Pink" },
+          { value: "light_orange",label: "🟠 Light Orange" },
         ] } } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
@@ -3080,4 +3088,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.6 loaded');
+console.log('✅ VpMobile24 Card v2.5.7.1 loaded');
