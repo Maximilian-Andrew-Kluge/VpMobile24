@@ -82,7 +82,7 @@
       },
       "subjects": {
         "title": "Sélectionner les matières",
-        "description": "Choisissez les matières à afficher. Trouvées: {subject_count} matières."
+        "description": "Choisissez les matières à afficher."
       },
       "change_credentials": {
         "title": "Modifier les identifiants",

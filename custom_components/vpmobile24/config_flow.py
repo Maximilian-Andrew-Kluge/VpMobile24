@@ -397,9 +397,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ): bool
                     }
                 ),
-                description_placeholders={
-                    "subject_count": "0",
-                },
             )
 
         schema_dict = {}
@@ -415,11 +412,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="subjects",
             data_schema=vol.Schema(schema_dict),
-            description_placeholders={
-                "subject_count": str(
-                    len(self._available_subjects)
-                ),
-            },
         )
 
     async def async_step_holidays(
@@ -933,7 +925,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 data_schema=vol.Schema(
                     {vol.Optional("continue", default=True): bool}
                 ),
-                description_placeholders={"subject_count": "0"},
             )
 
         current_excluded = self._config_entry.options.get(
@@ -961,7 +952,4 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="subjects",
             data_schema=vol.Schema(schema_dict),
-            description_placeholders={
-                "subject_count": str(len(self._available_subjects))
-            },
         )

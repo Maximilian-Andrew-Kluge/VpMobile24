@@ -99,7 +99,7 @@
       },
       "subjects": {
         "title": "Fächer auswählen",
-        "description": "Wähle die anzuzeigenden Fächer aus. Gefunden: {subject_count} Fächer."
+        "description": "Wähle die Fächer aus die angezeigt werden sollen."
       },
       "change_credentials": {
         "title": "Zugangsdaten ändern",

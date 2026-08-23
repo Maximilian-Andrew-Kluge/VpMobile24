@@ -92,7 +92,7 @@
       },
       "subjects": {
         "title": "Select subjects",
-        "description": "Choose the subjects to display. Found: {subject_count} subjects."
+        "description": "Choose the subjects to display."
       },
       "change_credentials": {
         "title": "Change credentials",
