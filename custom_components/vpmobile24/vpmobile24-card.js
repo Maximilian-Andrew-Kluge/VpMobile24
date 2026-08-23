@@ -101,6 +101,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.25)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
       light_blue: {
         name: '🔵 Light Blue',
@@ -109,6 +110,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#1e3a8a,#1e40af)', tile_current_color: '#eff6ff',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
       light_green: {
         name: '🟢 Light Green',
@@ -117,6 +119,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
       light_purple: {
         name: '🟣 Light Purple',
@@ -125,6 +128,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#4c1d95,#5b21b6)', tile_current_color: '#faf5ff',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
       light_pink: {
         name: '🩷 Light Pink',
@@ -133,6 +137,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#831843,#9d174d)', tile_current_color: '#fdf2f8',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
       light_orange: {
         name: '🟠 Light Orange',
@@ -141,6 +146,7 @@ class VpMobile24Card extends HTMLElement {
         tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
         tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
         tile_current: 'linear-gradient(135deg,#7c2d12,#9a3412)', tile_current_color: '#fff7ed',
+        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
       },
     };
   }
@@ -1299,6 +1305,9 @@ ha-card {
   --vpm-tile-cancelled-color: ${th.tile_cancelled_color};
   --vpm-tile-current: ${th.tile_current};
   --vpm-tile-current-color: ${th.tile_current_color};
+  --vpm-text: ${th.text || '#e2e8f0'};
+  --vpm-text-muted: ${th.text_muted || '#64748b'};
+  --vpm-header-bg: ${th.header_bg || 'linear-gradient(180deg,rgba(37,99,235,0.12) 0%,rgba(15,23,41,0) 100%)'};
 }
 ha-card {
   background: var(--vpm-bg) !important;
@@ -1307,7 +1316,7 @@ ha-card {
   box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #e2e8f0 !important;
+  color: var(--vpm-text) !important;
 }
 
 /* ══ HEADER ══════════════════════════════════════════════════════════════ */
@@ -1315,9 +1324,16 @@ ha-card {
   display: ${showHeader ? 'flex' : 'none'};
   align-items: center; gap: 10px;
   padding: 13px 16px 10px;
-  background: linear-gradient(180deg, rgba(37,99,235,0.12) 0%, rgba(15,23,41,0) 100%);
+  background: var(--vpm-header-bg);
   border-bottom: 1px solid rgba(255,255,255,0.07);
   flex-wrap: wrap;
+}
+.vp-hdr-title {
+  font-size: 1.1em; font-weight: 800; color: var(--vpm-text);
+  letter-spacing: -0.2px; line-height: 1.2;
+}
+.vp-hdr-kw {
+  font-size: .7em; font-weight: 600; color: var(--vpm-text-muted);
 }
 .vp-hdr-icon {
   width: 40px; height: 40px; flex-shrink: 0;
@@ -1408,7 +1424,7 @@ ha-card {
 .vp-table th {
   padding: 7px 3px; text-align: center;
   font-size: 0.74em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .5px; color: #475569;
+  letter-spacing: .5px; color: var(--vpm-text-muted);
   border-bottom: 1px solid rgba(255,255,255,0.07);
   background: transparent; line-height: 1.3;
 }
