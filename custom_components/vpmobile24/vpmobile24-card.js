@@ -2026,7 +2026,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       holiday: { color:'#f59e0b', bg:'rgba(245,158,11,.13)', border:'rgba(245,158,11,.35)', icon:'🏖️', label: tc.holiday || 'Ferien' },
     };
     const effectiveType = isHoliday ? 'holiday' : s.type;
-    const th = themes[effectiveType] || themes.done;
+    const lessonTh = themes[effectiveType] || themes.done;
 
     // ── Main content ──────────────────────────────────────────────────────
     let mainHtml = '';
@@ -2059,7 +2059,7 @@ class VpMobile24CurrentCard extends HTMLElement {
       }
       if (showProg && s.progress !== undefined) {
         mainHtml += `<div class="vc-progress-wrap">
-          <div class="vc-progress-bar" style="width:${s.progress.toFixed(1)}%;background:${th.color}"></div>
+          <div class="vc-progress-bar" style="width:${s.progress.toFixed(1)}%;background:${lessonTh.color}"></div>
           <span class="vc-progress-pct">${Math.round(s.progress)}%</span>
         </div>`;
       }
@@ -2081,7 +2081,7 @@ class VpMobile24CurrentCard extends HTMLElement {
         // Estimate break start from current time - 5min as fallback
         const breakProg = s.remaining <= 20 ? this._progress(now - (20 - s.remaining), s.nextStart, now) : 0;
         mainHtml += `<div class="vc-progress-wrap">
-          <div class="vc-progress-bar" style="width:${breakProg.toFixed(1)}%;background:${th.color}"></div>
+          <div class="vc-progress-bar" style="width:${breakProg.toFixed(1)}%;background:${lessonTh.color}"></div>
         </div>`;
       }
     } else {
@@ -2119,11 +2119,11 @@ class VpMobile24CurrentCard extends HTMLElement {
 <style>
 :host { display: block; }
 ha-card {
-  background: ${th.bg} !important;
+  background: ${lessonTh.bg} !important;
   border-radius: 16px !important;
   overflow: hidden;
-  border: 1px solid ${th.border} !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 0 1px ${th.border} !important;
+  border: 1px solid ${lessonTh.border} !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 0 1px ${lessonTh.border} !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #e2e8f0 !important;
   transition: border-color .4s, box-shadow .4s;
@@ -2131,23 +2131,23 @@ ha-card {
 .vc-main {
   display: flex; align-items: center; gap: 14px;
   padding: 16px 18px 12px;
-  background: ${th.bg};
-  border-left: 4px solid ${th.color};
+  background: ${lessonTh.bg};
+  border-left: 4px solid ${lessonTh.color};
   min-height: 80px;
 }
 .vc-icon {
   font-size: 2em; flex-shrink: 0;
-  filter: drop-shadow(0 0 6px ${th.color}88);
+  filter: drop-shadow(0 0 6px ${lessonTh.color}88);
   animation: ${s.type === 'lesson' || s.type === 'sub' ? 'vc-pulse-icon 3s ease-in-out infinite' : 'none'};
 }
 @keyframes vc-pulse-icon {
-  0%,100% { filter: drop-shadow(0 0 4px ${th.color}88); }
-  50%      { filter: drop-shadow(0 0 12px ${th.color}cc); }
+  0%,100% { filter: drop-shadow(0 0 4px ${lessonTh.color}88); }
+  50%      { filter: drop-shadow(0 0 12px ${lessonTh.color}cc); }
 }
 .vc-body { flex: 1; min-width: 0; }
 .vc-label {
   font-size: .68em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .8px; color: ${th.color}; margin-bottom: 4px;
+  letter-spacing: .8px; color: ${lessonTh.color}; margin-bottom: 4px;
   display: flex; align-items: center; gap: 6px;
 }
 .vc-title-badge {
@@ -2171,7 +2171,7 @@ ha-card {
 .vc-countdown {
   font-size: .82em; color: #94a3b8; margin-top: 2px;
 }
-.vc-countdown strong { color: ${th.color}; }
+.vc-countdown strong { color: ${lessonTh.color}; }
 /* Progress bar */
 .vc-progress-wrap {
   margin-top: 10px; height: 5px;
@@ -2181,11 +2181,11 @@ ha-card {
 .vc-progress-bar {
   height: 100%; border-radius: 10px;
   transition: width .8s ease;
-  box-shadow: 0 0 8px ${th.color}88;
+  box-shadow: 0 0 8px ${lessonTh.color}88;
 }
 .vc-progress-pct {
   position: absolute; right: 0; top: -16px;
-  font-size: .65em; color: ${th.color}; font-weight: 700;
+  font-size: .65em; color: ${lessonTh.color}; font-weight: 700;
 }
 /* Next lesson */
 .vc-next {
@@ -2197,7 +2197,7 @@ ha-card {
 }
 .vc-next-label { font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
 .vc-next-fach  { font-weight: 700; color: #e2e8f0; }
-.vc-next-time  { color: ${th.color}; font-weight: 600; }
+.vc-next-time  { color: ${lessonTh.color}; font-weight: 600; }
 /* Day info */
 .vc-day {
   display: flex; gap: 6px; flex-wrap: wrap;
@@ -2207,10 +2207,10 @@ ha-card {
 </style>
 <ha-card>
   <div class="vc-main">
-    <div class="vc-icon">${th.icon}</div>
+    <div class="vc-icon">${lessonTh.icon}</div>
     <div class="vc-body">
       <div class="vc-label">
-        ${th.label}
+        ${lessonTh.label}
         <span class="vc-title-badge">${title}</span>
       </div>
       ${mainHtml}
