@@ -22,73 +22,59 @@ class VpMobile24Card extends HTMLElement {
     return {
       navy: {
         name: 'Navy Dark (Standard)',
-        bg: '#0f1729',
-        tile_bg: '#1a2a50',
-        tile_normal: 'rgba(34,197,94,.1)',
-        tile_normal_color: '#86efac',
-        tile_normal_border: 'rgba(34,197,94,.2)',
-        tile_sub: 'rgba(234,179,8,0.18)',
-        tile_sub_color: '#fde68a',
-        tile_cancelled: 'rgba(239,68,68,0.18)',
-        tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#14532d,#166534)',
-        tile_current_color: '#bbf7d0',
+        bg: '#0f1729', tile_bg: '#1a2a50',
+        tile_normal: 'rgba(34,197,94,.1)', tile_normal_color: '#86efac', tile_normal_border: 'rgba(34,197,94,.2)',
+        tile_sub: 'rgba(234,179,8,0.18)', tile_sub_color: '#fde68a',
+        tile_cancelled: 'rgba(239,68,68,0.18)', tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#bbf7d0',
       },
       dark: {
         name: 'Dark',
-        bg: '#111827',
-        tile_bg: '#1f2937',
-        tile_normal: 'rgba(34,197,94,.12)',
-        tile_normal_color: '#6ee7b7',
-        tile_normal_border: 'rgba(34,197,94,.25)',
-        tile_sub: 'rgba(251,191,36,.15)',
-        tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(248,113,113,.15)',
-        tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)',
-        tile_current_color: '#a7f3d0',
+        bg: '#111827', tile_bg: '#1f2937',
+        tile_normal: 'rgba(34,197,94,.12)', tile_normal_color: '#6ee7b7', tile_normal_border: 'rgba(34,197,94,.25)',
+        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(248,113,113,.15)', tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)', tile_current_color: '#a7f3d0',
       },
       blue: {
         name: 'Blue',
-        bg: '#0c1a2e',
-        tile_bg: '#1e3a5f',
-        tile_normal: 'rgba(59,130,246,.15)',
-        tile_normal_color: '#93c5fd',
-        tile_normal_border: 'rgba(59,130,246,.3)',
-        tile_sub: 'rgba(234,179,8,0.2)',
-        tile_sub_color: '#fde68a',
-        tile_cancelled: 'rgba(239,68,68,0.2)',
-        tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#1e40af,#1d4ed8)',
-        tile_current_color: '#bfdbfe',
+        bg: '#0c1a2e', tile_bg: '#1e3a5f',
+        tile_normal: 'rgba(59,130,246,.15)', tile_normal_color: '#93c5fd', tile_normal_border: 'rgba(59,130,246,.3)',
+        tile_sub: 'rgba(234,179,8,0.2)', tile_sub_color: '#fde68a',
+        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#1e40af,#1d4ed8)', tile_current_color: '#bfdbfe',
       },
       purple: {
         name: 'Purple',
-        bg: '#1a0a2e',
-        tile_bg: '#2d1b4e',
-        tile_normal: 'rgba(168,85,247,.15)',
-        tile_normal_color: '#d8b4fe',
-        tile_normal_border: 'rgba(168,85,247,.3)',
-        tile_sub: 'rgba(251,191,36,.15)',
-        tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)',
-        tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#5b21b6,#6d28d9)',
-        tile_current_color: '#e9d5ff',
+        bg: '#1a0a2e', tile_bg: '#2d1b4e',
+        tile_normal: 'rgba(168,85,247,.15)', tile_normal_color: '#d8b4fe', tile_normal_border: 'rgba(168,85,247,.3)',
+        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#5b21b6,#6d28d9)', tile_current_color: '#e9d5ff',
       },
       light: {
         name: 'Light',
-        bg: '#f1f5f9',
-        tile_bg: '#e2e8f0',
-        tile_normal: 'rgba(34,197,94,.15)',
-        tile_normal_color: '#166534',
-        tile_normal_border: 'rgba(34,197,94,.3)',
-        tile_sub: 'rgba(234,179,8,0.2)',
-        tile_sub_color: '#92400e',
-        tile_cancelled: 'rgba(239,68,68,0.15)',
-        tile_cancelled_color: '#991b1b',
-        tile_current: 'linear-gradient(135deg,#14532d,#166534)',
-        tile_current_color: '#f0fdf4',
+        bg: '#f1f5f9', tile_bg: '#e2e8f0',
+        tile_normal: 'rgba(34,197,94,.15)', tile_normal_color: '#166534', tile_normal_border: 'rgba(34,197,94,.3)',
+        tile_sub: 'rgba(234,179,8,0.2)', tile_sub_color: '#92400e',
+        tile_cancelled: 'rgba(239,68,68,0.15)', tile_cancelled_color: '#991b1b',
+        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
+      },
+      red: {
+        name: 'Red',
+        bg: '#1a0a0a', tile_bg: '#3b1212',
+        tile_normal: 'rgba(239,68,68,.15)', tile_normal_color: '#fca5a5', tile_normal_border: 'rgba(239,68,68,.3)',
+        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(239,68,68,0.35)', tile_cancelled_color: '#fee2e2',
+        tile_current: 'linear-gradient(135deg,#7f1d1d,#991b1b)', tile_current_color: '#fee2e2',
+      },
+      forest: {
+        name: 'Forest',
+        bg: '#071a0f', tile_bg: '#14361f',
+        tile_normal: 'rgba(34,197,94,.18)', tile_normal_color: '#86efac', tile_normal_border: 'rgba(34,197,94,.35)',
+        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
+        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
+        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)', tile_current_color: '#a7f3d0',
       },
     };
   }
@@ -267,6 +253,8 @@ class VpMobile24Card extends HTMLElement {
           { value: "blue",   label: "🔵 Blue" },
           { value: "purple", label: "🟣 Purple" },
           { value: "light",  label: "☀️ Light" },
+          { value: "red",    label: "🔴 Red" },
+          { value: "forest", label: "🌿 Forest" },
         ] } } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
@@ -1699,6 +1687,11 @@ class VpMobile24CurrentCard extends HTMLElement {
     this._timer  = null;
   }
 
+  _getTheme() {
+    const n = (this._config && this._config.theme) || 'navy';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+  }
+
   static getStubConfig() {
     return {
       entity:       'sensor.vpmobile24_aktueller_unterricht',
@@ -1721,6 +1714,15 @@ class VpMobile24CurrentCard extends HTMLElement {
         { name: 'next_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
         { name: 'week_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
         { name: 'title',       default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
+        { name: 'theme', default: 'navy', selector: { select: { options: [
+          { value: 'navy',   label: '🌑 Navy Dark (Standard)' },
+          { value: 'dark',   label: '⬛ Dark' },
+          { value: 'blue',   label: '🔵 Blue' },
+          { value: 'purple', label: '🟣 Purple' },
+          { value: 'light',  label: '☀️ Light' },
+          { value: 'red',    label: '🔴 Red' },
+          { value: 'forest', label: '🌿 Forest' },
+        ]}}},
         { name: 'show_progress',  default: true, selector: { boolean: {} } },
         { name: 'show_countdown', default: true, selector: { boolean: {} } },
         { name: 'show_next',      default: true, selector: { boolean: {} } },
@@ -1979,6 +1981,7 @@ class VpMobile24CurrentCard extends HTMLElement {
     const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
 
     const tc         = this._getT();
+    const th         = this._getTheme();
     const rawTitle   = this._config.title || '';
     const title      = (rawTitle === '' || rawTitle === 'Aktueller Unterricht' || rawTitle === 'Current Lesson' || rawTitle === 'Cours actuel')
       ? tc.currentLesson
@@ -2100,7 +2103,7 @@ class VpMobile24CurrentCard extends HTMLElement {
 <style>
 :host { display: block; }
 ha-card {
-  background: #0f1729 !important;
+  background: ${th.bg} !important;
   border-radius: 16px !important;
   overflow: hidden;
   border: 1px solid ${th.border} !important;
@@ -2236,6 +2239,11 @@ class VpMobile24MultiCard extends HTMLElement {
     });
   }
 
+  _getTheme() {
+    const n = (this._config && this._config.theme) || 'navy';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+  }
+
   // ── Config form ──────────────────────────────────────────────────────────
   static getStubConfig() {
     return {
@@ -2269,6 +2277,15 @@ class VpMobile24MultiCard extends HTMLElement {
         { name: 'default_expanded', default: true, selector: { boolean: {} } },
         { name: 'show_week_nav',    default: true, selector: { boolean: {} } },
         { name: 'show_legend',      default: true, selector: { boolean: {} } },
+        { name: 'theme', default: 'navy', selector: { select: { options: [
+          { value: 'navy',   label: '🌑 Navy Dark (Standard)' },
+          { value: 'dark',   label: '⬛ Dark' },
+          { value: 'blue',   label: '🔵 Blue' },
+          { value: 'purple', label: '🟣 Purple' },
+          { value: 'light',  label: '☀️ Light' },
+          { value: 'red',    label: '🔴 Red' },
+          { value: 'forest', label: '🌿 Forest' },
+        ]}}},
       ],
       computeLabel: (s) => ({
         title:            'Kartentitel',
@@ -2542,6 +2559,7 @@ class VpMobile24MultiCard extends HTMLElement {
   // ── Main render ───────────────────────────────────────────────────────────
   _render() {
     if (!this._hass || !this._config) return;
+    const mcTh = this._getTheme();
 
     const entities      = this._sortedEntities(this._config.entities);
     const title         = this._config.title || 'Stundenplan Übersicht';
@@ -2758,7 +2776,7 @@ class VpMobile24MultiCard extends HTMLElement {
 <style>
 :host { display: block; }
 ha-card {
-  background: #0f1729 !important;
+  background: ${mcTh.bg} !important;
   border-radius: 16px !important;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.08) !important;
@@ -2830,7 +2848,7 @@ ha-card {
 }
 /* ── SECTION ── */
 .mc-section {
-  background: rgba(255,255,255,.03);
+  background: color-mix(in srgb, ${mcTh.tile_bg} 40%, transparent);
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 12px; overflow: hidden;
 }
