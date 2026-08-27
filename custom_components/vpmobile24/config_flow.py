@@ -443,6 +443,77 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             }),
         )
 
+    async def async_step_reauth(
+        self,
+        entry_data: dict[str, Any],
+    ) -> FlowResult:
+        """Handle re-authentication when credentials become invalid."""
+        self._config_data = dict(entry_data)
+        return await self.async_step_reauth_confirm()
+
+    async def async_step_reauth_confirm(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Confirm new credentials for re-authentication."""
+        errors: dict[str, str] = {}
+
+        if user_input is not None:
+            new_password = user_input[CONF_PASSWORD]
+            school_id = self._config_data[CONF_SCHOOL_ID]
+            username = self._config_data[CONF_USERNAME]
+            server_key = self._config_data.get(CONF_SERVER, "www")
+            base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
+
+            api = Stundenplan24API(
+                school_id=school_id,
+                username=username,
+                password=new_password,
+                base_url=base_url,
+            )
+            try:
+                connection_ok = await api.async_test_connection()
+                if not connection_ok:
+                    errors["base"] = "invalid_auth"
+                else:
+                    # Update the config entry with the new password
+                    existing_entry = await self.async_set_unique_id(
+                        self._config_data.get("_unique_id")
+                        or self.context.get("unique_id")
+                        or f"{school_id}_{self._config_data.get(CONF_CLASS_NAME, self._config_data.get(CONF_TEACHER_SHORT, ''))}"
+                    )
+                    new_data = dict(self._config_data)
+                    new_data[CONF_PASSWORD] = new_password
+                    # Also update server in case of fallback
+                    new_data[CONF_SERVER] = next(
+                        (k for k, v in DOWNLOAD_SERVERS.items() if v == api.base_url),
+                        server_key,
+                    )
+                    self.hass.config_entries.async_update_entry(
+                        self.hass.config_entries.async_get_entry(
+                            self.context["entry_id"]
+                        ),
+                        data=new_data,
+                    )
+                    await self.hass.config_entries.async_reload(self.context["entry_id"])
+                    return self.async_abort(reason="reauth_successful")
+            except Exception:
+                _LOGGER.exception("Unexpected exception during reauth")
+                errors["base"] = "unknown"
+            finally:
+                await api.async_close()
+
+        return self.async_show_form(
+            step_id="reauth_confirm",
+            data_schema=vol.Schema({
+                vol.Required(CONF_PASSWORD): str,
+            }),
+            errors=errors,
+            description_placeholders={
+                "school_id": self._config_data.get(CONF_SCHOOL_ID, ""),
+            },
+        )
+
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Options flow — change class and/or excluded subjects after initial setup."""

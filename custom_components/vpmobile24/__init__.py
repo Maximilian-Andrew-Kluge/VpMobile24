@@ -12,9 +12,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
+from homeassistant.exceptions import ConfigEntryAuthFailed
 
 from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE
-from .api_new import Stundenplan24API
+from .api_new import Stundenplan24API, Stundenplan24AuthError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.7.1"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.7.2"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -198,7 +199,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.7.1",
+        sw_version="2.5.7.2",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart
@@ -633,6 +634,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
             return today_data
 
+        except Stundenplan24AuthError as auth_err:
+            _LOGGER.error("VpMobile24: Authentication failed — credentials may have changed: %s", auth_err)
+            raise ConfigEntryAuthFailed(
+                "Authentication failed. Please update your password."
+            ) from auth_err
         except Exception as e:
             _LOGGER.error(f"Error updating data: {e}")
             from datetime import date

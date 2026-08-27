@@ -66,6 +66,13 @@
         "data": {
           "state_code": "Federal state"
         }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate VpMobile24",
+        "description": "The password for school **{school_id}** is no longer valid. Please enter the new password.",
+        "data": {
+          "password": "New password"
+        }
       }
     },
     "error": {
@@ -74,7 +81,8 @@
       "unknown": "An unknown error occurred."
     },
     "abort": {
-      "already_configured": "This class is already configured for this school."
+      "already_configured": "This class is already configured for this school.",
+      "reauth_successful": "Password updated successfully. The integration will reconnect automatically."
     }
   },
   "options": {

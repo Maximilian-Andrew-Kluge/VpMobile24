@@ -13,6 +13,10 @@ from aiohttp import BasicAuth
 _LOGGER = logging.getLogger(__name__)
 
 
+class Stundenplan24AuthError(Exception):
+    """Raised when the API returns 401/403 (invalid credentials)."""
+
+
 class Stundenplan24API:
     """API client for stundenplan24.de."""
 
@@ -126,43 +130,101 @@ class Stundenplan24API:
             raise
 
     async def async_get_teachers(self) -> list[str]:
-        """Get list of all teacher abbreviations from today's schedule XML.
+        """Get list of all teacher abbreviations.
 
-        Scans all classes in the current day's plan and collects unique teacher
-        abbreviations from <Le> elements. Falls back to next/prev days if today
-        has no data (weekend, holiday).
+        Strategy:
+        1. Try daily schedule XMLs (PlanKl{date}.xml) with parallel batch
+           requests (5 at a time) over a ±30 day window.
+        2. If no schedule XML has data (e.g. school year transition / holidays),
+           fall back to Klassen.xml which contains teacher abbreviations inside
+           <Unterricht><UeNr>/<UeFa>/<UeLe> blocks for each class.
         """
         try:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
             teachers: set[str] = set()
 
-            # Try today ± a few days to get a day with actual data
+            # Build candidate dates: today ± 30 days
             today = date.today()
-            candidates = [today + timedelta(days=i) for i in range(0, 7)] + \
-                         [today - timedelta(days=i) for i in range(1, 4)]
+            candidates = [today + timedelta(days=i) for i in range(0, 30)] + \
+                         [today - timedelta(days=i) for i in range(1, 31)]
 
-            for check_date in candidates:
-                date_str = check_date.strftime("%Y%m%d")
-                xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
-                try:
-                    async with session.get(xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
-                        if response.status != 200:
-                            continue
-                        xml_content = await response.text()
-                        root = ET.fromstring(xml_content)
-                        for le in root.findall(".//Le"):
-                            if le.text and le.text.strip():
-                                teachers.add(le.text.strip())
-                        if teachers:
-                            break  # found data — stop searching
-                except Exception:
-                    continue
+            # Fetch in parallel batches of 5
+            batch_size = 5
+            for i in range(0, len(candidates), batch_size):
+                batch = candidates[i:i + batch_size]
+                results = await asyncio.gather(
+                    *(self._fetch_teachers_for_date(session, auth, d) for d in batch),
+                    return_exceptions=True,
+                )
+                for result in results:
+                    if isinstance(result, set):
+                        teachers.update(result)
+                if teachers:
+                    break  # found data — stop searching
+
+            # Fallback: extract teachers from Klassen.xml if no schedule was found
+            if not teachers:
+                teachers = await self._async_get_teachers_from_klassen(session, auth)
 
             return sorted(teachers)
         except Exception as ex:
             _LOGGER.error("Error fetching teachers: %s", ex)
             return []
+
+    async def _fetch_teachers_for_date(
+        self,
+        session: aiohttp.ClientSession,
+        auth: BasicAuth,
+        check_date: date,
+    ) -> set[str]:
+        """Fetch teacher abbreviations from a single date's schedule XML."""
+        teachers: set[str] = set()
+        date_str = check_date.strftime("%Y%m%d")
+        xml_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/PlanKl{date_str}.xml"
+        try:
+            async with session.get(xml_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                if response.status != 200:
+                    return teachers
+                xml_content = await response.text()
+                root = ET.fromstring(xml_content)
+                for le in root.findall(".//Le"):
+                    if le.text and le.text.strip():
+                        teachers.add(le.text.strip())
+        except Exception:
+            pass
+        return teachers
+
+    async def _async_get_teachers_from_klassen(
+        self,
+        session: aiohttp.ClientSession,
+        auth: BasicAuth,
+    ) -> set[str]:
+        """Fallback: extract teacher abbreviations from Klassen.xml.
+
+        Klassen.xml contains <Unterricht> blocks per class with <UeLe> elements
+        holding teacher abbreviations. This file is always available, even when
+        no daily schedule XMLs exist (e.g. during school year transitions).
+        """
+        teachers: set[str] = set()
+        try:
+            classes_url = f"{self.base_url}/{self.school_id}/mobil/mobdaten/Klassen.xml"
+            async with session.get(classes_url, auth=auth, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                if response.status != 200:
+                    return teachers
+                xml_content = await response.text()
+                root = ET.fromstring(xml_content)
+                # <UeLe> elements contain teacher abbreviations
+                for ue_le in root.findall(".//UeLe"):
+                    if ue_le.text and ue_le.text.strip():
+                        teachers.add(ue_le.text.strip())
+                # Also check <Le> elements directly (some schemas use this)
+                for le in root.findall(".//Le"):
+                    if le.text and le.text.strip():
+                        teachers.add(le.text.strip())
+        except Exception as ex:
+            _LOGGER.debug("Fallback teacher fetch from Klassen.xml failed: %s", ex)
+        return teachers
 
     async def async_get_schedule(
         self,
@@ -185,6 +247,10 @@ class Stundenplan24API:
                 if response.status == 200:
                     xml_content = await response.text()
                     return self._parse_xml_schedule(xml_content, target_date, class_name, teacher_short)
+                if response.status in (401, 403):
+                    raise Stundenplan24AuthError(
+                        f"Authentication failed (HTTP {response.status}) for {target_date}"
+                    )
                 raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
 
         except Exception as ex:

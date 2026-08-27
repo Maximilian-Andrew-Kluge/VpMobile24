@@ -49,6 +49,13 @@
         "data": {
           "state_code": "Land"
         }
+      },
+      "reauth_confirm": {
+        "title": "Ré-authentification VpMobile24",
+        "description": "Le mot de passe pour l'école **{school_id}** n'est plus valide. Veuillez entrer le nouveau mot de passe.",
+        "data": {
+          "password": "Nouveau mot de passe"
+        }
       }
     },
     "error": {
@@ -57,7 +64,8 @@
       "unknown": "Une erreur inconnue s'est produite."
     },
     "abort": {
-      "already_configured": "Cette classe est déjà configurée."
+      "already_configured": "Cette classe est déjà configurée.",
+      "reauth_successful": "Mot de passe mis à jour. L'intégration se reconnectera automatiquement."
     }
   },
   "options": {

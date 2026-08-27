@@ -66,6 +66,13 @@
         "data": {
           "state_code": "Bundesland"
         }
+      },
+      "reauth_confirm": {
+        "title": "VpMobile24 erneut anmelden",
+        "description": "Das Passwort für Schule **{school_id}** ist nicht mehr gültig. Bitte gib das neue Passwort ein.",
+        "data": {
+          "password": "Neues Passwort"
+        }
       }
     },
     "error": {
@@ -74,7 +81,8 @@
       "unknown": "Ein unbekannter Fehler ist aufgetreten."
     },
     "abort": {
-      "already_configured": "Diese Klasse ist bereits eingerichtet."
+      "already_configured": "Diese Klasse ist bereits eingerichtet.",
+      "reauth_successful": "Passwort aktualisiert. Die Integration verbindet sich automatisch neu."
     }
   },
   "options": {
