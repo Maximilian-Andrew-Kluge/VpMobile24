@@ -24,7 +24,7 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.7.2"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.8"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -199,7 +199,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.7.2",
+        sw_version="2.5.8",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart
@@ -354,6 +354,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         self._week_data_cache[d]["changes"].append(lesson)
                     else:
                         self._week_data_cache[d]["lessons"].append(lesson)
+                # Per-day additional info (Tagesinfos) for the daily info row
+                for d, info in (data.get("week_additional_info", {}) or {}).items():
+                    if d not in self._week_data_cache:
+                        self._week_data_cache[d] = {"lessons": [], "changes": [], "additional_info": [], "timestamp": data.get("timestamp", "")}
+                    self._week_data_cache[d]["additional_info"].append(info)
                 return data
 
             from datetime import date

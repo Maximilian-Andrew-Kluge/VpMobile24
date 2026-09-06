@@ -20,7 +20,7 @@ _DAYS_DE = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"]
 
 def _lesson(period: int, subject: str, teacher: str, room: str, cls: str,
             is_change: bool = False, info: str = "", cancelled: bool = False,
-            target_date: date | None = None) -> dict[str, Any]:
+            target_date: date | None = None, supervision: bool = False) -> dict[str, Any]:
     t_start, t_end = _TIMES.get(period, ("", ""))
     return {
         "class": cls,
@@ -34,6 +34,7 @@ def _lesson(period: int, subject: str, teacher: str, room: str, cls: str,
         "course": "",
         "info": info,
         "is_change": is_change or cancelled,
+        "is_supervision": supervision,
         "nr": str(period),
         "date": (target_date or date.today()).isoformat(),
         "day_name": _DAYS_DE[target_date.weekday()] if target_date else "",
@@ -135,6 +136,12 @@ def get_demo_data_student(class_name: str = "10b") -> dict[str, Any]:
             {"text": "🎭 Demo-Modus aktiv – keine echten Schuldaten", "type": "general_info"},
             {"text": "Elternsprechtag am 15.09. von 15–18 Uhr", "type": "general_info"},
         ],
+        # Tagesinfos pro Datum (für die Tagesinfo-Zeile in der Wochentabelle)
+        "week_additional_info": {
+            monday.isoformat():                {"text": "Elternsprechtag 15.09."},
+            (monday+timedelta(1)).isoformat(): {"text": "Vertretungsplan beachten"},
+            (monday+timedelta(3)).isoformat(): {"text": "Klassenfoto 2. Stunde"},
+        },
         "last_updated": datetime.now().isoformat(),
         "timestamp": datetime.now().strftime("%d.%m.%Y %H:%M"),
         "classes": [class_name],
@@ -154,7 +161,8 @@ def get_demo_data_teacher(teacher_short: str = "DEM") -> dict[str, Any]:
     if today.weekday() < 5:
         lessons = [
             _lesson(2, "Musik",  teacher_short, "Musikraum", "8a",  target_date=today),
-            _lesson(3, "Musik",  teacher_short, "Musikraum", "9b",  target_date=today),
+            _lesson(3, "Aufsicht", teacher_short, "Pausenhof", "",
+                    supervision=True, info="Pausenaufsicht Hof", target_date=today),
             _lesson(5, "Musik",  teacher_short, "Musikraum", "10b", target_date=today),
             _lesson(7, "Chor",   teacher_short, "Aula",      "AG",  target_date=today),
         ]
@@ -166,17 +174,25 @@ def get_demo_data_teacher(teacher_short: str = "DEM") -> dict[str, Any]:
 
     week_lessons = []
     week_changes = []
+    # (class, subject, period, is_supervision)
     classes_by_day = {
-        0: [("8a","Musik",2),("9b","Musik",4),("10b","Musik",6)],
-        1: [("7a","Musik",1),("8b","Musik",3),("AG","Chor",7)],
-        2: [("8a","Musik",2),("9b","Musik",4),("10b","Musik",5)],
-        3: [("7b","Musik",2),("9a","Musik",5)],
-        4: [("8b","Musik",1),("10a","Musik",3),("AG","Chor",6)],
+        0: [("8a","Musik",2,False),("9b","Musik",4,False),("10b","Musik",6,False),
+            ("","Aufsicht",3,True)],
+        1: [("7a","Musik",1,False),("8b","Musik",3,False),("AG","Chor",7,False)],
+        2: [("8a","Musik",2,False),("9b","Musik",4,False),("10b","Musik",5,False),
+            ("","Aufsicht",1,True)],
+        3: [("7b","Musik",2,False),("9a","Musik",5,False)],
+        4: [("8b","Musik",1,False),("10a","Musik",3,False),("AG","Chor",6,False)],
     }
     for wd, entries in classes_by_day.items():
         d = monday + timedelta(days=wd)
-        for cls, subj, period in entries:
-            week_lessons.append(_lesson(period, subj, teacher_short, "Musikraum", cls, target_date=d))
+        for cls, subj, period, is_sup in entries:
+            room = "Pausenhof" if is_sup else "Musikraum"
+            info = "Pausenaufsicht Hof" if is_sup else ""
+            week_lessons.append(
+                _lesson(period, subj, teacher_short, room, cls,
+                        supervision=is_sup, info=info, target_date=d)
+            )
 
     # Eine Vertretung am Donnerstag
     week_changes.append(
@@ -195,8 +211,14 @@ def get_demo_data_teacher(teacher_short: str = "DEM") -> dict[str, Any]:
             {"text": "🎭 Demo-Modus aktiv – keine echten Schuldaten", "type": "general_info"},
             {"text": f"Lehrer-Demo: {teacher_short} | Fach: Musik", "type": "general_info"},
         ],
+        # Tagesinfos pro Datum (für die Tagesinfo-Zeile in der Wochentabelle)
+        "week_additional_info": {
+            monday.isoformat():                {"text": "Konferenz 14:00 im Lehrerzimmer"},
+            (monday+timedelta(2)).isoformat(): {"text": "Notenschluss heute"},
+            (monday+timedelta(4)).isoformat(): {"text": "Wandertag – Unterricht nach Plan"},
+        },
         "last_updated": datetime.now().isoformat(),
         "timestamp": datetime.now().strftime("%d.%m.%Y %H:%M"),
-        "classes": list({e[0] for entries in classes_by_day.values() for e in entries}),
+        "classes": list({e[0] for entries in classes_by_day.values() for e in entries if e[0]}),
         "is_demo": True,
     }

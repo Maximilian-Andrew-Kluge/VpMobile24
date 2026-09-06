@@ -187,6 +187,7 @@ class VpMobile24NextLessonSensor(CoordinatorEntity, SensorEntity):
             "klasse": lesson.get("class", ""),
             "zusatzinfo": lesson.get("info", ""),
             "ist_vertretung": lesson.get("is_change", False),
+            "ist_aufsicht": lesson.get("is_supervision", False),
         }
         if countdown_min is not None:
             attrs["countdown_minuten"] = countdown_min
@@ -511,6 +512,7 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                         "datum": date_str,
                         "klasse": lesson.get("class", ""),
                         "ist_vertretung": lesson.get("is_change", False),
+                        "ist_aufsicht": lesson.get("is_supervision", False),
                         "zusatzinfo": lesson.get("info", ""),
                     }
             except (ValueError, TypeError):
@@ -820,6 +822,7 @@ class VpMobile24CurrentLessonSensor(CoordinatorEntity, SensorEntity):
             "klasse": lesson.get("class", ""),
             "ist_ausfall": is_cancelled,
             "ist_vertretung": lesson.get("is_change", False) and not is_cancelled,
+            "ist_aufsicht": lesson.get("is_supervision", False),
             "zusatzinfo": lesson.get("info", ""),
             "datum": lesson.get("date", ""),
         }

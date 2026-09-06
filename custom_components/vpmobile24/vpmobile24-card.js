@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.5.7.2
-console.info('%c VpMobile24-CARD %c v2.5.7.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.5.8
+console.info('%c VpMobile24-CARD %c v2.5.8 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -172,6 +172,7 @@ class VpMobile24Card extends HTMLElement {
     if (act === 'cur-week')    { this._switchWeek(0); return; }
     if (act === 'reload')      { this._handleReload();  return; }
     if (act === 'info')        { this._showInfoPopup();  return; }
+    if (act === 'day-info')    { this._showInfoPopup(btn.dataset.vpmDaykey); return; }
     if (act === 'mob-day')     { this._switchMobDay(Number(btn.dataset.vpmDay)); return; }
     if (act === 'lesson') {
       try {
@@ -440,6 +441,13 @@ class VpMobile24Card extends HTMLElement {
   }
   get hass() { return this._hass; }
   getCardSize() { return 6; }
+  // Enable resizing in HA's section (grid) view
+  getGridOptions() {
+    return { rows: 6, columns: 12, min_rows: 3, min_columns: 6 };
+  }
+  static getGridOptions() {
+    return { rows: 6, columns: 12, min_rows: 3, min_columns: 6 };
+  }
 
   _handleReload() {
     const r = this._config.reload_entity || (this._config.sensors && this._config.sensors.reload_entity);
@@ -453,10 +461,12 @@ class VpMobile24Card extends HTMLElement {
     this._hass.callService('button', 'press', { entity_id: r });
   }
 
-  _showInfoPopup() {
+  _showInfoPopup(dayKey) {
     const e = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
     if (!e) return;
     if ((this._weekOffset || 0) !== 0) return;
+    // Remember which day was clicked (undefined = today, the default button)
+    this._infoPopupDay = dayKey || null;
     this._infoPopupOpen = true;
     this._renderInfoPopupContent();
   }
@@ -470,7 +480,12 @@ class VpMobile24Card extends HTMLElement {
     const wdNamesEN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const wdNamesFR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
     const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
-    const todayName = haLang === 'en' ? wdNamesEN[todayIdx] : haLang === 'fr' ? wdNamesFR[todayIdx] : wdNames[todayIdx];
+
+    // Which day are we showing? A clicked day-badge overrides "today".
+    const selectedKey = this._infoPopupDay || todayKey;
+    const dayIdxMap = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
+    const selIdx = dayIdxMap[selectedKey] !== undefined ? dayIdxMap[selectedKey] : todayIdx;
+    const selName = haLang === 'en' ? wdNamesEN[selIdx] : haLang === 'fr' ? wdNamesFR[selIdx] : wdNames[selIdx];
 
     const infoEntId = this._config.additional_info_entity || (this._config.sensors && this._config.sensors.additional_info_entity);
     const ent = (this._hass && infoEntId) ? this._hass.states[infoEntId] : null;
@@ -483,22 +498,37 @@ class VpMobile24Card extends HTMLElement {
       return [];
     };
 
-    let allg = [];
     const wi = attr.week_infos;
-    if (wi && wi[todayKey]) allg = toArr(wi[todayKey].allgemeine_infos);
-    if (allg.length === 0)  allg = toArr(attr.allgemeine_infos);
+    let allg = [];
+    let stund = [];
+    if (wi && wi[selectedKey]) {
+      allg  = toArr(wi[selectedKey].allgemeine_infos);
+      stund = toArr(wi[selectedKey].stunden_infos);
+    }
+    // Fallback to today's top-level attrs only when showing today
+    if (allg.length === 0 && selectedKey === todayKey)  allg  = toArr(attr.allgemeine_infos);
+    if (stund.length === 0 && selectedKey === todayKey) stund = toArr(attr.stunden_infos);
 
     let bodyHtml = '';
+    // Day heading so the user knows which day the infos belong to
+    bodyHtml += `<div class="vp-info-day-head">${selName}</div>`;
     if (allg.length > 0) {
-      bodyHtml = `<div class="vp-info-section">
+      bodyHtml += `<div class="vp-info-section">
         <div class="vp-info-section-label">${t.genInfo || '📢 Allgemeine Informationen'}</div>
         ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
       </div>`;
-    } else {
-      const noInfoMsg = haLang === 'en' ? `No additional info for ${todayName} available.`
-                      : haLang === 'fr' ? `Aucune info pour ${todayName}.`
-                      : `Keine Zusatzinformationen für ${todayName} verfügbar.`;
-      bodyHtml = `<div class="vp-info-none">${noInfoMsg}</div>`;
+    }
+    if (stund.length > 0) {
+      bodyHtml += `<div class="vp-info-section">
+        <div class="vp-info-section-label">${t.lessonInfo || '📋 Stunden-Informationen'}</div>
+        ${stund.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
+      </div>`;
+    }
+    if (allg.length === 0 && stund.length === 0) {
+      const noInfoMsg = haLang === 'en' ? `No additional info for ${selName} available.`
+                      : haLang === 'fr' ? `Aucune info pour ${selName}.`
+                      : `Keine Zusatzinformationen für ${selName} verfügbar.`;
+      bodyHtml += `<div class="vp-info-none">${noInfoMsg}</div>`;
     }
 
     let overlay = this.shadowRoot.getElementById('info-popup-overlay');
@@ -529,6 +559,7 @@ class VpMobile24Card extends HTMLElement {
 
   _closeInfoPopup() {
     this._infoPopupOpen = false;
+    this._infoPopupDay = null;
     const p = this.shadowRoot.getElementById('info-popup');
     const o = this.shadowRoot.getElementById('info-popup-overlay');
     if (p) p.classList.add('hidden');
@@ -1101,6 +1132,47 @@ ha-card {
     });
     tableHtml += '</tr></thead><tbody>';
 
+    // ── Per-day info row (Tagesinfos) ──────────────────────────────────
+    // Pull daily general infos (from ZusatzInfo/ZiZeile) for each weekday
+    // from the additional_info_entity and show them under the header.
+    const dayInfoMap = {};
+    let anyDayInfo = false;
+    if (additionalInfoEntity) {
+      const infoEntForDays = this._hass.states[additionalInfoEntity];
+      const weekInfos = (infoEntForDays && infoEntForDays.attributes && infoEntForDays.attributes.week_infos) || {};
+      dayKeys.forEach((dk, i) => {
+        const di = weekInfos[dk];
+        let infos = [];
+        if (di && Array.isArray(di.allgemeine_infos)) infos = di.allgemeine_infos.filter(Boolean);
+        // Only show current-week infos (weekOffset 0); other weeks have no data
+        if (weekOffset !== 0) infos = [];
+        dayInfoMap[i] = infos;
+        if (infos.length) anyDayInfo = true;
+      });
+    }
+    if (anyDayInfo) {
+      tableHtml += '<tr class="vp-dayinfo-tr"><td class="vp-td-num vp-dayinfo-num" title="' + (t.infoTitle || 'Tagesinfos').replace(/"/g,'&quot;') + '">ⓘ</td>';
+      days.forEach((d, di) => {
+        const infos = dayInfoMap[di] || [];
+        const isToday = di === todayIdx;
+        if (infos.length) {
+          const joined = infos.join(' · ');
+          const safeTitle = joined.replace(/"/g, '&quot;');
+          const safeText = joined.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          const dayKey = dayKeys[di];
+          // Compact badge: fixed-size pill that never widens the column.
+          // Hover shows a custom tooltip; click opens the info popup for that day.
+          tableHtml += '<td class="vp-dayinfo-td ' + (isToday ? 'vp-today-col' : '') + '">'
+            + '<div class="vp-dayinfo-cell" data-vpm="day-info" data-vpm-daykey="' + dayKey + '" data-vpm-tip="' + safeTitle + '">'
+            + '<span class="vp-dayinfo-ico">📌</span><span class="vp-dayinfo-txt">' + safeText + '</span>'
+            + '<span class="vp-dayinfo-tooltip">' + safeText + '</span></div></td>';
+        } else {
+          tableHtml += '<td class="vp-dayinfo-td ' + (isToday ? 'vp-today-col' : '') + '"></td>';
+        }
+      });
+      tableHtml += '</tr>';
+    }
+
     slots.forEach(slot => {
       if (slot.isPause) {
         tableHtml += '<tr class="vp-pause-tr"><td colspan="6"><div class="vp-pause-cell">' + t.pause + ' ' + slot.time + '</div></td></tr>';
@@ -1133,7 +1205,9 @@ ha-card {
               : lesson.fach;
             text = fachSpan2 + klasseLabel2 + raumLabel2;
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
+            const isSupervision = !!(lesson && lesson.ist_aufsicht);
             if (isCurrent)       cls += ' vp-current';
+            else if (isSupervision) cls += ' vp-supervision';
             else if (isVertretung) cls += ' vp-sub';
             else                   cls += ' vp-normal';
             if (isTeacherModeRender) cls += ' vp-teacher-tile';
@@ -1507,6 +1581,50 @@ ha-card {
 .vp-tile.vp-normal     { background: var(--vpm-tile-normal); color: var(--vpm-tile-normal-color); border: 1px solid var(--vpm-tile-normal-border); }
 .vp-tile.vp-today-tile { background: #1e3a6e; color: #bfdbfe; }
 .vp-tile.vp-sub        { background: var(--vpm-tile-sub) !important; color: var(--vpm-tile-sub-color) !important; border: 1px solid rgba(234,179,8,0.3); font-weight: 700; }
+.vp-tile.vp-supervision { background: rgba(139,92,246,0.18) !important; color: #c4b5fd !important; border: 1px solid rgba(139,92,246,0.4); font-weight: 700; }
+.vp-dayinfo-tr td { padding: 3px 4px; vertical-align: middle; }
+.vp-dayinfo-num { color: #93c5fd; text-align: center; font-size: 14px; }
+/* The td is a positioning context with a fixed height; the info pill is
+   absolutely positioned inside it so its text can NEVER widen the column. */
+.vp-dayinfo-td { position: relative; height: 26px; padding: 3px 4px; }
+.vp-dayinfo-cell {
+  position: absolute; inset: 3px 4px;
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(59,130,246,0.14); color: #bfdbfe;
+  border: 1px solid rgba(59,130,246,0.32); border-radius: 6px;
+  padding: 0 6px; font-size: 10.5px; line-height: 1.2;
+  cursor: pointer; overflow: visible;
+  transition: background .15s ease, border-color .15s ease;
+}
+.vp-dayinfo-cell:hover { background: rgba(59,130,246,0.28); border-color: rgba(59,130,246,0.6); }
+.vp-dayinfo-ico { flex: 0 0 auto; font-size: 11px; }
+.vp-dayinfo-txt {
+  flex: 1 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Custom hover tooltip — shows the full info text on hover */
+.vp-dayinfo-tooltip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  z-index: 50; min-width: 120px; max-width: 240px; width: max-content;
+  background: #0f1729; color: #e2e8f0;
+  border: 1px solid rgba(59,130,246,0.5); border-radius: 8px;
+  padding: 7px 10px; font-size: 11px; line-height: 1.35;
+  white-space: normal; text-align: left;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .15s ease;
+}
+.vp-dayinfo-tooltip::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent; border-top-color: #0f1729;
+}
+.vp-dayinfo-cell:hover .vp-dayinfo-tooltip { opacity: 1; visibility: visible; }
+/* Day heading inside the info popup */
+.vp-info-day-head {
+  font-size: 13px; font-weight: 700; color: #93c5fd;
+  margin: 0 0 8px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(148,163,184,0.2);
+}
 .vp-tile.vp-cancelled  { background: var(--vpm-tile-cancelled) !important; color: var(--vpm-tile-cancelled-color) !important; border: 1px solid rgba(239,68,68,0.3); font-weight: 700; }
 .vp-today-col .vp-tile.vp-normal  { background: var(--vpm-tile-normal); border-color: var(--vpm-tile-normal-border); }
 .vp-today-col .vp-tile.vp-cancelled { background: rgba(239,68,68,0.25) !important; box-shadow: 0 0 0 1px rgba(239,68,68,0.4); }
@@ -1861,6 +1979,13 @@ class VpMobile24CurrentCard extends HTMLElement {
   }
 
   getCardSize() { return 3; }
+  // Enable resizing in HA's section (grid) view
+  getGridOptions() {
+    return { rows: 3, columns: 12, min_rows: 2, min_columns: 4 };
+  }
+  static getGridOptions() {
+    return { rows: 3, columns: 12, min_rows: 2, min_columns: 4 };
+  }
 
   // ── Time helpers ─────────────────────────────────────────────────────────
   _parseMins(str) {
@@ -2409,6 +2534,13 @@ class VpMobile24MultiCard extends HTMLElement {
 
   get hass() { return this._hass; }
   getCardSize() { return 5; }
+  // Enable resizing in HA's section (grid) view
+  getGridOptions() {
+    return { rows: 5, columns: 12, min_rows: 3, min_columns: 6 };
+  }
+  static getGridOptions() {
+    return { rows: 5, columns: 12, min_rows: 3, min_columns: 6 };
+  }
 
   // ── Collapse state (localStorage) ────────────────────────────────────────
   _storeKey() { return 'vpm24_multi_collapsed_' + (this._config.title || 'default'); }
@@ -2459,9 +2591,31 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _className(entity, entityId) {
-    return (entity.attributes && entity.attributes.class)
-      || entityId.replace(/sensor\.vpmobile24_week_table_?/i, '').replace(/_/g,' ').trim()
-      || entityId;
+    // 1) Prefer the clean class attribute from the sensor (e.g. "5a")
+    const attrs = entity.attributes || {};
+    if (attrs.class) return attrs.class;
+    // 2) Teacher mode: show the teacher abbreviation if present
+    if (attrs.teacher_short) return attrs.teacher_short;
+    if (attrs.lehrer) return attrs.lehrer;
+    // 3) Fall back to a cleaned friendly_name, stripping the "VpMobile24 – " prefix
+    //    and the "(schoolid)" suffix so we don't show the full entity name.
+    const fn = attrs.friendly_name || '';
+    if (fn) {
+      const cleaned = fn
+        .replace(/^VpMobile24\s*[–-]\s*/i, '')
+        .replace(/\s*\([^)]*\)\s*$/, '')
+        .replace(/\b(week[_\s]?table|wochentabelle|wochenstundenplan)\b/i, '')
+        .trim();
+      if (cleaned) return cleaned;
+    }
+    // 4) Last resort: derive from the entity_id, stripping all known suffixes
+    const derived = entityId
+      .replace(/^sensor\./i, '')
+      .replace(/vpmobile24_?/i, '')
+      .replace(/_?(week_table|wochentabelle|wochenstundenplan)$/i, '')
+      .replace(/_/g, ' ')
+      .trim();
+    return derived || entityId;
   }
 
   _getWeekTable(entity) {
@@ -3088,4 +3242,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.5.7.2 loaded');
+console.log('✅ VpMobile24 Card v2.5.8 loaded');

@@ -367,6 +367,7 @@ class Stundenplan24API:
                 "course": "",
                 "info": "",
                 "is_change": False,
+                "is_supervision": False,
                 "nr": "",
             }
 
@@ -411,6 +412,24 @@ class Stundenplan24API:
             if info is not None and info.text:
                 lesson["info"] = info.text
                 lesson["is_change"] = True
+
+            # ── Detect break supervisions (Pausenaufsichten) ──────────────
+            # stundenplan24 encodes supervisions in the subject or info field
+            # with keywords like "Aufsicht" / "Pausenaufsicht" (sometimes the
+            # short "AU"). These are especially relevant in teacher mode.
+            supervision_terms = ("aufsicht", "pausenaufsicht")
+            subject_l = (lesson["subject"] or "").strip().lower()
+            info_l = (lesson["info"] or "").strip().lower()
+            if (
+                any(term in subject_l for term in supervision_terms)
+                or any(term in info_l for term in supervision_terms)
+                or subject_l in ("au",)
+            ):
+                lesson["is_supervision"] = True
+                # Make sure supervisions always have a readable label so they
+                # are not rendered as a cancellation (—).
+                if not lesson["subject"] or subject_l in ("au",):
+                    lesson["subject"] = "Aufsicht"
 
             # If subject is empty but info text AND teacher are present,
             # treat it as a special lesson (e.g. "Klassenleiterstunde").
