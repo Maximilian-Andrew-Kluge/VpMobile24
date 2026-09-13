@@ -24,7 +24,7 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.8"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.9"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -199,7 +199,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.8",
+        sw_version="2.5.9",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart
@@ -633,8 +633,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
             _LOGGER.debug("Data update completed successfully")
 
-            # ── Fetch school holidays from openholidaysapi.org ──────────────
-            _LOGGER.warning("VpMobile24: calling _async_update_holidays")
+            # ── Fetch school holidays from ferien-api.de ────────────────────
+            _LOGGER.debug("VpMobile24: calling _async_update_holidays")
             await self._async_update_holidays()
 
             return today_data
@@ -670,7 +670,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         or entry.data.get("state_code", "")
                     )
 
-            _LOGGER.warning("VpMobile24 holidays: entry_id=%s state_code=%s", self._entry_id, state_code)
+            _LOGGER.debug("VpMobile24 holidays: entry_id=%s state_code=%s", self._entry_id, state_code)
 
             if not state_code:
                 _LOGGER.debug("VpMobile24: no state_code configured, skipping holiday fetch")
@@ -687,6 +687,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             year = today.year
 
             all_holidays = []
+            rate_limited = False
             import aiohttp
             async with aiohttp.ClientSession() as session:
                 for y in [year, year + 1]:
@@ -703,15 +704,23 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                             "name": [{"language": "DE", "text": h.get("name", "Ferien").title()}],
                                         })
                                     _LOGGER.debug("VpMobile24: loaded %d entries for %s/%s", len(data), state_code, y)
+                            elif resp.status == 429:
+                                # Rate limited by ferien-api.de — temporary, keep old data
+                                rate_limited = True
+                                _LOGGER.debug("VpMobile24: ferien-api.de rate-limited (429) for %s/%s, keeping cached data", state_code, y)
                             else:
-                                _LOGGER.warning("VpMobile24: ferien-api.de returned %s for %s/%s", resp.status, state_code, y)
+                                _LOGGER.debug("VpMobile24: ferien-api.de returned %s for %s/%s", resp.status, state_code, y)
                     except Exception as err:
-                        _LOGGER.warning("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
+                        _LOGGER.debug("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
 
             if all_holidays:
                 self._holiday_data = all_holidays
                 _LOGGER.debug("VpMobile24: total %d holiday entries loaded for %s", len(self._holiday_data), state_code)
+            elif rate_limited:
+                # Don't wipe previously loaded holidays just because of a temporary 429
+                _LOGGER.debug("VpMobile24: holiday fetch skipped for %s (rate-limited), keeping %d cached entries",
+                              state_code, len(self._holiday_data))
             else:
-                _LOGGER.warning("VpMobile24: no holiday data loaded for %s", state_code)
+                _LOGGER.debug("VpMobile24: no holiday data loaded for %s", state_code)
         except Exception as err:
             _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)

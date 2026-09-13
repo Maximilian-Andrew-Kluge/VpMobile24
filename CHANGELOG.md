@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.5.9\] - 2026-08-27
+
+### Fixed
+
+-   Ferien-Abruf: HTTP 429 (Rate-Limit von ferien-api.de) wird jetzt sauber behandelt — vorhandene Feriendaten bleiben erhalten statt verworfen zu werden
+-   Überflüssige Debug-Ausgaben aus dem Fehler-Log entfernt (Ferien-Abruf wurde versehentlich als Warnung geloggt)
+
 ## \[2.5.8\] - 2026-08-27
 
 ### Added
