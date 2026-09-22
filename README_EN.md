@@ -101,16 +101,32 @@ Additionally, modern Lovelace cards are included.
 * Weekly overview with KW display and week navigation
 * Multiple classes (collapsible sections, statistics badges)
 * Current lesson (live progress bar, countdown, next lesson)
+* **Teacher mode** — plan by teacher abbreviation incl. break supervisions
+* **Daily info per weekday** — hover for full text, click for all details
+* **Resizable** in HA's section (grid) view
 * **Holiday display** — all three cards show 🏖️ during school holidays
 * Responsive design (desktop + mobile)
 * Multilingual: DE / EN / FR
-* Parallel course filter
+* Parallel course filter (incl. short upper-secondary courses like `la1`)
+* Zeroth period (period 0) support
 * Smart status bar (cancellations, substitutions, end of day)
 * Tooltips with teacher & room
 * CSP-safe (nginx, DuckDNS, reverse proxy)
 * Automatic updates every 15 minutes
 
-### 🆕 New Features in v2.5.0 – v2.5.5
+### 🆕 New Features in v2.6.x (Beta)
+
+* **Teacher mode** — dedicated mode for teachers: plan filtered by teacher abbreviation, abbreviation selectable via dropdown
+* **Break supervisions** — Aufsichten are detected in teacher mode and highlighted
+* **Daily info per day** — additional info shown as its own row per weekday; hover for the full text, click for all details of that day
+* **Upper-secondary courses** — short course codes (e.g. `la1`) are now correctly detected and shown
+* **Zeroth period** — period 0 (e.g. 07:50–08:35) is fetched and displayed
+* **Reauth flow** — on a password change a dialog appears directly in HA — no more delete/re-add
+* **Resizable cards** — all cards can be resized in HA's section (grid) view
+* **Reliable refresh** — week table & reload button now pick up subsequent changes correctly
+
+<details>
+<summary>Earlier highlights (v2.5.0 – v2.5.5)</summary>
 
 * **Holiday sensor** — automatic school holiday detection for all 16 German federal states (official KMK data)
 * **Holidays in cards** — schedule card shows holiday screen, current lesson + multi-class show banner
@@ -122,6 +138,8 @@ Additionally, modern Lovelace cards are included.
 * **Reload button** — spins green when refreshing
 * **Parallel course filter** — cancellations of other course groups filtered automatically
 * **Sensors** — now detect substitution lessons
+
+</details>
 
 ---
 
@@ -165,10 +183,13 @@ Copy folder `custom_components/vpmobile24` to `config/custom_components/vpmobile
 # ⚙️ Setup
 
 1. Settings → Devices & Services → Add Integration → **VpMobile24**
-2. Enter School ID, Username, Password
-3. Select your class
-4. Select subjects (select parallel course groups individually)
+2. **Choose user type:** Student, Teacher or Demo
+3. Enter School ID, Password (and server if needed)
+4. **Student:** select class + subjects (parallel and upper-secondary courses individually) · **Teacher:** select your teacher abbreviation
 5. **Select your federal state** (for automatic holiday detection)
+
+> [!TIP]
+> Federal state, subjects/courses, class, teacher abbreviation and credentials can be changed later via **Settings → VpMobile24 → Configure**. If the password changed, a reauth dialog appears automatically.
 
 ---
 
@@ -231,7 +252,19 @@ Yes — multiple classes and parallel course groups are supported.
 
 ### What is the parallel course filter?
 
-In the subject selection, all course groups appear (e.g. `789WB10`, `7INb1`). Select only your own course — then cancellations from other groups won't be shown.
+In the subject selection, all course groups appear (e.g. `789WB10`, `7INb1`, `la1`). Select only your own course — then cancellations from other groups won't be shown. Short upper-secondary courses like `la1` are detected correctly too.
+
+### Is there a teacher mode?
+
+Yes. Choose "Teacher" as the user type during setup and pick your abbreviation from the dropdown. The integration then shows all your lessons, substitutions and break supervisions (Aufsichten), which are highlighted in the card.
+
+### Are daily info / events shown?
+
+Yes. Additional info appears as its own row per weekday directly in the week table. Hover shows the full text, a click opens all details of that day.
+
+### Does it support a zeroth period?
+
+Yes, period 0 (e.g. 07:50–08:35) is fetched and shown in table, card and sensors — including substitutions and cancellations. Schools without a zeroth period won't see an empty row.
 
 ### How does holiday detection work?
 

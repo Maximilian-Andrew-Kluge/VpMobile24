@@ -142,6 +142,13 @@
 
         <div class="hero-features">
           <div class="hf-item">
+            <span class="hf-icon">👨‍🏫</span>
+            <div>
+              <strong>Lehrermodus</strong>
+              <span>Plan nach Lehrerkürzel</span>
+            </div>
+          </div>
+          <div class="hf-item">
             <span class="hf-icon">🏖️</span>
             <div>
               <strong>Ferien-Erkennung</strong>
@@ -179,8 +186,8 @@
           <div class="hf-item">
             <span class="hf-icon">ℹ️</span>
             <div>
-              <strong>Zusatzinfos</strong>
-              <span>Pro Tag anzeigen</span>
+              <strong>Tagesinfos</strong>
+              <span>Pro Tag · Hover &amp; Klick</span>
             </div>
           </div>
           <div class="hf-item">
@@ -466,6 +473,18 @@
                 <span class="feat-dot" style="background:#a78bfa"></span>
                 <div><strong>Mehrere Klassen</strong> – Vergleichsansicht für mehrere Klassen in einer Card</div>
               </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#3b82f6"></span>
+                <div><strong>Tagesinfos pro Tag</strong> – Zusatzinfos direkt in der Tabelle, Hover für vollen Text, Klick für alle Details</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#c4b5fd"></span>
+                <div><strong>Pausenaufsichten</strong> – im Lehrermodus farblich hervorgehoben</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#64748b"></span>
+                <div><strong>Frei skalierbar</strong> – Kartengröße in der Section-/Grid-Ansicht anpassbar</div>
+              </div>
             </div>
           </div>
 
@@ -551,6 +570,22 @@
               <div class="feat-item">
                 <span class="feat-dot" style="background:#475569"></span>
                 <div><strong>HACS-kompatibel</strong> – einfache Installation und automatische Updates</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#38bdf8"></span>
+                <div><strong>Lehrermodus</strong> – eigener Modus für Lehrer, Plan nach Lehrerkürzel inkl. Pausenaufsichten</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#f472b6"></span>
+                <div><strong>Reauth bei Passwortänderung</strong> – Dialog direkt in HA, kein Löschen &amp; Neu-Einrichten nötig</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#fbbf24"></span>
+                <div><strong>Oberstufenkurse</strong> – kurze Kurskürzel wie <code>la1</code> werden korrekt erkannt</div>
+              </div>
+              <div class="feat-item">
+                <span class="feat-dot" style="background:#2dd4bf"></span>
+                <div><strong>Nullte Stunde</strong> – Stunde 0 (z.B. 07:50–08:35) wird abgerufen und angezeigt</div>
               </div>
             </div>
           </div>
@@ -945,6 +980,27 @@ use_custom_times: false</code></pre>
                   <code>additional_info_entity: sensor.vpmobile24_zusatzinfos</code>
                 </div>
               </div>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Wie richte ich den Lehrermodus ein?</summary>
+            <div class="faq-body">
+              <p>Beim Hinzufügen der Integration als Benutzertyp <strong>„Lehrer"</strong> wählen und anschließend dein Kürzel aus dem Dropdown auswählen. Die Integration zeigt dann alle deine Stunden, Vertretungen und Pausenaufsichten. Aufsichten werden in der Karte farblich hervorgehoben.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Meine Schule hat eine nullte Stunde</summary>
+            <div class="faq-body">
+              <p>Stunde 0 (z.B. 07:50–08:35) wird automatisch abgerufen und in Tabelle, Karte und Sensoren angezeigt – inklusive Vertretungen und Ausfällen. Schulen ohne nullte Stunde sehen keine leere Zeile.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Oberstufenkurse (z.B. la1) fehlen</summary>
+            <div class="faq-body">
+              <p>Ab v2.6.0 werden auch kurze Kurskürzel wie <code>la1</code> korrekt erkannt. Falls ein Kurs vorher fehlte: einmal unter <strong>Einstellungen → VpMobile24 → Konfigurieren</strong> die Fächer/Kurse neu auswählen, dann lässt sich der Kurs anhaken.</p>
             </div>
           </details>
         </div>

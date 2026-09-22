@@ -26,12 +26,26 @@
 
 ---
 
-## 🚀 Was ist neu in v2.5.7?
+## 🚀 Was ist neu in v2.6.x?
 
 > [!IMPORTANT]
-> **VpMobile24 v2.5.5** ist das aktuelle Stable Release — veröffentlicht am **14.07.2026**
+> **VpMobile24 v2.5.5** ist das aktuelle Stable Release. Die neuen Funktionen unten sind in den aktuellen Beta-Versionen (v2.6.x) verfügbar.
 >
-> 🔗 [Alle Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+> 🔗 [Alle Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+
+| Neu | Beschreibung |
+|-----|-------------|
+| 👨‍🏫 Lehrermodus | Eigener Modus für Lehrer — Plan nach Lehrerkürzel, Kürzel per Dropdown wählbar |
+| 🛡️ Pausenaufsichten | Aufsichten werden im Lehrermodus erkannt und farblich hervorgehoben |
+| 📢 Tagesinfos pro Tag | Zusatzinfos direkt pro Wochentag in der Tabelle — Hover für vollen Text, Klick für alle Details |
+| 🎓 Oberstufenkurse | Kurze Kurskürzel (z.B. `la1`) werden jetzt korrekt erkannt und angezeigt |
+| 0️⃣ Nullte Stunde | Stunde 0 (z.B. 07:50–08:35) wird abgerufen und angezeigt |
+| 🔑 Reauth-Flow | Bei Passwortänderung erscheint direkt ein Dialog — kein Löschen/Neu-Einrichten mehr nötig |
+| 📐 Kartengröße | Karten frei skalierbar in der Section-/Grid-Ansicht |
+| 🔄 Zuverlässige Aktualisierung | Wochentabelle & Reload-Button laden nachträgliche Änderungen jetzt korrekt nach |
+
+<details>
+<summary>Frühere Highlights (v2.5.x)</summary>
 
 | Neu | Beschreibung |
 |-----|-------------|
@@ -39,10 +53,11 @@
 | 🔄 Reload-Animation | Pfeil dreht sich grün beim Aktualisieren |
 | 📚 Echtzeit-Erkennung | Aktueller Unterricht erkennt auch Vertretungsstunden |
 | 🌙 Vor Schulbeginn | Karte zeigt „Noch kein Unterricht" statt „Pause" |
-| ℹ️ Info-Popup Fix | Zeigt nur Infos des aktuellen Tages |
 | 🔵 Parallelkurs-Filter | Ausfälle fremder Kurse werden ausgeblendet |
 | 🌐 Zusatzserver | Unterstützung für zusatz1–10 (z.B. für Schulen mit eigenem Server) |
 | 🔑 Zugangsdaten ändern | Schul-ID, Passwort & Server nachträglich änderbar |
+
+</details>
 
 ---
 
@@ -95,7 +110,9 @@
 - 👥 Mehrere Klassen
 - ⏱️ Aktueller Unterricht
 - 🏖️ Ferien-Screen
-- 📊 Smart Status Bar
+- 📢 Tagesinfos pro Tag (Hover + Klick)
+- 🛡️ Pausenaufsichten (Lehrermodus)
+- 📐 Frei skalierbar (Grid-Ansicht)
 - 🌍 Mehrsprachig: DE / EN / FR
 - 🔵 Parallelkurs-Filter
 - 🛡️ CSP-sicher (nginx, DuckDNS)
@@ -103,6 +120,9 @@
 </td>
 </tr>
 </table>
+
+> [!NOTE]
+> **👨‍🏫 Lehrermodus:** Neben dem Schülermodus gibt es jetzt einen eigenen Lehrermodus. Statt einer Klasse wählst du dein Lehrerkürzel (per Dropdown), und die Integration zeigt alle deine Stunden, Vertretungen und Pausenaufsichten.
 
 ---
 
@@ -123,13 +143,13 @@
 ## ⚙️ Einrichtung
 
 1. **Einstellungen → Geräte & Dienste → Integration hinzufügen → VpMobile24**
-2. Schul-ID, Benutzername, Passwort eingeben
-3. Klasse auswählen
-4. Fächer auswählen *(Parallelkurse einzeln wählen)*
+2. **Benutzertyp wählen:** Schüler, Lehrer oder Demo
+3. Schul-ID, Passwort (und ggf. Server) eingeben
+4. **Schülermodus:** Klasse + Fächer wählen *(Parallel- und Oberstufenkurse einzeln)* · **Lehrermodus:** Lehrerkürzel wählen
 5. **Bundesland auswählen** *(für automatische Ferienerkennung)*
 
 > [!TIP]
-> Das Bundesland lässt sich nachträglich unter **Einstellungen → VpMobile24 → Konfigurieren** ändern.
+> Bundesland, Fächer/Kurse, Klasse, Lehrerkürzel und Zugangsdaten lassen sich nachträglich unter **Einstellungen → VpMobile24 → Konfigurieren** ändern. Bei geändertem Passwort erscheint automatisch ein Reauth-Dialog.
 
 ---
 
@@ -231,7 +251,25 @@ Bundesland beim Einrichten oder unter Konfigurieren auswählen. Die Daten kommen
 <details>
 <summary>Was ist der Parallelkurs-Filter?</summary>
 
-In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`, `7INb1`). Wähle nur deinen Kurs — Ausfälle anderer Gruppen werden dann ausgeblendet.
+In der Fächerauswahl erscheinen alle Kursgruppen (z.B. `789WB10`, `7INb1`, `la1`). Wähle nur deinen Kurs — Ausfälle anderer Gruppen werden dann ausgeblendet. Auch kurze Oberstufenkurse wie `la1` werden korrekt erkannt.
+</details>
+
+<details>
+<summary>Gibt es einen Lehrermodus?</summary>
+
+Ja. Beim Einrichten „Lehrer" als Benutzertyp wählen und dein Kürzel per Dropdown auswählen. Die Integration zeigt dann alle deine Stunden, Vertretungen und Pausenaufsichten. Aufsichten werden in der Karte farblich hervorgehoben.
+</details>
+
+<details>
+<summary>Werden Tagesinfos / Tagesevents angezeigt?</summary>
+
+Ja. Zusatzinfos erscheinen als eigene Zeile pro Wochentag direkt in der Wochentabelle. Hover zeigt den vollen Text, ein Klick öffnet alle Details des jeweiligen Tages.
+</details>
+
+<details>
+<summary>Meine Schule hat eine nullte Stunde — wird die unterstützt?</summary>
+
+Ja, Stunde 0 (z.B. 07:50–08:35) wird abgerufen und in Tabelle, Karte und Sensoren angezeigt — inklusive Vertretungen und Ausfällen. Schulen ohne nullte Stunde sehen keine leere Zeile.
 </details>
 
 <details>
