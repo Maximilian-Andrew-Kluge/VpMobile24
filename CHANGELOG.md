@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.1\] - 2026-08-27
+
+### Fixed
+
+-   Nullte Stunde (Stunde 0, z.B. 07:50–08:35) wird jetzt korrekt abgerufen und in Wochentabelle, Karte und Sensoren angezeigt — inkl. Vertretungen/Ausfälle in Stunde 0 (#-Ticket)
+-   Behoben, dass `period == 0` fälschlich als "leer" verworfen wurde (0 ist in Python falsy)
+-   Karte (Wochen- und Mehrklassen-Ansicht) rendert Stunde 0 nun, wenn Daten dafür vorliegen
+
 ## \[2.6.0\] - 2026-08-27
 
 ### Fixed

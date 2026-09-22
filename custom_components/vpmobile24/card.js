@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.0
-console.info('%c VpMobile24-CARD %c v2.6.0 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.1
+console.info('%c VpMobile24-CARD %c v2.6.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -914,6 +914,33 @@ class VpMobile24Card extends HTMLElement {
     const pauseCount  = useCustomTimes ? Number(ts.pause_count  ?? cfg.pause_count  ?? 2) : 2;
 
     const slots = [];
+
+    // Nullte Stunde (period 0): only shown when the week table actually
+    // contains data for period 0 on any weekday. Some schools teach a 0th
+    // period (e.g. 07:50–08:35).
+    let hasPeriodZero = false;
+    let periodZeroTime = '';
+    if (this._hass && this._config.entity) {
+      const wtEnt = this._hass.states[this._config.entity];
+      const off = this._weekOffset || 0;
+      const wt = wtEnt && wtEnt.attributes && (
+        off === 2 ? wtEnt.attributes.next_next_week_table
+        : off === 1 ? wtEnt.attributes.next_week_table
+        : wtEnt.attributes.week_table);
+      if (wt) {
+        for (const day of ['monday','tuesday','wednesday','thursday','friday']) {
+          const l0 = wt[day] && wt[day]['0'];
+          if (l0) {
+            hasPeriodZero = true;
+            if (!periodZeroTime && l0.zeit) periodZeroTime = l0.zeit;
+          }
+        }
+      }
+    }
+    if (hasPeriodZero) {
+      slots.push({ period: 0, time: periodZeroTime, lessonNumber: 0 });
+    }
+
     for (let i = 1; i <= lessonCount; i++) {
       const time = useCustomTimes
         ? (ts['time_'+i] ?? cfg['time_'+i] ?? defaults['time_'+i] ?? '')
@@ -2886,10 +2913,10 @@ class VpMobile24MultiCard extends HTMLElement {
         if (!weekTable) {
           gridHtml = '<div class="mc-no-data">Keine Wochendaten verfügbar</div>';
         } else {
-          // Collect periods that have at least one lesson
+          // Collect periods that have at least one lesson (incl. period 0)
           const maxPeriod = 10;
           const usedPeriods = [];
-          for (let p = 1; p <= maxPeriod; p++) {
+          for (let p = 0; p <= maxPeriod; p++) {
             if (dayKeys.some(dk => weekTable[dk] && weekTable[dk][String(p)])) {
               usedPeriods.push(p);
             }
@@ -3242,4 +3269,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.0 loaded');
+console.log('✅ VpMobile24 Card v2.6.1 loaded');

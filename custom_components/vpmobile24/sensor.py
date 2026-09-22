@@ -495,15 +495,18 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
 
     def _create_week_table(self, all_lessons: list) -> dict:
         weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday"]
-        table: dict = {day: {str(p): None for p in range(1, 11)} for day in weekdays}
+        # Include period 0 (nullte Stunde) — some schools teach a 0th period.
+        table: dict = {day: {str(p): None for p in range(0, 11)} for day in weekdays}
         for lesson in all_lessons:
             date_str = lesson.get("date", "")
             period = lesson.get("period", "")
-            if not date_str or not period:
+            # Note: use explicit None/"" check — "not period" would wrongly
+            # drop period 0 (0 is falsy in Python).
+            if not date_str or period in (None, ""):
                 continue
             try:
                 wd = datetime.fromisoformat(date_str).weekday()
-                if 0 <= wd <= 4 and str(period).isdigit() and 1 <= int(period) <= 10:
+                if 0 <= wd <= 4 and str(period).isdigit() and 0 <= int(period) <= 10:
                     table[weekdays[wd]][period] = {
                         "fach": lesson.get("subject", ""),
                         "lehrer": lesson.get("teacher", ""),
@@ -744,8 +747,8 @@ class VpMobile24NextFreePeriodSensor(CoordinatorEntity, SensorEntity):
                 if str(p).isdigit():
                     today_lessons[int(p)] = lesson
 
-        # Walk periods 1â€“10, find first future free/cancelled slot
-        for period in range(1, 11):
+        # Walk periods 0â€“10, find first future free/cancelled slot
+        for period in range(0, 11):
             lesson = today_lessons.get(period)
             if lesson is None:
                 continue  # no entry at all â€” not a known free period
