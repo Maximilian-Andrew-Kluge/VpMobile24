@@ -24,7 +24,7 @@ PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.5.9"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.6.0"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -199,7 +199,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.5.9",
+        sw_version="2.6.0",
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart
@@ -241,7 +241,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coord.selected_courses  = new_selected
         # If state_code changed, refresh holiday data immediately
         await coord._async_update_holidays()
-        await coord.async_request_refresh()
+        # Force a full reload — the class may have changed, so the cached days
+        # (holding the old class' data) must be dropped.
+        if hasattr(coord, "async_force_refresh"):
+            await coord.async_force_refresh()
+        else:
+            await coord.async_request_refresh()
 
     entry.async_on_unload(entry.add_update_listener(_async_options_updated))
 
@@ -290,12 +295,23 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self._week_data_cache = {}
         self._current_week_monday = None
         self._holiday_data: list = []
+        self._force_refresh = False  # set by reload button to bypass the day cache
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
             update_interval=timedelta(minutes=15),
         )
+
+    async def async_force_refresh(self) -> None:
+        """Force a full reload: clear the day cache so every day is re-fetched.
+
+        Used by the reload button and when the user changes options, so
+        nachträgliche Änderungen auf stundenplan24.de sofort sichtbar werden.
+        """
+        self._force_refresh = True
+        self._week_data_cache = {}
+        await self.async_request_refresh()
 
     def _resolve_original_subject(self, base_schedule, weekday_index, period, course):
         """Return the original subject for a cancelled slot, or '' if ambiguous."""
@@ -387,16 +403,33 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     "days_loaded": 0
                 }
 
+            # On a forced refresh (reload button / options change) drop the
+            # whole cache so every day is fetched fresh.
+            force = self._force_refresh
+            self._force_refresh = False
+            if force:
+                _LOGGER.debug("VpMobile24: force refresh — clearing day cache")
+                self._week_data_cache = {}
+
             cached_dates = set(self._week_data_cache.keys())
             _LOGGER.debug(f"Cached dates: {cached_dates}")
 
-            dates_to_load = [today]
+            # Always re-fetch today AND all upcoming days of the current week,
+            # because substitutions/changes for those days can still change on
+            # the server. Only past days of the week stay cached (they no longer
+            # change) to save requests.
+            dates_to_load = []
             for date_str in week_dates:
-                if date_str not in cached_dates and date_str != today_str:
-                    try:
-                        dates_to_load.append(date.fromisoformat(date_str))
-                    except ValueError:
-                        continue
+                try:
+                    d = date.fromisoformat(date_str)
+                except ValueError:
+                    continue
+                is_today_or_future = d >= today
+                if is_today_or_future or date_str not in cached_dates:
+                    dates_to_load.append(d)
+            # Safety: make sure today is always included
+            if today not in dates_to_load:
+                dates_to_load.insert(0, today)
 
             _LOGGER.debug(f"Loading dates: {[d.isoformat() for d in dates_to_load]}")
 
@@ -416,6 +449,9 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     ex_str = str(ex)
                     if "404" in ex_str:
                         _LOGGER.debug("No schedule for %s (404 - weekend/holiday)", target_date)
+                        # A day that used to have data but now 404s (schedule
+                        # withdrawn) must lose its stale cache entry.
+                        self._week_data_cache.pop(date_str, None)
                     else:
                         _LOGGER.warning("Could not fetch schedule for %s: %s", target_date, ex)
                     continue

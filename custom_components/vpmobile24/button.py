@@ -71,7 +71,12 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        _LOGGER.info("Manual reload button pressed")
-        await self.coordinator.async_request_refresh()
+        _LOGGER.info("Manual reload button pressed — forcing full refresh")
+        # Force a full reload so nachträgliche Änderungen auf stundenplan24.de
+        # sofort übernommen werden (not just today's cached day).
+        if hasattr(self.coordinator, "async_force_refresh"):
+            await self.coordinator.async_force_refresh()
+        else:
+            await self.coordinator.async_request_refresh()
 
 

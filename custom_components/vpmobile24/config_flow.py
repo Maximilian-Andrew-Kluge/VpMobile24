@@ -33,6 +33,22 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+def _is_course_group(s: str) -> bool:
+    """Return True if this looks like a parallel course group.
+
+    Course groups in stundenplan24 are a subject/course label ending in a
+    group number, e.g. "la1", "ma2", "7INb1", "789WB12". The reliable signal
+    is: the label ends with a digit AND contains at least one letter. This
+    also correctly catches short upper-secondary courses like "la1" (which the
+    old ``len(s) > 3`` heuristic missed). Plain subjects like "EN", "MA", "PH"
+    do not end in a digit, so they are not treated as course groups.
+    """
+    s = (s or "").strip()
+    if len(s) < 2:
+        return False
+    return s[-1].isdigit() and any(c.isalpha() for c in s)
+
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for vpmobile24."""
 
@@ -368,16 +384,21 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle subject selection."""
 
         if user_input is not None:
-            excluded_subjects = []
-
-            for subject in self._available_subjects:
-                if not user_input.get(subject, True):
-                    excluded_subjects.append(subject)
+            # Normal subjects that were unchecked → excluded.
+            # Course groups (e.g. "la1") that were checked → selected_courses.
+            excluded_subjects = [
+                s for s in self._available_subjects
+                if not user_input.get(s, True) and not _is_course_group(s)
+            ]
+            selected_courses = [
+                s for s in self._available_subjects
+                if _is_course_group(s) and user_input.get(s, False)
+            ]
 
             if excluded_subjects:
-                self._config_data[
-                    CONF_EXCLUDED_SUBJECTS
-                ] = excluded_subjects
+                self._config_data[CONF_EXCLUDED_SUBJECTS] = excluded_subjects
+            if selected_courses:
+                self._config_data[CONF_SELECTED_COURSES] = selected_courses
 
             # Go to holiday/state selection step
             await self.async_set_unique_id(
@@ -400,14 +421,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
 
         schema_dict = {}
-
-        for subject in self._available_subjects:
-            schema_dict[
-                vol.Optional(
-                    subject,
-                    default=True,
-                )
-            ] = bool
+        for s in self._available_subjects:
+            if _is_course_group(s):
+                # Course groups default OFF — the user opts in to the ones they attend
+                schema_dict[vol.Optional(s, default=False)] = bool
+            else:
+                # Normal subjects default ON — uncheck to exclude
+                schema_dict[vol.Optional(s, default=True)] = bool
 
         return self.async_show_form(
             step_id="subjects",
@@ -959,9 +979,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Step 2 — choose which subjects to include (uncheck = exclude)."""
         if user_input is not None:
-            def _is_course_group(s: str) -> bool:
-                return any(c.isdigit() for c in s) and len(s) > 3
-
             excluded = [
                 s for s in self._available_subjects
                 if not user_input.get(s, True) and not _is_course_group(s)
@@ -1006,10 +1023,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             CONF_SELECTED_COURSES,
             self._config_entry.data.get(CONF_SELECTED_COURSES, []),
         )
-
-        def _is_course_group(s: str) -> bool:
-            """Return True if this looks like a parallel course group (e.g. 789WB12, 7INb1)."""
-            return any(c.isdigit() for c in s) and len(s) > 3
 
         schema_dict = {}
         for s in self._available_subjects:

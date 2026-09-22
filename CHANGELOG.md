@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.0\] - 2026-08-27
+
+### Fixed
+
+-   Oberstufenkurse (z.B. `la1`) werden jetzt korrekt erkannt und im Stundenplan angezeigt (#17) — kurze Kurskürzel wurden bisher fälschlich als normales Fach behandelt
+-   Wochentabelle aktualisiert sich jetzt zuverlässig: heutiger + kommende Tage der Woche werden bei jedem Update neu geladen, sodass nachträgliche Änderungen auf stundenplan24.de übernommen werden (#15)
+-   Reload-Button lädt jetzt wirklich alle Daten neu (kompletter Cache-Reset) statt nur den heutigen Tag
+-   Ein zurückgezogener Tagesplan (404) entfernt jetzt die veralteten Daten aus dem Cache
+
+### Changed
+
+-   Kursauswahl bei der Ersteinrichtung: Kursgruppen und normale Fächer werden jetzt sauber getrennt (Kurse als Opt-in)
+
 ## \[2.5.9\] - 2026-08-27
 
 ### Fixed
