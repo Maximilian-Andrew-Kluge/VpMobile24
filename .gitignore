@@ -128,12 +128,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Test files and debug scripts
+# Test files and debug scripts (loose scripts in the repo root)
 debug_*.py
 test_*.py
 *_test.py
 fix_*.py
 patch_*.py
+
+# ...but DO track the proper test suite under tests/
+!tests/
+!tests/**
 api_test_result.json
 basic_auth_result.html
 found_mobdaten_hashjsk.txt
