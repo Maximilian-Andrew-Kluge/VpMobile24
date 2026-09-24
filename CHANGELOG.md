@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.2\] - 2026-08-27
+
+### Changed
+
+-   Stundenplan-Card UI modernisiert: ruhigeres Design mit klarer Statushierarchie — Status (Ausfall/Vertretung/Aufsicht) jetzt als linker Rand + Statuspunkt statt vollflächiger Farbe
+-   Aktuelle Stunde klarer hervorgehoben (dezenter blauer Akzent statt starkem Glow)
+-   Pausen dezenter, weichere Radien, mehr Whitespace, modernere Header-Pills und Legende
+-   Bessere Light-Mode-Kontraste, Fokus-States und `prefers-reduced-motion`-Unterstützung
+-   Keine funktionalen Änderungen — nur Darstellung
+
 ## \[2.6.1\] - 2026-08-27
 
 ### Fixed
