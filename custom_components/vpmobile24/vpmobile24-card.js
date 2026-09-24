@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.7
-console.info('%c VpMobile24-CARD %c v2.6.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.1
+console.info('%c VpMobile24-CARD %c v2.6.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -2453,16 +2453,28 @@ class VpMobile24CurrentCard extends HTMLElement {
     // ── Colors & icons per type ───────────────────────────────────────────
     // Determine if 'free' is actually before school (>60min until first lesson)
     const isBeforeSchool = s.type === 'free' && s.remaining !== undefined && s.remaining > 60;
+    // Monochrome MDI-Icons (statt Emojis)
+    const _ic = (p) => '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="' + p + '"/></svg>';
+    const MDI = {
+      book:   'M19 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2m0 18H6.5A1.5 1.5 0 0 1 5 18.5 1.5 1.5 0 0 1 6.5 17H19zm0-6H6.5A1.5 1.5 0 0 0 5 15.5V4h14z',
+      swap:   'M6 4v3h13v2H6v3l-4-4zm12 16v-3H5v-2h13v-3l4 4z',
+      clock:  'M12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16m0-18a10 10 0 1 0 0 20 10 10 0 0 0 0-20m.5 5H11v6l5.25 3.15.75-1.23-4.5-2.67z',
+      moon:   'M17.75 4.09 15.22 6.03l.93 3.07-2.62-1.81-2.62 1.81.93-3.07-2.53-1.94 3.21-.07L13.71 1l1.06 3.02zm3.5 6.91-1.4 1.09.52 1.73-1.47-1.02-1.47 1.02.52-1.73-1.4-1.09 1.81-.04.65-1.71.6 1.71zM12 22a9 9 0 0 1-8.98-9.5A9 9 0 0 0 12 3a9 9 0 0 0 8.98 9.5A9 9 0 0 1 12 22',
+      pause:  'M14 19h4V5h-4M6 19h4V5H6z',
+      flag:   'M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6z',
+      beach:  'M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z'
+    };
+    // Design-System-Farben (blau primär), an die Stundenplan-Card angeglichen
     const themes = {
-      lesson:  { color:'#22c55e', bg:'rgba(34,197,94,.13)',  border:'rgba(34,197,94,.35)',  icon:'📖', label: tc.currentLesson },
-      sub:     { color:'#f97316', bg:'rgba(249,115,22,.13)', border:'rgba(249,115,22,.35)', icon:'🔄', label: tc.sub },
-      free:    { color: isBeforeSchool ? '#64748b' : '#3b82f6',
-                 bg:    isBeforeSchool ? 'rgba(100,116,139,.1)' : 'rgba(59,130,246,.13)',
-                 border:isBeforeSchool ? 'rgba(100,116,139,.25)' : 'rgba(59,130,246,.35)',
-                 icon:  isBeforeSchool ? '🌙' : '⏸',
+      lesson:  { color:'#4f7cff', bg:'rgba(79,124,255,.10)',  border:'rgba(79,124,255,.35)',  icon:_ic(MDI.book),  label: tc.currentLesson },
+      sub:     { color:'#f59e0b', bg:'rgba(245,158,11,.10)',  border:'rgba(245,158,11,.35)',  icon:_ic(MDI.swap),  label: tc.sub },
+      free:    { color: isBeforeSchool ? '#94a3b8' : '#8b5cf6',
+                 bg:    isBeforeSchool ? 'rgba(148,163,184,.10)' : 'rgba(139,92,246,.10)',
+                 border:isBeforeSchool ? 'rgba(148,163,184,.25)' : 'rgba(139,92,246,.35)',
+                 icon:  isBeforeSchool ? _ic(MDI.moon) : _ic(MDI.pause),
                  label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
-      done:    { color:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.25)',icon:'🏁', label: tc.done },
-      holiday: { color:'#f59e0b', bg:'rgba(245,158,11,.13)', border:'rgba(245,158,11,.35)', icon:'🏖️', label: tc.holiday || 'Ferien' },
+      done:    { color:'#22c55e', bg:'rgba(34,197,94,.10)', border:'rgba(34,197,94,.28)', icon:_ic(MDI.flag), label: tc.done },
+      holiday: { color:'#8b5cf6', bg:'rgba(139,92,246,.10)', border:'rgba(139,92,246,.35)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
     };
     const effectiveType = isHoliday ? 'holiday' : s.type;
     const lessonTh = themes[effectiveType] || themes.done;
@@ -2481,18 +2493,18 @@ class VpMobile24CurrentCard extends HTMLElement {
         if (endAttr) {
           const endD = new Date(endAttr);
           const endStr = endD.toLocaleDateString(haLang === 'en' ? 'en-GB' : haLang === 'fr' ? 'fr-FR' : 'de-DE', {day:'2-digit',month:'2-digit'});
-          mainHtml += `<div class="vc-meta"><span class="vc-chip">📅 ${haLang === 'en' ? 'Until' : haLang === 'fr' ? 'Jusqu\'au' : 'Bis'} ${endStr}</span></div>`;
+          mainHtml += `<div class="vc-meta"><span class="vc-chip">${haLang === 'en' ? 'Until' : haLang === 'fr' ? 'Jusqu\'au' : 'Bis'} ${endStr}</span></div>`;
         }
       }
     } else if (s.type === 'lesson' || s.type === 'sub') {
       mainHtml += `<div class="vc-subject">${s.fach}</div>`;
       mainHtml += `<div class="vc-meta">`;
       if (s.stunde) mainHtml += `<span class="vc-chip">${s.stunde}. ${tc.period}</span>`;
-      if (s.zeit)   mainHtml += `<span class="vc-chip">🕐 ${s.zeit}</span>`;
-      if (showTeach && s.lehrer) mainHtml += `<span class="vc-chip">👤 ${s.lehrer}</span>`;
-      if (showRoom  && s.raum)   mainHtml += `<span class="vc-chip">🚪 ${s.raum}</span>`;
+      if (s.zeit)   mainHtml += `<span class="vc-chip">${s.zeit}</span>`;
+      if (showTeach && s.lehrer) mainHtml += `<span class="vc-chip">${s.lehrer}</span>`;
+      if (showRoom  && s.raum)   mainHtml += `<span class="vc-chip">${s.raum}</span>`;
       mainHtml += `</div>`;
-      if (s.info) mainHtml += `<div class="vc-info">ℹ️ ${s.info}</div>`;
+      if (s.info) mainHtml += `<div class="vc-info">${s.info}</div>`;
       if (showCount && s.remaining !== undefined) {
         mainHtml += `<div class="vc-countdown">${tc.remaining} <strong>${this._fmtCountdown(s.remaining, tc)}</strong></div>`;
       }
@@ -2507,9 +2519,9 @@ class VpMobile24CurrentCard extends HTMLElement {
         mainHtml += `<div class="vc-subject" style="font-size:1em;opacity:.7">${tc.nextLesson}</div>`;
         mainHtml += `<div class="vc-subject">${s.nextFach}</div>`;
         mainHtml += `<div class="vc-meta">`;
-        if (s.nextZeit)   mainHtml += `<span class="vc-chip">🕐 ${s.nextZeit}</span>`;
-        if (showTeach && s.nextLehrer) mainHtml += `<span class="vc-chip">👤 ${s.nextLehrer}</span>`;
-        if (showRoom  && s.nextRaum)   mainHtml += `<span class="vc-chip">🚪 ${s.nextRaum}</span>`;
+        if (s.nextZeit)   mainHtml += `<span class="vc-chip">${s.nextZeit}</span>`;
+        if (showTeach && s.nextLehrer) mainHtml += `<span class="vc-chip">${s.nextLehrer}</span>`;
+        if (showRoom  && s.nextRaum)   mainHtml += `<span class="vc-chip">${s.nextRaum}</span>`;
         mainHtml += `</div>`;
       }
       if (showCount && s.remaining !== undefined) {
@@ -2539,7 +2551,7 @@ class VpMobile24CurrentCard extends HTMLElement {
         <span class="vc-next-label">${tc.next}</span>
         <span class="vc-next-fach">${s.nextFach}</span>
         ${s.nextZeit ? `<span class="vc-next-time">${s.nextZeit.split('-')[0]}</span>` : ''}
-        ${showRoom && s.nextRaum ? `<span class="vc-chip" style="font-size:.68em">🚪 ${s.nextRaum}</span>` : ''}
+        ${showRoom && s.nextRaum ? `<span class="vc-chip" style="font-size:.68em">${s.nextRaum}</span>` : ''}
       </div>`;
     }
 
@@ -2547,10 +2559,10 @@ class VpMobile24CurrentCard extends HTMLElement {
     let dayHtml = '';
     if (showDay && (s.gesamt || s.nVertretung || s.unterrichtsEnde)) {
       dayHtml = `<div class="vc-day">`;
-      if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">📚 ${s.gesamt} ${tc.lessons}</span>`;
-      if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">⏳ ${s.verbleibend} ${tc.remaining2}</span>`;
-      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f97316">🔄 ${s.nVertretung}× ${tc.subst}</span>`;
-      if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">🏁 ${tc.endAt} ${s.unterrichtsEnde}</span>`;
+      if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">${s.gesamt} ${tc.lessons}</span>`;
+      if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">${s.verbleibend} ${tc.remaining2}</span>`;
+      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f59e0b">${s.nVertretung}× ${tc.subst}</span>`;
+      if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">${tc.endAt} ${s.unterrichtsEnde}</span>`;
       dayHtml += `</div>`;
     }
 
@@ -2558,69 +2570,75 @@ class VpMobile24CurrentCard extends HTMLElement {
 <style>
 :host { display: block; }
 ha-card {
-  background: ${lessonTh.bg} !important;
-  border-radius: 16px !important;
+  background: var(--card-background-color, #111827) !important;
+  border-radius: 20px !important;
   overflow: hidden;
   border: 1px solid ${lessonTh.border} !important;
-  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 0 1px ${lessonTh.border} !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #e2e8f0 !important;
-  transition: border-color .4s, box-shadow .4s;
+  box-shadow: 0 10px 30px rgba(0,0,0,.18) !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--primary-text-color, #f8fafc) !important;
+  transition: border-color .3s, box-shadow .3s;
 }
 .vc-main {
-  display: flex; align-items: center; gap: 14px;
-  padding: 16px 18px 12px;
-  background: ${lessonTh.bg};
-  border-left: 4px solid ${lessonTh.color};
-  min-height: 80px;
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 18px 20px 14px;
+  min-height: 76px;
 }
+/* Icon-Container: 44px, abgerundet, dezente Statusfarbe */
 .vc-icon {
-  font-size: 2em; flex-shrink: 0;
-  filter: drop-shadow(0 0 6px ${lessonTh.color}88);
-  animation: ${s.type === 'lesson' || s.type === 'sub' ? 'vc-pulse-icon 3s ease-in-out infinite' : 'none'};
+  width: 44px; height: 44px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: ${lessonTh.bg};
+  border: 1px solid ${lessonTh.border};
+  color: ${lessonTh.color};
 }
-@keyframes vc-pulse-icon {
-  0%,100% { filter: drop-shadow(0 0 4px ${lessonTh.color}88); }
-  50%      { filter: drop-shadow(0 0 12px ${lessonTh.color}cc); }
-}
+.vc-icon svg { display: block; }
 .vc-body { flex: 1; min-width: 0; }
 .vc-label {
   font-size: .68em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .8px; color: ${lessonTh.color}; margin-bottom: 4px;
-  display: flex; align-items: center; gap: 6px;
+  letter-spacing: .09em; color: ${lessonTh.color}; margin-bottom: 5px;
+  display: flex; align-items: center; gap: 7px;
 }
+/* dezenter, sanft pulsierender Statuspunkt bei laufendem Unterricht */
+.vc-label::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: ${lessonTh.color}; flex-shrink: 0;
+  ${s.type === 'lesson' || s.type === 'sub' ? 'animation: vc-dot 2s ease-in-out infinite;' : ''}
+}
+@keyframes vc-dot { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
 .vc-title-badge {
-  font-size: .7em; font-weight: 600; background: rgba(255,255,255,.08);
-  border-radius: 12px; padding: 1px 8px; color: #94a3b8;
+  font-size: .7em; font-weight: 600; background: rgba(255,255,255,.06);
+  border-radius: 999px; padding: 2px 9px; color: var(--secondary-text-color, #94a3b8);
 }
 .vc-subject {
-  font-size: 1.45em; font-weight: 800; color: #fff;
-  line-height: 1.2; margin-bottom: 6px;
+  font-size: 1.5em; font-weight: 800; color: var(--primary-text-color, #f8fafc);
+  letter-spacing: -0.3px;
+  line-height: 1.2; margin-bottom: 7px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .vc-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
 .vc-chip {
   display: inline-flex; align-items: center; gap: 3px;
-  font-size: .72em; font-weight: 600; color: #94a3b8;
-  background: rgba(255,255,255,.07); border-radius: 20px; padding: 2px 9px;
-  border: 1px solid rgba(255,255,255,.08);
+  font-size: .72em; font-weight: 600; color: var(--secondary-text-color, #94a3b8);
+  background: rgba(148,163,184,.10); border-radius: 999px; padding: 3px 10px;
+  border: 1px solid rgba(148,163,184,.14);
 }
-.vc-chip-sm { font-size: .68em; padding: 2px 7px; }
-.vc-info { font-size: .75em; color: #f59e0b; margin-bottom: 5px; }
+.vc-chip-sm { font-size: .68em; padding: 2px 8px; }
+.vc-info { font-size: .78em; color: #f59e0b; margin-bottom: 5px; }
 .vc-countdown {
-  font-size: .82em; color: #94a3b8; margin-top: 2px;
+  font-size: .84em; color: var(--secondary-text-color, #94a3b8); margin-top: 2px;
 }
 .vc-countdown strong { color: ${lessonTh.color}; }
-/* Progress bar */
+/* Progress bar (dezent) */
 .vc-progress-wrap {
-  margin-top: 10px; height: 5px;
-  background: rgba(255,255,255,.08); border-radius: 10px;
+  margin-top: 12px; height: 4px;
+  background: rgba(148,163,184,.15); border-radius: 999px;
   overflow: hidden; position: relative;
 }
 .vc-progress-bar {
-  height: 100%; border-radius: 10px;
+  height: 100%; border-radius: 999px;
   transition: width .8s ease;
-  box-shadow: 0 0 8px ${lessonTh.color}88;
 }
 .vc-progress-pct {
   position: absolute; right: 0; top: -16px;
@@ -2629,19 +2647,18 @@ ha-card {
 /* Next lesson */
 .vc-next {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding: 8px 18px;
-  background: rgba(255,255,255,.03);
-  border-top: 1px solid rgba(255,255,255,.05);
+  padding: 10px 20px;
+  border-top: 1px solid var(--divider-color, rgba(255,255,255,.07));
   font-size: .78em;
 }
-.vc-next-label { font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
-.vc-next-fach  { font-weight: 700; color: #e2e8f0; }
+.vc-next-label { font-weight: 700; color: var(--secondary-text-color, #64748b); text-transform: uppercase; letter-spacing: .06em; }
+.vc-next-fach  { font-weight: 700; color: var(--primary-text-color, #e2e8f0); }
 .vc-next-time  { color: ${lessonTh.color}; font-weight: 600; }
 /* Day info */
 .vc-day {
   display: flex; gap: 6px; flex-wrap: wrap;
-  padding: 8px 18px 12px;
-  border-top: 1px solid rgba(255,255,255,.04);
+  padding: 10px 20px 14px;
+  border-top: 1px solid var(--divider-color, rgba(255,255,255,.07));
 }
 </style>
 <ha-card>
@@ -2956,15 +2973,15 @@ class VpMobile24MultiCard extends HTMLElement {
     const l = ['de','en','fr'].includes(lang) ? lang : 'de';
     return {
       de: { sub:'Vtg.', cancel:'Ausfall', lesson:'Unterricht', subFull:'Vertretung',
-            nextLesson:'Nächste Stunde', period:'Stunde',
+            nextLesson:'Nächste Stunde', period:'Stunde', now:'Jetzt',
             curWeek:'‹ Aktuelle Woche', nextWeek:'Nächste Woche ›',
             noClasses:'Keine Klassen gefunden', kw:'KW', until:'bis' },
       en: { sub:'Sub.', cancel:'Cancel.', lesson:'Lesson', subFull:'Substitution',
-            nextLesson:'Next Lesson', period:'Period',
+            nextLesson:'Next Lesson', period:'Period', now:'Now',
             curWeek:'‹ Current Week', nextWeek:'Next Week ›',
             noClasses:'No classes found', kw:'CW', until:'until' },
       fr: { sub:'Remp.', cancel:'Annulé', lesson:'Cours', subFull:'Remplacement',
-            nextLesson:'Prochain cours', period:'Heure',
+            nextLesson:'Prochain cours', period:'Heure', now:'Actuel',
             curWeek:'‹ Semaine actuelle', nextWeek:'Semaine suivante ›',
             noClasses:'Aucune classe trouvée', kw:'SC', until:'jusqu\'au' },
     }[l];
@@ -3044,6 +3061,28 @@ class VpMobile24MultiCard extends HTMLElement {
   _render() {
     if (!this._hass || !this._config) return;
     const mcTh = this._getTheme();
+    const isLight = /^#?[ef]/i.test((mcTh.bg || '').replace('#','')) && parseInt((mcTh.bg||'#000').slice(1,3),16) > 200;
+
+    // ── Design-system palette (Dark + Light aware) ───────────────────────
+    const PAL = isLight ? {
+      primary:'#2563eb', success:'#16a34a', warning:'#b45309', error:'#dc2626',
+      txt:'#0f172a', txt2:'#64748b', txt3:'#94a3b8',
+      border:'rgba(15,23,42,.10)', surface:'rgba(15,23,42,.03)', surfaceH:'rgba(15,23,42,.06)',
+      curBg:'rgba(37,99,235,.14)', curTxt:'#1e3a8a', curRing:'#2563eb',
+      nBg:'rgba(22,163,74,.10)', nTxt:'#166534', nBorder:'rgba(22,163,74,.28)',
+      sBg:'rgba(180,83,9,.12)',  sTxt:'#92400e', sBorder:'rgba(180,83,9,.30)',
+      cBg:'rgba(220,38,38,.10)', cTxt:'#b91c1c', cBorder:'rgba(220,38,38,.28)',
+      empty:'rgba(15,23,42,.02)', emptyTxt:'rgba(15,23,42,.22)'
+    } : {
+      primary:'#4F7CFF', success:'#22C55E', warning:'#F59E0B', error:'#EF4444',
+      txt:'#F8FAFC', txt2:'#94A3B8', txt3:'#64748B',
+      border:'rgba(255,255,255,.07)', surface:'rgba(255,255,255,.03)', surfaceH:'rgba(255,255,255,.06)',
+      curBg:'rgba(79,124,255,.16)', curTxt:'#c7d6ff', curRing:'#4F7CFF',
+      nBg:'rgba(34,197,94,.10)', nTxt:'#86efac', nBorder:'rgba(34,197,94,.22)',
+      sBg:'rgba(245,158,11,.12)', sTxt:'#fcd34d', sBorder:'rgba(245,158,11,.28)',
+      cBg:'rgba(239,68,68,.10)',  cTxt:'#fca5a5', cBorder:'rgba(239,68,68,.24)',
+      empty:'rgba(255,255,255,.02)', emptyTxt:'rgba(148,163,184,.35)'
+    };
 
     const entities      = this._sortedEntities(this._config.entities);
     const title         = this._config.title || 'Stundenplan Übersicht';
@@ -3090,7 +3129,7 @@ class VpMobile24MultiCard extends HTMLElement {
     for (const entityId of filtered) {
       const entity    = this._hass.states[entityId];
       if (!entity) {
-        sectionsHtml += `<div class="mc-section mc-error">⚠ Entity nicht gefunden: ${entityId}</div>`;
+        sectionsHtml += `<div class="mc-section mc-error">Entity nicht gefunden: ${entityId}</div>`;
         continue;
       }
       const weekTable  = this._getWeekTable(entity);
@@ -3102,7 +3141,7 @@ class VpMobile24MultiCard extends HTMLElement {
       // Next lesson for badge
       const nextL = this._nextLesson(weekTable);
       const nextBadge = nextL && this._weekOffset === 0
-        ? `<span class="mc-next-badge">${mc.nextLesson}: ${dayNames[nextL.dayIdx]}, ${nextL.period}. ${mc.period}${nextL.lesson.fach ? ' · ' + nextL.lesson.fach : ''}</span>`
+        ? `<span class="mc-next-badge">${dayNames[nextL.dayIdx]} · ${nextL.period}.${nextL.lesson.fach ? ' ' + nextL.lesson.fach : ''}</span>`
         : '';
 
       // Stats row: count per type across whole week
@@ -3190,16 +3229,20 @@ class VpMobile24MultiCard extends HTMLElement {
               let tileStyle = '';
               let tileCls   = 'mc-tile';
               if (isCur) {
-                tileStyle = 'background:#14532d;color:#86efac;box-shadow:0 0 0 2px #22c55e;font-weight:700';
+                tileStyle = `background:${PAL.curBg};color:${PAL.curTxt};box-shadow:inset 0 0 0 1.5px ${PAL.curRing};font-weight:700`;
               } else if (type === 'empty' || !les) {
-                tileStyle = `background:${isT ? 'rgba(37,99,235,.06)' : 'rgba(255,255,255,.03)'};color:#334155`;
+                tileStyle = `background:${isT ? PAL.surface : PAL.empty};color:${PAL.emptyTxt}`;
+              } else if (type === 'cancelled') {
+                tileStyle = `background:${PAL.cBg};color:${PAL.cTxt};box-shadow:inset 0 0 0 1px ${PAL.cBorder}`;
+              } else if (type === 'sub') {
+                tileStyle = `background:${PAL.sBg};color:${PAL.sTxt};box-shadow:inset 0 0 0 1px ${PAL.sBorder}`;
               } else {
-                tileStyle = `background:${bg};color:${type==='cancelled'?'#fca5a5':type==='sub'?'#fde68a':'#dcfce7'};border:1px solid ${color}35`;
+                tileStyle = `background:${PAL.nBg};color:${PAL.nTxt};box-shadow:inset 0 0 0 1px ${PAL.nBorder}`;
               }
               if (les) tileCls += ' mc-tile-hover';
               const tooltip = les ? `title="${[les.fach, les.lehrer && les.lehrer, les.raum && les.raum].filter(Boolean).join(' · ')}"` : '';
               gridHtml += `<td class="${isT?'mc-td-today':''}">
-                <div class="mc-tile" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
+                <div class="${tileCls}" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
               </td>`;
             });
             gridHtml += '</tr>';
@@ -3210,8 +3253,8 @@ class VpMobile24MultiCard extends HTMLElement {
           if (nextL && this._weekOffset === 0) {
             const nl = nextL.lesson;
             const ntype = this._lessonType(nl);
-            const ncolor = this._statusColor(ntype);
-            gridHtml += `<div class="mc-next-bar" style="border-left:3px solid ${ncolor}">
+            const ncolor = ntype==='cancelled'?PAL.error:ntype==='sub'?PAL.warning:PAL.primary;
+            gridHtml += `<div class="mc-next-bar" style="box-shadow:inset 3px 0 0 ${ncolor}">
               <span class="mc-next-label">${mc.nextLesson}</span>
               <span class="mc-next-info">${dayFull[nextL.dayIdx]}, ${nextL.period}. ${mc.period}</span>
               ${nl.fach ? `<span class="mc-next-fach" style="color:${ncolor}">${nl.fach}</span>` : ''}
@@ -3231,9 +3274,9 @@ class VpMobile24MultiCard extends HTMLElement {
               ${nextBadge}
             </div>
             <div class="mc-section-stats">
-              ${nNormal ? `<span class="mc-stat mc-stat-n">${nNormal}×</span>` : ''}
-              ${nSub    ? `<span class="mc-stat mc-stat-s">${nSub}× ${mc.sub}</span>` : ''}
-              ${nCancel ? `<span class="mc-stat mc-stat-c">${nCancel}× ${mc.cancel}</span>` : ''}
+              ${nNormal ? `<span class="mc-stat" title="${mc.lesson}"><span class="mc-stat-dot" style="background:${PAL.success}"></span>${nNormal}</span>` : ''}
+              ${nSub    ? `<span class="mc-stat" title="${mc.subFull}"><span class="mc-stat-dot" style="background:${PAL.warning}"></span>${nSub}</span>` : ''}
+              ${nCancel ? `<span class="mc-stat" title="${mc.cancel}"><span class="mc-stat-dot" style="background:${PAL.error}"></span>${nCancel}</span>` : ''}
             </div>
           </div>
           <div class="mc-section-body${isCollapsed ? ' hidden' : ''}">
@@ -3250,9 +3293,10 @@ class VpMobile24MultiCard extends HTMLElement {
 
     const legendHtml = showLegend ? `
       <div class="mc-legend">
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#22c55e"></span>${mc.lesson}</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#eab308"></span>${mc.subFull}</span>
-        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:#ef4444"></span>${mc.cancel}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.success}"></span>${mc.lesson}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.warning}"></span>${mc.subFull}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.error}"></span>${mc.cancel}</span>
+        <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.primary}"></span>${mc.now || 'Jetzt'}</span>
       </div>` : '';
 
     // ── Full HTML ─────────────────────────────────────────────────────────
@@ -3261,36 +3305,34 @@ class VpMobile24MultiCard extends HTMLElement {
 :host { display: block; }
 ha-card {
   background: ${mcTh.bg} !important;
-  border-radius: 16px !important;
+  border-radius: 20px !important;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.08) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,.55) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #e2e8f0 !important;
+  border: 1px solid ${PAL.border} !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.20) !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: ${PAL.txt} !important;
 }
 /* ── HEADER ── */
 .mc-hdr {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 16px 10px;
-  background: rgba(255,255,255,.02);
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  flex-wrap: wrap; gap: 8px;
+  display: flex; align-items: center;
+  padding: 16px 18px;
+  flex-wrap: wrap; gap: 10px;
 }
 .mc-hdr-icon {
   width: 38px; height: 38px; flex-shrink: 0;
-  background: linear-gradient(135deg,#3b82f6,#1d4ed8);
-  border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.2em;
-  box-shadow: 0 3px 10px rgba(29,78,216,.45);
+  background: linear-gradient(135deg,${PAL.primary},#6d5dfb);
+  border-radius: 11px; display: flex; align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(79,124,255,.30);
 }
 .mc-hdr-title {
-  font-size: 1.05em; font-weight: 700; color: #fff;
-  flex: 1; min-width: 100px;
+  font-size: 1.1em; font-weight: 800; color: ${PAL.txt};
+  flex: 1; min-width: 100px; letter-spacing: -.2px;
 }
 .mc-hdr-kw {
-  font-size: .75em; font-weight: 600; color: #64748b;
-  background: rgba(255,255,255,.06); border-radius: 20px;
-  padding: 4px 10px; white-space: nowrap;
+  font-size: .74em; font-weight: 700; color: ${PAL.txt2};
+  background: ${PAL.surface}; border: 1px solid ${PAL.border}; border-radius: 20px;
+  padding: 4px 11px; white-space: nowrap;
 }
 /* ── CONTROLS ── */
 .mc-controls {
@@ -3311,115 +3353,116 @@ ha-card {
 .mc-search::placeholder { color: #475569; }
 .mc-pill {
   display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 20px; padding: 5px 12px;
-  font-size: .76em; font-weight: 500; color: #94a3b8;
+  background: ${PAL.surface};
+  border: 1px solid ${PAL.border};
+  border-radius: 20px; padding: 6px 13px;
+  font-size: .76em; font-weight: 600; color: ${PAL.txt2};
   cursor: pointer; font-family: inherit; white-space: nowrap;
-  transition: all .2s; line-height: 1.3;
+  transition: all .18s; line-height: 1.3;
 }
-.mc-pill:hover { background: rgba(255,255,255,.12); color: #e2e8f0; }
-.mc-pill-blue { color: #93c5fd; border-color: rgba(59,130,246,.3); background: rgba(59,130,246,.08); }
-.mc-pill-blue:hover { background: rgba(59,130,246,.18); border-color: #3b82f6; }
-.mc-pill-green { color: #86efac; border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.08); }
-.mc-pill-green:hover { background: rgba(34,197,94,.18); border-color: #22c55e; }
+.mc-pill:hover { background: ${PAL.surfaceH}; color: ${PAL.txt}; }
+.mc-pill-blue { color: ${PAL.primary}; border-color: rgba(79,124,255,.35); background: rgba(79,124,255,.08); }
+.mc-pill-blue:hover { background: rgba(79,124,255,.16); border-color: ${PAL.primary}; }
+.mc-pill-green { color: ${PAL.success}; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); }
+.mc-pill-green:hover { background: rgba(34,197,94,.16); border-color: ${PAL.success}; }
 /* ── GRID LAYOUT for sections ── */
 .mc-sections-grid {
   display: grid;
   grid-template-columns: ${gridCols};
-  gap: 10px;
-  padding: 10px 12px 14px;
+  gap: 6px;
+  padding: 4px 10px 8px;
 }
-/* ── SECTION ── */
+/* ── SECTION (borderless, divider-based) ── */
 .mc-section {
-  background: color-mix(in srgb, ${mcTh.tile_bg} 40%, transparent);
-  border: 1px solid rgba(255,255,255,.07);
+  background: transparent;
   border-radius: 12px; overflow: hidden;
 }
 .mc-section-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; cursor: pointer;
-  background: rgba(255,255,255,.04);
-  transition: background .15s; user-select: none; gap: 8px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  padding: 11px 8px; cursor: pointer;
+  background: transparent;
+  transition: background .15s; user-select: none; gap: 10px;
+  border-radius: 10px;
 }
-.mc-section-head:hover { background: rgba(255,255,255,.07); }
-.mc-section-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; flex-wrap: wrap; }
+.mc-section-head:hover { background: ${PAL.surface}; }
+.mc-section-left { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 0; flex-wrap: wrap; }
 .mc-chevron {
-  font-size: 1.1em; color: #475569; font-weight: 700;
+  font-size: 1.15em; color: ${PAL.txt3}; font-weight: 700;
   transition: transform .25s; display: inline-block; flex-shrink: 0;
 }
-.mc-chevron-open { transform: rotate(90deg); }
-.mc-class-name { font-size: .95em; font-weight: 700; color: #e2e8f0; white-space: nowrap; }
+.mc-chevron-open { transform: rotate(90deg); color: ${PAL.primary}; }
+.mc-class-name { font-size: .98em; font-weight: 800; color: ${PAL.txt}; white-space: nowrap; letter-spacing: -.2px; }
 .mc-next-badge {
-  font-size: .68em; font-weight: 600; color: #93c5fd;
-  background: rgba(59,130,246,.13); border: 1px solid rgba(59,130,246,.25);
-  border-radius: 12px; padding: 2px 8px; white-space: nowrap;
+  font-size: .7em; font-weight: 600; color: ${PAL.txt2};
+  background: ${PAL.surface}; border: 1px solid ${PAL.border};
+  border-radius: 12px; padding: 2px 9px; white-space: nowrap;
 }
-.mc-section-stats { display: flex; gap: 5px; flex-shrink: 0; }
-.mc-stat { font-size: .68em; font-weight: 700; border-radius: 10px; padding: 2px 7px; }
-.mc-stat-n { background: rgba(34,197,94,.12);  color: #86efac; }
-.mc-stat-s { background: rgba(234,179,8,.12);  color: #fde68a; }
-.mc-stat-c { background: rgba(239,68,68,.12);  color: #fca5a5; }
-.mc-section-body { padding: 0; transition: max-height .3s ease; }
+.mc-section-stats { display: flex; gap: 9px; flex-shrink: 0; align-items: center; }
+.mc-stat { font-size: .78em; font-weight: 700; color: ${PAL.txt2}; display: inline-flex; align-items: center; gap: 5px; }
+.mc-stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.mc-section-body { padding: 0; }
 .mc-section-body.hidden { display: none; }
-.mc-no-data { padding: 14px 16px; color: #475569; font-size: .85em; font-style: italic; }
-.mc-error { padding: 14px; color: #ef4444; font-size: .82em; border: 1px solid rgba(239,68,68,.2); border-radius: 12px; }
+.mc-no-data { padding: 14px 16px; color: ${PAL.txt3}; font-size: .85em; font-style: italic; }
+.mc-error { padding: 14px; color: ${PAL.error}; font-size: .82em; border: 1px solid rgba(239,68,68,.2); border-radius: 12px; }
 /* ── TIMETABLE ── */
-.mc-grid-wrap { overflow-x: auto; }
-.mc-tbl { width: 100%; border-collapse: separate; border-spacing: 0; padding: 6px 8px 8px; }
+.mc-grid-wrap { overflow-x: auto; padding: 2px 4px 6px; }
+.mc-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
 .mc-tbl thead th {
-  font-size: .7em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .5px; color: #475569; padding: 5px 3px;
+  font-size: .68em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: ${PAL.txt3}; padding: 4px 3px 8px;
   text-align: center;
 }
 .mc-th-today { display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
-  background: #2563eb; color: #fff; border-radius: 7px; padding: 3px 9px;
-  font-size: .88em; font-weight: 700; }
-.mc-th-day  { display: block; font-size: .88em; }
-.mc-th-date { display: block; font-size: .8em; color: #475569; font-weight: 500; }
-.mc-th-today .mc-th-date { color: rgba(255,255,255,.75); }
-.mc-td-num { width: 44px; min-width: 44px; padding: 3px 4px; text-align: center; }
-.mc-pnum  { font-size: .82em; font-weight: 700; color: #94a3b8; line-height: 1.3; }
-.mc-ptime { font-size: .58em; color: #334155; white-space: nowrap; margin-top: 1px; }
-.mc-tbl td { padding: 3px 3px; vertical-align: middle; }
-.mc-td-today { background: rgba(37,99,235,.05); }
+  background: ${PAL.primary}; color: #fff; border-radius: 8px; padding: 3px 10px;
+  font-size: .9em; font-weight: 700; }
+.mc-th-day  { display: block; font-size: .9em; }
+.mc-th-date { display: block; font-size: .82em; color: ${PAL.txt3}; font-weight: 500; }
+.mc-th-today .mc-th-date { color: rgba(255,255,255,.8); }
+.mc-td-num { width: 42px; min-width: 42px; padding: 3px 4px; text-align: center; }
+.mc-pnum  { font-size: .82em; font-weight: 700; color: ${PAL.txt2}; line-height: 1.3; }
+.mc-ptime { font-size: .58em; color: ${PAL.txt3}; white-space: nowrap; margin-top: 1px; }
+.mc-tbl td { padding: 2px 2px; vertical-align: middle; }
+.mc-td-today { background: ${PAL.surface}; }
+.mc-td-today:first-of-type { border-radius: 8px 0 0 8px; }
 .mc-tile {
-  border-radius: 7px; padding: 4px 3px;
+  border-radius: 8px; padding: 4px 3px;
   font-size: .78em; font-weight: 600;
   min-height: 38px; display: flex; align-items: center; justify-content: center;
   text-align: center; transition: filter .12s, transform .12s;
   line-height: 1.2;
 }
-.mc-tile-hover:hover { filter: brightness(1.18); transform: scale(1.05); }
-/* ── NEXT LESSON BAR ── */
+.mc-tile-hover { cursor: pointer; }
+.mc-tile-hover:hover { filter: brightness(1.12); transform: translateY(-1px); }
+/* ── NEXT LESSON BAR (subtle status bar, not a box) ── */
 .mc-next-bar {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin: 0 8px 8px; padding: 7px 12px;
-  background: rgba(255,255,255,.04); border-radius: 8px;
-  font-size: .75em;
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  margin: 2px 8px 10px; padding: 8px 12px 8px 14px;
+  background: ${PAL.surface}; border-radius: 10px;
+  font-size: .76em;
 }
-.mc-next-label { font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
-.mc-next-info  { color: #94a3b8; }
-.mc-next-fach  { font-weight: 700; }
-.mc-next-chip  { color: #64748b; background: rgba(255,255,255,.05); border-radius: 6px; padding: 1px 6px; }
-/* ── LEGEND ── */
+.mc-next-label { font-weight: 700; color: ${PAL.txt3}; text-transform: uppercase; letter-spacing: .5px; flex-shrink: 0; }
+.mc-next-info  { color: ${PAL.txt2}; }
+.mc-next-fach  { font-weight: 800; }
+.mc-next-chip  { color: ${PAL.txt2}; background: ${PAL.surfaceH}; border-radius: 6px; padding: 1px 7px; }
+/* ── LEGEND (compact) ── */
 .mc-legend {
-  display: flex; gap: 14px; flex-wrap: wrap;
-  padding: 8px 16px 12px; font-size: .75em; color: #64748b;
-  border-top: 1px solid rgba(255,255,255,.05);
+  display: flex; gap: 16px; flex-wrap: wrap;
+  padding: 10px 18px 14px; font-size: .74em; color: ${PAL.txt2};
+  border-top: 1px solid ${PAL.border};
 }
-.mc-leg-item { display: flex; align-items: center; gap: 5px; }
+.mc-leg-item { display: flex; align-items: center; gap: 6px; }
 .mc-leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 /* ── POPUP — same style as main card ── */
 .vp-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 9998; backdrop-filter: blur(3px); }
 .vp-popup {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  background: #162040; border-radius: 16px;
-  box-shadow: 0 16px 64px rgba(0,0,0,.8);
-  max-width: 400px; width: 94%; z-index: 9999;
-  border: 1px solid rgba(255,255,255,.13); color: #e2e8f0; overflow: hidden;
+  background: #131f38; border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  max-width: 440px; width: calc(100% - 32px); z-index: 9999;
+  border: 1px solid rgba(255,255,255,.08); color: #e2e8f0; overflow: hidden;
+  animation: vp-popup-in .18s ease;
 }
+@keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 .vp-popup-title {
   font-size: 1em; font-weight: 700; color: #fff;
   padding: 18px 20px 14px;
@@ -3438,16 +3481,16 @@ ha-card {
 .vp-detail-val  { font-size: .92em; font-weight: 500; color: #e2e8f0; flex: 1; }
 .vp-detail-empty{ padding: 16px 20px; color: #475569; font-size: .86em; font-style: italic; }
 .vp-popup-footer{ padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn   { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 9px 24px; cursor: pointer; font-size: .88em; font-family: inherit; font-weight: 600; transition: background .18s; }
-.vp-popup-btn:hover { background: #1d4ed8; }
+.vp-popup-btn   { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn:hover { background: #6d5dfb; transform: translateY(-1px); }
 .vp-popup-ausfall {
-  background: linear-gradient(135deg,#7f1d1d,#991b1b) !important;
-  border-color: rgba(239,68,68,.5) !important;
-  box-shadow: 0 0 0 1px rgba(239,68,68,.3), 0 16px 56px rgba(239,68,68,.45) !important;
-  display: flex !important; flex-direction: column !important; min-height: 200px;
+  background: #131f38 !important;
+  border-color: rgba(239,68,68,.45) !important;
+  box-shadow: 0 0 0 1px rgba(239,68,68,.22), 0 20px 60px rgba(239,68,68,.16) !important;
+  display: flex !important; flex-direction: column !important;
 }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
-.vp-ausfall-block { color: #fca5a5; font-size: 2.6em; font-weight: 900; letter-spacing: 5px; text-align: center; padding: 24px 20px; text-shadow: 0 0 30px rgba(255,100,100,1); flex: 1; display: flex; align-items: center; justify-content: center; }
+.vp-ausfall-block { color: #fca5a5; font-size: 1.3em; font-weight: 800; letter-spacing: 1px; text-align: center; padding: 28px 20px 12px; }
 .hidden { display: none !important; }
 </style>
 <ha-card>
@@ -3463,7 +3506,7 @@ ha-card {
   </div>
 
   <!-- Holiday banner -->
-  ${isHoliday ? `<div style="margin:8px 16px 0;padding:10px 14px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:#fde68a;font-size:.9em">🏖️ ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
+  ${isHoliday ? `<div style="margin:6px 16px 2px;padding:10px 14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:${isLight ? '#6d28d9' : '#c4b5fd'};font-size:.9em"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg> ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
 
   <!-- Class sections grid -->
   <div class="mc-sections-grid">
@@ -3482,4 +3525,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.7 loaded');
+console.log('✅ VpMobile24 Card v2.6.1 loaded');
