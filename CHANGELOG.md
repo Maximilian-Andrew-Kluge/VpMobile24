@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.3\] - 2026-08-27
+
+### Changed
+
+-   Stundenplan-Zellen sind jetzt exakt gleich groß — lange Ausfall-/Vertretungstexte vergrößern die Zelle nicht mehr (feste Zellenhöhe, `table-layout: fixed`, gleiche Spaltenbreiten, Text clippt statt zu wachsen)
+-   Info-Button aus dem Karten-Header entfernt; „Nächste Woche" und Reload stehen jetzt kompakt zusammen (Tagesinfos bleiben über die 📌-Zeile im Plan erreichbar)
+
 ## \[2.6.2\] - 2026-08-27
 
 ### Changed

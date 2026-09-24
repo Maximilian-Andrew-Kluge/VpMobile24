@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.2
-console.info('%c VpMobile24-CARD %c v2.6.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.3
+console.info('%c VpMobile24-CARD %c v2.6.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -1541,13 +1541,18 @@ ha-card {
 .vp-hint-holiday { background: rgba(139,92,246,.14); color: #c4b5fd; border: 1px solid rgba(139,92,246,.3); font-weight: 700; }
 
 /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
-.vp-table { width: 100%; border-collapse: separate; border-spacing: 4px 6px; padding: 8px 12px 12px; }
+/* table-layout:fixed => alle Tages-Spalten exakt gleich breit, unabhängig
+   vom Textinhalt. Die Zeitspalte (#) hat eine eigene feste Breite. */
+.vp-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 4px 6px; padding: 8px 12px 12px; }
 .vp-table th {
   padding: 6px 3px 10px; text-align: center;
   font-size: 0.72em; font-weight: 700; text-transform: uppercase;
   letter-spacing: .6px; color: var(--vpm-text-muted);
   background: transparent; line-height: 1.3;
 }
+/* Alle 5 Tages-Spalten teilen sich die Restbreite zu gleichen Teilen */
+.vp-table th:not(.vp-th-num),
+.vp-table td:not(.vp-td-num) { width: calc((100% - 50px) / 5); }
 .vp-th-num { width: 50px; min-width: 50px; }
 .vp-th-day  { display: block; font-size: .92em; }
 .vp-th-date { display: block; font-size: .82em; color: var(--vpm-text-faint); font-weight: 500;
@@ -1573,17 +1578,22 @@ ha-card {
    statt vollflächiger Farbe. Weniger visuelles Rauschen, klare Hierarchie. */
 .vp-tile {
   position: relative;
+  box-sizing: border-box;
+  width: 100%; max-width: 100%;
   border-radius: var(--vpm-radius-tile); padding: 4px 6px 4px 10px;
   font-size: .86em; font-weight: 600; color: var(--vpm-text);
-  height: 52px; min-height: 52px;
+  height: 52px; min-height: 52px; max-height: 52px;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   transition: background .15s, transform .15s, box-shadow .15s;
   background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent);
   border: 1px solid var(--vpm-hairline);
   line-height: 1.2; text-align: center;
+  /* Text darf die feste Zellengröße niemals verändern: fester Höhenrahmen +
+     overflow:hidden clippen langen Text, kein Wachsen der Zelle. */
   overflow: hidden;
   word-break: break-word;
+  overflow-wrap: anywhere;
   hyphens: auto;
 }
 /* kleiner Statuspunkt oben rechts */
@@ -1941,9 +1951,6 @@ ha-card {
     </div>
     <div class="vp-hdr-spacer"></div>
     <div class="vp-hdr-actions">
-      ${infoBtn && weekOffset === 0
-        ? `<button class="vp-pill vp-pill-amber${infoBtnHasInfo ? ' has-info' : ''}" data-vpm="info" title="${t.infoTitle}">ⓘ Info</button>`
-        : ''}
       ${weekOffset === 0
         ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
         : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
@@ -3352,4 +3359,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.2 loaded');
+console.log('✅ VpMobile24 Card v2.6.3 loaded');
