@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.3
-console.info('%c VpMobile24-CARD %c v2.6.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.4
+console.info('%c VpMobile24-CARD %c v2.6.4 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -500,31 +500,25 @@ class VpMobile24Card extends HTMLElement {
 
     const wi = attr.week_infos;
     let allg = [];
-    let stund = [];
     if (wi && wi[selectedKey]) {
-      allg  = toArr(wi[selectedKey].allgemeine_infos);
-      stund = toArr(wi[selectedKey].stunden_infos);
+      allg = toArr(wi[selectedKey].allgemeine_infos);
     }
     // Fallback to today's top-level attrs only when showing today
     if (allg.length === 0 && selectedKey === todayKey)  allg  = toArr(attr.allgemeine_infos);
-    if (stund.length === 0 && selectedKey === todayKey) stund = toArr(attr.stunden_infos);
+
+    // NOTE: "Stunden-Informationen" (per-lesson cancellations/substitutions)
+    // are intentionally NOT shown here — they belong in the timetable itself.
+    // This popup shows ONLY general daily information (allgemeine_infos).
 
     let bodyHtml = '';
     // Day heading so the user knows which day the infos belong to
     bodyHtml += `<div class="vp-info-day-head">${selName}</div>`;
     if (allg.length > 0) {
       bodyHtml += `<div class="vp-info-section">
-        <div class="vp-info-section-label">${t.genInfo || '📢 Allgemeine Informationen'}</div>
+        <div class="vp-info-section-label">${(t.genInfo || 'Allgemeine Informationen').replace(/^[^\p{L}]+/u, '')}</div>
         ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
       </div>`;
-    }
-    if (stund.length > 0) {
-      bodyHtml += `<div class="vp-info-section">
-        <div class="vp-info-section-label">${t.lessonInfo || '📋 Stunden-Informationen'}</div>
-        ${stund.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
-      </div>`;
-    }
-    if (allg.length === 0 && stund.length === 0) {
+    } else {
       const noInfoMsg = haLang === 'en' ? `No additional info for ${selName} available.`
                       : haLang === 'fr' ? `Aucune info pour ${selName}.`
                       : `Keine Zusatzinformationen für ${selName} verfügbar.`;
@@ -544,7 +538,7 @@ class VpMobile24Card extends HTMLElement {
       p.id = 'info-popup';
       p.className = 'vp-popup';
       p.innerHTML = `
-        <div class="vp-info-popup-title">${t.infoTitle || 'ℹ️ Zusatzinformationen'}</div>
+        <div class="vp-info-popup-title">${(t.infoTitle || 'Zusatzinformationen').replace(/^[^\p{L}]+/u, '')}</div>
         <div id="info-popup-content"></div>
         <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close || 'Schließen'}</button></div>`;
       this.shadowRoot.appendChild(p);
@@ -1490,6 +1484,8 @@ ha-card {
 }
 .vp-pill:hover { background: rgba(255,255,255,0.11); color: var(--vpm-text); transform: translateY(-1px); }
 .vp-pill:focus-visible { outline: 2px solid var(--vpm-c-current); outline-offset: 2px; }
+/* Icon-Pill (Reload): nahezu quadratisch, gleiche Höhe wie die Text-Pill */
+.vp-pill-icon { width: 34px; padding: 7px 0; font-size: .95em; }
 .vp-pill-blue  { color: #9db8ff; border-color: rgba(79,124,255,0.3); background: rgba(79,124,255,0.10); }
 .vp-pill-blue:hover  { background: rgba(79,124,255,0.2); border-color: #4f7cff; color: #c3d2ff; }
 .vp-pill-green { color: #86efac; border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
@@ -1580,9 +1576,9 @@ ha-card {
   position: relative;
   box-sizing: border-box;
   width: 100%; max-width: 100%;
-  border-radius: var(--vpm-radius-tile); padding: 4px 6px 4px 10px;
-  font-size: .86em; font-weight: 600; color: var(--vpm-text);
-  height: 52px; min-height: 52px; max-height: 52px;
+  border-radius: var(--vpm-radius-tile); padding: 6px 7px 6px 11px;
+  font-size: .95em; font-weight: 600; color: var(--vpm-text);
+  height: 58px; min-height: 58px; max-height: 58px;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   transition: background .15s, transform .15s, box-shadow .15s;
@@ -1605,8 +1601,8 @@ ha-card {
   width: 6px; height: 6px; border-radius: 50%;
 }
 .vp-tile.vp-teacher-tile {
-  height: 62px; min-height: 62px;
-  padding: 4px 4px 4px 10px;
+  height: 68px; min-height: 68px; max-height: 68px;
+  padding: 5px 5px 5px 11px;
   hyphens: none;
   word-break: normal;
 }
@@ -1715,6 +1711,8 @@ ha-card {
   border: 1px solid rgba(239,68,68,0.2);
   border-left: 3px solid var(--vpm-c-cancel);
   font-weight: 700;
+  /* Ausfalltext etwas kleiner, damit lange Meldungen in ~3 Zeilen passen */
+  font-size: .82em; line-height: 1.15;
 }
 .vp-tile.vp-cancelled::after { background: var(--vpm-c-cancel); }
 .vp-today-col .vp-tile.vp-cancelled { background: rgba(239,68,68,0.15); }
@@ -1839,12 +1837,14 @@ ha-card {
 }
 .vp-popup {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  background: #131f38; border-radius: 16px;
-  box-shadow: 0 16px 56px rgba(0,0,0,.75);
-  max-width: 420px; width: 94%; z-index: 9999;
-  border: 1px solid rgba(255,255,255,.1); color: #e2e8f0; overflow: hidden;
+  background: #131f38; border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  max-width: 440px; width: calc(100% - 32px); z-index: 9999;
+  border: 1px solid rgba(255,255,255,.08); color: #e2e8f0; overflow: hidden;
   max-height: 85vh; display: flex; flex-direction: column;
+  animation: vp-popup-in .18s ease;
 }
+@keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 .vp-popup-title {
   font-size: 1em; font-weight: 700; color: #fff;
   padding: 18px 20px 14px;
@@ -1863,9 +1863,10 @@ ha-card {
 .vp-detail-label  { font-size: .75em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 52px; }
 .vp-detail-val    { font-size: .92em; font-weight: 500; color: #e2e8f0; flex: 1; }
 .vp-detail-empty  { padding: 16px 20px; color: #475569; font-size: .85em; font-style: italic; }
-.vp-popup-footer  { padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn     { background: #2563eb; color: #fff; border: none; border-radius: 8px; padding: 9px 22px; cursor: pointer; font-size: .88em; font-family: inherit; transition: background .18s; }
-.vp-popup-btn:hover { background: #1d4ed8; }
+.vp-popup-footer  { padding: 14px 18px 18px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
+.vp-popup-btn     { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 22px; cursor: pointer; font-size: .88em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 40px; }
+.vp-popup-btn:hover { background: #6d5dfb; transform: translateY(-1px); }
+.vp-popup-btn:focus-visible { outline: 2px solid #9db8ff; outline-offset: 2px; }
 /* Ausfall popup */
 .vp-popup-ausfall {
   background: linear-gradient(135deg,#7f1d1d,#991b1b) !important;
@@ -1885,40 +1886,54 @@ ha-card {
   color: #fca5a5; font-size: 0.95em; font-weight: 500;
   text-align: center; padding: 4px 16px 16px; opacity: 0.85;
 }
-/* Info popup */
+/* ── Info popup (modernes Informations-Panel) ── */
 .vp-info-popup-title {
-  padding: 16px 20px 12px; font-size: 1em; font-weight: 700; color: #fcd34d;
-  border-bottom: 1px solid rgba(245,158,11,.2);
-  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  padding: 18px 20px 6px; font-size: 1.12em; font-weight: 800; color: var(--vpm-text);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  letter-spacing: -0.3px;
 }
-#info-popup-content { overflow-y: auto; flex: 1; }
-.vp-info-section { padding: 10px 16px 4px; }
+.vp-info-popup-title::before {
+  content: 'ℹ'; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; flex-shrink: 0; font-size: .78em;
+  background: rgba(79,124,255,0.14); color: #9db8ff;
+  border: 1px solid rgba(79,124,255,0.28); border-radius: 9px;
+}
+#info-popup-content { overflow-y: auto; flex: 1; padding-bottom: 6px; }
+/* Dünne, dezente Scrollbar passend zum Dark-Theme */
+#info-popup-content { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+#info-popup-content::-webkit-scrollbar { width: 7px; }
+#info-popup-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; }
+#info-popup-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); }
+#info-popup-content::-webkit-scrollbar-track { background: transparent; }
+/* Tages-Überschrift unter dem Titel */
+.vp-info-day-head {
+  font-size: .82em; font-weight: 600; color: var(--vpm-text-muted);
+  padding: 0 20px 12px; margin: 0;
+  border-bottom: var(--vpm-border);
+}
+.vp-info-section { padding: 14px 20px 4px; }
 .vp-info-section-label {
-  font-size: .65em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .8px; color: #64748b; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 5px;
+  font-size: .66em; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .9px; color: var(--vpm-text-faint); margin-bottom: 8px;
 }
+/* Info-Einträge: leicht, ohne schweren Rahmen — nur Bullet + Text + Hover */
 .vp-info-entry {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 7px 10px; margin-bottom: 4px;
-  background: rgba(255,255,255,.04); border-radius: 8px;
-  border-left: 3px solid rgba(245,158,11,.4);
-  font-size: .88em; color: #e2e8f0; line-height: 1.4;
+  display: flex; gap: 11px; align-items: flex-start;
+  padding: 9px 10px; margin-bottom: 2px;
+  background: transparent; border: none; border-radius: 10px;
+  font-size: .9em; color: var(--vpm-text); line-height: 1.5;
+  transition: background .15s;
 }
-.vp-info-entry::before { content: '•'; color: #f59e0b; flex-shrink: 0; margin-top: 1px; }
+.vp-info-entry:hover { background: rgba(255,255,255,0.04); }
+.vp-info-entry::before {
+  content: ''; flex-shrink: 0; margin-top: .55em;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #9db8ff;
+}
 .vp-info-none {
-  padding: 24px 20px; color: #475569;
-  font-size: .85em; font-style: italic; text-align: center;
+  padding: 22px 20px; color: var(--vpm-text-faint);
+  font-size: .88em; text-align: center;
 }
-.vp-info-section { padding: 12px 20px 4px; }
-.vp-info-section-label { font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #64748b; margin-bottom: 8px; }
-.vp-info-entry {
-  display: flex; gap: 10px; align-items: flex-start;
-  padding: 9px 12px; margin-bottom: 6px;
-  background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.15);
-  border-radius: 8px; font-size: .86em; color: #e2e8f0; line-height: 1.5;
-}
-.vp-info-none { padding: 16px 20px; color: #475569; font-size: .86em; font-style: italic; }
 .hidden { display: none !important; }
 
 /* ══ ACCESSIBILITY ═══════════════════════════════════════════════════════ */
@@ -1955,7 +1970,7 @@ ha-card {
         ? `<button class="vp-pill vp-pill-blue" data-vpm="next-week">${t.nextWeek}</button>`
         : `<button class="vp-pill vp-pill-green" data-vpm="cur-week">${t.currentWeek}</button>`}
       ${reloadEntity
-        ? `<button class="vp-pill${this._reloading ? ' vp-pill-reloading' : ''}" data-vpm="reload"><span class="vp-reload-icon" style="display:inline-block">↺</span></button>`
+        ? `<button class="vp-pill vp-pill-icon${this._reloading ? ' vp-pill-reloading' : ''}" data-vpm="reload" title="${t.refresh || 'Aktualisieren'}"><span class="vp-reload-icon" style="display:inline-block">↺</span></button>`
         : ''}
     </div>
   </div>
@@ -1988,7 +2003,7 @@ ha-card {
 <!-- ── Info popup ── -->
 <div id="info-popup-overlay" class="vp-popup-overlay hidden"></div>
 <div id="info-popup" class="vp-popup hidden">
-  <div class="vp-info-popup-title">${t.infoTitle}</div>
+  <div class="vp-info-popup-title">${(t.infoTitle || 'Zusatzinformationen').replace(/^[^\p{L}]+/u, '')}</div>
   <div id="info-popup-content"></div>
   <div class="vp-popup-footer"><button class="vp-popup-btn" data-vpm="close-info">${t.close}</button></div>
 </div>`;
@@ -3359,4 +3374,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.3 loaded');
+console.log('✅ VpMobile24 Card v2.6.4 loaded');

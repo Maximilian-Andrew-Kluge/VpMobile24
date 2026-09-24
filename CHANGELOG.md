@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.4\] - 2026-08-27
+
+### Changed
+
+-   Zusatzinfo-Fenster: „Stunden-Informationen" (einzelne Ausfall-/Vertretungsmeldungen) werden dort nicht mehr angezeigt — sie erscheinen weiterhin im Stundenplan selbst. Das Fenster zeigt nur noch allgemeine Tagesinfos.
+-   Zusatzinfo-Fenster modernisiert: dezenter blauer Icon-Header, leichte Info-Einträge (Bullet + Hover statt schwerer Boxen), dünne Scrollbar, moderner Schließen-Button
+-   Obere Buttons vereinheitlicht: „Nächste Woche" und Reload gleiche Höhe, Reload als quadratische Icon-Pill
+-   Stundenfelder leicht vergrößert (58px, größere Fachkürzel) bei weiterhin exakt gleichen Zellengrößen; Ausfalltext etwas kompakter
+
 ## \[2.6.3\] - 2026-08-27
 
 ### Changed
