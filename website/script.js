@@ -143,91 +143,118 @@
     }).catch(() => {});
   });
 
-  /* ---------- Interactive demo ---------- */
-  const DEMO = {
-    0: { date: "Mo, 22. Sep", today: true, lessons: [
-      { t: "08:00", s: "Mathematik", teach: "Müller", room: "201", type: "normal" },
-      { t: "08:50", s: "Deutsch", teach: "Schmidt", room: "103", type: "normal" },
-      { pause: "09:35 – 09:50" },
-      { t: "09:50", s: "Englisch", teach: "Weber", room: "204", type: "normal" },
-      { t: "10:40", s: "Physik", teach: "—", room: "—", type: "cancel" },
-      { t: "11:30", s: "Sport", teach: "Koch", room: "Halle", type: "normal" }
-    ]},
-    1: { date: "Di, 23. Sep", lessons: [
-      { t: "08:00", s: "Biologie", teach: "Grün", room: "Bio1", type: "normal" },
-      { t: "08:50", s: "Mathematik", teach: "Müller", room: "201", type: "normal" },
-      { pause: "09:35 – 09:50" },
-      { t: "09:50", s: "Vertretung", teach: "Braun → Schulz", room: "108", type: "sub" },
-      { t: "10:40", s: "Kunst", teach: "Rose", room: "Kunst", type: "normal" }
-    ]},
-    2: { date: "Mi, 24. Sep", lessons: [
-      { t: "08:00", s: "Deutsch", teach: "Schmidt", room: "103", type: "normal" },
-      { t: "08:50", s: "Englisch", teach: "Weber", room: "204", type: "normal" },
-      { pause: "09:35 – 09:50" },
-      { t: "09:50", s: "Musik", teach: "Demel", room: "Musik", type: "normal" },
-      { t: "10:40", s: "Mathematik", teach: "Müller", room: "201", type: "normal" }
-    ]},
-    3: { date: "Do, 25. Sep", lessons: [
-      { t: "08:00", s: "Physik", teach: "Weiss", room: "Lab1", type: "normal" },
-      { t: "08:50", s: "Geschichte", teach: "Hartl", room: "203", type: "normal" },
-      { pause: "09:35 – 09:50" },
-      { t: "09:50", s: "Chemie", teach: "Fischer", room: "Lab3", type: "sub" },
-      { t: "10:40", s: "Deutsch", teach: "Schmidt", room: "103", type: "normal" }
-    ]},
-    4: { date: "Fr, 26. Sep", lessons: [
-      { t: "08:00", s: "Biologie", teach: "Grün", room: "Bio1", type: "normal" },
-      { t: "08:50", s: "Informatik", teach: "Klein", room: "PC1", type: "normal" },
-      { pause: "09:35 – 09:50" },
-      { t: "09:50", s: "Sport", teach: "Koch", room: "Halle", type: "normal" },
-      { t: "10:40", s: "Kunst", teach: "—", room: "—", type: "cancel" }
-    ]}
-  };
-  const DEMO_NEXT_NOTE = { s: "Projektwoche", teach: "Klassenleitung", room: "Aula", type: "normal", t: "ganztägig" };
+  /* ---------- Interactive demo (echte HA-Wochentabelle) ---------- */
+  function esc(str) { return String(str).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])); }
 
-  let demoDay = 0;
+  // Zeitraster wie in der echten Card
+  const DEMO_SLOTS = [
+    { p: 1, time: "08:00" },
+    { p: 2, time: "08:50" },
+    { pause: "Pause · 09:35 – 09:50" },
+    { p: 3, time: "09:50" },
+    { p: 4, time: "10:40" },
+    { pause: "Pause · 11:25 – 11:45" },
+    { p: 5, time: "11:45" },
+    { p: 6, time: "12:35" }
+  ];
+  // l = [Fach, Lehrer, Raum, Typ]  · Typ: n=normal, s=Vertretung, c=Ausfall, "" = leer
+  function L(s, teach, room, type) { return { s: s, teach: teach, room: room, type: type || "n" }; }
+  const EMPTY = { s: "", type: "" };
+
+  // Wochendaten: DEMO[week][period][dayIndex]
+  const DEMO_WEEKS = {
+    0: { // Diese Woche
+      1: [L("MA","Müller","201","n"), L("BIO","Grün","Bio1","n"), L("DE","Schmidt","103","n"), L("PH","Weiss","Lab1","n"), L("BIO","Grün","Bio1","n")],
+      2: [L("MA","Müller","201","n"), L("SPO","Koch","Halle","s"), L("EN","Weber","204","n"), L("GE","Hartl","203","n"), L("INF","Klein","PC1","n")],
+      3: [L("EN","Weber","204","n"), L("MA","Müller","201","n"), L("SPO","Koch","Halle","n"), L("DE","Schmidt","103","n"), L("SPO","Koch","Halle","n")],
+      4: [L("PH","","","c"), L("KU","Rose","Kunst","n"), L("MU","Demel","Musik","n"), L("CH","Fischer","Lab3","s"), L("KU","","","c")],
+      5: [L("GE","Hartl","203","n"), L("DE","Schmidt","103","n"), L("MA","Müller","201","n"), L("EN","Weber","204","n"), EMPTY],
+      6: [L("SPO","Koch","Halle","n"), L("REL","Bauer","106","n"), EMPTY, L("PH","Weiss","Lab1","n"), EMPTY]
+    },
+    1: { // Nächste Woche (leicht anders, damit der Wechsel sichtbar ist)
+      1: [L("PW","Klasse","Aula","n"), L("MA","Müller","201","n"), L("DE","Schmidt","103","n"), L("PH","Weiss","Lab1","n"), L("BIO","Grün","Bio1","n")],
+      2: [L("PW","Klasse","Aula","n"), L("BIO","Grün","Bio1","n"), L("EN","Weber","204","n"), L("GE","","","c"), L("INF","Klein","PC1","n")],
+      3: [L("PW","Klasse","Aula","n"), L("EN","Weber","204","s"), L("MA","Müller","201","n"), L("DE","Schmidt","103","n"), L("SPO","Koch","Halle","n")],
+      4: [L("KU","Rose","Kunst","n"), L("MA","Müller","201","n"), L("MU","Demel","Musik","n"), L("CH","Fischer","Lab2","n"), L("KU","Rose","Kunst","n")],
+      5: [L("GE","Hartl","203","n"), L("DE","Schmidt","103","n"), L("MA","Müller","201","n"), L("EN","Weber","204","n"), EMPTY],
+      6: [EMPTY, L("REL","Bauer","106","n"), EMPTY, L("PH","Weiss","Lab1","n"), EMPTY]
+    }
+  };
+  const DAY_SHORT = ["MO", "DI", "MI", "DO", "FR"];
+  const DAY_FULL = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
+  const DAY_DATE = [["22","23","24","25","26"], ["29","30","01","02","03"]];
+  const DAY_HEADDATE = [
+    ["Mo, 22. Sep","Di, 23. Sep","Mi, 24. Sep","Do, 25. Sep","Fr, 26. Sep"],
+    ["Mo, 29. Sep","Di, 30. Sep","Mi, 01. Okt","Do, 02. Okt","Fr, 03. Okt"]
+  ];
+  const TODAY_IDX = 0; // Montag als "heute" markiert (nur diese Woche)
+
+  let demoDay = 0;   // aktiv hervorgehobene Spalte / Mobil-Tag
   let demoWeek = 0;
   const demoView = $("#demoView");
   const demoDate = $("#demoDate");
   const demoWeekLabel = $("#demoWeekLabel");
 
-  function esc(str) { return String(str).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])); }
+  const CLS = { n: "mk-normal", s: "mk-sub-c", c: "mk-cancel-c", "": "mk-empty" };
+  const LABEL = { n: "Unterricht", s: "Vertretung", c: "Ausfall" };
+
+  function cellHtml(cell, dayIdx, slot, isToday) {
+    if (!cell || cell.type === "") return '<td class="dc-cell-td' + (isToday ? " is-today-col" : "") + '"><div class="dc-cell mk-empty"></div></td>';
+    const cls = CLS[cell.type] || "mk-normal";
+    const tip = "<b>" + esc(cell.s) + "</b> · " + (LABEL[cell.type] || "Unterricht") +
+      (cell.teach ? "<br>👤 " + esc(cell.teach) : "") +
+      (cell.room ? " · 🚪 " + esc(cell.room) : "") +
+      "<br>🕐 " + esc(slot.time) + " · " + esc(DAY_FULL[dayIdx]);
+    const subj = cell.type === "c" ? "—" : esc(cell.s);
+    const meta = cell.type !== "c" && cell.room ? '<small>' + esc(cell.room) + "</small>" : "";
+    return '<td class="dc-cell-td' + (isToday ? " is-today-col" : "") + '">' +
+      '<div class="dc-cell ' + cls + '" tabindex="0">' + subj + meta +
+      '<span class="dc-tip">' + tip + "</span></div></td>";
+  }
 
   function renderDemo() {
     if (!demoView) return;
-    const day = DEMO[demoDay];
-    let lessons = day.lessons.slice();
-    if (demoWeek === 1) {
-      // Nächste Woche: leicht variieren, damit der Wechsel sichtbar ist
-      lessons = [{ t: "08:00", ...DEMO_NEXT_NOTE }].concat(lessons.slice(1));
-    }
-    const title = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"][demoDay];
-    let html = '<div class="demo-day-title">' + title +
-      (day.today && demoWeek === 0 ? ' <span class="badge-today">Heute</span>' : "") + "</div>";
-    lessons.forEach(l => {
-      if (l.pause) { html += '<div class="demo-pause-row">Pause · ' + esc(l.pause) + "</div>"; return; }
-      const label = l.type === "cancel" ? "Ausfall" : l.type === "sub" ? "Vertretung" : "Unterricht";
-      html +=
-        '<div class="demo-lesson type-' + l.type + '" tabindex="0">' +
-          '<span class="dl-time">' + esc(l.t) + "</span>" +
-          "<div><div class=\"dl-subj\">" + esc(l.s) + "</div>" +
-          '<div class="dl-meta">' + (l.teach && l.teach !== "—" ? "👤 " + esc(l.teach) + " · " : "") +
-          (l.room && l.room !== "—" ? "🚪 " + esc(l.room) : "") + "</div></div>" +
-          '<span class="dl-status" aria-hidden="true"></span>' +
-          '<span class="dl-tip"><b>' + esc(l.s) + "</b> · " + label +
-          (l.teach && l.teach !== "—" ? "<br>👤 " + esc(l.teach) : "") +
-          (l.room && l.room !== "—" ? " · 🚪 " + esc(l.room) : "") +
-          "<br>🕐 " + esc(l.t) + "</span>" +
-        "</div>";
+    const week = DEMO_WEEKS[demoWeek];
+    const todayIdx = demoWeek === 0 ? TODAY_IDX : -1;
+
+    // Kopfzeile (Wochentage)
+    let head = '<tr><th class="dc-num-h">#</th>';
+    DAY_SHORT.forEach((d, i) => {
+      const active = i === demoDay ? " dc-day-active" : "";
+      const today = i === todayIdx;
+      head += '<th class="dc-day-h' + active + (today ? " dc-today-h" : "") + '">' +
+        '<span>' + d + "</span><small>" + DAY_DATE[demoWeek][i] + "</small></th>";
     });
-    demoView.innerHTML = html;
-    if (demoDate) demoDate.textContent = day.date;
+    head += "</tr>";
+
+    // Zeilen
+    let body = "";
+    DEMO_SLOTS.forEach(slot => {
+      if (slot.pause) { body += '<tr class="dc-pause"><td colspan="6">' + esc(slot.pause) + "</td></tr>"; return; }
+      const row = week[slot.p] || [];
+      body += '<tr><td class="dc-num"><b>' + slot.p + "</b><span>" + esc(slot.time) + "</span></td>";
+      for (let i = 0; i < 5; i++) body += cellHtml(row[i], i, slot, i === todayIdx || i === demoDay);
+      body += "</tr>";
+    });
+
+    demoView.innerHTML =
+      '<table class="dc-table"><thead>' + head + "</thead><tbody>" + body + "</tbody></table>" +
+      '<div class="dc-legend">' +
+        '<span><i style="background:#3b82f6"></i>Heute</span>' +
+        '<span><i style="background:#f59e0b"></i>Vertretung</span>' +
+        '<span><i style="background:#ef4444"></i>Ausfall</span>' +
+        '<span><i style="background:#22c55e"></i>Jetzt</span>' +
+      "</div>";
+
+    if (demoDate) demoDate.textContent = DAY_HEADDATE[demoWeek][demoDay];
     if (demoWeekLabel) demoWeekLabel.textContent = "Klasse 10b · " + (demoWeek === 0 ? "Diese Woche" : "Nächste Woche");
   }
 
   $$(".demo-day").forEach(btn => {
     btn.addEventListener("click", () => {
-      $$(".demo-day").forEach(b => b.classList.remove("active"));
+      $$(".demo-day").forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
       btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
       demoDay = Number(btn.dataset.day) || 0;
       renderDemo();
     });

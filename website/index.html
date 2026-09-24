@@ -342,16 +342,16 @@
       <div class="container">
         <div class="section-label reveal">Live Demo</div>
         <h2 class="section-title reveal">Probier's direkt aus.</h2>
-        <p class="section-desc reveal">Wechsle zwischen den Wochentagen und sieh, wie sich der Stundenplan verändert. Fahre über eine Stunde für Details. (Beispieldaten)</p>
+        <p class="section-desc reveal">Die echte Wochentabelle wie in Home Assistant. Wähle einen Tag zum Hervorheben, wechsle die Woche und fahre über eine Stunde für Details. (Beispieldaten)</p>
 
         <div class="demo-wrap reveal">
           <div class="demo-controls">
-            <div class="demo-days" role="tablist" aria-label="Wochentag wählen">
-              <button class="demo-day active" data-day="0" role="tab">Mo</button>
-              <button class="demo-day" data-day="1" role="tab">Di</button>
-              <button class="demo-day" data-day="2" role="tab">Mi</button>
-              <button class="demo-day" data-day="3" role="tab">Do</button>
-              <button class="demo-day" data-day="4" role="tab">Fr</button>
+            <div class="demo-days" role="tablist" aria-label="Wochentag hervorheben">
+              <button class="demo-day active" data-day="0" role="tab" aria-selected="true">Mo</button>
+              <button class="demo-day" data-day="1" role="tab" aria-selected="false">Di</button>
+              <button class="demo-day" data-day="2" role="tab" aria-selected="false">Mi</button>
+              <button class="demo-day" data-day="3" role="tab" aria-selected="false">Do</button>
+              <button class="demo-day" data-day="4" role="tab" aria-selected="false">Fr</button>
             </div>
             <div class="demo-actions">
               <button class="demo-action active" id="demoWeekCur" data-week="0">Diese Woche</button>
