@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.6\] - 2026-08-27
+
+### Changed
+
+-   Emojis aus der Karten-UI entfernt und durch monochrome Icons bzw. dezente Statuspunkte ersetzt (Header, Kacheln, Popups, Legende, Tagesinfos, Ferien-Screen, Smart-Hints) — professionellerer, ruhigerer Look
+-   Kalender-Icon im Header jetzt als sauberes SVG (statt Emoji)
+-   Popup-Detailkarten nutzen monochrome MDI-Icons für Zeit/Lehrer/Raum/Klasse
+-   Hinweis: Theme-Auswahl und Editor-Abschnitte behalten ihre kleinen Auswahl-Icons (Konfigurations-UI, nicht die Karte selbst)
+
 ## \[2.6.5\] - 2026-08-27
 
 ### Changed

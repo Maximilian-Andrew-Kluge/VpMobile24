@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.5
-console.info('%c VpMobile24-CARD %c v2.6.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.6
+console.info('%c VpMobile24-CARD %c v2.6.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -195,9 +195,9 @@ class VpMobile24Card extends HTMLElement {
            holiday:'Schulferien',
            noDetail:'Keine weiteren Details verfügbar.',
            noInfo:(d)=>'Keine Zusatzinformationen für '+d+' verfügbar.',
-           genInfo:'📢 Allgemeine Informationen',
-           lessonInfo:'📋 Stunden-Informationen',
-           infoTitle:'ℹ️ Zusatzinformationen',
+           genInfo:'Allgemeine Informationen',
+           lessonInfo:'Stunden-Informationen',
+           infoTitle:'Zusatzinformationen',
            refresh:'↺ Aktualisieren',
            nextWeek:'Nächste Woche \u2192',
            currentWeek:'\u2190 Aktuelle Woche',
@@ -214,9 +214,9 @@ class VpMobile24Card extends HTMLElement {
            holiday:'School Holidays',
            noDetail:'No further details available.',
            noInfo:(d)=>'No additional info for '+d+' available.',
-           genInfo:'📢 General Information',
-           lessonInfo:'📋 Lesson Information',
-           infoTitle:'ℹ️ Additional Information',
+           genInfo:'General Information',
+           lessonInfo:'Lesson Information',
+           infoTitle:'Additional Information',
            refresh:'↺ Refresh',
            nextWeek:'Next Week \u2192',
            currentWeek:'\u2190 Current Week',
@@ -233,9 +233,9 @@ class VpMobile24Card extends HTMLElement {
            holiday:'Vacances scolaires',
            noDetail:'Aucun d\u00e9tail disponible.',
            noInfo:(d)=>'Aucune info pour '+d+'.',
-           genInfo:'📢 Informations g\u00e9n\u00e9rales',
-           lessonInfo:'📋 Informations de cours',
-           infoTitle:'ℹ️ Informations suppl\u00e9mentaires',
+           genInfo:'Informations g\u00e9n\u00e9rales',
+           lessonInfo:'Informations de cours',
+           infoTitle:'Informations suppl\u00e9mentaires',
            refresh:'↺ Actualiser',
            nextWeek:'Semaine suivante \u2192',
            currentWeek:'\u2190 Semaine actuelle',
@@ -588,6 +588,15 @@ class VpMobile24Card extends HTMLElement {
     if (!popup || !overlay || !title || !content) return;
     const t = this._t || this._buildTranslations();
     const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    // Monochrome MDI-Icons (statt Emojis)
+    const _svg = (p) => '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="' + p + '"/></svg>';
+    const IC = {
+      clock: _svg('M12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16m0-18a10 10 0 1 0 0 20 10 10 0 0 0 0-20m.5 5H11v6l5.25 3.15.75-1.23-4.5-2.67z'),
+      account: _svg('M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4'),
+      door: _svg('M8 3a2 2 0 0 0-2 2v14H4v2h16v-2h-2V5a2 2 0 0 0-2-2zm6 8a1 1 0 0 1 1 1 1 1 0 0 1-1 1 1 1 0 0 1-1-1 1 1 0 0 1 1-1'),
+      school: _svg('M12 3 1 9l4 2.18v6L12 21l7-3.82v-6L21 9zm6.82 6L12 12.72 5.18 9 12 5.28zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73z'),
+      info: _svg('M11 9h2V7h-2m1 13a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2z')
+    };
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
     const lehrer = (lesson && lesson.lehrer) || '';
     const raum   = (lesson && lesson.raum)   || '';
@@ -606,12 +615,12 @@ class VpMobile24Card extends HTMLElement {
     if (isActuallyCancelled) {
       title.innerHTML = ''; title.style.display = 'none';
       const lines = [];
-      if (raum)   lines.push('🚪 ' + esc(raum));
+      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
       if (info)   lines.push(esc(info));
       const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
       content.innerHTML =
         '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-cancel">🔴 ' + esc(t.cancel) + '</div>' +
+          '<div class="vp-status-badge vp-status-badge-cancel"><span class="vp-status-dot"></span>' + esc(t.cancel) + '</div>' +
           (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
           meta +
         '</div>';
@@ -625,13 +634,13 @@ class VpMobile24Card extends HTMLElement {
     if (isVertretung) {
       title.innerHTML = ''; title.style.display = 'none';
       const lines = [];
-      if (raum)   lines.push('🚪 ' + esc(raum));
-      if (zeit)   lines.push('🕐 ' + esc(zeit));
+      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
+      if (zeit)   lines.push(esc(zeit));
       if (info)   lines.push(esc(info));
       const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
       content.innerHTML =
         '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-sub">🟡 ' + esc(t.substitution) + '</div>' +
+          '<div class="vp-status-badge vp-status-badge-sub"><span class="vp-status-dot"></span>' + esc(t.substitution) + '</div>' +
           '<div class="vp-status-fach">' + esc(fach) + '</div>' +
           (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
           meta +
@@ -656,7 +665,7 @@ class VpMobile24Card extends HTMLElement {
     }
     if (isCurrentNow) popup.classList.add('vp-popup-current');
     title.style.display = '';
-    const nowBadge = isCurrentNow ? '<span class="vp-detail-badge vp-detail-now">🔵 ' + esc(t.now) + '</span>' : '';
+    const nowBadge = isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
     title.innerHTML =
       '<div class="vp-detail-head">' +
         '<div class="vp-detail-head-left">' +
@@ -674,12 +683,12 @@ class VpMobile24Card extends HTMLElement {
         '<div class="vp-detail-val">' + esc(val) + '</div>' +
       '</div>';
     let cells = '';
-    cells += cell('🕐', t.time || 'Zeit', zeit || '—');
-    if (lehrer) cells += cell('👤', t.teacher, lehrer);
-    if (raum)   cells += cell('🚪', t.room, raum);
-    if (klasse) cells += cell('🏫', t.classLabel, klasse);
+    cells += cell(IC.clock, t.time || 'Zeit', zeit || '—');
+    if (lehrer) cells += cell(IC.account, t.teacher, lehrer);
+    if (raum)   cells += cell(IC.door, t.room, raum);
+    if (klasse) cells += cell(IC.school, t.classLabel, klasse);
     let rows = '<div class="vp-detail-grid">' + cells + '</div>';
-    if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
+    if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">' + IC.info + '</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
     if (!lehrer && !raum && !klasse && !info) rows = '<div class="vp-detail-empty">' + esc(t.noDetail) + '</div>';
     content.innerHTML = rows;
     popup.classList.remove('hidden');
@@ -806,7 +815,7 @@ class VpMobile24Card extends HTMLElement {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, isTeacherMode && lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, isTeacherMode && lesson.klasse && lesson.klasse, lesson.lehrer && lesson.lehrer, lesson.raum && lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' · ') : '';
           const lessonAttr = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -1106,14 +1115,14 @@ ha-card {
 </style>
 <ha-card>
   <div class="hol-hdr">
-    <div class="hol-hdr-icon">🗓️</div>
+    <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div>
       <div class="hol-hdr-title">${title}</div>
       ${className ? `<span class="hol-hdr-class">${t.classLabel || 'Klasse'} ${className}</span>` : ''}
     </div>
   </div>
   <div class="hol-wrap">
-    <div class="hol-icon">🏖️</div>
+    <div class="hol-icon"><svg viewBox="0 0 24 24" width="52" height="52" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01zM2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg></div>
     <div class="hol-title">${holidayName}</div>
     ${endDate ? `<div class="hol-sub">${untilStr} ${fmtDate(endDate)}</div>` : ''}
     ${nextName && nextStart && !isHolidayFromSensor ? `<div class="hol-next">${nextStr}: ${nextName} ab ${fmtDate(nextStart)}</div>` : ''}
@@ -1245,7 +1254,7 @@ ha-card {
           // Hover shows a custom tooltip; click opens the info popup for that day.
           tableHtml += '<td class="vp-dayinfo-td ' + (isToday ? 'vp-today-col' : '') + '">'
             + '<div class="vp-dayinfo-cell" data-vpm="day-info" data-vpm-daykey="' + dayKey + '" data-vpm-tip="' + safeTitle + '">'
-            + '<span class="vp-dayinfo-ico">📌</span><span class="vp-dayinfo-txt">' + safeText + '</span>'
+            + '<span class="vp-dayinfo-ico"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M11 9h2V7h-2m1 13a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2z"/></svg></span><span class="vp-dayinfo-txt">' + safeText + '</span>'
             + '<span class="vp-dayinfo-tooltip">' + safeText + '</span></div></td>';
         } else {
           tableHtml += '<td class="vp-dayinfo-td ' + (isToday ? 'vp-today-col' : '') + '"></td>';
@@ -1300,7 +1309,7 @@ ha-card {
           } else {
             cls += ' vp-empty';
           }
-          const tip = lesson ? [lesson.fach, isTeacherModeRender && lesson.klasse && '🏫 '+lesson.klasse, lesson.lehrer && '👤 '+lesson.lehrer, lesson.raum && '🚪 '+lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' | ') : '';
+          const tip = lesson ? [lesson.fach, isTeacherModeRender && lesson.klasse && lesson.klasse, lesson.lehrer && lesson.lehrer, lesson.raum && lesson.raum, lesson.zusatzinfo].filter(Boolean).join(' · ') : '';
           const lessonAttr2 = (lesson && (lesson.fach || isCancelled))
             ? 'data-vpm="lesson" data-vpm-lesson=\'' + JSON.stringify(lesson).replace(/'/g,'&#39;').replace(/\\/g,'\\\\') + '\' data-vpm-day="' + dayFullNames[di] + '" data-vpm-period="' + slot.period + '" data-vpm-time="' + slot.time + '" data-vpm-cancelled="' + isCancelled + '"'
             : '';
@@ -1405,7 +1414,7 @@ ha-card {
     if (isHoliday) {
       const hlLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
       const nextStart = holidayEnt && holidayEnt.attributes.naechste_ferien_start;
-      smartHints.push(`<span class="vp-hint vp-hint-holiday">🏖️ ${holidayName}</span>`);
+      smartHints.push(`<span class="vp-hint vp-hint-holiday">${holidayName}</span>`);
     } else if (todayIdx >= 0 && weekTable) {
       const todayData = weekTable[dayKeys[todayIdx]] || {};
       let nSub = 0, nCancel = 0, lastEnd = '';
@@ -1424,8 +1433,8 @@ ha-card {
       });
       headerCancelCount = nCancel;
       // Ausfälle wandern in eine Header-Pill (siehe unten); Vertretungen bleiben als Hint
-      if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× ${t.sub}</span>`);
-      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 ${t.today}: ${lastEnd}</span>`);
+      if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">${nSub}× ${t.sub}</span>`);
+      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">${t.today}: ${lastEnd}</span>`);
     }
     // Next lesson — show during active lesson OR during pause/free time today
     if (todayIdx >= 0 && weekTable) {
@@ -1450,7 +1459,7 @@ ha-card {
           const nl = { de:'Nächste', en:'Next', fr:'Prochain' };
           const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
           const nextStr = (nl[haLang] || nl.de);
-          smartHints.unshift(`<span class="vp-hint vp-hint-green">▶ ${nextStr}: ${nextLes.fach}${nextSlot.time ? ' · ' + nextSlot.time.split('-')[0] : ''}</span>`);
+          smartHints.unshift(`<span class="vp-hint vp-hint-green">${nextStr}: ${nextLes.fach}${nextSlot.time ? ' · ' + nextSlot.time.split('-')[0] : ''}</span>`);
         }
       }
     }
@@ -1972,6 +1981,9 @@ ha-card {
 }
 .vp-status-badge-cancel { background: rgba(239,68,68,.14); color: #fca5a5; border: 1px solid rgba(239,68,68,.4); }
 .vp-status-badge-sub    { background: rgba(245,158,11,.14); color: #fcd34d; border: 1px solid rgba(245,158,11,.4); }
+/* Statuspunkt in Badges (ersetzt Emojis) */
+.vp-status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; display: inline-block; }
+.vp-detail-badge { display: inline-flex; align-items: center; gap: 6px; }
 .vp-status-fach    { font-size: 2em; font-weight: 800; color: var(--vpm-text); letter-spacing: -0.5px; line-height: 1; margin-top: 2px; }
 .vp-status-teacher { font-size: 1.05em; font-weight: 600; color: var(--vpm-text); }
 .vp-status-meta    { font-size: .9em; font-weight: 500; color: var(--vpm-text-muted); line-height: 1.55; }
@@ -1987,8 +1999,8 @@ ha-card {
   letter-spacing: -0.3px;
 }
 .vp-info-popup-title::before {
-  content: 'ℹ'; display: inline-flex; align-items: center; justify-content: center;
-  width: 30px; height: 30px; flex-shrink: 0; font-size: .78em;
+  content: 'i'; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; flex-shrink: 0; font-size: .8em; font-weight: 800; font-style: italic;
   background: rgba(79,124,255,0.14); color: #9db8ff;
   border: 1px solid rgba(79,124,255,0.28); border-radius: 9px;
 }
@@ -2048,7 +2060,7 @@ ha-card {
 
   <!-- ── Header ── -->
   <div class="vp-hdr">
-    <div class="vp-hdr-icon">📅</div>
+    <div class="vp-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="vp-hdr-body">
       <div class="vp-hdr-top">
         <span class="vp-hdr-title">${title}</span>
@@ -2999,12 +3011,12 @@ class VpMobile24MultiCard extends HTMLElement {
     let badge = '';
     if (isVertretung) badge = '<span class="vp-detail-badge vp-detail-sub">Vertretung</span>';
 
-    let rows = '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
+    let rows = '<div class="vp-detail-row">'
       + '<span class="vp-detail-label">' + period + '. Stunde</span>'
       + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
-    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span><span class="vp-detail-label">Lehrer</span><span class="vp-detail-val">' + lehrer + '</span></div>';
-    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span><span class="vp-detail-label">Raum</span><span class="vp-detail-val">' + raum + '</span></div>';
-    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-label">Info</span><span class="vp-detail-val">' + info + '</span></div>';
+    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-label">Lehrer</span><span class="vp-detail-val">' + lehrer + '</span></div>';
+    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-label">Raum</span><span class="vp-detail-val">' + raum + '</span></div>';
+    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-label">Info</span><span class="vp-detail-val">' + info + '</span></div>';
     if (!lehrer && !raum && !info) rows += '<div class="vp-detail-empty">Keine weiteren Details verfügbar.</div>';
 
     pop.className = 'vp-popup';
@@ -3184,7 +3196,7 @@ class VpMobile24MultiCard extends HTMLElement {
                 tileStyle = `background:${bg};color:${type==='cancelled'?'#fca5a5':type==='sub'?'#fde68a':'#dcfce7'};border:1px solid ${color}35`;
               }
               if (les) tileCls += ' mc-tile-hover';
-              const tooltip = les ? `title="${[les.fach, les.lehrer && '👤 '+les.lehrer, les.raum && '🚪 '+les.raum].filter(Boolean).join(' | ')}"` : '';
+              const tooltip = les ? `title="${[les.fach, les.lehrer && les.lehrer, les.raum && les.raum].filter(Boolean).join(' · ')}"` : '';
               gridHtml += `<td class="${isT?'mc-td-today':''}">
                 <div class="mc-tile" style="${tileStyle}" ${onclk} ${tooltip}>${fach}</div>
               </td>`;
@@ -3202,8 +3214,8 @@ class VpMobile24MultiCard extends HTMLElement {
               <span class="mc-next-label">${mc.nextLesson}</span>
               <span class="mc-next-info">${dayFull[nextL.dayIdx]}, ${nextL.period}. ${mc.period}</span>
               ${nl.fach ? `<span class="mc-next-fach" style="color:${ncolor}">${nl.fach}</span>` : ''}
-              ${nl.lehrer ? `<span class="mc-next-chip">👤 ${nl.lehrer}</span>` : ''}
-              ${nl.raum   ? `<span class="mc-next-chip">🚪 ${nl.raum}</span>` : ''}
+              ${nl.lehrer ? `<span class="mc-next-chip">${nl.lehrer}</span>` : ''}
+              ${nl.raum   ? `<span class="mc-next-chip">${nl.raum}</span>` : ''}
             </div>`;
           }
         }
@@ -3440,7 +3452,7 @@ ha-card {
 <ha-card>
   <!-- Header -->
   <div class="mc-hdr">
-    <div class="mc-hdr-icon">📅</div>
+    <div class="mc-hdr-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
@@ -3469,4 +3481,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.5 loaded');
+console.log('✅ VpMobile24 Card v2.6.6 loaded');
