@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.6
-console.info('%c VpMobile24-CARD %c v2.6.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.7
+console.info('%c VpMobile24-CARD %c v2.6.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -1534,10 +1534,11 @@ ha-card {
   border-radius: var(--vpm-radius-pill); padding: 3px 10px;
 }
 .vp-hdr-sub {
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .vp-hdr-kw {
   font-size: .78em; font-weight: 600; color: var(--vpm-text-muted);
+  white-space: nowrap;
 }
 /* Kompakte Ausfall-Pill im Header, neben dem Wochenstatus */
 .vp-hdr-ausfall {
@@ -3481,4 +3482,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.6 loaded');
+console.log('✅ VpMobile24 Card v2.6.7 loaded');

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.7\] - 2026-08-27
+
+### Changed
+
+-   Ausfall-Pill bleibt jetzt zuverlässig direkt rechts neben dem Wochenstatus („KW · Aktuell") stehen und rutscht nur bei echtem Platzmangel um
+
 ## \[2.6.6\] - 2026-08-27
 
 ### Changed
