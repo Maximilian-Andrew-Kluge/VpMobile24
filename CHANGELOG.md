@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.5\] - 2026-08-27
+
+### Changed
+
+-   Ausfall-Anzeige jetzt als kompakte Pill direkt im Header (neben KW/Aktuell) statt als eigene Zeile; wandert auf schmalen Displays in die nächste Zeile
+-   Stunden-Detail-Popup komplett modernisiert: großes Fach + Stunden-Badge im Header, Details als Icon-Karten (Zeit/Lehrer/Raum/Klasse); aktuelle Stunde zeigt ein „Jetzt"-Badge
+-   Ausfall- und Vertretungs-Popup vereinheitlicht: kompakt, zentriert, Status-Badge + Akzentrahmen statt großer Vollfläche (rot bzw. amber)
+-   Alle Popups teilen jetzt ein einheitliches Design-System (Radius, Button, Overlay, Öffnen-Animation)
+
 ## \[2.6.4\] - 2026-08-27
 
 ### Changed

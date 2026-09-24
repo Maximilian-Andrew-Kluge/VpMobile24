@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.4
-console.info('%c VpMobile24-CARD %c v2.6.4 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.5
+console.info('%c VpMobile24-CARD %c v2.6.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -190,7 +190,7 @@ class VpMobile24Card extends HTMLElement {
     const _i = {
       de:{ today:'Heute', sub:'Vertretung', now:'Jetzt', pause:'Pause',
            cancel:'AUSFALL', close:'Schließen', period:'Stunde',
-           teacher:'Lehrer', room:'Raum', info:'Info',
+           teacher:'Lehrer', room:'Raum', info:'Info', time:'Zeit',
            cancelled:'Ausfall', substitution:'Vertretung',
            holiday:'Schulferien',
            noDetail:'Keine weiteren Details verfügbar.',
@@ -209,7 +209,7 @@ class VpMobile24Card extends HTMLElement {
            wdFull:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'] },
       en:{ today:'Today', sub:'Substitution', now:'Now', pause:'Break',
            cancel:'CANCELLED', close:'Close', period:'Period',
-           teacher:'Teacher', room:'Room', info:'Info',
+           teacher:'Teacher', room:'Room', info:'Info', time:'Time',
            cancelled:'Cancelled', substitution:'Substitution',
            holiday:'School Holidays',
            noDetail:'No further details available.',
@@ -228,7 +228,7 @@ class VpMobile24Card extends HTMLElement {
            wdFull:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] },
       fr:{ today:'Aujourd\u0027hui', sub:'Remplacement', now:'Maintenant', pause:'Pause',
            cancel:'ANNUL\u00c9', close:'Fermer', period:'Heure',
-           teacher:'Prof', room:'Salle', info:'Info',
+           teacher:'Prof', room:'Salle', info:'Info', time:'Heure',
            cancelled:'Annul\u00e9', substitution:'Remplacement',
            holiday:'Vacances scolaires',
            noDetail:'Aucun d\u00e9tail disponible.',
@@ -587,6 +587,7 @@ class VpMobile24Card extends HTMLElement {
     const content = this.shadowRoot.getElementById('popup-content');
     if (!popup || !overlay || !title || !content) return;
     const t = this._t || this._buildTranslations();
+    const esc = (s) => String(s == null ? '' : s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
     const fach   = (lesson && lesson.fach && lesson.fach !== '---' && lesson.fach !== '—') ? lesson.fach : '—';
     const lehrer = (lesson && lesson.lehrer) || '';
     const raum   = (lesson && lesson.raum)   || '';
@@ -597,30 +598,89 @@ class VpMobile24Card extends HTMLElement {
     const hasFach = fach !== '—';
     const isActuallyCancelled = !hasFach && (isCancelled || fach === '—');
     const isVertretung = !isActuallyCancelled && !!(lesson && lesson.ist_vertretung);
+
+    // Reset accent classes each render
+    popup.classList.remove('vp-popup-ausfall', 'vp-popup-sub', 'vp-popup-current');
+
+    // ── AUSFALL: kompaktes, akzentuiertes Popup ──
     if (isActuallyCancelled) {
       title.innerHTML = ''; title.style.display = 'none';
-      const infoHtml = info
-        ? '<div class="vp-ausfall-info">' + info + '</div>'
-        : '';
-      content.innerHTML = '<div class="vp-ausfall-block">' + t.cancel + '</div>' + infoHtml;
+      const lines = [];
+      if (raum)   lines.push('🚪 ' + esc(raum));
+      if (info)   lines.push(esc(info));
+      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
+      content.innerHTML =
+        '<div class="vp-status-body">' +
+          '<div class="vp-status-badge vp-status-badge-cancel">🔴 ' + esc(t.cancel) + '</div>' +
+          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
+          meta +
+        '</div>';
       popup.classList.add('vp-popup-ausfall');
       popup.classList.remove('hidden');
       overlay.classList.remove('hidden');
       return;
     }
-    let badge = '';
-    if (isVertretung) badge = '<span class="vp-detail-badge vp-detail-sub">' + t.substitution + '</span>';
+
+    // ── VERTRETUNG: gleiches System, amber Akzent ──
+    if (isVertretung) {
+      title.innerHTML = ''; title.style.display = 'none';
+      const lines = [];
+      if (raum)   lines.push('🚪 ' + esc(raum));
+      if (zeit)   lines.push('🕐 ' + esc(zeit));
+      if (info)   lines.push(esc(info));
+      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
+      content.innerHTML =
+        '<div class="vp-status-body">' +
+          '<div class="vp-status-badge vp-status-badge-sub">🟡 ' + esc(t.substitution) + '</div>' +
+          '<div class="vp-status-fach">' + esc(fach) + '</div>' +
+          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
+          meta +
+        '</div>';
+      popup.classList.add('vp-popup-sub');
+      popup.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+      return;
+    }
+
+    // ── NORMAL / AKTUELL: modernes Detail-Popup ──
+    // Aktuelle Stunde erkennen (Zeitfenster jetzt?)
+    let isCurrentNow = false;
+    if (zeit && zeit.indexOf('-') !== -1) {
+      const now = new Date(); const nowMins = now.getHours() * 60 + now.getMinutes();
+      const p = zeit.split('-');
+      const a = p[0].trim().split(':').map(Number), b = p[1].trim().split(':').map(Number);
+      if (a.length === 2 && b.length === 2 && !isNaN(a[0]) && !isNaN(b[0])) {
+        const todayDow = now.getDay();
+        if (todayDow >= 1 && todayDow <= 5 && nowMins >= a[0]*60+a[1] && nowMins <= b[0]*60+b[1]) isCurrentNow = true;
+      }
+    }
+    if (isCurrentNow) popup.classList.add('vp-popup-current');
     title.style.display = '';
-    title.innerHTML = '<span class="vp-detail-num">' + slotPeriod + '. ' + t.period + '</span>'
-      + '<span class="vp-detail-fach">' + fach + '</span>' + badge;
-    let rows = '<div class="vp-detail-row"><span class="vp-detail-icon">🕐</span>'
-      + '<span class="vp-detail-label">' + slotPeriod + '. ' + t.period + '</span>'
-      + '<span class="vp-detail-val">' + (zeit || '—') + '</span></div>';
-    if (lehrer) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">👤</span><span class="vp-detail-label">' + t.teacher + '</span><span class="vp-detail-val">' + lehrer + '</span></div>';
-    if (raum)   rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🚪</span><span class="vp-detail-label">' + t.room + '</span><span class="vp-detail-val">' + raum + '</span></div>';
-    if (klasse) rows += '<div class="vp-detail-row"><span class="vp-detail-icon">🏫</span><span class="vp-detail-label">' + t.classLabel + '</span><span class="vp-detail-val">' + klasse + '</span></div>';
-    if (info)   rows += '<div class="vp-detail-row vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-label">' + t.info + '</span><span class="vp-detail-val">' + info + '</span></div>';
-    if (!lehrer && !raum && !info) rows += '<div class="vp-detail-empty">' + t.noDetail + '</div>';
+    const nowBadge = isCurrentNow ? '<span class="vp-detail-badge vp-detail-now">🔵 ' + esc(t.now) + '</span>' : '';
+    title.innerHTML =
+      '<div class="vp-detail-head">' +
+        '<div class="vp-detail-head-left">' +
+          '<span class="vp-detail-num">' + esc(slotPeriod) + '. ' + esc(t.period) + '</span>' +
+          '<span class="vp-detail-fach">' + esc(fach) + '</span>' +
+        '</div>' +
+        nowBadge +
+      '</div>' +
+      (zeit ? '<div class="vp-detail-headtime">' + esc(zeit) + '</div>' : '');
+
+    const cell = (icon, label, val) =>
+      '<div class="vp-detail-cell">' +
+        '<div class="vp-detail-cell-top"><span class="vp-detail-icon">' + icon + '</span>' +
+        '<span class="vp-detail-label">' + esc(label) + '</span></div>' +
+        '<div class="vp-detail-val">' + esc(val) + '</div>' +
+      '</div>';
+    let cells = '';
+    cells += cell('🕐', t.time || 'Zeit', zeit || '—');
+    if (lehrer) cells += cell('👤', t.teacher, lehrer);
+    if (raum)   cells += cell('🚪', t.room, raum);
+    if (klasse) cells += cell('🏫', t.classLabel, klasse);
+    let rows = '<div class="vp-detail-grid">' + cells + '</div>';
+    if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">ℹ️</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
+    if (!lehrer && !raum && !klasse && !info) rows = '<div class="vp-detail-empty">' + esc(t.noDetail) + '</div>';
     content.innerHTML = rows;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
@@ -1340,6 +1400,7 @@ ha-card {
 
     // Smart hints: count today's substitutions & cancellations
     let smartHints = [];
+    let headerCancelCount = 0;  // Ausfälle heute → kompakte Header-Pill
     // ── Holiday banner takes priority ──────────────────────────────────
     if (isHoliday) {
       const hlLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
@@ -1361,7 +1422,8 @@ ha-card {
           if (p[1]) lastEnd = p[1];
         }
       });
-      if (nCancel > 0) smartHints.push(`<span class="vp-hint vp-hint-red">⚠ ${nCancel}× ${t.cancelled}</span>`);
+      headerCancelCount = nCancel;
+      // Ausfälle wandern in eine Header-Pill (siehe unten); Vertretungen bleiben als Hint
       if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">🔄 ${nSub}× ${t.sub}</span>`);
       if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">🏁 ${t.today}: ${lastEnd}</span>`);
     }
@@ -1467,6 +1529,18 @@ ha-card {
 }
 .vp-hdr-kw {
   font-size: .78em; font-weight: 600; color: var(--vpm-text-muted);
+}
+/* Kompakte Ausfall-Pill im Header, neben dem Wochenstatus */
+.vp-hdr-ausfall {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72em; font-weight: 700; white-space: nowrap;
+  color: #fca5a5; background: rgba(239,68,68,.12);
+  border: 1px solid rgba(239,68,68,.28); border-radius: var(--vpm-radius-pill);
+  padding: 3px 10px;
+}
+.vp-hdr-ausfall::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--vpm-c-cancel); flex-shrink: 0;
 }
 .vp-hdr-spacer { flex: 1; }
 .vp-hdr-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
@@ -1845,47 +1919,67 @@ ha-card {
   animation: vp-popup-in .18s ease;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
+/* ── Popup: einheitliches Design-System (Normal / Aktuell / Vertretung / Ausfall) ── */
 .vp-popup-title {
-  font-size: 1em; font-weight: 700; color: #fff;
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: flex; flex-direction: column; gap: 6px;
 }
-.vp-detail-num    { font-size: .75em; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 5px; }
-.vp-detail-fach   { font-size: 1.1em; font-weight: 800; color: #fff; }
-.vp-detail-badge  { font-size: .68em; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
-.vp-detail-sub    { background: rgba(234,179,8,.2);  color: #fde68a; border: 1px solid rgba(234,179,8,.3); }
-.vp-detail-cancelled { background: rgba(239,68,68,.15); color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
-.vp-detail-row    { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
-.vp-detail-row:last-child { border-bottom: none; }
-.vp-detail-info-row { background: rgba(245,158,11,.06); }
-.vp-detail-icon   { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
-.vp-detail-label  { font-size: .75em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 52px; }
-.vp-detail-val    { font-size: .92em; font-weight: 500; color: #e2e8f0; flex: 1; }
-.vp-detail-empty  { padding: 16px 20px; color: #475569; font-size: .85em; font-style: italic; }
-.vp-popup-footer  { padding: 14px 18px 18px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn     { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 22px; cursor: pointer; font-size: .88em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 40px; }
+.vp-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.vp-detail-head-left { display: flex; flex-direction: column; gap: 6px; }
+.vp-detail-num    { font-size: .68em; font-weight: 700; color: var(--vpm-text-muted); text-transform: uppercase; letter-spacing: .6px; }
+.vp-detail-fach   { font-size: 1.7em; font-weight: 800; color: var(--vpm-text); letter-spacing: -0.5px; line-height: 1; }
+.vp-detail-headtime { font-size: .86em; font-weight: 500; color: var(--vpm-text-muted); }
+.vp-detail-badge  { font-size: .7em; font-weight: 700; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
+.vp-detail-now    { background: rgba(79,124,255,.16); color: #9db8ff; border: 1px solid rgba(79,124,255,.4); }
+
+/* Detail-Grid: Icon + Label + Wert als Blöcke */
+.vp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px 4px; }
+.vp-detail-cell {
+  background: #151C2B; border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px; padding: 11px 13px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.vp-detail-cell-top { display: flex; align-items: center; gap: 7px; }
+.vp-detail-icon   { font-size: 1em; width: 20px; text-align: center; flex-shrink: 0; }
+.vp-detail-label  { font-size: .66em; font-weight: 700; color: var(--vpm-text-faint); text-transform: uppercase; letter-spacing: .6px; }
+.vp-detail-val    { font-size: .98em; font-weight: 600; color: var(--vpm-text); word-break: break-word; }
+.vp-detail-info-row {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 8px 18px 0; padding: 11px 13px;
+  background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 12px;
+}
+.vp-detail-info-row .vp-detail-val { font-weight: 500; font-size: .9em; }
+.vp-detail-empty  { padding: 18px 22px; color: var(--vpm-text-faint); font-size: .88em; text-align: center; }
+
+.vp-popup-footer  { padding: 16px 18px 18px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
+.vp-popup-btn     { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
 .vp-popup-btn:hover { background: #6d5dfb; transform: translateY(-1px); }
 .vp-popup-btn:focus-visible { outline: 2px solid #9db8ff; outline-offset: 2px; }
-/* Ausfall popup */
-.vp-popup-ausfall {
-  background: linear-gradient(135deg,#7f1d1d,#991b1b) !important;
-  border-color: rgba(239,68,68,0.5) !important;
-  box-shadow: 0 0 0 1px rgba(239,68,68,.3), 0 16px 56px rgba(239,68,68,.45), 0 0 80px rgba(239,68,68,.2) !important;
-  display: flex !important; flex-direction: column !important; min-height: 220px;
+
+/* Aktuelle Stunde: dezenter blauer Akzentrahmen */
+.vp-popup-current { border-color: rgba(79,124,255,.45) !important; box-shadow: 0 0 0 1px rgba(79,124,255,.25), 0 20px 60px rgba(0,0,0,.6) !important; }
+
+/* Status-Popups (Ausfall/Vertretung): kompakt, zentriert, Akzent statt Vollfläche */
+.vp-status-body {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; padding: 30px 24px 18px;
 }
+.vp-status-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .82em; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+  padding: 7px 16px; border-radius: 999px;
+}
+.vp-status-badge-cancel { background: rgba(239,68,68,.14); color: #fca5a5; border: 1px solid rgba(239,68,68,.4); }
+.vp-status-badge-sub    { background: rgba(245,158,11,.14); color: #fcd34d; border: 1px solid rgba(245,158,11,.4); }
+.vp-status-fach    { font-size: 2em; font-weight: 800; color: var(--vpm-text); letter-spacing: -0.5px; line-height: 1; margin-top: 2px; }
+.vp-status-teacher { font-size: 1.05em; font-weight: 600; color: var(--vpm-text); }
+.vp-status-meta    { font-size: .9em; font-weight: 500; color: var(--vpm-text-muted); line-height: 1.55; }
+
+.vp-popup-ausfall { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 20px 60px rgba(239,68,68,.18) !important; }
 .vp-popup-ausfall .vp-popup-title { display: none !important; }
-.vp-popup-ausfall #popup-content  { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
-.vp-ausfall-block {
-  color: #fca5a5; font-size: 2.6em; font-weight: 900;
-  letter-spacing: 5px; text-align: center; padding: 20px;
-  text-shadow: 0 0 30px rgba(255,100,100,1), 0 0 60px rgba(255,50,50,0.7);
-}
-.vp-ausfall-info {
-  color: #fca5a5; font-size: 0.95em; font-weight: 500;
-  text-align: center; padding: 4px 16px 16px; opacity: 0.85;
-}
+.vp-popup-sub { border-color: rgba(245,158,11,0.45) !important; box-shadow: 0 0 0 1px rgba(245,158,11,.22), 0 20px 60px rgba(245,158,11,.16) !important; }
+.vp-popup-sub .vp-popup-title { display: none !important; }
 /* ── Info popup (modernes Informations-Panel) ── */
 .vp-info-popup-title {
   padding: 18px 20px 6px; font-size: 1.12em; font-weight: 800; color: var(--vpm-text);
@@ -1962,6 +2056,7 @@ ha-card {
       </div>
       <div class="vp-hdr-sub">
         <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'}</span>
+        ${headerCancelCount > 0 ? `<span class="vp-hdr-ausfall">${headerCancelCount}× ${t.cancelled}</span>` : ''}
       </div>
     </div>
     <div class="vp-hdr-spacer"></div>
@@ -3374,4 +3469,4 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.4 loaded');
+console.log('✅ VpMobile24 Card v2.6.5 loaded');
