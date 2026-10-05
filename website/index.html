@@ -76,8 +76,10 @@
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#installation">Installation</a>
+        <a href="#setup">Einrichtung</a>
         <a href="#card">Card</a>
         <a href="#sensors">Sensoren</a>
+        <a href="#automations">Benachrichtigungen</a>
         <a href="#troubleshooting">Hilfe</a>
       </div>
 
@@ -92,13 +94,13 @@
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 5 18.3 5.3 18.3 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
         </a>
         <a class="nav-cta desk-only" href="https://my.home-assistant.io/redirect/hacs_repository/?repository=VpMobile24&category=Integration&owner=Maximilian-Andrew-Kluge" target="_blank" rel="noopener">Installieren</a>
-        <button class="nav-burger" id="burger" aria-label="Menü öffnen" aria-expanded="false"><span></span><span></span><span></span></button>
+        <button class="nav-burger" id="burger" aria-label="Menü öffnen" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
 
   <!-- ===== MOBILE DRAWER ===== -->
-  <div class="drawer" id="drawer" role="dialog" aria-label="Mobiles Menü">
+  <div class="drawer" id="drawer" role="dialog" aria-label="Mobiles Menü" aria-modal="true" aria-hidden="true">
     <div class="drawer-head">
       <span class="brand">VpMobile<span class="accent">24</span></span>
       <button class="icon-btn" id="drawerClose" aria-label="Menü schließen">
@@ -108,8 +110,10 @@
     <nav class="drawer-links" aria-label="Mobile Navigation">
       <a href="#features">Features</a>
       <a href="#installation">Installation</a>
+      <a href="#setup">Einrichtung</a>
       <a href="#card">Card einrichten</a>
       <a href="#sensors">Sensoren</a>
+      <a href="#automations">Benachrichtigungen</a>
       <a href="#troubleshooting">Hilfe</a>
       <a href="#faq">FAQ</a>
     </nav>
@@ -128,7 +132,7 @@
       <div class="hero-glow"></div>
       <div class="container hero-inner">
         <div class="hero-text">
-          <span class="eyebrow"><span class="dot"></span> Open Source · Home Assistant Integration</span>
+          <span class="eyebrow"><span class="dot"></span> Open Source · Schüler &amp; Lehrermodus · Home Assistant</span>
           <h1>Dein Stundenplan.<br/><span class="grad">Direkt in Home Assistant.</span></h1>
           <p class="hero-sub">VpMobile24 verbindet deinen Stundenplan von Stundenplan24 mit Home Assistant – automatisch, übersichtlich und genau dort, wo du ihn brauchst.</p>
           <div class="hero-cta">
@@ -140,20 +144,20 @@
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 5 18.3 5.3 18.3 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
               GitHub ansehen
             </a>
+            <a class="btn btn-outline" href="#features">Alle Funktionen</a>
           </div>
-          <p class="hero-note"><span>Kostenlos</span><span class="sep">·</span><span>Open Source</span><span class="sep">·</span><span>HACS kompatibel</span></p>
+          <p class="hero-note"><span>Kostenlos</span><span class="sep">·</span><span>Open Source &amp; HACS</span><span class="sep">·</span><span>Schüler &amp; Lehrer</span></p>
         </div>
 
         <!-- Product mockup -->
         <div class="mockup-wrap">
           <div class="mockup" role="img" aria-label="Vorschau der VpMobile24 Stundenplan-Karte in Home Assistant">
             <div class="mk-head">
-              <div class="mk-ico">📅</div>
+              <div class="mk-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
               <div>
                 <div class="mk-title">Stundenplan</div>
                 <div class="mk-sub">Klasse 10b</div>
               </div>
-              <span class="mk-pill">ⓘ Info</span>
               <span class="mk-chip">Di, 23. Sep</span>
             </div>
             <div class="mk-table">
@@ -188,10 +192,10 @@
               </div>
             </div>
             <div class="mk-legend">
-              <span><i style="background:#3b82f6"></i>Heute</span>
-              <span><i style="background:#f59e0b"></i>Vertretung</span>
-              <span><i style="background:#ef4444"></i>Ausfall</span>
-              <span><i style="background:#22c55e"></i>Jetzt</span>
+              <span><i style="background:#4F7CFF"></i>Heute</span>
+              <span><i style="background:#F59E0B"></i>Vertretung</span>
+              <span><i style="background:#EF4444"></i>Ausfall</span>
+              <span><i style="background:#4F7CFF"></i>Jetzt</span>
             </div>
           </div>
         </div>
@@ -210,6 +214,8 @@
         <div class="stat"><div class="stat-num">0</div><div class="stat-label">Zeilen YAML nötig</div></div>
         <div class="stat-div"></div>
         <div class="stat"><div class="stat-num">Open Source</div><div class="stat-label">Kostenlos &amp; transparent</div></div>
+        <div class="stat-div"></div>
+        <div class="stat"><div class="stat-num">16</div><div class="stat-label">Bundesländer</div></div>
       </div>
     </section>
 
@@ -334,40 +340,118 @@
             </div>
           </div>
         </div>
+
+        <!-- Lehrermodus -->
+        <div class="showcase reverse reveal">
+          <div class="showcase-text">
+            <div class="showcase-eyebrow">Lehrermodus</div>
+            <h3>Für Lehrkräfte gemacht.</h3>
+            <p>Im Lehrermodus siehst du deine eigenen Stunden, Vertretungen und Pausenaufsichten – gefiltert nach deinem Kürzel.</p>
+            <ul class="showcase-list">
+              <li><span class="check">✓</span> Eigene Stunden, Vertretungen &amp; Ausfälle</li>
+              <li><span class="check">✓</span> Pausenaufsichten farblich hervorgehoben</li>
+              <li><span class="check">✓</span> Gleiche Oberfläche wie Schülermodus</li>
+            </ul>
+          </div>
+          <div class="showcase-visual">
+            <div class="teacher-visual">
+              <div class="tv-row">
+                <span class="tv-badge">Lehrer</span>
+                <span style="color:var(--text-2);font-size:.85rem">Kürzel: MUS</span>
+              </div>
+              <div class="tv-row">
+                <span class="tv-badge-aufsicht">Pausenaufsicht</span>
+                <span style="color:var(--text-2);font-size:.85rem">Hof · 10:10 Uhr</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- A/B-Wochen -->
+        <div class="showcase reveal">
+          <div class="showcase-text">
+            <div class="showcase-eyebrow">A/B-Wochen &amp; Stunde 0</div>
+            <h3>Wochentypen automatisch erkannt.</h3>
+            <p>VpMobile24 unterscheidet A- und B-Wochen und zeigt die nullte Stunde an, wenn deine Schule sie verwendet.</p>
+            <ul class="showcase-list">
+              <li><span class="check">✓</span> A-Woche / B-Woche wird im Header angezeigt</li>
+              <li><span class="check">✓</span> Stunde 0 automatisch erkannt</li>
+              <li><span class="check">✓</span> Korrekte Darstellung in allen Karten</li>
+            </ul>
+          </div>
+          <div class="showcase-visual">
+            <div class="ab-visual">
+              <div class="ab-badges">
+                <span class="ab-badge ab-badge-a">A-Woche</span>
+                <span class="ab-badge ab-badge-b">B-Woche</span>
+              </div>
+              <span class="ab-stunde0">Stunde 0 · 07:50 – 08:35</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ===== INTERACTIVE DEMO ===== -->
     <section class="section" id="demo">
       <div class="container">
-        <div class="section-label reveal">Live Demo</div>
-        <h2 class="section-title reveal">Probier's direkt aus.</h2>
-        <p class="section-desc reveal">Die echte Wochentabelle wie in Home Assistant. Wähle einen Tag zum Hervorheben, wechsle die Woche und fahre über eine Stunde für Details. (Beispieldaten)</p>
+        <div class="section-label reveal">Card Creator</div>
+        <h2 class="section-title reveal">Bau dir deine Karte.</h2>
+        <p class="section-desc reveal">Stell deine VpMobile24-Karte zusammen, sieh die Vorschau live und kopiere die fertige YAML direkt in Home Assistant. (Vorschau mit Beispieldaten)</p>
 
-        <div class="demo-wrap reveal">
-          <div class="demo-controls">
-            <div class="demo-days" role="tablist" aria-label="Wochentag hervorheben">
-              <button class="demo-day active" data-day="0" role="tab" aria-selected="true">Mo</button>
-              <button class="demo-day" data-day="1" role="tab" aria-selected="false">Di</button>
-              <button class="demo-day" data-day="2" role="tab" aria-selected="false">Mi</button>
-              <button class="demo-day" data-day="3" role="tab" aria-selected="false">Do</button>
-              <button class="demo-day" data-day="4" role="tab" aria-selected="false">Fr</button>
-            </div>
-            <div class="demo-actions">
-              <button class="demo-action active" id="demoWeekCur" data-week="0">Diese Woche</button>
-              <button class="demo-action" id="demoWeekNext" data-week="1">Nächste Woche</button>
-              <button class="demo-action" id="demoReload" title="Neu laden">
-                <span class="spin">↺</span> Neu laden
-              </button>
-            </div>
+        <!-- Card-Typ Umschalter -->
+        <div class="cc-typebar reveal" role="tablist" aria-label="Kartentyp">
+          <button class="cc-type active" data-cc-type="week"    role="tab" aria-selected="true">Wochenplan</button>
+          <button class="cc-type"        data-cc-type="current" role="tab" aria-selected="false">Aktuelle Stunde</button>
+          <button class="cc-type"        data-cc-type="multi"   role="tab" aria-selected="false">Mehrere Klassen</button>
+        </div>
+
+        <div class="cc-layout reveal">
+          <!-- Optionen -->
+          <div class="cc-panel">
+            <h3 class="cc-panel-title">Optionen</h3>
+            <div class="cc-form" id="ccForm"></div>
           </div>
-          <div class="demo-card">
-            <div class="mk-head">
-              <div class="mk-ico">📅</div>
-              <div><div class="mk-title">Stundenplan</div><div class="mk-sub" id="demoWeekLabel">Klasse 10b · Diese Woche</div></div>
-              <span class="mk-chip" id="demoDate">Mo, 22. Sep</span>
+
+          <!-- Vorschau + YAML -->
+          <div class="cc-preview-col">
+            <div class="demo-wrap">
+              <!-- Wochenplan / Aktuelle Stunde Vorschau -->
+              <div class="demo-card" id="demoCard">
+                <div class="dc-head">
+                  <div class="dc-head-ico" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg>
+                  </div>
+                  <div class="dc-head-main">
+                    <div class="dc-head-title" id="demoTitle">Stundenplan</div>
+                    <div class="dc-head-row">
+                      <span class="dc-head-kw dc-head-cls" id="demoClass">Klasse 09f</span>
+                      <div class="dc-head-actions" id="demoActions">
+                        <button class="dc-btn dc-btn-primary" id="demoWeekToggle" data-week="0">Nächste Woche
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8.6 16.6 13.2 12 8.6 7.4 10 6l6 6-6 6z"/></svg>
+                        </button>
+                        <button class="dc-btn dc-btn-icon" id="demoReload" title="Neu laden" aria-label="Neu laden">
+                          <svg class="dc-spin" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35A8 8 0 1 0 19.73 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="dc-head-kwline" id="demoWeekLabel">KW 39 · Aktuell</div>
+                    <span class="dc-ausfall-pill" id="demoAusfall"><i></i>6× Ausfall</span>
+                  </div>
+                </div>
+                <div class="demo-day-view" id="demoView" aria-live="polite"></div>
+              </div>
             </div>
-            <div class="demo-day-view" id="demoView" aria-live="polite"></div>
+
+            <!-- YAML Ausgabe -->
+            <div class="cc-yaml">
+              <div class="cc-yaml-head">
+                <span class="cc-yaml-label">YAML für Home Assistant</span>
+                <button class="copy-btn" id="ccCopy" type="button">Kopieren</button>
+              </div>
+              <pre class="cc-yaml-pre"><code id="ccYaml"></code></pre>
+              <p class="cc-yaml-hint">In Home Assistant: Dashboard bearbeiten → <strong>Karte hinzufügen</strong> → <strong>Manuell</strong> → einfügen. Ersetze die <code>sensor.*</code>-Namen durch deine echten Entitäten.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -502,6 +586,74 @@
       </div>
     </section>
 
+    <!-- ===== SETUP ===== -->
+    <section class="section" id="setup">
+      <div class="container">
+        <div class="section-label reveal">Einrichtung</div>
+        <h2 class="section-title reveal">Schritt für Schritt einrichten.</h2>
+        <p class="section-desc reveal">So richtest du VpMobile24 nach der Installation ein – egal ob Schüler, Lehrer oder Demo-Modus.</p>
+
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h3>Benutzertyp wählen</h3>
+              <div class="step-badges">
+                <span class="step-badge badge-student">Schüler</span>
+                <span class="step-badge badge-teacher">Lehrer</span>
+                <span class="step-badge badge-demo">Demo</span>
+              </div>
+              <p>Wähle beim Einrichten der Integration deinen Benutzertyp. Im <strong>Demo-Modus</strong> werden Beispieldaten geladen – ohne echte Zugangsdaten.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h3>Schul-ID &amp; Passwort eingeben</h3>
+              <p>Gib deine Schul-ID (z.B. <code>10001329</code>) und dein VpMobile24-Passwort ein. Beides erhältst du von deiner Schule oder im Elternbrief.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h3>Downloadserver auswählen</h3>
+              <p>Standardmäßig wird <strong>www</strong> verwendet. Falls deine Schule einen Zusatzserver nutzt (z.B. <code>zusatz1</code> bis <code>zusatz10</code>), wähle ihn aus dem Dropdown.</p>
+              <div class="info-box"><span>💡</span><span>Den richtigen Server findest du im Elternbrief deiner Schule oder durch ausprobieren.</span></div>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h3>Klasse oder Lehrerkürzel auswählen</h3>
+              <p>Im <strong>Schülermodus</strong>: Klassenbezeichnung eingeben (z.B. <code>10b</code>).<br>
+              Im <strong>Lehrermodus</strong>: Dein Kürzel aus dem Dropdown wählen.<br>
+              Für <strong>Oberstufenkurse</strong> (z.B. <code>la1</code>, <code>ma2</code>): Kurse einzeln im nächsten Schritt anwählen.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h3>Fächer &amp; Kurse auswählen</h3>
+              <p>Wähle deine belegten Fächer und Parallelkurse. Oberstufenkurse wie <code>la1</code> sind einzeln auswählbar. Nicht ausgewählte Kurse werden ausgeblendet.</p>
+            </div>
+          </div>
+
+          <div class="step reveal">
+            <div class="step-num">6</div>
+            <div class="step-body">
+              <h3>Bundesland wählen &amp; Einrichtung abschließen</h3>
+              <p>Wähle dein Bundesland für die automatische Ferienerkennung (16 Bundesländer verfügbar). VpMobile24 erkennt Ferienzeiten dann ohne weitere Konfiguration.</p>
+              <div class="info-box"><span>🔒</span><span>Nach einer Passwortänderung kannst du die Zugangsdaten jederzeit über <strong>Einstellungen → VpMobile24 → Konfigurieren → Neu authentifizieren</strong> aktualisieren.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== CARD ===== -->
     <section class="section" id="card">
       <div class="container">
@@ -570,6 +722,88 @@ use_custom_times: false</code></pre>
             </div>
           </div>
         </div>
+
+        <div class="faq-list" style="margin-top:32px">
+          <details class="faq-item">
+            <summary>Karte: Aktuelle Unterrichtsstunde</summary>
+            <div class="faq-body">
+              <div class="code-block">
+                <div class="code-label">YAML</div>
+                <pre class="code-pre"><code>type: custom:vpmobile24-current-card
+entity: sensor.vpmobile24_aktueller_unterricht
+next_entity: sensor.vpmobile24_naechste_stunde
+week_entity: sensor.vpmobile24_heutiger_stundenplan
+show_progress: true
+show_countdown: true
+show_next: true
+show_teacher: true
+show_room: true</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Karte: Mehrere Klassen (Multi-Card)</summary>
+            <div class="faq-body">
+              <div class="code-block">
+                <div class="code-label">YAML</div>
+                <pre class="code-pre"><code>type: custom:vpmobile24-multi-card
+title: Stundenplan Übersicht
+entities:
+  - sensor.vpmobile24_10a_week_table
+  - sensor.vpmobile24_10b_week_table
+columns: auto
+show_week_nav: true
+show_legend: true</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Karte: Lehrermodus</summary>
+            <div class="faq-body">
+              <div class="code-block">
+                <div class="code-label">YAML</div>
+                <pre class="code-pre"><code>type: custom:vpmobile24-card
+entity: sensor.vpmobile24_week_table
+additional_info_entity: sensor.vpmobile24_zusatzinfos
+reload_entity: button.vpmobile24_reload
+show_header: true
+header_settings:
+  title: Stundenplan Lehrer
+  class_name: MUS
+highlight_today: true
+show_time: true</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Karte: Section / Grid-Layout (Mushroom-Kombi)</summary>
+            <div class="faq-body">
+              <p>Kombiniere VpMobile24 mit einer Mushroom-Karte in einem HA-Section-Layout:</p>
+              <div class="code-block">
+                <div class="code-label">YAML</div>
+                <pre class="code-pre"><code>type: grid
+columns: 2
+square: false
+cards:
+  - type: custom:vpmobile24-current-card
+    entity: sensor.vpmobile24_aktueller_unterricht
+    next_entity: sensor.vpmobile24_naechste_stunde
+    week_entity: sensor.vpmobile24_heutiger_stundenplan
+  - type: custom:vpmobile24-card
+    entity: sensor.vpmobile24_week_table
+    show_header: true
+    highlight_today: true</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+        </div>
       </div>
     </section>
 
@@ -580,54 +814,232 @@ use_custom_times: false</code></pre>
         <h2 class="section-title reveal">Erstellte Sensoren.</h2>
         <p class="section-desc reveal">Nach der Einrichtung stehen dir folgende Entitäten in Home Assistant zur Verfügung – mit Copy-Button für die Entity-ID.</p>
 
-        <div class="sensors-grid">
-          <div class="sensor-card sensor-main">
-            <div class="sensor-top"><span class="sensor-icon">📅</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_week_table">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_week_table</code></div>
-            <div class="sensor-desc">Vollständige Wochenübersicht – wird von der Lovelace Card verwendet</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">🕐</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_naechste_stunde">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_naechste_stunde</code></div>
-            <div class="sensor-desc">Nächste Unterrichtsstunde heute</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">📆</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_heutiger_stundenplan">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_heutiger_stundenplan</code></div>
-            <div class="sensor-desc">Heutiger Stundenplan mit allen Stunden</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">ℹ️</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_zusatzinfos">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_zusatzinfos</code></div>
-            <div class="sensor-desc">Zusatzinformationen und Hinweise pro Tag</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">🔄</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_aenderungen">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_aenderungen</code></div>
-            <div class="sensor-desc">Aktuelle Vertretungen und Stundenplanänderungen</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">⏱️</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_aktueller_unterricht">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_aktueller_unterricht</code></div>
-            <div class="sensor-desc">Aktuelle laufende Stunde – mit Fach, Lehrer &amp; Raum</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">🏖️</span><button class="copy-btn sensor-copy" data-copy="sensor.vpmobile24_ferien">Kopieren</button></div>
-            <div class="sensor-name"><code>sensor.vpmobile24_ferien</code></div>
-            <div class="sensor-desc">Schulferien-Erkennung – automatisch per Bundesland (KMK-Daten)</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">📅</span><button class="copy-btn sensor-copy" data-copy="calendar.vpmobile24_week_calendar">Kopieren</button></div>
-            <div class="sensor-name"><code>calendar.vpmobile24_week_calendar</code></div>
-            <div class="sensor-desc">Wochenkalender – nutzbar in HA-Kalender-Ansicht</div>
-          </div>
-          <div class="sensor-card">
-            <div class="sensor-top"><span class="sensor-icon">🔁</span><button class="copy-btn sensor-copy" data-copy="button.vpmobile24_reload">Kopieren</button></div>
-            <div class="sensor-name"><code>button.vpmobile24_reload</code></div>
-            <div class="sensor-desc">Manuelles Neuladen der Stundenplandaten</div>
-          </div>
+        <div class="sensor-table-wrap reveal">
+          <table class="sensor-table">
+            <thead>
+              <tr>
+                <th>Sensor</th>
+                <th>Entity-ID</th>
+                <th>Beschreibung</th>
+                <th>Beispielwert</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Wochentabelle</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_week_table">Kopieren</button> sensor.vpmobile24_week_table</code></td>
+                <td>Vollständige Wochenübersicht – wird von der Lovelace Card verwendet</td>
+                <td><code>OK</code></td>
+              </tr>
+              <tr>
+                <td><strong>Nächste Woche</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_next_week_table">Kopieren</button> sensor.vpmobile24_next_week_table</code></td>
+                <td>Stundenplan der kommenden Woche</td>
+                <td><code>OK</code></td>
+              </tr>
+              <tr>
+                <td><strong>Übernächste Woche</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_next_next_week_table">Kopieren</button> sensor.vpmobile24_next_next_week_table</code></td>
+                <td>Stundenplan in zwei Wochen</td>
+                <td><code>OK</code></td>
+              </tr>
+              <tr>
+                <td><strong>Nächste Stunde</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_naechste_stunde">Kopieren</button> sensor.vpmobile24_naechste_stunde</code></td>
+                <td>Nächste Unterrichtsstunde heute mit Fach, Lehrer &amp; Raum</td>
+                <td><code>Mathematik</code></td>
+              </tr>
+              <tr>
+                <td><strong>Heutiger Stundenplan</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_heutiger_stundenplan">Kopieren</button> sensor.vpmobile24_heutiger_stundenplan</code></td>
+                <td>Heutiger Tagesplan mit allen Stunden</td>
+                <td><code>6 Stunden</code></td>
+              </tr>
+              <tr>
+                <td><strong>Zusatzinfos</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_zusatzinfos">Kopieren</button> sensor.vpmobile24_zusatzinfos</code></td>
+                <td>Tageshinweise und Zusatzinformationen</td>
+                <td><code>Pädagogischer Tag</code></td>
+              </tr>
+              <tr>
+                <td><strong>Änderungen</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_aenderungen">Kopieren</button> sensor.vpmobile24_aenderungen</code></td>
+                <td>Aktuelle Vertretungen, Ausfälle und Stundenplanänderungen</td>
+                <td><code>2 Änderungen</code></td>
+              </tr>
+              <tr>
+                <td><strong>Aktueller Unterricht</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_aktueller_unterricht">Kopieren</button> sensor.vpmobile24_aktueller_unterricht</code></td>
+                <td>Laufende Stunde mit Fach, Lehrer, Raum &amp; Fortschritt</td>
+                <td><code>Mathematik</code></td>
+              </tr>
+              <tr>
+                <td><strong>Kalender</strong></td>
+                <td><code><button class="copy-btn" data-copy="calendar.vpmobile24_week_calendar">Kopieren</button> calendar.vpmobile24_week_calendar</code></td>
+                <td>Wochenkalender – nutzbar in der HA-Kalenderansicht</td>
+                <td><code>—</code></td>
+              </tr>
+              <tr>
+                <td><strong>Ferien</strong></td>
+                <td><code><button class="copy-btn" data-copy="sensor.vpmobile24_ferien">Kopieren</button> sensor.vpmobile24_ferien</code></td>
+                <td>Schulferien-Erkennung per Bundesland (KMK-Daten)</td>
+                <td><code>false</code></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="info-box" style="margin-top:20px"><span>💡</span><span>Bei mehreren Klassen werden die Sensor-IDs mit der Klasse ergänzt, z.B. <code>sensor.vpmobile24_week_table_10b</code>. Die genauen IDs findest du unter <strong>Einstellungen → Geräte &amp; Dienste → VpMobile24</strong>.</span></div>
+
+        <div class="hint-box reveal">
+          <span>💡</span>
+          <span>Bei mehreren Klassen wird die Klasse an die Entity-ID angehängt, z.B.
+          <code>sensor.vpmobile24_week_table_10b</code>. Die genauen IDs findest du unter
+          <strong>Einstellungen → Geräte &amp; Dienste → VpMobile24</strong>.</span>
+        </div>
+
+        <div class="info-box reveal" style="margin-top:16px">
+          <span>📋</span>
+          <span>Beispiel für eine Automation mit <code>sensor.vpmobile24_aenderungen</code>:
+          <a href="#automations" style="color:var(--accent-2);font-weight:600">→ Benachrichtigungen &amp; Automationen</a></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== AUTOMATIONS ===== -->
+    <section class="section" id="automations">
+      <div class="container">
+        <div class="section-label reveal">Benachrichtigungen</div>
+        <h2 class="section-title reveal">Automationen &amp; Benachrichtigungen.</h2>
+        <p class="section-desc reveal">Lass Home Assistant dich automatisch informieren – bei Ausfällen, Vertretungen oder morgens zur Übersicht. Alle Beispiele sind Vorlagen – passe <code>notify.mobile_app_…</code> an dein Gerät an.</p>
+
+        <div class="faq-list">
+          <details class="faq-item reveal">
+            <summary>Ausfall melden</summary>
+            <div class="faq-body">
+              <p>Wird ausgelöst, sobald sich <code>sensor.vpmobile24_aenderungen</code> ändert.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Ausfall melden
+trigger:
+  - platform: state
+    entity_id: sensor.vpmobile24_aenderungen
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Stundenplan geändert"
+      message: "Es gibt eine neue Änderung im Stundenplan."</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary>Raumänderung melden</summary>
+            <div class="faq-body">
+              <p>Prüft täglich und meldet, wenn ein Raumwechsel vorliegt.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Raumänderung
+trigger:
+  - platform: state
+    entity_id: sensor.vpmobile24_aenderungen
+condition:
+  - condition: template
+    value_template: "{{ 'Raum' in states('sensor.vpmobile24_aenderungen') }}"
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Raumänderung"
+      message: "Ein Raum wurde geändert. Bitte Stundenplan prüfen."</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary>Vertretung eingetragen</summary>
+            <div class="faq-body">
+              <p>Benachrichtigt, wenn eine Vertretung neu eingetragen wird.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Vertretung
+trigger:
+  - platform: state
+    entity_id: sensor.vpmobile24_aenderungen
+condition:
+  - condition: template
+    value_template: "{{ 'Vertretung' in states('sensor.vpmobile24_aenderungen') }}"
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Vertretung"
+      message: "Es gibt eine neue Vertretung im Stundenplan."</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary>Nächste Stunde beginnt bald</summary>
+            <div class="faq-body">
+              <p>Erinnert dich 5 Minuten vor Beginn der nächsten Stunde.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Nächste Stunde
+trigger:
+  - platform: state
+    entity_id: sensor.vpmobile24_naechste_stunde
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Nächste Stunde"
+      message: >
+        Gleich: {{ states('sensor.vpmobile24_naechste_stunde') }}</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary>Stundenplan aktualisiert</summary>
+            <div class="faq-body">
+              <p>Wird ausgelöst, wenn neue Stundenplandaten abgerufen werden.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Plan aktualisiert
+trigger:
+  - platform: state
+    entity_id: sensor.vpmobile24_week_table
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Stundenplan aktualisiert"
+      message: "Der Wochenplan wurde neu geladen."</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary>Tägliche Morgenübersicht</summary>
+            <div class="faq-body">
+              <p>Jeden Morgen um 07:00 Uhr eine Zusammenfassung des heutigen Stundenplans.</p>
+              <div class="code-block">
+                <div class="code-label">YAML – Vorlage</div>
+                <pre class="code-pre"><code>alias: VpMobile24 – Morgenübersicht
+trigger:
+  - platform: time
+    at: "07:00:00"
+action:
+  - service: notify.mobile_app_mein_geraet
+    data:
+      title: "Guten Morgen!"
+      message: >
+        Heute: {{ states('sensor.vpmobile24_heutiger_stundenplan') }}</code></pre>
+                <button class="copy-btn copy-pre" data-copy-pre="true">Kopieren</button>
+              </div>
+            </div>
+          </details>
+        </div>
       </div>
     </section>
 
@@ -646,6 +1058,26 @@ use_custom_times: false</code></pre>
           <details class="faq-item"><summary>Funktioniert es auf dem Smartphone?</summary><div class="faq-body"><p>Ja. Die Karten sind vollständig responsive und für Smartphone, Tablet und Desktop optimiert.</p></div></details>
           <details class="faq-item"><summary>Brauche ich YAML?</summary><div class="faq-body"><p>Nein. Sowohl die Integration als auch die Card lassen sich komplett über die Home-Assistant-Oberfläche konfigurieren. YAML ist optional.</p></div></details>
           <details class="faq-item"><summary>Welche Sprachen werden unterstützt?</summary><div class="faq-body"><p>Deutsch, Englisch und Französisch (DE / EN / FR) – automatisch anhand deiner Home-Assistant-Sprache.</p></div></details>
+          <details class="faq-item">
+            <summary>Unterstützt VpMobile24 den Lehrermodus?</summary>
+            <div class="faq-body"><p>Ja. Im Lehrermodus siehst du deine eigenen Stunden, Vertretungen und Pausenaufsichten – gefiltert nach deinem Lehrerkürzel. Wähle beim Einrichten als Benutzertyp <strong>„Lehrer"</strong>.</p></div>
+          </details>
+          <details class="faq-item">
+            <summary>Funktioniert VpMobile24 mit A/B-Wochen?</summary>
+            <div class="faq-body"><p>Ja. VpMobile24 erkennt A- und B-Wochen automatisch anhand der Serverdaten. Der aktive Wochentyp wird im Card-Header angezeigt.</p></div>
+          </details>
+          <details class="faq-item">
+            <summary>Werden Benachrichtigungen unterstützt?</summary>
+            <div class="faq-body"><p>Ja, über Standard-HA-Automationen. VpMobile24 stellt die Sensoren bereit – du konfigurierst die Benachrichtigungen in Home Assistant. Fertige Vorlagen findest du im Bereich <a href="#automations">Benachrichtigungen</a>.</p></div>
+          </details>
+          <details class="faq-item">
+            <summary>Welche Home-Assistant-Version wird benötigt?</summary>
+            <div class="faq-body"><p>VpMobile24 erfordert eine aktuelle Version von Home Assistant Core. Die genaue Mindestversion findest du in den <a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases" target="_blank" rel="noopener">Release Notes</a> auf GitHub.</p></div>
+          </details>
+          <details class="faq-item">
+            <summary>Wie funktioniert die Demo-Installation?</summary>
+            <div class="faq-body"><p>Im Demo-Modus (Benutzertyp <strong>„Demo"</strong> bei der Einrichtung) lädt VpMobile24 Beispieldaten ohne echte Zugangsdaten. Ideal zum Testen der Oberfläche und Karten, bevor du deine echten Schuldaten einträgst.</p></div>
+          </details>
         </div>
       </div>
     </section>
@@ -726,6 +1158,67 @@ use_custom_times: false</code></pre>
           <details class="faq-item">
             <summary>Oberstufenkurse (z.B. la1) fehlen</summary>
             <div class="faq-body"><p>Ab v2.6.0 werden auch kurze Kurskürzel wie <code>la1</code> korrekt erkannt. Falls ein Kurs vorher fehlte: einmal unter <strong>Einstellungen → VpMobile24 → Konfigurieren</strong> die Fächer/Kurse neu auswählen, dann lässt sich der Kurs anhaken.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Verbindungsfehler beim Einrichten</summary>
+            <div class="faq-body"><p>Stelle sicher, dass deine Home-Assistant-Instanz Internetzugang hat. Prüfe Schul-ID und Passwort auf Tippfehler. Falls der Standardserver <code>www</code> nicht funktioniert, versuche <code>zusatz1</code> bis <code>zusatz10</code>.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Zugangsdaten geändert – Reauthentifizierung</summary>
+            <div class="faq-body"><p>Nach einer Passwortänderung in VpMobil24 zeigt Home Assistant einen Authentifizierungsfehler. Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → VpMobile24 → Neu authentifizieren</strong> und trage das neue Passwort ein.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>A/B-Woche wird falsch angezeigt</summary>
+            <div class="faq-body"><p>VpMobile24 übernimmt den Wochentyp direkt vom Stundenplan24-Server deiner Schule. Wenn die Anzeige nicht stimmt, prüfe ob deine Schule tatsächlich A/B-Wochen auf dem Server pflegt.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Ferienerkennung funktioniert nicht</summary>
+            <div class="faq-body"><p>Stelle sicher, dass du beim Einrichten das richtige Bundesland ausgewählt hast. Öffne <strong>Einstellungen → VpMobile24 → Konfigurieren</strong> und überprüfe die Bundesland-Einstellung.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Diagnose-Informationen abrufen</summary>
+            <div class="faq-body"><p>Gehe zu <strong>Einstellungen → Geräte &amp; Dienste → VpMobile24 → drei Punkte (⋮) → Diagnose herunterladen</strong>. Die heruntergeladene JSON-Datei enthält alle relevanten Informationen für ein Bug-Report auf GitHub.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Integration erscheint nicht in der Integrationsliste</summary>
+            <div class="faq-body"><ol>
+              <li>Prüfe ob die Installation in HACS erfolgreich war</li>
+              <li>Starte Home Assistant neu</li>
+              <li>Lösche den Browser-Cache (<kbd>Strg</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>)</li>
+              <li>Suche nach „VpMobile24" im Dialog „Integration hinzufügen"</li>
+            </ol></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Kalender-Einträge fehlen oder sind falsch</summary>
+            <div class="faq-body"><p>Der <code>calendar.vpmobile24_week_calendar</code> wird beim nächsten Datenabruf (alle 15 Min.) aktualisiert. Erzwinge ein Update über den <code>button.vpmobile24_reload</code>. Prüfe den Sensorstatus unter <strong>Einstellungen → Geräte &amp; Dienste</strong>.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Sensoren zeigen „unavailable"</summary>
+            <div class="faq-body"><p>Das passiert nach einem HA-Neustart kurz, bis die erste Datenabfrage erfolgt. Warte 1–2 Minuten oder klicke den Reload-Button. Bei dauerhaftem „unavailable" prüfe die Logs unter <strong>Einstellungen → System → Protokolle</strong> auf VpMobile24-Fehler.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Stundenplan zeigt veraltete Daten</summary>
+            <div class="faq-body"><p>VpMobile24 ruft Daten alle 15 Minuten ab. Drücke den Reload-Button in der Card oder ruf <code>button.vpmobile24_reload</code> per Automation auf. Falls die Daten dauerhaft veraltet sind, prüfe die Netzwerkverbindung deiner HA-Instanz.</p></div>
+          </details>
+
+          <details class="faq-item">
+            <summary>HACS zeigt eine neue Version an, aber Update schlägt fehl</summary>
+            <div class="faq-body"><ol>
+              <li>Öffne HACS → Integrationen → VpMobile24</li>
+              <li>Klicke auf <strong>Aktualisieren</strong></li>
+              <li>Starte Home Assistant neu</li>
+              <li>Leere den Browser-Cache</li>
+              <li>Falls das Update weiterhin fehlschlägt, deinstalliere VpMobile24 in HACS und installiere es neu</li>
+            </ol></div>
           </details>
         </div>
       </div>
@@ -819,7 +1312,9 @@ use_custom_times: false</code></pre>
           <h5>VpMobile24</h5>
           <a href="#features">Features</a>
           <a href="#installation">Installation</a>
+          <a href="#setup">Einrichtung</a>
           <a href="#sensors">Sensoren</a>
+          <a href="#automations">Benachrichtigungen</a>
           <a href="#faq">FAQ</a>
         </div>
         <div class="footer-col">

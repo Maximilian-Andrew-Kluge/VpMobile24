@@ -61,11 +61,35 @@
   /* ---------- Mobile drawer ---------- */
   const drawer = $("#drawer");
   const burger = $("#burger");
-  function openDrawer() { if (drawer) { drawer.classList.add("open"); burger && burger.setAttribute("aria-expanded", "true"); } }
-  function closeDrawer() { if (drawer) { drawer.classList.remove("open"); burger && burger.setAttribute("aria-expanded", "false"); } }
+  function openDrawer() {
+    if (drawer) {
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      burger && burger.setAttribute("aria-expanded", "true");
+      setTimeout(() => {
+        const focusable = drawer.querySelector('a[href], button:not([disabled]), [tabindex="0"]');
+        if (focusable) focusable.focus();
+      }, 50);
+    }
+  }
+  function closeDrawer() {
+    if (drawer) {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      burger && burger.setAttribute("aria-expanded", "false");
+      burger && burger.focus();
+    }
+  }
   if (burger) burger.addEventListener("click", openDrawer);
   if ($("#drawerClose")) $("#drawerClose").addEventListener("click", closeDrawer);
   $$(".drawer-links a").forEach(a => a.addEventListener("click", closeDrawer));
+
+  // Drawer Escape key
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape" && drawer && drawer.classList.contains("open")) {
+      closeDrawer();
+    }
+  });
 
   /* ---------- Smooth scroll for in-page anchors ---------- */
   $$('a[href^="#"]').forEach(a => {
@@ -146,84 +170,168 @@
   /* ---------- Interactive demo (echte HA-Wochentabelle) ---------- */
   function esc(str) { return String(str).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])); }
 
-  // Zeitraster wie in der echten Card
+  // Zeitraster + Pausen wie in der echten Card
   const DEMO_SLOTS = [
-    { p: 1, time: "08:00" },
-    { p: 2, time: "08:50" },
-    { pause: "Pause · 09:35 – 09:50" },
-    { p: 3, time: "09:50" },
-    { p: 4, time: "10:40" },
-    { pause: "Pause · 11:25 – 11:45" },
-    { p: 5, time: "11:45" },
-    { p: 6, time: "12:35" }
+    { p: 1, time: "08:00–08:45" },
+    { p: 2, time: "08:50–09:35" },
+    { pause: "Pause · 10:10 – 10:30" },
+    { p: 3, time: "10:00–10:45" },
+    { p: 4, time: "10:45–11:30" },
+    { pause: "Pause · 12:15 – 12:45" },
+    { p: 5, time: "12:15–13:00" },
+    { p: 6, time: "13:05–13:50" },
+    { p: 7, time: "14:00–14:45" },
+    { p: 8, time: "14:35–15:20" }
   ];
-  // l = [Fach, Lehrer, Raum, Typ]  · Typ: n=normal, s=Vertretung, c=Ausfall, "" = leer
-  function L(s, teach, room, type) { return { s: s, teach: teach, room: room, type: type || "n" }; }
+  // l = {s:Fach, teach:Lehrer, room:Raum, type:n|s|c, note:Zusatz}
+  // Typ: n=normal, s=Vertretung, c=Ausfall, "" = leer
+  function L(s, teach, room, type, note) { return { s: s, teach: teach || "", room: room || "", type: type || "n", note: note || "" }; }
   const EMPTY = { s: "", type: "" };
 
-  // Wochendaten: DEMO[week][period][dayIndex]
+  // Wochendaten: DEMO[week][period][dayIndex] — Reihenfolge MO DI MI DO FR
   const DEMO_WEEKS = {
-    0: { // Diese Woche
-      1: [L("MA","Müller","201","n"), L("BIO","Grün","Bio1","n"), L("DE","Schmidt","103","n"), L("PH","Weiss","Lab1","n"), L("BIO","Grün","Bio1","n")],
-      2: [L("MA","Müller","201","n"), L("SPO","Koch","Halle","s"), L("EN","Weber","204","n"), L("GE","Hartl","203","n"), L("INF","Klein","PC1","n")],
-      3: [L("EN","Weber","204","n"), L("MA","Müller","201","n"), L("SPO","Koch","Halle","n"), L("DE","Schmidt","103","n"), L("SPO","Koch","Halle","n")],
-      4: [L("PH","","","c"), L("KU","Rose","Kunst","n"), L("MU","Demel","Musik","n"), L("CH","Fischer","Lab3","s"), L("KU","","","c")],
-      5: [L("GE","Hartl","203","n"), L("DE","Schmidt","103","n"), L("MA","Müller","201","n"), L("EN","Weber","204","n"), EMPTY],
-      6: [L("SPO","Koch","Halle","n"), L("REL","Bauer","106","n"), EMPTY, L("PH","Weiss","Lab1","n"), EMPTY]
+    0: { // Aktuelle Woche (KW 39)
+      1: [L("PH","","B12"), L("P:gw","","GW1"), L("EN","","204"), L("DE","Petschlies","103","c","Frau Petschlies fällt aus"), L("FR","Weder","St.3","s","Frau Weder verlegt nach St.3")],
+      2: [L("PH","","B12"), L("P:gw","","GW1"), L("EN","","204"), L("DE","Petschlies","103","c","Frau Petschlies fällt aus"), L("FR","Weder","St.4","s","Frau Weder verlegt nach St.4")],
+      3: [L("DE","","103"), L("MA","","201"), L("ETH","","108"), L("SPO:m","Kaumann","Halle","c","Herr Kaumann fällt aus"), L("FR","","St.3")],
+      4: [L("DE","","103"), L("MA","","201"), L("ETH","","108"), L("SPO:w","Furmanzack","Halle","c","Frau Furmanzack fällt aus"), L("FR","","St.3")],
+      5: [L("MA","","201"), L("INF","","PC1"), L("GEO","","205"), L("BIO","Gommlich","Bio1","c","Frau Gommlich fällt aus"), L("CH","","Lab3")],
+      6: [L("MA","","201"), L("KU","","Kunst"), L("FREI","","","s"), L("BIO","Gommlich","Bio1","c","Frau Gommlich fällt aus"), L("CH","","Lab3")],
+      7: [L("Frsol","","A1"), L("EN","","204"), L("G/R/W","","202"), EMPTY, EMPTY],
+      8: [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
     },
-    1: { // Nächste Woche (leicht anders, damit der Wechsel sichtbar ist)
-      1: [L("PW","Klasse","Aula","n"), L("MA","Müller","201","n"), L("DE","Schmidt","103","n"), L("PH","Weiss","Lab1","n"), L("BIO","Grün","Bio1","n")],
-      2: [L("PW","Klasse","Aula","n"), L("BIO","Grün","Bio1","n"), L("EN","Weber","204","n"), L("GE","","","c"), L("INF","Klein","PC1","n")],
-      3: [L("PW","Klasse","Aula","n"), L("EN","Weber","204","s"), L("MA","Müller","201","n"), L("DE","Schmidt","103","n"), L("SPO","Koch","Halle","n")],
-      4: [L("KU","Rose","Kunst","n"), L("MA","Müller","201","n"), L("MU","Demel","Musik","n"), L("CH","Fischer","Lab2","n"), L("KU","Rose","Kunst","n")],
-      5: [L("GE","Hartl","203","n"), L("DE","Schmidt","103","n"), L("MA","Müller","201","n"), L("EN","Weber","204","n"), EMPTY],
-      6: [EMPTY, L("REL","Bauer","106","n"), EMPTY, L("PH","Weiss","Lab1","n"), EMPTY]
+    1: { // Nächste Woche (KW 40) — leicht anders, keine Ausfälle
+      1: [L("PH","","B12"), L("P:gw","","GW1"), L("EN","","204"), L("DE","Petschlies","103"), L("FR","Weder","St.2")],
+      2: [L("PH","","B12"), L("P:gw","","GW1"), L("EN","","204"), L("DE","Petschlies","103"), L("FR","Weder","St.2")],
+      3: [L("DE","","103"), L("MA","","201"), L("ETH","","108"), L("SPO:m","Kaumann","Halle"), L("FR","","St.3")],
+      4: [L("DE","","103"), L("MA","","201"), L("ETH","","108"), L("SPO:w","Furmanzack","Halle"), L("FR","","St.3")],
+      5: [L("MA","","201"), L("INF","","PC1"), L("GEO","","205"), L("BIO","Gommlich","Bio1"), L("CH","","Lab3")],
+      6: [L("MA","","201"), L("KU","","Kunst"), L("EN","Weber","204","s","Herr Weber vertritt"), L("BIO","Gommlich","Bio1"), L("CH","","Lab3")],
+      7: [L("Frsol","","A1"), L("EN","","204"), L("G/R/W","","202"), EMPTY, EMPTY],
+      8: [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]
     }
   };
   const DAY_SHORT = ["MO", "DI", "MI", "DO", "FR"];
   const DAY_FULL = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
-  const DAY_DATE = [["22","23","24","25","26"], ["29","30","01","02","03"]];
-  const DAY_HEADDATE = [
-    ["Mo, 22. Sep","Di, 23. Sep","Mi, 24. Sep","Do, 25. Sep","Fr, 26. Sep"],
-    ["Mo, 29. Sep","Di, 30. Sep","Mi, 01. Okt","Do, 02. Okt","Fr, 03. Okt"]
-  ];
-  const TODAY_IDX = 0; // Montag als "heute" markiert (nur diese Woche)
+  // Mutable arrays filled by initDemoDates below
+  var DAY_DATE = [[], []];
+  var TODAY_IDX = -1;
+  var KW_LABEL = ["", ""];
 
-  let demoDay = 0;   // aktiv hervorgehobene Spalte / Mobil-Tag
+  // ---------- Dynamic demo dates ----------
+  function getISOWeek(date) {
+    var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    var dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+  (function initDemoDates() {
+    var today = new Date();
+    var rawDow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
+    var dow = rawDow === 0 ? 6 : rawDow - 1; // 0=Mon,...,4=Fri,5=Sat,6=Sun
+    var monday = new Date(today);
+    monday.setDate(today.getDate() - dow);
+
+    var kw0 = getISOWeek(monday);
+    var nextMonday = new Date(monday);
+    nextMonday.setDate(monday.getDate() + 7);
+    var kw1 = getISOWeek(nextMonday);
+
+    var MONTHS_SHORT = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+    var datesW0 = [], datesW1 = [];
+    for (var i = 0; i < 5; i++) {
+      var d0 = new Date(monday); d0.setDate(monday.getDate() + i);
+      var d1 = new Date(nextMonday); d1.setDate(nextMonday.getDate() + i);
+      datesW0.push(String(d0.getDate()).padStart(2, "0"));
+      datesW1.push(String(d1.getDate()).padStart(2, "0"));
+    }
+
+    DAY_DATE[0] = datesW0;
+    DAY_DATE[1] = datesW1;
+
+    // todayIdx: 0=Mon...4=Fri; weekend = -1 (no highlight)
+    var todayIdx = (rawDow >= 1 && rawDow <= 5) ? rawDow - 1 : -1;
+    TODAY_IDX = todayIdx;
+    window.__demoTodayIdx = todayIdx;
+
+    KW_LABEL[0] = "KW " + kw0 + " · Aktuell";
+    KW_LABEL[1] = "KW " + kw1 + " · Nächste Woche";
+
+    // Update hero mockup chip
+    var chip = document.querySelector(".mk-chip");
+    if (chip && rawDow >= 1 && rawDow <= 5) {
+      var DAY_ABBR = ["Mo","Di","Mi","Do","Fr"];
+      var chipDay = new Date(monday); chipDay.setDate(monday.getDate() + (rawDow - 1));
+      chip.textContent = DAY_ABBR[rawDow - 1] + ", " + chipDay.getDate() + ". " + MONTHS_SHORT[chipDay.getMonth()];
+    }
+  })();
+  const CUR_PERIOD = -1;   // keine aktuelle Stunde in der Referenz hervorgehoben
+  // Tages-Info-Pills pro Wochentag (wie im Referenzbild)
+  const DAY_INFO = [
+    ["Jg8 – Englandfahrt", "Jg8 – Englandfahrt", "Instrumentalunterricht", "Heute pädagogischer Tag", "Jg8 – Englandfahrt"],
+    ["", "", "", "", ""]
+  ];
+
   let demoWeek = 0;
   const demoView = $("#demoView");
-  const demoDate = $("#demoDate");
   const demoWeekLabel = $("#demoWeekLabel");
+  const demoAusfall = $("#demoAusfall");
 
-  const CLS = { n: "mk-normal", s: "mk-sub-c", c: "mk-cancel-c", "": "mk-empty" };
+  const CLS = { n: "dc-n", s: "dc-s", c: "dc-c", "": "dc-empty" };
   const LABEL = { n: "Unterricht", s: "Vertretung", c: "Ausfall" };
 
-  function cellHtml(cell, dayIdx, slot, isToday) {
-    if (!cell || cell.type === "") return '<td class="dc-cell-td' + (isToday ? " is-today-col" : "") + '"><div class="dc-cell mk-empty"></div></td>';
-    const cls = CLS[cell.type] || "mk-normal";
-    const tip = "<b>" + esc(cell.s) + "</b> · " + (LABEL[cell.type] || "Unterricht") +
-      (cell.teach ? "<br>👤 " + esc(cell.teach) : "") +
-      (cell.room ? " · 🚪 " + esc(cell.room) : "") +
-      "<br>🕐 " + esc(slot.time) + " · " + esc(DAY_FULL[dayIdx]);
-    const subj = cell.type === "c" ? "—" : esc(cell.s);
-    const meta = cell.type !== "c" && cell.room ? '<small>' + esc(cell.room) + "</small>" : "";
+  function cellHtml(cell, dayIdx, slot, isToday, isNow) {
+    if (!cell || cell.type === "") return '<td class="dc-cell-td' + (isToday ? " is-today-col" : "") + '"><div class="dc-cell dc-empty"></div></td>';
+    let cls = CLS[cell.type] || "dc-n";
+    const now = isNow && cell.type !== "c";
+    if (now) cls = "dc-now";
+    const subj = esc(cell.s);
+    // Tooltip
+    let tip = "<b>" + subj + "</b> · " + (now ? "Jetzt" : (LABEL[cell.type] || "Unterricht"));
+    if (cell.teach) tip += "<br>" + esc(cell.teach);
+    if (cell.room && cell.type !== "c") tip += (cell.teach ? " · " : "<br>") + esc(cell.room);
+    tip += "<br>" + esc(slot.time) + " · " + esc(DAY_FULL[dayIdx]);
+    if (cell.note) tip += "<br><em>" + esc(cell.note) + "</em>";
+    // Cell body: subject + status dot; cancel shows teacher note
+    const dot = '<span class="dc-dot"></span>';
+    let inner;
+    if (cell.type === "c") {
+      inner = '<span class="dc-subj">' + subj + "</span>" +
+        '<small class="dc-note">' + esc(cell.note || "fällt aus") + "</small>";
+    } else {
+      inner = '<span class="dc-subj">' + subj + "</span>" +
+        (cell.note ? '<small class="dc-note">' + esc(cell.note) + "</small>" : "");
+    }
     return '<td class="dc-cell-td' + (isToday ? " is-today-col" : "") + '">' +
-      '<div class="dc-cell ' + cls + '" tabindex="0">' + subj + meta +
+      '<div class="dc-cell ' + cls + '" tabindex="0">' + dot + inner +
       '<span class="dc-tip">' + tip + "</span></div></td>";
   }
 
   function renderDemo() {
     if (!demoView) return;
     const week = DEMO_WEEKS[demoWeek];
-    const todayIdx = demoWeek === 0 ? TODAY_IDX : -1;
+    const todayIdx = demoWeek === 0 ? (window.__demoTodayIdx !== undefined ? window.__demoTodayIdx : TODAY_IDX) : -1;
 
     // Kopfzeile (Wochentage)
-    let head = '<tr><th class="dc-num-h">#</th>';
+    let head = '<tr class="dc-days-row"><th class="dc-num-h"></th>';
     DAY_SHORT.forEach((d, i) => {
-      const active = i === demoDay ? " dc-day-active" : "";
       const today = i === todayIdx;
-      head += '<th class="dc-day-h' + active + (today ? " dc-today-h" : "") + '">' +
-        '<span>' + d + "</span><small>" + DAY_DATE[demoWeek][i] + "</small></th>";
+      const inner = '<span class="dc-day-name">' + d + '</span><span class="dc-day-date">' + DAY_DATE[demoWeek][i] + "</span>";
+      head += '<th class="dc-day-h' + (today ? " dc-today-h" : "") + '">' +
+        (today ? '<span class="dc-today-box">' + inner + "</span>" : inner) + "</th>";
+    });
+    head += "</tr>";
+
+    // Info-Pills-Zeile (Tages-Infos)
+    const infoIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>';
+    head += '<tr class="dc-info-row"><th class="dc-info-h">' +
+      '<span class="dc-info-marker">' + infoIcon + '</span></th>';
+    DAY_SHORT.forEach((d, i) => {
+      const txt = (DAY_INFO[demoWeek] && DAY_INFO[demoWeek][i]) || "";
+      head += '<th class="dc-info-cell">' +
+        (txt ? '<span class="dc-info-pill" title="' + esc(txt) + '">' + infoIcon + '<span class="dc-info-txt">' + esc(txt) + '</span></span>' : '') +
+        "</th>";
     });
     head += "</tr>";
 
@@ -233,41 +341,42 @@
       if (slot.pause) { body += '<tr class="dc-pause"><td colspan="6">' + esc(slot.pause) + "</td></tr>"; return; }
       const row = week[slot.p] || [];
       body += '<tr><td class="dc-num"><b>' + slot.p + "</b><span>" + esc(slot.time) + "</span></td>";
-      for (let i = 0; i < 5; i++) body += cellHtml(row[i], i, slot, i === todayIdx || i === demoDay);
+      for (let i = 0; i < 5; i++) {
+        const isToday = i === todayIdx;
+        const isNow = demoWeek === 0 && isToday && slot.p === CUR_PERIOD;
+        body += cellHtml(row[i], i, slot, isToday, isNow);
+      }
       body += "</tr>";
     });
 
     demoView.innerHTML =
-      '<table class="dc-table"><thead>' + head + "</thead><tbody>" + body + "</tbody></table>" +
+      '<div class="dc-table-wrap"><table class="dc-table"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div>" +
       '<div class="dc-legend">' +
-        '<span><i style="background:#3b82f6"></i>Heute</span>' +
-        '<span><i style="background:#f59e0b"></i>Vertretung</span>' +
-        '<span><i style="background:#ef4444"></i>Ausfall</span>' +
-        '<span><i style="background:#22c55e"></i>Jetzt</span>' +
+        '<span><i style="background:#4F7CFF"></i>Heute</span>' +
+        '<span><i style="background:#F59E0B"></i>Vertretung</span>' +
+        '<span><i style="background:#EF4444"></i>Ausfall</span>' +
+        '<span><i style="background:#4F7CFF"></i>Jetzt</span>' +
       "</div>";
 
-    if (demoDate) demoDate.textContent = DAY_HEADDATE[demoWeek][demoDay];
-    if (demoWeekLabel) demoWeekLabel.textContent = "Klasse 10b · " + (demoWeek === 0 ? "Diese Woche" : "Nächste Woche");
+    if (demoWeekLabel) demoWeekLabel.textContent = KW_LABEL[demoWeek];
+    if (demoAusfall) demoAusfall.style.display = demoWeek === 0 ? "" : "none";
   }
 
-  $$(".demo-day").forEach(btn => {
-    btn.addEventListener("click", () => {
-      $$(".demo-day").forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
-      btn.classList.add("active");
-      btn.setAttribute("aria-selected", "true");
-      demoDay = Number(btn.dataset.day) || 0;
-      renderDemo();
-    });
-  });
   function setWeek(w) {
     demoWeek = w;
-    const cur = $("#demoWeekCur"), next = $("#demoWeekNext");
-    if (cur) cur.classList.toggle("active", w === 0);
-    if (next) next.classList.toggle("active", w === 1);
+    const toggle = $("#demoWeekToggle");
+    if (toggle) {
+      toggle.dataset.week = String(w);
+      toggle.innerHTML = w === 0
+        ? 'Nächste Woche <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8.6 16.6 13.2 12 8.6 7.4 10 6l6 6-6 6z"/></svg>'
+        : '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M15.4 7.4 10.8 12l4.6 4.6L14 18l-6-6 6-6z"/></svg> Aktuelle Woche';
+      toggle.classList.toggle("dc-btn-green", w === 1);
+      toggle.classList.toggle("dc-btn-primary", w === 0);
+    }
     renderDemo();
   }
-  if ($("#demoWeekCur")) $("#demoWeekCur").addEventListener("click", () => setWeek(0));
-  if ($("#demoWeekNext")) $("#demoWeekNext").addEventListener("click", () => setWeek(1));
+  const demoWeekToggle = $("#demoWeekToggle");
+  if (demoWeekToggle) demoWeekToggle.addEventListener("click", () => setWeek(demoWeek === 0 ? 1 : 0));
   const demoReload = $("#demoReload");
   if (demoReload) {
     demoReload.addEventListener("click", () => {
@@ -276,6 +385,315 @@
     });
   }
   renderDemo();
+
+  /* ---------- Card Creator ---------- */
+  // Themes (bg + tile_bg) exakt aus der echten Card
+  // Next-Gen Theme-System — identisch zur echten Card (bg/card/primary +
+  // fixe Statusfarbe je Dark/Light für die Vorschau-Punkte).
+  const CC_THEMES = [
+    // Dark
+    { v: "navy",        name: "Navy Dark",   category: "Dark",  kw: "Navy · Blau · Neutral",     bg: "#0B0F19", card: "#111827", tile: "#1A2233", primary: "#4F7CFF", status: "#22C55E", light: false },
+    { v: "graphite",    name: "Graphite",    category: "Dark",  kw: "Grau · Schwarz · Minimal",  bg: "#090A0C", card: "#121416", tile: "#202328", primary: "#E5E7EB", status: "#22C55E", light: false },
+    { v: "ocean_blue",  name: "Ocean Blue",  category: "Dark",  kw: "Blau · Navy · Technisch",   bg: "#07111F", card: "#0D1A2B", tile: "#172E47", primary: "#3B82F6", status: "#22C55E", light: false },
+    { v: "deep_purple", name: "Deep Purple", category: "Dark",  kw: "Violett · Dunkel · Elegant",bg: "#0F0B18", card: "#171222", tile: "#291F3B", primary: "#8B5CF6", status: "#22C55E", light: false },
+    { v: "forest_green",name: "Forest Green",category: "Dark",  kw: "Grün · Natur · Ruhig",      bg: "#07130D", card: "#0D1E16", tile: "#193428", primary: "#22C55E", status: "#22C55E", light: false },
+    { v: "ruby",        name: "Ruby",        category: "Dark",  kw: "Rot · Dunkel · Elegant",    bg: "#13090B", card: "#211013", tile: "#341A1F", primary: "#EF4444", status: "#22C55E", light: false },
+    { v: "sunset",      name: "Sunset",      category: "Dark",  kw: "Orange · Warm · Modern",    bg: "#140D08", card: "#21160D", tile: "#352317", primary: "#F97316", status: "#22C55E", light: false },
+    { v: "deep_teal",   name: "Deep Teal",   category: "Dark",  kw: "Türkis · Kühl · Technisch", bg: "#061315", card: "#0C1F22", tile: "#17373B", primary: "#14B8A6", status: "#22C55E", light: false },
+    { v: "dark_rose",   name: "Dark Rose",   category: "Dark",  kw: "Rosé · Dunkel · Elegant",   bg: "#140B11", card: "#21121A", tile: "#351D29", primary: "#EC4899", status: "#22C55E", light: false },
+    // Light
+    { v: "light",       name: "Light",       category: "Light", kw: "Weiß · Grau · Blau",        bg: "#F4F6FA", card: "#FFFFFF", tile: "#F8FAFC", primary: "#4169E1", status: "#16A34A", light: true },
+    { v: "sky_blue",    name: "Sky Blue",    category: "Light", kw: "Blau · Frisch · Hell",      bg: "#F1F7FF", card: "#FFFFFF", tile: "#F5F9FF", primary: "#2563EB", status: "#16A34A", light: true },
+    { v: "fresh_green", name: "Fresh Green", category: "Light", kw: "Grün · Natur · Hell",       bg: "#F1FAF4", card: "#FFFFFF", tile: "#F6FBF8", primary: "#16A34A", status: "#16A34A", light: true },
+    { v: "soft_purple", name: "Soft Purple", category: "Light", kw: "Violett · Elegant · Hell",  bg: "#F7F4FC", card: "#FFFFFF", tile: "#FAF8FD", primary: "#7C3AED", status: "#16A34A", light: true },
+    { v: "soft_rose",   name: "Soft Rose",   category: "Light", kw: "Rosé · Warm · Hell",        bg: "#FFF5F8", card: "#FFFFFF", tile: "#FFF9FB", primary: "#DB2777", status: "#16A34A", light: true },
+    { v: "warm_orange", name: "Warm Orange", category: "Light", kw: "Orange · Warm · Hell",      bg: "#FFF8F1", card: "#FFFFFF", tile: "#FFFAF6", primary: "#EA580C", status: "#16A34A", light: true }
+  ];
+  const CC_THEME_MAP = {};
+  CC_THEMES.forEach(t => CC_THEME_MAP[t.v] = t);
+
+  // Konfig-State pro Typ (Defaults = echte getStubConfig-Werte)
+  const CC = {
+    type: "week",
+    week: {
+      entity: "sensor.vpmobile24_week_table",
+      title: "Stundenplan",
+      class_name: "09f",
+      theme: "navy",
+      show_header: true,
+      show_time: true,
+      highlight_today: true,
+      use_custom_times: false
+    },
+    current: {
+      entity: "sensor.vpmobile24_aktueller_unterricht",
+      next_entity: "sensor.vpmobile24_naechste_stunde",
+      week_entity: "sensor.vpmobile24_wochentabelle",
+      title: "",
+      theme: "navy",
+      show_progress: true,
+      show_countdown: true,
+      show_next: true,
+      show_teacher: true,
+      show_room: true,
+      show_day_info: true
+    },
+    multi: {
+      entities: ["sensor.vpmobile24_09f_week_table", "sensor.vpmobile24_07a_week_table"],
+      title: "Stundenplan Übersicht",
+      theme: "navy",
+      columns: "auto",
+      show_week_nav: true,
+      show_legend: true
+    }
+  };
+
+  const ccForm = $("#ccForm");
+  const ccYaml = $("#ccYaml");
+  const demoCard = $("#demoCard");
+  const demoTitle = $("#demoTitle");
+  const demoClass = $("#demoClass");
+  const demoActions = $("#demoActions");
+
+  function ccText(id, label, val, hint) {
+    return '<label class="cc-field"><span class="cc-lbl">' + esc(label) + '</span>' +
+      '<input class="cc-input" type="text" data-cc="' + id + '" value="' + esc(val) + '">' +
+      (hint ? '<span class="cc-hint">' + esc(hint) + '</span>' : '') + '</label>';
+  }
+  function ccTextarea(id, label, val, hint) {
+    return '<label class="cc-field"><span class="cc-lbl">' + esc(label) + '</span>' +
+      '<textarea class="cc-input cc-area" rows="3" data-cc="' + id + '">' + esc(val) + '</textarea>' +
+      (hint ? '<span class="cc-hint">' + esc(hint) + '</span>' : '') + '</label>';
+  }
+  function ccSelect(id, label, val, opts) {
+    let o = "";
+    opts.forEach(op => { o += '<option value="' + esc(op.v) + '"' + (op.v === val ? " selected" : "") + '>' + esc(op.l) + '</option>'; });
+    return '<label class="cc-field"><span class="cc-lbl">' + esc(label) + '</span>' +
+      '<select class="cc-input" data-cc="' + id + '">' + o + '</select></label>';
+  }
+  function ccToggle(id, label, val) {
+    return '<label class="cc-toggle"><input type="checkbox" data-cc="' + id + '"' + (val ? " checked" : "") + '>' +
+      '<span class="cc-toggle-track"><span class="cc-toggle-thumb"></span></span>' +
+      '<span class="cc-toggle-lbl">' + esc(label) + '</span></label>';
+  }
+
+  // Visueller Theme-Selector: Karten mit Farbvorschau-Punkten + aktivem Zustand.
+  function ccThemeCard(t, active) {
+    const dot = (c) => '<span class="cc-th-dot" style="background:' + c + '"></span>';
+    const check = '<svg class="cc-th-check" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+    return '<button type="button" class="cc-th' + (active ? " cc-th-active" : "") + '" role="radio" aria-checked="' + (active ? "true" : "false") + '" data-cc-theme="' + esc(t.v) + '">' +
+      '<span class="cc-th-preview" style="background:' + t.bg + '">' +
+        '<span class="cc-th-bar" style="background:' + t.card + '"></span>' +
+        '<span class="cc-th-dots">' + dot(t.primary) + dot(t.tile) + dot(t.status) + '</span>' +
+      '</span>' +
+      '<span class="cc-th-body"><span class="cc-th-name">' + esc(t.name) + '</span>' +
+      '<span class="cc-th-kw">' + esc(t.kw) + '</span></span>' +
+      (active ? check : '') + '</button>';
+  }
+  function ccThemePicker(val) {
+    const groups = [["Dark Themes", false], ["Light Themes", true]];
+    let h = '<div class="cc-field"><span class="cc-lbl">Theme</span><div class="cc-themes" role="radiogroup" aria-label="Theme">';
+    groups.forEach(([label, isLight]) => {
+      h += '<div class="cc-th-group">' + esc(label) + '</div><div class="cc-th-grid">';
+      CC_THEMES.filter(t => t.light === isLight).forEach(t => { h += ccThemeCard(t, t.v === val); });
+      h += '</div>';
+    });
+    h += '</div></div>';
+    return h;
+  }
+
+  function renderCcForm() {
+    if (!ccForm) return;
+    const c = CC[CC.type];
+    let h = "";
+    if (CC.type === "week") {
+      h += ccText("entity", "Entity (Wochentabelle)", c.entity, "z.B. sensor.vpmobile24_week_table");
+      h += ccText("title", "Titel", c.title);
+      h += ccText("class_name", "Klasse (optional)", c.class_name, "Überschreibt den Klassennamen aus dem Sensor");
+      h += ccThemePicker(c.theme);
+      h += '<div class="cc-toggles">';
+      h += ccToggle("show_header", "Header anzeigen", c.show_header);
+      h += ccToggle("show_time", "Zeiten anzeigen", c.show_time);
+      h += ccToggle("highlight_today", "Heute hervorheben", c.highlight_today);
+      h += ccToggle("use_custom_times", "Eigene Zeiten", c.use_custom_times);
+      h += '</div>';
+    } else if (CC.type === "current") {
+      h += ccText("entity", "Entity (Aktuelle Stunde)", c.entity, "z.B. sensor.vpmobile24_aktueller_unterricht");
+      h += ccText("next_entity", "Entity (Nächste Stunde)", c.next_entity);
+      h += ccText("week_entity", "Entity (Wochentabelle)", c.week_entity);
+      h += ccText("title", "Titel (optional)", c.title);
+      h += ccThemePicker(c.theme);
+      h += '<div class="cc-toggles">';
+      h += ccToggle("show_progress", "Fortschritt", c.show_progress);
+      h += ccToggle("show_countdown", "Countdown", c.show_countdown);
+      h += ccToggle("show_next", "Nächste Stunde", c.show_next);
+      h += ccToggle("show_teacher", "Lehrer", c.show_teacher);
+      h += ccToggle("show_room", "Raum", c.show_room);
+      h += ccToggle("show_day_info", "Tages-Info", c.show_day_info);
+      h += '</div>';
+    } else {
+      h += ccTextarea("entities", "Entities (eine pro Zeile)", c.entities.join("\n"), "Je Klasse eine Wochentabellen-Entity");
+      h += ccText("title", "Titel", c.title);
+      h += ccThemePicker(c.theme);
+      h += ccSelect("columns", "Spalten", c.columns, [
+        { v: "auto", l: "Automatisch" }, { v: "1", l: "1 Spalte" },
+        { v: "2", l: "2 Spalten" }, { v: "3", l: "3 Spalten" }
+      ]);
+      h += '<div class="cc-toggles">';
+      h += ccToggle("show_week_nav", "Wochen-Navigation", c.show_week_nav);
+      h += ccToggle("show_legend", "Legende", c.show_legend);
+      h += '</div>';
+    }
+    ccForm.innerHTML = h;
+
+    // Events binden (Text/Select/Toggle)
+    ccForm.querySelectorAll("[data-cc]").forEach(el => {
+      const key = el.dataset.cc;
+      const evt = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
+      el.addEventListener(evt, () => {
+        const cur = CC[CC.type];
+        if (el.type === "checkbox") cur[key] = el.checked;
+        else if (key === "entities") cur[key] = el.value.split("\n").map(s => s.trim()).filter(Boolean);
+        else cur[key] = el.value;
+        applyCc();
+      });
+    });
+
+    // Theme-Karten (visueller Selector)
+    ccForm.querySelectorAll("[data-cc-theme]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        CC[CC.type].theme = btn.dataset.ccTheme;
+        // aktiven Zustand ohne Full-Rerender umschalten (behält Fokus/Scroll)
+        ccForm.querySelectorAll("[data-cc-theme]").forEach(b => {
+          const on = b === btn;
+          b.classList.toggle("cc-th-active", on);
+          b.setAttribute("aria-checked", on ? "true" : "false");
+          const chk = b.querySelector(".cc-th-check");
+          if (on && !chk) {
+            b.insertAdjacentHTML("beforeend", '<svg class="cc-th-check" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>');
+          } else if (!on && chk) { chk.remove(); }
+        });
+        applyCc();
+      });
+    });
+  }
+
+  // YAML-Erzeugung
+  function yamlStr(v) {
+    if (v === "") return '""';
+    if (/^[\w./:-]+$/.test(v)) return v;
+    return '"' + String(v).replace(/"/g, '\\"') + '"';
+  }
+  function buildYaml() {
+    const c = CC[CC.type];
+    let y = "";
+    if (CC.type === "week") {
+      y += "type: custom:vpmobile24-card\n";
+      y += "entity: " + yamlStr(c.entity) + "\n";
+      y += "theme: " + yamlStr(c.theme) + "\n";
+      if (!c.show_header) y += "show_header: false\n";
+      if (!c.show_time) y += "show_time: false\n";
+      if (!c.highlight_today) y += "highlight_today: false\n";
+      if (c.use_custom_times) y += "use_custom_times: true\n";
+      if (c.title || c.class_name) {
+        y += "header_settings:\n";
+        if (c.title) y += "  title: " + yamlStr(c.title) + "\n";
+        if (c.class_name) y += "  class_name: " + yamlStr(c.class_name) + "\n";
+      }
+    } else if (CC.type === "current") {
+      y += "type: custom:vpmobile24-current-card\n";
+      y += "entity: " + yamlStr(c.entity) + "\n";
+      if (c.next_entity) y += "next_entity: " + yamlStr(c.next_entity) + "\n";
+      if (c.week_entity) y += "week_entity: " + yamlStr(c.week_entity) + "\n";
+      if (c.title) y += "title: " + yamlStr(c.title) + "\n";
+      y += "theme: " + yamlStr(c.theme) + "\n";
+      [["show_progress", c.show_progress], ["show_countdown", c.show_countdown],
+       ["show_next", c.show_next], ["show_teacher", c.show_teacher],
+       ["show_room", c.show_room], ["show_day_info", c.show_day_info]].forEach(([k, v]) => {
+        if (!v) y += k + ": false\n";
+      });
+    } else {
+      y += "type: custom:vpmobile24-multi-card\n";
+      if (c.title) y += "title: " + yamlStr(c.title) + "\n";
+      y += "theme: " + yamlStr(c.theme) + "\n";
+      if (c.columns && c.columns !== "auto") y += "columns: " + yamlStr(c.columns) + "\n";
+      if (!c.show_week_nav) y += "show_week_nav: false\n";
+      if (!c.show_legend) y += "show_legend: false\n";
+      y += "entities:\n";
+      (c.entities.length ? c.entities : ["sensor.beispiel_week_table"]).forEach(e => {
+        y += "  - " + yamlStr(e) + "\n";
+      });
+    }
+    return y.trimEnd();
+  }
+
+  // Vorschau an Konfig anpassen
+  function applyCc() {
+    const c = CC[CC.type];
+    const th = CC_THEME_MAP[c.theme] || CC_THEME_MAP.navy;
+    if (demoCard) {
+      demoCard.style.background = th.bg;
+      demoCard.style.setProperty("--dc-primary", th.primary);
+      demoCard.classList.toggle("dc-light", !!th.light);
+    }
+    // Titel / Klasse / Header
+    if (CC.type === "week") {
+      if (demoTitle) demoTitle.textContent = c.title || "Stundenplan";
+      if (demoClass) { demoClass.textContent = "Klasse " + (c.class_name || "09f"); demoClass.style.display = ""; }
+      if (demoActions) demoActions.style.display = "";
+      if (demoCard) demoCard.classList.toggle("dc-no-header", !c.show_header);
+    } else if (CC.type === "current") {
+      if (demoTitle) demoTitle.textContent = c.title || "Aktueller Unterricht";
+      if (demoClass) demoClass.style.display = "none";
+      if (demoActions) demoActions.style.display = "none";
+      if (demoCard) demoCard.classList.remove("dc-no-header");
+    } else {
+      if (demoTitle) demoTitle.textContent = c.title || "Stundenplan Übersicht";
+      if (demoClass) { demoClass.textContent = (c.entities.length || 2) + " Klassen"; demoClass.style.display = ""; }
+      if (demoActions) demoActions.style.display = c.show_week_nav ? "" : "none";
+      if (demoCard) demoCard.classList.remove("dc-no-header");
+    }
+    // Legende (nur relevant für Wochen-/Multi-Vorschau)
+    const legend = demoView && demoView.querySelector(".dc-legend");
+    if (legend) legend.style.display = (CC.type === "multi" && !c.show_legend) ? "none" : "";
+    // Zeiten-Spalte ausblenden bei show_time=false (Wochenplan)
+    if (demoCard) demoCard.classList.toggle("dc-no-time", CC.type === "week" && !c.show_time);
+    // YAML aktualisieren
+    if (ccYaml) ccYaml.textContent = buildYaml();
+  }
+
+  // Typ-Umschalter
+  $$(".cc-type").forEach(btn => {
+    btn.addEventListener("click", () => {
+      $$(".cc-type").forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      CC.type = btn.dataset.ccType;
+      renderCcForm();
+      applyCc();
+    });
+  });
+
+  // Copy-Button
+  const ccCopy = $("#ccCopy");
+  if (ccCopy) {
+    ccCopy.addEventListener("click", () => {
+      const text = buildYaml();
+      const done = () => { ccCopy.textContent = "Kopiert!"; ccCopy.classList.add("copied"); setTimeout(() => { ccCopy.textContent = "Kopieren"; ccCopy.classList.remove("copied"); }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else { fallbackCopy(text, done); }
+    });
+  }
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta); if (cb) cb();
+  }
+
+  if (ccForm) { renderCcForm(); applyCc(); }
 
   /* ---------- Documentation search ---------- */
   const SEARCH_INDEX = [
