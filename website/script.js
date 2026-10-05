@@ -171,7 +171,7 @@
   function esc(str) { return String(str).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])); }
 
   // Zeitraster + Pausen wie in der echten Card
-  const DEMO_SLOTS = [
+  let DEMO_SLOTS = [
     { p: 1, time: "08:00–08:45" },
     { p: 2, time: "08:50–09:35" },
     { pause: "Pause · 10:10 – 10:30" },
@@ -794,5 +794,379 @@
       })
       .catch(() => { /* keep static fallback */ });
   })();
+
+  /* ===== Demo Config: Themes, Schedule Editor, Theme Preview ===== */
+
+  const DEMO_THEMES = [
+    { v: "demo-default",  name: "VpMobile24 Blue",     bg: "#111827", primary: "#4F7CFF", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444", txt: "#F8FAFC",  txt2: "#94A3B8" },
+    { v: "demo-ha-dark",  name: "Home Assistant Dark",  bg: "#1c1c1c", primary: "#03a9f4", success: "#4caf50", warning: "#ff9800", danger: "#f44336", txt: "#ffffff",  txt2: "#b0bec5" },
+    { v: "demo-ha-light", name: "Home Assistant Light", bg: "#fafafa", primary: "#03a9f4", success: "#4caf50", warning: "#ff9800", danger: "#f44336", txt: "#212121",  txt2: "#757575" },
+    { v: "demo-midnight", name: "Midnight",             bg: "#0a0a0a", primary: "#8B5CF6", success: "#22C55E", warning: "#F59E0B", danger: "#EF4444", txt: "#e2e8f0",  txt2: "#64748B" },
+    { v: "demo-ocean",    name: "Ocean",                bg: "#071520", primary: "#0ea5e9", success: "#06b6d4", warning: "#f59e0b", danger: "#ef4444", txt: "#e0f2fe",  txt2: "#7dd3fc" },
+    { v: "demo-green",    name: "Forest Green",         bg: "#071309", primary: "#22c55e", success: "#22c55e", warning: "#eab308", danger: "#ef4444", txt: "#f0fdf4",  txt2: "#86efac" },
+    { v: "demo-contrast", name: "High Contrast",        bg: "#000000", primary: "#ffffff", success: "#00ff00", warning: "#ffff00", danger: "#ff0000", txt: "#ffffff",  txt2: "#cccccc" }
+  ];
+
+  const DEFAULT_SCHEDULE = [
+    { type: "lesson", period: 0, start: "07:50", end: "08:35" },
+    { type: "lesson", period: 1, start: "08:40", end: "09:25" },
+    { type: "lesson", period: 2, start: "09:30", end: "10:15" },
+    { type: "break",  label: "Pause", start: "10:15", end: "10:35" },
+    { type: "lesson", period: 3, start: "10:35", end: "11:20" },
+    { type: "lesson", period: 4, start: "11:25", end: "12:10" },
+    { type: "break",  label: "Mittagspause", start: "12:10", end: "12:50" },
+    { type: "lesson", period: 5, start: "12:50", end: "13:35" },
+    { type: "lesson", period: 6, start: "13:40", end: "14:25" },
+    { type: "lesson", period: 7, start: "14:30", end: "15:15" },
+    { type: "lesson", period: 8, start: "15:20", end: "16:05" }
+  ];
+  let SCHEDULE = DEFAULT_SCHEDULE.map(function(x) { return Object.assign({}, x); });
+
+  function scheduleToSlots() {
+    return SCHEDULE.map(function(item) {
+      if (item.type === "break") {
+        return { pause: (item.label || "Pause") + " \u00b7 " + item.start + " \u2013 " + item.end };
+      }
+      return { p: item.period, time: item.start + "\u2013" + item.end };
+    });
+  }
+
+  function loadSchedule() {
+    try {
+      var raw = localStorage.getItem("vpm24-schedule");
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {}
+    return DEFAULT_SCHEDULE.map(function(x) { return Object.assign({}, x); });
+  }
+
+  function saveSchedule() {
+    try { localStorage.setItem("vpm24-schedule", JSON.stringify(SCHEDULE)); } catch(e) {}
+  }
+
+  function resetSchedule() {
+    SCHEDULE = DEFAULT_SCHEDULE.map(function(x) { return Object.assign({}, x); });
+    DEMO_SLOTS = scheduleToSlots();
+    renderScheduleEditor();
+    renderDemo();
+    saveSchedule();
+  }
+
+  function validateSchedule() {
+    var errors = [];
+    var timeRe = /^\d{2}:\d{2}$/;
+    var usedPeriods = {};
+
+    SCHEDULE.forEach(function(item, idx) {
+      if (!item.start || !timeRe.test(item.start)) {
+        errors.push({ idx: idx, field: "start", message: "Stunde " + (idx+1) + ": Bitte gib eine g\u00fcltige Uhrzeit im Format HH:MM ein (Startzeit)." });
+      }
+      if (!item.end || !timeRe.test(item.end)) {
+        errors.push({ idx: idx, field: "end", message: "Stunde " + (idx+1) + ": Bitte gib eine g\u00fcltige Uhrzeit im Format HH:MM ein (Endzeit)." });
+      }
+      if (item.start && item.end && timeRe.test(item.start) && timeRe.test(item.end)) {
+        if (item.end <= item.start) {
+          errors.push({ idx: idx, field: "end", message: "Stunde " + (idx+1) + ": Die Endzeit muss nach der Startzeit liegen." });
+        }
+      }
+      if (item.type === "lesson") {
+        if (item.period === undefined || item.period === null || item.period === "") {
+          errors.push({ idx: idx, field: "period", message: "Stunde " + (idx+1) + ": Periodennummer fehlt." });
+        } else {
+          var pk = String(item.period);
+          if (usedPeriods[pk]) {
+            errors.push({ idx: idx, field: "period", message: "Periodennummer " + item.period + " ist doppelt vorhanden." });
+          }
+          usedPeriods[pk] = true;
+        }
+      }
+    });
+
+    for (var i = 1; i < SCHEDULE.length; i++) {
+      var prev = SCHEDULE[i-1];
+      var curr = SCHEDULE[i];
+      if (prev.end && curr.start && /^\d{2}:\d{2}$/.test(prev.end) && /^\d{2}:\d{2}$/.test(curr.start)) {
+        if (curr.start < prev.end) {
+          errors.push({ idx: i, field: "start", message: "Diese Zeit \u00fcberschneidet sich mit dem vorherigen Eintrag." });
+        }
+      }
+    }
+
+    if (SCHEDULE.length > 12) {
+      errors.push({ idx: -1, field: "global", message: "Maximal 12 Eintr\u00e4ge erlaubt. Bitte l\u00f6sche einen Eintrag." });
+    }
+
+    return errors;
+  }
+
+  function _esc(str) {
+    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function renderScheduleEditor() {
+    var container = document.getElementById("scheduleEditorRows");
+    if (!container) return;
+    var errors = validateSchedule();
+    var errorMap = {};
+    errors.forEach(function(e) {
+      if (!errorMap[e.idx]) errorMap[e.idx] = [];
+      errorMap[e.idx].push(e);
+    });
+
+    var html = "";
+    SCHEDULE.forEach(function(item, idx) {
+      var isBreak = item.type === "break";
+      var rowErrors = errorMap[idx] || [];
+      var hasError = rowErrors.length > 0;
+      var startInvalid = rowErrors.some(function(e) { return e.field === "start"; });
+      var endInvalid = rowErrors.some(function(e) { return e.field === "end"; });
+      var rowClass = "schedule-row" + (isBreak ? " is-break" : "") + (hasError ? " has-error" : "");
+
+      var labelHtml;
+      if (isBreak) {
+        labelHtml = '<input class="sr-label-input" type="text" aria-label="Pausenbezeichnung" value="' + _esc(item.label || "Pause") + '" data-sr-idx="' + idx + '" data-sr-field="label" />';
+      } else {
+        labelHtml = '<div class="sr-label">Stunde ' + item.period + '</div>';
+      }
+
+      var startErrMsg = rowErrors.filter(function(e) { return e.field === "start"; }).map(function(e) { return e.message; }).join(" ");
+      var endErrMsg = rowErrors.filter(function(e) { return e.field === "end"; }).map(function(e) { return e.message; }).join(" ");
+
+      var canUp = idx > 0;
+      var canDown = idx < SCHEDULE.length - 1;
+
+      html += '<div class="' + rowClass + '">';
+      html += '<div>' + labelHtml + '</div>';
+      html += '<div class="sr-time-group">';
+      html += '  <div class="sr-time-label">Beginn</div>';
+      html += '  <input class="sr-time-input' + (startInvalid ? " invalid" : "") + '" type="text" placeholder="HH:MM" maxlength="5"';
+      html += '    aria-label="Startzeit" value="' + _esc(item.start || "") + '"';
+      html += '    data-sr-idx="' + idx + '" data-sr-field="start" />';
+      if (startErrMsg) html += '  <div class="sr-error" role="alert">' + _esc(startErrMsg) + '</div>';
+      html += '</div>';
+      html += '<div class="sr-time-group">';
+      html += '  <div class="sr-time-label">Ende</div>';
+      html += '  <input class="sr-time-input' + (endInvalid ? " invalid" : "") + '" type="text" placeholder="HH:MM" maxlength="5"';
+      html += '    aria-label="Endzeit" value="' + _esc(item.end || "") + '"';
+      html += '    data-sr-idx="' + idx + '" data-sr-field="end" />';
+      if (endErrMsg) html += '  <div class="sr-error" role="alert">' + _esc(endErrMsg) + '</div>';
+      html += '</div>';
+      html += '<div class="sr-actions">';
+      html += '  <button class="sr-btn" data-sr-action="up" data-sr-idx="' + idx + '" aria-label="Nach oben" ' + (!canUp ? "disabled" : "") + '>\u2191</button>';
+      html += '  <button class="sr-btn" data-sr-action="down" data-sr-idx="' + idx + '" aria-label="Nach unten" ' + (!canDown ? "disabled" : "") + '>\u2193</button>';
+      html += '  <button class="sr-btn sr-del" data-sr-action="del" data-sr-idx="' + idx + '" aria-label="L\u00f6schen">\uD83D\uDDD1</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+
+    container.querySelectorAll("[data-sr-idx]").forEach(function(el) {
+      var idx2 = parseInt(el.getAttribute("data-sr-idx"), 10);
+      var field = el.getAttribute("data-sr-field");
+      var action = el.getAttribute("data-sr-action");
+
+      if (action === "up") {
+        el.addEventListener("click", function() { moveRow(idx2, -1); });
+      } else if (action === "down") {
+        el.addEventListener("click", function() { moveRow(idx2, 1); });
+      } else if (action === "del") {
+        el.addEventListener("click", function() { deleteRow(idx2); });
+      } else if (field) {
+        el.addEventListener("input", function() {
+          if (field === "start" || field === "end") {
+            SCHEDULE[idx2][field] = el.value;
+          } else if (field === "label") {
+            SCHEDULE[idx2].label = el.value;
+          }
+          applyScheduleChange();
+        });
+      }
+    });
+  }
+
+  function addLesson() {
+    var maxPeriod = -1;
+    SCHEDULE.forEach(function(item) {
+      if (item.type === "lesson" && typeof item.period === "number" && item.period > maxPeriod) {
+        maxPeriod = item.period;
+      }
+    });
+    SCHEDULE.push({ type: "lesson", period: maxPeriod + 1, start: "", end: "" });
+    renderScheduleEditor();
+    applyScheduleChange();
+  }
+
+  function addBreak() {
+    SCHEDULE.push({ type: "break", label: "Pause", start: "", end: "" });
+    renderScheduleEditor();
+    applyScheduleChange();
+  }
+
+  function moveRow(idx, dir) {
+    var target = idx + dir;
+    if (target < 0 || target >= SCHEDULE.length) return;
+    var tmp = SCHEDULE[idx];
+    SCHEDULE[idx] = SCHEDULE[target];
+    SCHEDULE[target] = tmp;
+    DEMO_SLOTS = scheduleToSlots();
+    renderScheduleEditor();
+    renderDemo();
+    saveSchedule();
+  }
+
+  function deleteRow(idx) {
+    SCHEDULE.splice(idx, 1);
+    DEMO_SLOTS = scheduleToSlots();
+    renderScheduleEditor();
+    renderDemo();
+    saveSchedule();
+  }
+
+  var _scheduleDebounce = null;
+  function applyScheduleChange() {
+    clearTimeout(_scheduleDebounce);
+    _scheduleDebounce = setTimeout(function() {
+      var errors = validateSchedule();
+      renderScheduleEditor();
+      var valDiv = document.getElementById("scheduleValidation");
+      if (errors.length === 0) {
+        DEMO_SLOTS = scheduleToSlots();
+        renderDemo();
+        saveSchedule();
+        if (valDiv) valDiv.classList.remove("visible");
+      } else {
+        if (valDiv) {
+          valDiv.textContent = errors.map(function(e) { return e.message; }).join(" | ");
+          valDiv.classList.add("visible");
+        }
+      }
+    }, 300);
+  }
+
+  function applyDemoTheme(themeId) {
+    var t = null;
+    for (var i = 0; i < DEMO_THEMES.length; i++) {
+      if (DEMO_THEMES[i].v === themeId) { t = DEMO_THEMES[i]; break; }
+    }
+    if (!t) t = DEMO_THEMES[0];
+    var dc = document.getElementById("demoCard");
+    if (dc) {
+      dc.style.background = t.bg;
+      dc.style.setProperty("--dc-primary", t.primary);
+      dc.style.setProperty("--dc-success", t.success);
+      dc.style.setProperty("--dc-warning", t.warning);
+      dc.style.setProperty("--dc-error", t.danger);
+      dc.style.setProperty("--dc-txt", t.txt);
+      dc.style.setProperty("--dc-txt2", t.txt2);
+      dc.style.setProperty("--dc-border", t.bg === "#000000" ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.07)");
+    }
+    try { localStorage.setItem("vpm24-demo-theme", themeId); } catch(e) {}
+    renderThemePreview(t);
+    renderDemoThemeGrid(themeId);
+  }
+
+  function renderDemoThemeGrid(activeId) {
+    var grid = document.getElementById("demoThemeGrid");
+    if (!grid) return;
+    var html = "";
+    DEMO_THEMES.forEach(function(t) {
+      var isActive = t.v === activeId;
+      html += '<button class="cc-th' + (isActive ? " active" : "") + '"';
+      html += ' data-dt="' + t.v + '"';
+      html += ' role="radio" aria-checked="' + (isActive ? "true" : "false") + '"';
+      html += ' aria-label="' + _esc(t.name) + '"';
+      html += ' style="--th-bg:' + t.bg + '; --th-p:' + t.primary + '; --th-s:' + t.success + '; --th-w:' + t.warning + '; --th-d:' + t.danger + ';">';
+      html += '<div class="cc-th-preview"><div class="cc-th-p cc-normal"></div><div class="cc-th-p cc-sub"></div><div class="cc-th-p cc-cancel"></div></div>';
+      html += '<div class="cc-th-name">' + _esc(t.name) + '</div>';
+      html += '</button>';
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll(".cc-th").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        applyDemoTheme(btn.getAttribute("data-dt"));
+      });
+    });
+  }
+
+  function renderThemePreview(t) {
+    var card = document.getElementById("themePreviewCard");
+    if (!card) return;
+    var txtColor = t.txt || "#fff";
+    var txt2Color = t.txt2 || "#94a3b8";
+    card.style.background = t.bg;
+    card.style.color = txtColor;
+    var html = '';
+    html += '<div class="tpc-head" style="background:' + t.bg + ';">';
+    html += '  <div class="tpc-head-ico" style="background:' + t.primary + '20;">&#x1F4C5;</div>';
+    html += '  <div>';
+    html += '    <div class="tpc-title" style="color:' + txtColor + ';">Stundenplan \u00b7 Klasse 10b</div>';
+    html += '    <div class="tpc-sub" style="color:' + txt2Color + ';">Heute \u00b7 aktuelle Stunde</div>';
+    html += '  </div>';
+    html += '</div>';
+    html += '<div class="tpc-table" style="background:' + t.bg + ';">';
+    html += '<div class="tpc-row"><div class="tpc-num" style="color:' + txt2Color + ';">1</div>';
+    html += '<div class="tpc-cell" style="background:' + t.success + '20; color:' + t.success + '; border:1px solid ' + t.success + '40;">Mathe \u25b6</div>';
+    html += '<div class="tpc-cell" style="background:' + t.primary + '20; color:' + t.primary + '; border:1px solid ' + t.primary + '40;">Deutsch</div>';
+    html += '<div class="tpc-cell" style="background:' + t.primary + '20; color:' + t.primary + '; border:1px solid ' + t.primary + '40;">Physik</div>';
+    html += '</div>';
+    html += '<div class="tpc-row"><div class="tpc-pause" style="color:' + txt2Color + ';">\u2014 Pause \u00b7 09:25 \u2013 09:40 \u2014</div></div>';
+    html += '<div class="tpc-row"><div class="tpc-num" style="color:' + txt2Color + ';">2</div>';
+    html += '<div class="tpc-cell" style="background:' + t.warning + '20; color:' + t.warning + '; border:1px solid ' + t.warning + '40;">Englisch \u2194</div>';
+    html += '<div class="tpc-cell" style="background:' + t.danger + '20; color:' + t.danger + '; border:1px solid ' + t.danger + '40;">Bio \u2715</div>';
+    html += '<div class="tpc-cell" style="background:' + t.primary + '20; color:' + t.primary + '; border:1px solid ' + t.primary + '40;">Sport</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="tpc-legend">';
+    html += '<span><i style="background:' + t.success + ';"></i><span style="color:' + txt2Color + ';">Jetzt</span></span>';
+    html += '<span><i style="background:' + t.warning + ';"></i><span style="color:' + txt2Color + ';">Vertretung</span></span>';
+    html += '<span><i style="background:' + t.danger + ';"></i><span style="color:' + txt2Color + ';">Ausfall</span></span>';
+    html += '<span><i style="background:' + t.primary + ';"></i><span style="color:' + txt2Color + ';">Normal</span></span>';
+    html += '</div>';
+    card.innerHTML = html;
+  }
+
+  // Tab switching for demo config section
+  document.querySelectorAll(".demo-cfg-tab").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".demo-cfg-tab").forEach(function(b) {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      document.querySelectorAll(".demo-cfg-panel").forEach(function(p) {
+        p.classList.remove("active");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+      var panel = document.getElementById("cfg-" + btn.getAttribute("data-cfg-tab"));
+      if (panel) panel.classList.add("active");
+      if (btn.getAttribute("data-cfg-tab") === "schedule") renderScheduleEditor();
+    });
+  });
+
+  // === Demo Config Init ===
+  SCHEDULE = loadSchedule();
+  DEMO_SLOTS = scheduleToSlots();
+  var _savedDemoTheme = (function() { try { return localStorage.getItem("vpm24-demo-theme") || "demo-default"; } catch(e) { return "demo-default"; } })();
+  renderDemoThemeGrid(_savedDemoTheme);
+  applyDemoTheme(_savedDemoTheme);
+  renderDemo();
+
+  document.getElementById("addLessonBtn") && document.getElementById("addLessonBtn").addEventListener("click", addLesson);
+  document.getElementById("addBreakBtn") && document.getElementById("addBreakBtn").addEventListener("click", addBreak);
+  document.getElementById("loadDefaultsBtn") && document.getElementById("loadDefaultsBtn").addEventListener("click", function() {
+    SCHEDULE = DEFAULT_SCHEDULE.map(function(x) { return Object.assign({}, x); });
+    DEMO_SLOTS = scheduleToSlots();
+    renderScheduleEditor();
+    renderDemo();
+    saveSchedule();
+  });
+  document.getElementById("demoConfigReset") && document.getElementById("demoConfigReset").addEventListener("click", function() {
+    resetSchedule();
+    try { localStorage.removeItem("vpm24-demo-theme"); } catch(e) {}
+    applyDemoTheme("demo-default");
+  });
 
 })();

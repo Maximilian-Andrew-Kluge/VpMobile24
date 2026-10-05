@@ -457,6 +457,45 @@
       </div>
     </section>
 
+    <!-- ===== DEMO CONFIG ===== -->
+    <section class="section section-alt" id="demoConfig">
+      <div class="container">
+        <div class="section-label reveal">Demo-Einstellungen</div>
+        <h2 class="section-title reveal">Demo anpassen.</h2>
+        <p class="section-desc reveal">Wähle ein Theme und passe die Unterrichtszeiten an – die Demo oben aktualisiert sich sofort.</p>
+
+        <div class="demo-config-tabs reveal" role="tablist">
+          <button class="demo-cfg-tab active" data-cfg-tab="theme" role="tab" aria-selected="true">🎨 Theme</button>
+          <button class="demo-cfg-tab" data-cfg-tab="schedule" role="tab" aria-selected="false">⏰ Unterrichtszeiten</button>
+        </div>
+
+        <!-- Theme Panel -->
+        <div class="demo-cfg-panel active" id="cfg-theme">
+          <div class="demo-theme-grid" id="demoThemeGrid" role="radiogroup" aria-label="Demo-Theme auswählen"></div>
+          <div class="theme-preview-wrap">
+            <div class="theme-preview-label">Live-Vorschau</div>
+            <div id="themePreviewCard" class="theme-preview-card" aria-label="Theme-Vorschau" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <!-- Schedule Panel -->
+        <div class="demo-cfg-panel" id="cfg-schedule">
+          <div class="schedule-editor">
+            <div id="scheduleEditorRows" aria-label="Unterrichtszeiten" aria-live="polite"></div>
+            <div class="schedule-actions">
+              <button class="btn btn-secondary" id="addLessonBtn">+ Stunde hinzufügen</button>
+              <button class="btn btn-secondary" id="addBreakBtn">+ Pause hinzufügen</button>
+            </div>
+            <div class="schedule-footer">
+              <button class="btn btn-secondary" id="loadDefaultsBtn">Standardzeiten laden</button>
+              <button class="btn btn-secondary" id="demoConfigReset">Auf Standard zurücksetzen</button>
+            </div>
+            <div id="scheduleValidation" class="schedule-validation" aria-live="polite" role="status"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== INSTALLATION ===== -->
     <section class="section section-alt" id="installation">
       <div class="container">
