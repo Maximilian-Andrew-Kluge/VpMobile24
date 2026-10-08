@@ -275,7 +275,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-header-bg: transparent;
   --vpm-text: var(--primary-text-color, #fff);
   --vpm-text-muted: var(--secondary-text-color, #9b9b9b);
-  --vpm-text-faint: var(--secondary-text-color, #9b9b9b);
+  --vpm-text-faint: color-mix(in srgb, var(--secondary-text-color, #9b9b9b) 60%, transparent);
   --vpm-primary: var(--primary-color, #03a9f4);
   --vpm-primary-2: var(--accent-color, var(--primary-color, #03a9f4));
   --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
