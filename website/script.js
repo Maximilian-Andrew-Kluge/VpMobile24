@@ -1106,13 +1106,74 @@
     });
   }
 
+  // Leitet abgeleitete Site-Variablen aus den Theme-Grundfarben her
+  function _themeVars(t) {
+    // Erkennt ob das Theme hell oder dunkel ist (Luminanz des Hintergrunds)
+    var isLight = (function() {
+      var hex = t.bg.replace("#","");
+      if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+      var r = parseInt(hex.substr(0,2),16);
+      var g = parseInt(hex.substr(2,2),16);
+      var b = parseInt(hex.substr(4,2),16);
+      return (0.299*r + 0.587*g + 0.114*b) > 128;
+    })();
+    // Alphawerte für helle vs. dunkle Overlays
+    var borderAlpha  = isLight ? "rgba(0,0,0,0.10)"    : "rgba(255,255,255,0.08)";
+    var borderStrong = isLight ? "rgba(0,0,0,0.16)"    : "rgba(255,255,255,0.14)";
+    // bg-2: leicht aufgehellt/abgedunkelt; card: noch etwas heller/dunkler als bg-2
+    var bg2    = isLight ? _blend(t.bg, "#000000", 0.05) : _blend(t.bg, "#ffffff", 0.07);
+    var card   = isLight ? _blend(t.bg, "#000000", 0.03) : _blend(t.bg, "#ffffff", 0.12);
+    var hover  = isLight ? _blend(t.bg, "#000000", 0.07) : _blend(t.bg, "#ffffff", 0.16);
+    return {
+      "--bg":            t.bg,
+      "--bg-2":          bg2,
+      "--card":          card,
+      "--card-hover":    hover,
+      "--border":        borderAlpha,
+      "--border-strong": borderStrong,
+      "--text":          t.txt,
+      "--text-2":        t.txt2,
+      "--text-3":        isLight ? "rgba(0,0,0,0.38)" : "rgba(255,255,255,0.38)",
+      "--accent":        t.primary,
+      "--accent-2":      t.primary,
+      "--success":       t.success,
+      "--warning":       t.warning,
+      "--danger":        t.danger,
+      "--pause":         t.primary
+    };
+  }
+
+  // Mischt hex-Farbe mit einer zweiten Farbe (ratio 0=src, 1=target)
+  function _blend(src, target, ratio) {
+    var s = _hexToRgb(src);
+    var d = _hexToRgb(target);
+    if (!s || !d) return src;
+    var r = Math.round(s.r + (d.r - s.r) * ratio);
+    var g = Math.round(s.g + (d.g - s.g) * ratio);
+    var b = Math.round(s.b + (d.b - s.b) * ratio);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  function _hexToRgb(hex) {
+    var h = hex.replace("#","");
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    if (h.length !== 6) return null;
+    return { r: parseInt(h.substr(0,2),16), g: parseInt(h.substr(2,2),16), b: parseInt(h.substr(4,2),16) };
+  }
+
   function applyDemoTheme(themeId) {
     var t = null;
     for (var i = 0; i < DEMO_THEMES.length; i++) {
       if (DEMO_THEMES[i].v === themeId) { t = DEMO_THEMES[i]; break; }
     }
     if (!t) t = DEMO_THEMES[0];
-    // Demo-Karte direkt stylen
+
+    // Vollständige Site-weite Überschreibung aller CSS-Variablen
+    var vars = _themeVars(t);
+    var root = document.documentElement;
+    Object.keys(vars).forEach(function(k) { root.style.setProperty(k, vars[k]); });
+
+    // Demo-Karte direkt stylen (--dc-* werden von renderDemo() verwendet)
     var dc = document.getElementById("demoCard");
     if (dc) {
       dc.style.background = t.bg;
@@ -1124,16 +1185,27 @@
       dc.style.setProperty("--dc-txt2", t.txt2);
       dc.style.setProperty("--dc-border", t.bg === "#000000" ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.07)");
     }
-    // Accent-only: Akzent- und Statusfarben auf :root setzen (Dark/Light-Toggle bleibt erhalten)
-    var root = document.documentElement;
-    root.style.setProperty("--accent", t.primary);
-    root.style.setProperty("--accent-2", t.primary);
-    root.style.setProperty("--success", t.success);
-    root.style.setProperty("--warning", t.warning);
-    root.style.setProperty("--danger", t.danger);
+
     try { localStorage.setItem("vpm24-demo-theme", themeId); } catch(e) {}
     renderThemePreview(t);
     renderDemoThemeGrid(themeId);
+  }
+
+  // Entfernt alle per applyDemoTheme gesetzten inline-Stile von :root
+  function clearDemoTheme() {
+    var root = document.documentElement;
+    ["--bg","--bg-2","--card","--card-hover","--border","--border-strong",
+     "--text","--text-2","--text-3","--accent","--accent-2",
+     "--success","--warning","--danger","--pause"].forEach(function(k) {
+      root.style.removeProperty(k);
+    });
+    var dc = document.getElementById("demoCard");
+    if (dc) {
+      dc.style.removeProperty("background");
+      ["--dc-primary","--dc-success","--dc-warning","--dc-error","--dc-txt","--dc-txt2","--dc-border"].forEach(function(k) {
+        dc.style.removeProperty(k);
+      });
+    }
   }
 
   function renderDemoThemeGrid(activeId) {
@@ -1242,13 +1314,7 @@
   document.getElementById("demoConfigReset") && document.getElementById("demoConfigReset").addEventListener("click", function() {
     resetSchedule();
     try { localStorage.removeItem("vpm24-demo-theme"); } catch(e) {}
-    // Accent-Farben auf :root zurücksetzen
-    var root = document.documentElement;
-    root.style.removeProperty("--accent");
-    root.style.removeProperty("--accent-2");
-    root.style.removeProperty("--success");
-    root.style.removeProperty("--warning");
-    root.style.removeProperty("--danger");
+    clearDemoTheme();
     applyDemoTheme("demo-default");
   });
 
