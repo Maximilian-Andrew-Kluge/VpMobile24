@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[2.6.2\] - 2026-10-05
+
+### Fixed
+
+- Feriendaten für Sachsen-Anhalt, Mecklenburg-Vorpommern, Brandenburg, Berlin und Thüringen korrigiert (Herbstferien und weitere Termine hatten fälschlich die Daten von 2025)
+- Kalender-Entität kann jetzt über Einstellungen → Konfigurieren deaktiviert werden, sodass der Stundenplan nicht mehr in der HA-Kalenderübersicht erscheint (#20)
+
+### Added
+
+- Neues Theme **„HA Standard"** (`theme: ha_default`): übernimmt alle Farben vom aktiv eingestellten Home Assistant Theme – keine eigenen Hintergründe, schwarze Schrift auf weißem Grund wenn HA hell ist
+
+### Changed
+
+- Kontraste für Wochentag-Beschriftungen (Mo–Fr) und Stundenzeiten in allen Themes erhöht – besser lesbar auf großen Displays und aus Distanz
+
 ## \[2.6.7\] - 2026-08-27
 
 ### Changed

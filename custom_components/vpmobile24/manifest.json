@@ -10,5 +10,5 @@
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Maximilian-Andrew-Kluge/VpMobile24/issues",
-  "version": "2.6.1"
+  "version": "2.6.2"
 }

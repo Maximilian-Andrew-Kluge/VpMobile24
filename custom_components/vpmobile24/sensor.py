@@ -440,19 +440,41 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         excluded = getattr(self.coordinator, "excluded_subjects", [])
         selected = getattr(self.coordinator, "selected_courses", [])
 
+        def _is_course_group_label(label: str) -> bool:
+            label = (label or "").strip()
+            if len(label) < 2:
+                return False
+            if label.endswith(")") and "(" in label:
+                return True  # per-teacher label "Course (Teacher)"
+            return label[-1].isdigit() and any(c.isalpha() for c in label)
+
+        def _selection_excludes(lesson: dict) -> bool:
+            """True if lesson's course group was not selected (teacher-aware)."""
+            if not selected:
+                return False
+            sel = set(selected)
+            course_key = (lesson.get("course_key") or "").strip()
+            course = (lesson.get("course") or "").strip()
+            if course_key and course_key in sel:
+                return False
+            if course and course in sel:
+                return False
+            if course_key and _is_course_group_label(course_key):
+                return True
+            if course and _is_course_group_label(course):
+                return True
+            return False
+
         def _should_include(lesson: dict) -> bool:
             subj   = lesson.get("subject", "") or ""
             course = lesson.get("course",  "") or ""
             if subj and subj in excluded:
                 return False
-            if selected and course and course not in selected:
-                if any(c.isdigit() for c in course):
-                    return False
+            if _selection_excludes(lesson):
+                return False
             is_cancelled = not subj or subj.strip() in ["\u2014", "---", "", "-", " "]
             if is_cancelled and course:
                 if course in excluded:
-                    return False
-                if selected and course not in selected and any(c.isdigit() for c in course):
                     return False
             return True
 
@@ -890,30 +912,34 @@ _KMK_HOLIDAYS: dict = {
     ],
     "BB": [
         {"start": "2026-02-02", "end": "2026-02-07", "name": "Winterferien Brandenburg"},
-        {"start": "2026-04-03", "end": "2026-04-17", "name": "Osterferien Brandenburg"},
-        {"start": "2026-06-25", "end": "2026-08-07", "name": "Sommerferien Brandenburg"},
-        {"start": "2026-10-12", "end": "2026-10-23", "name": "Herbstferien Brandenburg"},
+        {"start": "2026-03-30", "end": "2026-04-10", "name": "Osterferien Brandenburg"},
+        {"start": "2026-05-26", "end": "2026-05-26", "name": "Pfingstferien Brandenburg"},
+        {"start": "2026-07-09", "end": "2026-08-22", "name": "Sommerferien Brandenburg"},
+        {"start": "2026-10-19", "end": "2026-10-30", "name": "Herbstferien Brandenburg"},
         {"start": "2026-12-23", "end": "2027-01-02", "name": "Weihnachtsferien Brandenburg"},
     ],
     "BE": [
         {"start": "2026-01-26", "end": "2026-01-31", "name": "Winterferien Berlin"},
-        {"start": "2026-03-30", "end": "2026-04-11", "name": "Osterferien Berlin"},
-        {"start": "2026-06-25", "end": "2026-08-07", "name": "Sommerferien Berlin"},
-        {"start": "2026-10-12", "end": "2026-10-23", "name": "Herbstferien Berlin"},
-        {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Berlin"},
+        {"start": "2026-03-30", "end": "2026-04-10", "name": "Osterferien Berlin"},
+        {"start": "2026-05-26", "end": "2026-05-26", "name": "Pfingstferien Berlin"},
+        {"start": "2026-07-09", "end": "2026-08-22", "name": "Sommerferien Berlin"},
+        {"start": "2026-10-19", "end": "2026-10-31", "name": "Herbstferien Berlin"},
+        {"start": "2026-12-23", "end": "2027-01-02", "name": "Weihnachtsferien Berlin"},
     ],
     "TH": [
         {"start": "2026-02-16", "end": "2026-02-21", "name": "Winterferien Thüringen"},
-        {"start": "2026-04-03", "end": "2026-04-11", "name": "Osterferien Thüringen"},
+        {"start": "2026-04-07", "end": "2026-04-17", "name": "Osterferien Thüringen"},
+        {"start": "2026-05-15", "end": "2026-05-15", "name": "Pfingstferien Thüringen"},
         {"start": "2026-07-04", "end": "2026-08-14", "name": "Sommerferien Thüringen"},
-        {"start": "2026-10-03", "end": "2026-10-11", "name": "Herbstferien Thüringen"},
-        {"start": "2026-12-22", "end": "2027-01-02", "name": "Weihnachtsferien Thüringen"},
+        {"start": "2026-10-12", "end": "2026-10-24", "name": "Herbstferien Thüringen"},
+        {"start": "2026-12-23", "end": "2027-01-02", "name": "Weihnachtsferien Thüringen"},
     ],
     "ST": [
-        {"start": "2026-02-02", "end": "2026-02-14", "name": "Winterferien Sachsen-Anhalt"},
-        {"start": "2026-04-03", "end": "2026-04-14", "name": "Osterferien Sachsen-Anhalt"},
-        {"start": "2026-06-25", "end": "2026-08-05", "name": "Sommerferien Sachsen-Anhalt"},
-        {"start": "2026-10-02", "end": "2026-10-11", "name": "Herbstferien Sachsen-Anhalt"},
+        {"start": "2026-01-31", "end": "2026-02-06", "name": "Winterferien Sachsen-Anhalt"},
+        {"start": "2026-03-30", "end": "2026-04-04", "name": "Osterferien Sachsen-Anhalt"},
+        {"start": "2026-05-26", "end": "2026-05-29", "name": "Pfingstferien Sachsen-Anhalt"},
+        {"start": "2026-07-04", "end": "2026-08-14", "name": "Sommerferien Sachsen-Anhalt"},
+        {"start": "2026-10-19", "end": "2026-10-30", "name": "Herbstferien Sachsen-Anhalt"},
         {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Sachsen-Anhalt"},
     ],
     "BW": [
@@ -941,10 +967,11 @@ _KMK_HOLIDAYS: dict = {
         {"start": "2026-12-21", "end": "2027-01-05", "name": "Weihnachtsferien Schleswig-Holstein"},
     ],
     "MV": [
-        {"start": "2026-02-02", "end": "2026-02-14", "name": "Winterferien Mecklenburg-Vorpommern"},
-        {"start": "2026-04-03", "end": "2026-04-11", "name": "Osterferien Mecklenburg-Vorpommern"},
-        {"start": "2026-06-25", "end": "2026-08-05", "name": "Sommerferien Mecklenburg-Vorpommern"},
-        {"start": "2026-10-05", "end": "2026-10-17", "name": "Herbstferien Mecklenburg-Vorpommern"},
+        {"start": "2026-02-09", "end": "2026-02-20", "name": "Winterferien Mecklenburg-Vorpommern"},
+        {"start": "2026-03-30", "end": "2026-04-08", "name": "Osterferien Mecklenburg-Vorpommern"},
+        {"start": "2026-05-22", "end": "2026-05-26", "name": "Pfingstferien Mecklenburg-Vorpommern"},
+        {"start": "2026-07-13", "end": "2026-08-22", "name": "Sommerferien Mecklenburg-Vorpommern"},
+        {"start": "2026-10-15", "end": "2026-10-24", "name": "Herbstferien Mecklenburg-Vorpommern"},
         {"start": "2026-12-21", "end": "2027-01-02", "name": "Weihnachtsferien Mecklenburg-Vorpommern"},
     ],
     "RP": [
