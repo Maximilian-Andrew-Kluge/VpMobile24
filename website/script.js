@@ -995,14 +995,18 @@
       }
     });
     SCHEDULE.push({ type: "lesson", period: maxPeriod + 1, start: "", end: "" });
+    DEMO_SLOTS = scheduleToSlots();
     renderScheduleEditor();
-    applyScheduleChange();
+    renderDemo();
+    saveSchedule();
   }
 
   function addBreak() {
     SCHEDULE.push({ type: "break", label: "Pause", start: "", end: "" });
+    DEMO_SLOTS = scheduleToSlots();
     renderScheduleEditor();
-    applyScheduleChange();
+    renderDemo();
+    saveSchedule();
   }
 
   function moveRow(idx, dir) {
@@ -1030,7 +1034,8 @@
     clearTimeout(_scheduleDebounce);
     _scheduleDebounce = setTimeout(function() {
       var errors = validateSchedule();
-      renderScheduleEditor();
+      // Fehler inline aktualisieren – KEIN innerHTML-Rebuild (würde Fokus zerstören)
+      _updateScheduleErrorsInPlace(errors);
       var valDiv = document.getElementById("scheduleValidation");
       if (errors.length === 0) {
         DEMO_SLOTS = scheduleToSlots();
@@ -1039,11 +1044,66 @@
         if (valDiv) valDiv.classList.remove("visible");
       } else {
         if (valDiv) {
-          valDiv.textContent = errors.map(function(e) { return e.message; }).join(" | ");
+          valDiv.textContent = errors.map(function(e) { return e.message; }).join(" \u00b7 ");
           valDiv.classList.add("visible");
         }
       }
     }, 300);
+  }
+
+  // Aktualisiert nur Fehler-Klassen und Fehlermeldungen, ohne den Fokus zu zerstören
+  function _updateScheduleErrorsInPlace(errors) {
+    var container = document.getElementById("scheduleEditorRows");
+    if (!container) return;
+    var errorMap = {};
+    errors.forEach(function(e) {
+      if (e.idx >= 0) {
+        if (!errorMap[e.idx]) errorMap[e.idx] = [];
+        errorMap[e.idx].push(e);
+      }
+    });
+    var rows = container.querySelectorAll(".schedule-row");
+    rows.forEach(function(row, idx) {
+      var rowErrors = errorMap[idx] || [];
+      var hasError = rowErrors.length > 0;
+      row.classList.toggle("has-error", hasError);
+      // Start-Input
+      var startInput = row.querySelector('[data-sr-field="start"]');
+      if (startInput) {
+        var startErr = rowErrors.filter(function(e) { return e.field === "start"; });
+        startInput.classList.toggle("invalid", startErr.length > 0);
+        var startErrEl = startInput.parentElement.querySelector(".sr-error");
+        if (startErr.length > 0) {
+          if (!startErrEl) {
+            startErrEl = document.createElement("div");
+            startErrEl.className = "sr-error";
+            startErrEl.setAttribute("role", "alert");
+            startInput.parentElement.appendChild(startErrEl);
+          }
+          startErrEl.textContent = startErr.map(function(e) { return e.message; }).join(" ");
+        } else if (startErrEl) {
+          startErrEl.remove();
+        }
+      }
+      // End-Input
+      var endInput = row.querySelector('[data-sr-field="end"]');
+      if (endInput) {
+        var endErr = rowErrors.filter(function(e) { return e.field === "end"; });
+        endInput.classList.toggle("invalid", endErr.length > 0);
+        var endErrEl = endInput.parentElement.querySelector(".sr-error");
+        if (endErr.length > 0) {
+          if (!endErrEl) {
+            endErrEl = document.createElement("div");
+            endErrEl.className = "sr-error";
+            endErrEl.setAttribute("role", "alert");
+            endInput.parentElement.appendChild(endErrEl);
+          }
+          endErrEl.textContent = endErr.map(function(e) { return e.message; }).join(" ");
+        } else if (endErrEl) {
+          endErrEl.remove();
+        }
+      }
+    });
   }
 
   function applyDemoTheme(themeId) {
@@ -1052,6 +1112,7 @@
       if (DEMO_THEMES[i].v === themeId) { t = DEMO_THEMES[i]; break; }
     }
     if (!t) t = DEMO_THEMES[0];
+    // Demo-Karte direkt stylen
     var dc = document.getElementById("demoCard");
     if (dc) {
       dc.style.background = t.bg;
@@ -1063,6 +1124,13 @@
       dc.style.setProperty("--dc-txt2", t.txt2);
       dc.style.setProperty("--dc-border", t.bg === "#000000" ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.07)");
     }
+    // Accent-only: Akzent- und Statusfarben auf :root setzen (Dark/Light-Toggle bleibt erhalten)
+    var root = document.documentElement;
+    root.style.setProperty("--accent", t.primary);
+    root.style.setProperty("--accent-2", t.primary);
+    root.style.setProperty("--success", t.success);
+    root.style.setProperty("--warning", t.warning);
+    root.style.setProperty("--danger", t.danger);
     try { localStorage.setItem("vpm24-demo-theme", themeId); } catch(e) {}
     renderThemePreview(t);
     renderDemoThemeGrid(themeId);
@@ -1074,13 +1142,21 @@
     var html = "";
     DEMO_THEMES.forEach(function(t) {
       var isActive = t.v === activeId;
-      html += '<button class="cc-th' + (isActive ? " active" : "") + '"';
+      var check = isActive ? '<svg class="cc-th-check" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>' : '';
+      html += '<button class="cc-th' + (isActive ? " cc-th-active" : "") + '"';
       html += ' data-dt="' + t.v + '"';
       html += ' role="radio" aria-checked="' + (isActive ? "true" : "false") + '"';
-      html += ' aria-label="' + _esc(t.name) + '"';
-      html += ' style="--th-bg:' + t.bg + '; --th-p:' + t.primary + '; --th-s:' + t.success + '; --th-w:' + t.warning + '; --th-d:' + t.danger + ';">';
-      html += '<div class="cc-th-preview"><div class="cc-th-p cc-normal"></div><div class="cc-th-p cc-sub"></div><div class="cc-th-p cc-cancel"></div></div>';
-      html += '<div class="cc-th-name">' + _esc(t.name) + '</div>';
+      html += ' aria-label="' + _esc(t.name) + '">';
+      // Farbvorschau mit inline styles statt CSS-Variablen
+      html += '<span class="cc-th-preview" style="background:' + t.bg + '">';
+      html += '<span class="cc-th-bar" style="background:' + t.primary + '40"></span>';
+      html += '<span class="cc-th-dots">';
+      html += '<span class="cc-th-dot" style="background:' + t.primary + '"></span>';
+      html += '<span class="cc-th-dot" style="background:' + t.success + '"></span>';
+      html += '<span class="cc-th-dot" style="background:' + t.danger + '"></span>';
+      html += '</span></span>';
+      html += '<span class="cc-th-body"><span class="cc-th-name">' + _esc(t.name) + '</span></span>';
+      html += check;
       html += '</button>';
     });
     grid.innerHTML = html;
@@ -1166,6 +1242,13 @@
   document.getElementById("demoConfigReset") && document.getElementById("demoConfigReset").addEventListener("click", function() {
     resetSchedule();
     try { localStorage.removeItem("vpm24-demo-theme"); } catch(e) {}
+    // Accent-Farben auf :root zurücksetzen
+    var root = document.documentElement;
+    root.style.removeProperty("--accent");
+    root.style.removeProperty("--accent-2");
+    root.style.removeProperty("--success");
+    root.style.removeProperty("--warning");
+    root.style.removeProperty("--danger");
     applyDemoTheme("demo-default");
   });
 

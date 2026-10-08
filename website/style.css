@@ -989,7 +989,7 @@ kbd { background: var(--bg-2); border: 1px solid var(--border-strong); border-bo
    Demo Config Section
    ===================== */
 .demo-config-tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; margin-bottom: 28px; }
-.demo-cfg-tab { padding: 9px 18px; border-radius: 8px; border: none; background: transparent; color: var(--text-2); font-weight: 600; font-size: .9rem; cursor: pointer; transition: background .2s, color .2s; min-height: 42px; }
+.demo-cfg-tab { padding: 9px 18px; border-radius: 8px; border: none; background: transparent; color: var(--text-2); font-weight: 600; font-size: .9rem; cursor: pointer; transition: background .2s, color .2s; min-height: 44px; }
 .demo-cfg-tab:hover { color: var(--text); }
 .demo-cfg-tab.active { background: var(--accent); color: #fff; }
 .demo-cfg-panel { display: none; }
@@ -1024,13 +1024,26 @@ kbd { background: var(--bg-2); border: 1px solid var(--border-strong); border-bo
 .sr-time-input.invalid { border-color: var(--danger, #EF4444); background: rgba(239,68,68,.05); }
 .sr-error { font-size: .74rem; color: var(--danger, #EF4444); margin-top: 3px; }
 .sr-actions { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
-.sr-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-2); color: var(--text-2); font-size: .9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; min-height: 36px; }
+.sr-btn { width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-2); color: var(--text-2); font-size: .9rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; min-height: 44px; }
 .sr-btn:hover { background: var(--card-hover, var(--card)); color: var(--text); border-color: var(--border-strong); }
 .sr-btn.sr-del:hover { background: rgba(239,68,68,.12); color: var(--danger, #EF4444); border-color: rgba(239,68,68,.4); }
 .schedule-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .schedule-footer { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--border); }
 .schedule-validation { padding: 12px 14px; border-radius: 10px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); color: var(--danger, #EF4444); font-size: .84rem; display: none; }
 .schedule-validation.visible { display: block; }
+/* Active state for demo theme cards (fixes class mismatch: code uses .active, existing .cc-th-active not applied) */
+.cc-th.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 3px rgba(79,124,255,.14); background: rgba(79,124,255,.06); }
+/* Color swatches inside demo theme cards — consume --th-p / --th-s / --th-w / --th-d from inline style */
+.demo-theme-grid .cc-th { padding: 10px; }
+.demo-theme-grid .cc-th-preview { display: flex; gap: 3px; width: auto; height: 28px; flex-shrink: 0; background: var(--th-bg, #111); border-radius: 6px; padding: 5px 6px; overflow: hidden; border: none; }
+.demo-theme-grid .cc-th-p { flex: 1; border-radius: 3px; min-width: 0; }
+.demo-theme-grid .cc-normal { background: var(--th-p, #4F7CFF); }
+.demo-theme-grid .cc-sub    { background: var(--th-w, #F59E0B); }
+.demo-theme-grid .cc-cancel { background: var(--th-d, #EF4444); }
+/* Demo theme grid: full-width layout for the demo config section */
+.demo-theme-grid .cc-th { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+.demo-theme-grid .cc-th-preview { width: 100%; }
+.demo-theme-grid .cc-th-name { font-size: .82rem; font-weight: 700; color: var(--text); }
 @media (max-width: 640px) {
   .schedule-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; }
   .sr-label { grid-column: 1 / -1; padding-top: 0; }
