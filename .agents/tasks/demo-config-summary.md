@@ -57,7 +57,7 @@ All reads/writes wrapped in `try/catch` — degrades gracefully if localStorage 
 | 1 | `.cc-th.active` class not highlighted | Added `.cc-th.active` CSS rule mirroring `.cc-th-active` |
 | 2 | Theme card swatches invisible | Added `.cc-th-p / .cc-normal / .cc-sub / .cc-cancel` CSS rules consuming `--th-p/--th-w/--th-d` |
 | 3 | `--th-bg/--th-p` CSS vars unused | Resolved by #2 — CSS rules now consume them |
-| 4 | Theme only touches `#demoCard` | **Pending user decision** — see below |
+| 4 | Theme only touches `#demoCard` | `applyDemoTheme` now calls `_themeVars(t)` to derive all 14 site CSS vars (`--bg`, `--bg-2`, `--card`, `--card-hover`, `--border`, `--border-strong`, `--text`, `--text-2`, `--text-3`, `--accent`, `--accent-2`, `--success`, `--warning`, `--danger`, `--pause`) and sets them on `document.documentElement.style`. `clearDemoTheme()` removes them all on reset. |
 | 5 | Focus lost on debounced re-render | `applyScheduleChange` uses `_updateScheduleErrorsInPlace` (no innerHTML replace); structural changes use `renderScheduleEditor` directly |
 | 6 | `.demo-cfg-tab` touch target 42 px | Changed `min-height` to `44px` |
 | 7 | `.sr-btn` touch targets 36 px | Changed `width`, `height`, `min-height` to `44px` |
@@ -92,3 +92,12 @@ Waiting for user answer before implementing.
 - Individual error `<div>`s: `role="alert"`
 - All buttons have `aria-label`
 - Touch targets: 44 × 44 px minimum (tabs and sr-btn)
+
+## How site-wide theming works (finding #4)
+
+`applyDemoTheme(themeId)` performs a full override of the site's CSS variables:
+
+1. `_themeVars(t)` inspects the theme's `bg` luminance to detect dark vs. light, then derives `--bg-2`, `--card`, `--card-hover` by blending `bg` with white (dark themes) or black (light themes) at small ratios.
+2. All 14 derived vars are set as inline styles on `document.documentElement`. These override both the `:root` defaults and `:root[data-theme="light"]` — the entire site updates instantly (navigation, buttons, cards, FAQ, code blocks, etc.).
+3. The existing dark/light toggle still functions, but its stylesheet rules are overridden by the inline styles while a demo theme is active.
+4. `clearDemoTheme()` removes all inline styles, handing control back to the dark/light toggle. It is called when the user clicks "Auf Standard zurücksetzen".
