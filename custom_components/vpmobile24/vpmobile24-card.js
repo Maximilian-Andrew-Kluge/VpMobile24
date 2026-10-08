@@ -1974,9 +1974,9 @@ ha-card {
 }
 /* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
 .vp-tile.vp-normal {
-  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent);
-  color: var(--vpm-text);
-  border-left: 3px solid color-mix(in srgb, var(--vpm-c-normal) 55%, transparent);
+  background: var(--vpm-tile-normal);
+  color: var(--vpm-tile-normal-color);
+  border-left: 3px solid var(--vpm-tile-normal-border);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
@@ -2148,8 +2148,8 @@ ha-card {
 .vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-text);
-  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent); border-radius: 8px;
+  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-tile-normal-color);
+  background: var(--vpm-tile-normal); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
 .vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
