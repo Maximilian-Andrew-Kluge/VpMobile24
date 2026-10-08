@@ -1033,16 +1033,13 @@ kbd { background: var(--bg-2); border: 1px solid var(--border-strong); border-bo
 .schedule-validation.visible { display: block; }
 /* Active state for demo theme cards (fixes class mismatch: code uses .active, existing .cc-th-active not applied) */
 .cc-th.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 3px rgba(79,124,255,.14); background: rgba(79,124,255,.06); }
-/* Color swatches inside demo theme cards — consume --th-p / --th-s / --th-w / --th-d from inline style */
-.demo-theme-grid .cc-th { padding: 10px; }
-.demo-theme-grid .cc-th-preview { display: flex; gap: 3px; width: auto; height: 28px; flex-shrink: 0; background: var(--th-bg, #111); border-radius: 6px; padding: 5px 6px; overflow: hidden; border: none; }
+/* Demo theme grid: color swatches consume --th-p / --th-w / --th-d set as inline CSS vars */
+.demo-theme-grid .cc-th { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
+.demo-theme-grid .cc-th-preview { display: flex; gap: 3px; width: 100%; height: 28px; flex-shrink: 0; background: var(--th-bg, #111); border-radius: 6px; padding: 5px 6px; overflow: hidden; border: none; }
 .demo-theme-grid .cc-th-p { flex: 1; border-radius: 3px; min-width: 0; }
 .demo-theme-grid .cc-normal { background: var(--th-p, #4F7CFF); }
 .demo-theme-grid .cc-sub    { background: var(--th-w, #F59E0B); }
 .demo-theme-grid .cc-cancel { background: var(--th-d, #EF4444); }
-/* Demo theme grid: full-width layout for the demo config section */
-.demo-theme-grid .cc-th { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px; }
-.demo-theme-grid .cc-th-preview { width: 100%; }
 .demo-theme-grid .cc-th-name { font-size: .82rem; font-weight: 700; color: var(--text); }
 @media (max-width: 640px) {
   .schedule-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto; }
