@@ -1773,7 +1773,7 @@ ha-card {
   background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2));
   border-radius: 14px; display: flex; align-items: center;
   justify-content: center; font-size: 1.35em;
-  box-shadow: 0 6px 18px rgba(79,124,255,0.35);
+  box-shadow: none;
 }
 .vp-hdr-body { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 3px; }
 .vp-hdr-top  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -1895,7 +1895,7 @@ ha-card {
   background: linear-gradient(135deg, var(--vpm-primary), var(--vpm-primary-2));
   color: #fff; border-radius: 10px; padding: 5px 12px;
   font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .5px;
-  box-shadow: 0 4px 12px rgba(79,124,255,0.4);
+  box-shadow: none;
 }
 .vp-today-date { font-size: .8em; font-weight: 500; opacity: .9; text-transform: none; letter-spacing: 0; }
 
@@ -2059,7 +2059,7 @@ ha-card {
   color: var(--vpm-text) !important; font-weight: 800;
   border: 1px solid rgba(79,124,255,0.5) !important;
   border-left: 3px solid var(--vpm-c-current) !important;
-  box-shadow: 0 0 0 1px rgba(79,124,255,0.35), 0 6px 18px rgba(79,124,255,0.22) !important;
+  box-shadow: none !important;
 }
 .vp-tile.vp-current::after {
   content: ''; position: absolute; top: 6px; right: 6px;
@@ -3562,7 +3562,7 @@ ha-card {
   background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2));
   border-radius: 11px; display: flex; align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(79,124,255,.30);
+  box-shadow: none;
 }
 .mc-hdr-title {
   font-size: 1.1em; font-weight: 800; color: ${PAL.txt};
