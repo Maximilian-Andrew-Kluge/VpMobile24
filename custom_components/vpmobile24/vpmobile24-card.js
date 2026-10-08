@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.1
-console.info('%c VpMobile24-CARD %c v2.6.1 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.2
+console.info('%c VpMobile24-CARD %c v2.6.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -19,141 +19,445 @@ class VpMobile24Card extends HTMLElement {
   }
 
   static get _THEMES() {
+    // ── VpMobile24 Next-Gen Theme-System ─────────────────────────────────
+    // Jedes Theme: id, name, category, description, keywords, light-Flag und
+    // eine vollständige Oberflächen-Palette. Statusfarben (Unterricht/Vtg/
+    // Ausfall/Pause) sind NICHT hier — sie sind projektweit fix (siehe
+    // _designTokens). Nur der Primary-Akzent ist theme-spezifisch.
+    // Kein Pink/Magenta außerhalb von Dark Rose / Soft Rose.
     return {
-      // ── Dark Themes ──────────────────────────────────────────────────────
+      // ── SYSTEM THEME ─────────────────────────────────────────────────────
+      ha_default: {
+        name: 'HA Standard', category: 'System', light: null,
+        description: 'Folgt dem aktiven Home Assistant Theme (keine eigenen Farben)',
+        keywords: 'Standard · HA · System',
+        bg: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
+        card: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
+        surface: 'var(--secondary-background-color, rgba(255,255,255,0.05))',
+        elevated: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
+        primary: 'var(--primary-color, #03a9f4)',
+        primary_2: 'var(--accent-color, var(--primary-color, #03a9f4))',
+        text: 'var(--primary-text-color, #fff)',
+        text_secondary: 'var(--secondary-text-color, #9b9b9b)',
+        text_muted: 'var(--disabled-text-color, var(--secondary-text-color, #9b9b9b))',
+        border: 'var(--divider-color, rgba(255,255,255,0.12))',
+        shadow: 'var(--ha-card-box-shadow, none)',
+        ha_mode: true,
+      },
+      // ── DARK THEMES ──────────────────────────────────────────────────────
       navy: {
-        name: '🌑 Navy Dark',
-        bg: '#0f1729', tile_bg: '#1a2a50',
-        tile_normal: 'rgba(34,197,94,.1)', tile_normal_color: '#86efac', tile_normal_border: 'rgba(34,197,94,.2)',
-        tile_sub: 'rgba(234,179,8,0.18)', tile_sub_color: '#fde68a',
-        tile_cancelled: 'rgba(239,68,68,0.18)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#bbf7d0',
+        name: 'Navy Dark', category: 'Dark', light: false,
+        description: 'Modernes VpMobile24 Standard-Theme',
+        keywords: 'Navy · Blau · Neutral',
+        bg: '#0B0F19', card: '#111827', surface: '#151C2B', elevated: '#1A2233',
+        primary: '#4F7CFF', primary_2: '#6D8DFF',
+        text: '#F8FAFC', text_secondary: '#94A3B8', text_muted: '#64748B',
+        border: 'rgba(255,255,255,0.07)', shadow: '0 8px 30px rgba(0,0,0,0.18)',
       },
-      dark: {
-        name: '⬛ Dark',
-        bg: '#111827', tile_bg: '#1f2937',
-        tile_normal: 'rgba(34,197,94,.12)', tile_normal_color: '#6ee7b7', tile_normal_border: 'rgba(34,197,94,.25)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(248,113,113,.15)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)', tile_current_color: '#a7f3d0',
+      graphite: {
+        name: 'Graphite', category: 'Dark', light: false,
+        description: 'Neutrales Anthrazit-Theme',
+        keywords: 'Grau · Schwarz · Minimal',
+        bg: '#090A0C', card: '#121416', surface: '#191B1F', elevated: '#202328',
+        primary: '#E5E7EB', primary_2: '#F3F4F6',
+        text: '#F5F5F5', text_secondary: '#A1A1AA', text_muted: '#71717A',
+        border: 'rgba(255,255,255,0.08)', shadow: '0 8px 30px rgba(0,0,0,0.30)',
       },
-      dark_blue: {
-        name: '🔵 Dark Blue',
-        bg: '#0c1a2e', tile_bg: '#1e3a5f',
-        tile_normal: 'rgba(59,130,246,.15)', tile_normal_color: '#93c5fd', tile_normal_border: 'rgba(59,130,246,.3)',
-        tile_sub: 'rgba(234,179,8,0.2)', tile_sub_color: '#fde68a',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#1e40af,#1d4ed8)', tile_current_color: '#bfdbfe',
+      ocean_blue: {
+        name: 'Ocean Blue', category: 'Dark', light: false,
+        description: 'Tiefblaues modernes Theme',
+        keywords: 'Blau · Navy · Technisch',
+        bg: '#07111F', card: '#0D1A2B', surface: '#12253B', elevated: '#172E47',
+        primary: '#3B82F6', primary_2: '#60A5FA',
+        text: '#F8FAFC', text_secondary: '#93C5FD', text_muted: '#64748B',
+        border: 'rgba(96,165,250,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
-      dark_purple: {
-        name: '🟣 Dark Purple',
-        bg: '#1a0a2e', tile_bg: '#2d1b4e',
-        tile_normal: 'rgba(168,85,247,.15)', tile_normal_color: '#d8b4fe', tile_normal_border: 'rgba(168,85,247,.3)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#5b21b6,#6d28d9)', tile_current_color: '#e9d5ff',
+      deep_purple: {
+        name: 'Deep Purple', category: 'Dark', light: false,
+        description: 'Elegantes Theme mit violetten Akzenten',
+        keywords: 'Violett · Dunkel · Elegant',
+        bg: '#0F0B18', card: '#171222', surface: '#211A30', elevated: '#291F3B',
+        primary: '#8B5CF6', primary_2: '#A78BFA',
+        text: '#FAF8FF', text_secondary: '#C4B5FD', text_muted: '#7C7391',
+        border: 'rgba(167,139,250,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
-      dark_green: {
-        name: '🌿 Dark Green',
-        bg: '#071a0f', tile_bg: '#14361f',
-        tile_normal: 'rgba(34,197,94,.18)', tile_normal_color: '#86efac', tile_normal_border: 'rgba(34,197,94,.35)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#064e3b,#065f46)', tile_current_color: '#a7f3d0',
+      forest_green: {
+        name: 'Forest Green', category: 'Dark', light: false,
+        description: 'Ruhiges Theme mit natürlichen Grüntönen',
+        keywords: 'Grün · Natur · Ruhig',
+        bg: '#07130D', card: '#0D1E16', surface: '#14281F', elevated: '#193428',
+        primary: '#22C55E', primary_2: '#4ADE80',
+        text: '#F0FDF4', text_secondary: '#86EFAC', text_muted: '#5B7466',
+        border: 'rgba(74,222,128,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
-      dark_red: {
-        name: '🔴 Dark Red',
-        bg: '#1a0a0a', tile_bg: '#3b1212',
-        tile_normal: 'rgba(239,68,68,.15)', tile_normal_color: '#fca5a5', tile_normal_border: 'rgba(239,68,68,.3)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.35)', tile_cancelled_color: '#fee2e2',
-        tile_current: 'linear-gradient(135deg,#7f1d1d,#991b1b)', tile_current_color: '#fee2e2',
+      ruby: {
+        name: 'Ruby', category: 'Dark', light: false,
+        description: 'Dunkles Theme mit tiefrotem Akzent',
+        keywords: 'Rot · Dunkel · Elegant',
+        bg: '#13090B', card: '#211013', surface: '#2A1619', elevated: '#341A1F',
+        primary: '#EF4444', primary_2: '#F87171',
+        text: '#FFF5F5', text_secondary: '#FCA5A5', text_muted: '#8A6A6E',
+        border: 'rgba(248,113,113,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
-      dark_orange: {
-        name: '🟠 Dark Orange',
-        bg: '#1a0f05', tile_bg: '#3b2010',
-        tile_normal: 'rgba(249,115,22,.15)', tile_normal_color: '#fdba74', tile_normal_border: 'rgba(249,115,22,.3)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#9a3412,#c2410c)', tile_current_color: '#fed7aa',
+      sunset: {
+        name: 'Sunset', category: 'Dark', light: false,
+        description: 'Warmes Theme mit orangefarbenem Akzent',
+        keywords: 'Orange · Warm · Modern',
+        bg: '#140D08', card: '#21160D', surface: '#2A1D12', elevated: '#352317',
+        primary: '#F97316', primary_2: '#FB923C',
+        text: '#FFF7ED', text_secondary: '#FDBA74', text_muted: '#8A7259',
+        border: 'rgba(251,146,60,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
-      dark_teal: {
-        name: '🩵 Dark Teal',
-        bg: '#071a1a', tile_bg: '#0f2f2f',
-        tile_normal: 'rgba(20,184,166,.15)', tile_normal_color: '#5eead4', tile_normal_border: 'rgba(20,184,166,.3)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#0f766e,#0d9488)', tile_current_color: '#ccfbf1',
+      deep_teal: {
+        name: 'Deep Teal', category: 'Dark', light: false,
+        description: 'Modernes Teal-Theme mit kühlen Türkistönen',
+        keywords: 'Türkis · Kühl · Technisch',
+        bg: '#061315', card: '#0C1F22', surface: '#122C30', elevated: '#17373B',
+        primary: '#14B8A6', primary_2: '#2DD4BF',
+        text: '#F0FDFA', text_secondary: '#5EEAD4', text_muted: '#5B7A78',
+        border: 'rgba(45,212,191,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
-      dark_pink: {
-        name: '🩷 Dark Pink',
-        bg: '#1a0a12', tile_bg: '#3b1225',
-        tile_normal: 'rgba(236,72,153,.15)', tile_normal_color: '#f9a8d4', tile_normal_border: 'rgba(236,72,153,.3)',
-        tile_sub: 'rgba(251,191,36,.15)', tile_sub_color: '#fcd34d',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#fca5a5',
-        tile_current: 'linear-gradient(135deg,#9d174d,#be185d)', tile_current_color: '#fce7f3',
+      dark_rose: {
+        name: 'Dark Rose', category: 'Dark', light: false,
+        description: 'Elegantes Theme mit dezenten Rosé-Akzenten',
+        keywords: 'Rosé · Dunkel · Elegant',
+        bg: '#140B11', card: '#21121A', surface: '#2A1722', elevated: '#351D29',
+        primary: '#EC4899', primary_2: '#F472B6',
+        text: '#FDF2F8', text_secondary: '#F9A8D4', text_muted: '#8A6579',
+        border: 'rgba(244,114,182,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
-      // ── Light Themes ─────────────────────────────────────────────────────
+      // ── LIGHT THEMES ─────────────────────────────────────────────────────
       light: {
-        name: '☀️ Light',
-        bg: '#f1f5f9', tile_bg: '#e2e8f0',
-        tile_normal: 'rgba(34,197,94,.2)', tile_normal_color: '#166534', tile_normal_border: 'rgba(34,197,94,.4)',
-        tile_sub: 'rgba(234,179,8,0.25)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.2)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+        name: 'Light', category: 'Light', light: true,
+        description: 'Klares Standard-Theme',
+        keywords: 'Weiß · Grau · Blau',
+        bg: '#F1F4F8', card: '#FFFFFF', surface: '#F8FAFC', elevated: '#FFFFFF',
+        primary: '#4F6FE8', primary_2: '#4169E1',
+        text: '#0F172A', text_secondary: '#64748B', text_muted: '#94A3B8',
+        border: 'rgba(15,23,42,0.08)', shadow: '0 8px 30px rgba(15,23,42,0.08)',
       },
-      light_blue: {
-        name: '🔵 Light Blue',
-        bg: '#eff6ff', tile_bg: '#dbeafe',
-        tile_normal: 'rgba(37,99,235,.2)', tile_normal_color: '#1e40af', tile_normal_border: 'rgba(37,99,235,.4)',
-        tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#1e3a8a,#1e40af)', tile_current_color: '#eff6ff',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+      sky_blue: {
+        name: 'Sky Blue', category: 'Light', light: true,
+        description: 'Helles, frisches Theme mit blauen Akzenten',
+        keywords: 'Blau · Frisch · Hell',
+        bg: '#F1F7FF', card: '#FFFFFF', surface: '#F5F9FF', elevated: '#FFFFFF',
+        primary: '#2563EB', primary_2: '#3B82F6',
+        text: '#0F172A', text_secondary: '#64748B', text_muted: '#94A3B8',
+        border: 'rgba(37,99,235,0.12)', shadow: '0 6px 24px rgba(15,23,42,0.07)',
       },
-      light_green: {
-        name: '🟢 Light Green',
-        bg: '#f0fdf4', tile_bg: '#dcfce7',
-        tile_normal: 'rgba(22,163,74,.2)', tile_normal_color: '#14532d', tile_normal_border: 'rgba(22,163,74,.4)',
-        tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#14532d,#166534)', tile_current_color: '#f0fdf4',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+      fresh_green: {
+        name: 'Fresh Green', category: 'Light', light: true,
+        description: 'Helles, natürliches Theme mit grünen Akzenten',
+        keywords: 'Grün · Natur · Hell',
+        bg: '#F1FAF4', card: '#FFFFFF', surface: '#F6FBF8', elevated: '#FFFFFF',
+        primary: '#16A34A', primary_2: '#22C55E',
+        text: '#102017', text_secondary: '#64746A', text_muted: '#94A39A',
+        border: 'rgba(22,163,74,0.12)', shadow: '0 6px 24px rgba(16,32,23,0.07)',
       },
-      light_purple: {
-        name: '🟣 Light Purple',
-        bg: '#faf5ff', tile_bg: '#ede9fe',
-        tile_normal: 'rgba(124,58,237,.2)', tile_normal_color: '#4c1d95', tile_normal_border: 'rgba(124,58,237,.4)',
-        tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#4c1d95,#5b21b6)', tile_current_color: '#faf5ff',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+      soft_purple: {
+        name: 'Soft Purple', category: 'Light', light: true,
+        description: 'Helles, elegantes Theme mit violetten Akzenten',
+        keywords: 'Violett · Elegant · Hell',
+        bg: '#F7F4FC', card: '#FFFFFF', surface: '#FAF8FD', elevated: '#FFFFFF',
+        primary: '#7C3AED', primary_2: '#8B5CF6',
+        text: '#18111F', text_secondary: '#64596F', text_muted: '#948AA0',
+        border: 'rgba(124,58,237,0.12)', shadow: '0 6px 24px rgba(24,17,31,0.07)',
       },
-      light_pink: {
-        name: '🩷 Light Pink',
-        bg: '#fdf2f8', tile_bg: '#fce7f3',
-        tile_normal: 'rgba(219,39,119,.2)', tile_normal_color: '#831843', tile_normal_border: 'rgba(219,39,119,.4)',
-        tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#831843,#9d174d)', tile_current_color: '#fdf2f8',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+      soft_rose: {
+        name: 'Soft Rose', category: 'Light', light: true,
+        description: 'Helles, warmes Theme mit Rosé-Akzenten',
+        keywords: 'Rosé · Warm · Hell',
+        bg: '#FFF5F8', card: '#FFFFFF', surface: '#FFF9FB', elevated: '#FFFFFF',
+        primary: '#DB2777', primary_2: '#EC4899',
+        text: '#1F1118', text_secondary: '#6F5963', text_muted: '#A08A94',
+        border: 'rgba(219,39,119,0.12)', shadow: '0 6px 24px rgba(31,17,24,0.07)',
       },
-      light_orange: {
-        name: '🟠 Light Orange',
-        bg: '#fff7ed', tile_bg: '#ffedd5',
-        tile_normal: 'rgba(234,88,12,.2)', tile_normal_color: '#7c2d12', tile_normal_border: 'rgba(234,88,12,.4)',
-        tile_sub: 'rgba(234,179,8,0.3)', tile_sub_color: '#78350f',
-        tile_cancelled: 'rgba(239,68,68,0.25)', tile_cancelled_color: '#7f1d1d',
-        tile_current: 'linear-gradient(135deg,#7c2d12,#9a3412)', tile_current_color: '#fff7ed',
-        text: '#0f172a', text_muted: '#475569', header_bg: 'rgba(0,0,0,0.04)',
+      warm_orange: {
+        name: 'Warm Orange', category: 'Light', light: true,
+        description: 'Helles, freundliches Theme mit orangenen Akzenten',
+        keywords: 'Orange · Warm · Hell',
+        bg: '#FFF8F1', card: '#FFFFFF', surface: '#FFFAF6', elevated: '#FFFFFF',
+        primary: '#EA580C', primary_2: '#F97316',
+        text: '#1C120B', text_secondary: '#6F5B4E', text_muted: '#A0907E',
+        border: 'rgba(234,88,12,0.12)', shadow: '0 6px 24px rgba(28,18,11,0.07)',
       },
     };
   }
 
+  // Legacy-Alias-Tabelle: alte Theme-IDs → neue IDs (Bestandsschutz für
+  // bereits konfigurierte Karten mit theme: dark_blue etc.).
+  static get _THEME_ALIASES() {
+    return {
+      ha: 'ha_default',
+      home_assistant: 'ha_default',
+      system: 'ha_default',
+      dark: 'graphite',
+      dark_blue: 'ocean_blue',
+      dark_purple: 'deep_purple',
+      dark_green: 'forest_green',
+      dark_red: 'ruby',
+      dark_orange: 'sunset',
+      dark_teal: 'deep_teal',
+      dark_pink: 'dark_rose',
+      light_blue: 'sky_blue',
+      light_green: 'fresh_green',
+      light_purple: 'soft_purple',
+      light_pink: 'soft_rose',
+      light_orange: 'warm_orange',
+    };
+  }
+
+  static _resolveThemeId(name) {
+    const themes = VpMobile24Card._THEMES;
+    if (themes[name]) return name;
+    const alias = VpMobile24Card._THEME_ALIASES[name];
+    if (alias && themes[alias]) return alias;
+    return 'navy';
+  }
+
   _getTheme() {
     const themeName = (this._config && this._config.theme) || 'navy';
-    return VpMobile24Card._THEMES[themeName] || VpMobile24Card._THEMES.navy;
+    return VpMobile24Card._THEMES[VpMobile24Card._resolveThemeId(themeName)];
+  }
+
+  // Options-Liste für die HA-Config-Form: Name + Schlagworte, gruppiert nach
+  // Dark/Light, ohne Emojis. Reihenfolge wie im Theme-System definiert.
+  static _themeSelectOptions() {
+    const THEMES = VpMobile24Card._THEMES;
+    const order = [
+      'ha_default', 'navy', 'graphite', 'ocean_blue', 'deep_purple', 'forest_green',
+      'ruby', 'sunset', 'deep_teal', 'dark_rose',
+      'light', 'sky_blue', 'fresh_green', 'soft_purple', 'soft_rose', 'warm_orange',
+    ];
+    return order.map((id) => {
+      const t = THEMES[id];
+      const suffix = id === 'navy' ? ' (Standard)' : '';
+      return { value: id, label: `${t.category} · ${t.name}${suffix} — ${t.keywords}` };
+    });
+  }
+
+  // ── Globales VpMobile24 Design-System ────────────────────────────────────
+  // Liefert den kompletten --vpm-* Variablenblock für :host.
+  // Option B: Ohne explizites theme: folgt automatisch Dark/Light der
+  // HA-/System-Präferenz. Mit theme: überschreiben die Theme-Farben (Bestandsschutz).
+  // Baut den vollständigen --vpm-* Variablenblock (Inhalt für einen :host{}
+  // oder @media-Selektor) aus einem Theme-Objekt. Statusfarben sind fix je
+  // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
+  // dem Theme. Tile-Tokens werden daraus abgeleitet.
+  static _themeVars(theme) {
+    if (theme.ha_mode) return VpMobile24Card._themeVarsHA(theme);
+    const light = !!theme.light;
+    if (light) return VpMobile24Card._themeVarsLight(theme);
+    return VpMobile24Card._themeVarsDark(theme);
+  }
+
+  // ── HA-Standard-Modus ────────────────────────────────────────────────────
+  // Delegiert alle Farben an das aktive HA-Theme via CSS-Variablen.
+  static _themeVarsHA(theme) {
+    const success = 'var(--success-color, #22C55E)';
+    const warning = 'var(--warning-color, #F59E0B)';
+    const error = 'var(--error-color, #DB4437)';
+    const pause = 'var(--info-color, #38BDF8)';
+    return `
+  --vpm-bg: var(--card-background-color, var(--ha-card-background, #1c1c1c));
+  --vpm-card: var(--card-background-color, var(--ha-card-background, #1c1c1c));
+  --vpm-surface: var(--secondary-background-color, rgba(255,255,255,0.04));
+  --vpm-elevated: var(--card-background-color, #1c1c1c);
+  --vpm-popup-bg: var(--card-background-color, #1c1c1c);
+  --vpm-border: var(--divider-color, rgba(255,255,255,0.12));
+  --vpm-border-strong: var(--divider-color, rgba(255,255,255,0.2));
+  --vpm-hairline: var(--divider-color, rgba(255,255,255,0.07));
+  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(255,255,255,0.12)));
+  --vpm-divider: var(--divider-color, rgba(255,255,255,0.07));
+  --vpm-hover: rgba(128,128,128,0.08);
+  --vpm-shadow: var(--ha-card-box-shadow, none);
+  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,.4);
+  --vpm-header-bg: transparent;
+  --vpm-text: var(--primary-text-color, #fff);
+  --vpm-text-muted: var(--secondary-text-color, #9b9b9b);
+  --vpm-text-faint: var(--secondary-text-color, #9b9b9b);
+  --vpm-primary: var(--primary-color, #03a9f4);
+  --vpm-primary-2: var(--accent-color, var(--primary-color, #03a9f4));
+  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 35%, transparent);
+  --vpm-success: ${success};
+  --vpm-warning: ${warning};
+  --vpm-error: ${error};
+  --vpm-pause: ${pause};
+  --vpm-info: var(--primary-color, #03a9f4);
+  --vpm-c-normal: ${success};
+  --vpm-c-sub: ${warning};
+  --vpm-c-cancel: ${error};
+  --vpm-c-current: var(--primary-color, #03a9f4);
+  --vpm-c-holiday: ${warning};
+  --vpm-tile-bg: var(--secondary-background-color, rgba(255,255,255,0.04));
+  --vpm-tile-normal: color-mix(in srgb, ${success} 10%, transparent);
+  --vpm-tile-normal-color: var(--primary-text-color, #fff);
+  --vpm-tile-normal-border: color-mix(in srgb, ${success} 30%, transparent);
+  --vpm-tile-sub: color-mix(in srgb, ${warning} 12%, transparent);
+  --vpm-tile-sub-color: color-mix(in srgb, ${warning} 90%, #fff);
+  --vpm-tile-sub-border: color-mix(in srgb, ${warning} 35%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, ${error} 12%, transparent);
+  --vpm-tile-cancelled-color: color-mix(in srgb, ${error} 80%, #fff);
+  --vpm-tile-cancelled-border: color-mix(in srgb, ${error} 40%, transparent);
+  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-tile-current-color: color-mix(in srgb, var(--primary-color, #03a9f4) 45%, #fff);
+  --vpm-tile-current-border: var(--primary-color, #03a9f4);
+  --vpm-tile-empty: rgba(128,128,128,0.03);
+  --vpm-tile-empty-border: var(--divider-color, rgba(255,255,255,0.05));`;
+  }
+
+  // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
+  static _themeVarsDark(theme) {
+    const success = '#22C55E', warning = '#F59E0B', error = '#EF4444', pause = '#38BDF8';
+    const nColor = theme.text, sColor = '#FCD34D', cColor = '#FCA5A5';
+    const primarySoft = 'color-mix(in srgb, ' + theme.primary + ' 16%, transparent)';
+    const primaryBorder = 'color-mix(in srgb, ' + theme.primary + ' 35%, transparent)';
+    const curTxt = 'color-mix(in srgb, ' + theme.primary + ' 45%, #fff)';
+    const headerBg = 'linear-gradient(180deg, color-mix(in srgb, ' + theme.primary + ' 9%, transparent) 0%, transparent 100%)';
+    return `
+  /* Oberflächen (Theme) */
+  --vpm-bg: ${theme.bg};
+  --vpm-card: ${theme.card};
+  --vpm-surface: ${theme.surface};
+  --vpm-elevated: ${theme.elevated};
+  --vpm-popup-bg: ${theme.card};
+  --vpm-border: ${theme.border};
+  --vpm-border-strong: rgba(255,255,255,0.12);
+  --vpm-hairline: rgba(255,255,255,0.06);
+  --vpm-card-border: ${theme.border};
+  --vpm-divider: ${theme.border};
+  --vpm-hover: rgba(255,255,255,0.04);
+  --vpm-shadow: ${theme.shadow};
+  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,.4);
+  --vpm-header-bg: ${headerBg};
+  /* Text (Theme) */
+  --vpm-text: ${theme.text};
+  --vpm-text-muted: color-mix(in srgb, ${theme.text_secondary} 85%, #fff);
+  --vpm-text-faint: color-mix(in srgb, ${theme.text_muted} 60%, #fff);
+  /* Primary-Akzent (Theme) */
+  --vpm-primary: ${theme.primary};
+  --vpm-primary-2: ${theme.primary_2 || theme.primary};
+  --vpm-primary-soft: ${primarySoft};
+  --vpm-primary-border: ${primaryBorder};
+  /* Statusfarben — projektweit konsistent (nicht theme-abhängig) */
+  --vpm-success: ${success};
+  --vpm-warning: ${warning};
+  --vpm-error: ${error};
+  --vpm-pause: ${pause};
+  --vpm-info: ${theme.primary};
+  /* Legacy-Aliase */
+  --vpm-c-normal: ${success};
+  --vpm-c-sub: ${warning};
+  --vpm-c-cancel: ${error};
+  --vpm-c-current: ${theme.primary};
+  --vpm-c-holiday: ${warning};
+  /* Tiles (Status als dezenter Akzent, aktuell = Primary) */
+  --vpm-tile-bg: ${theme.elevated};
+  --vpm-tile-normal: color-mix(in srgb, ${success} 10%, transparent);
+  --vpm-tile-normal-color: ${nColor};
+  --vpm-tile-normal-border: color-mix(in srgb, ${success} 30%, transparent);
+  --vpm-tile-sub: color-mix(in srgb, ${warning} 12%, transparent);
+  --vpm-tile-sub-color: ${sColor};
+  --vpm-tile-sub-border: color-mix(in srgb, ${warning} 35%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, ${error} 12%, transparent);
+  --vpm-tile-cancelled-color: ${cColor};
+  --vpm-tile-cancelled-border: color-mix(in srgb, ${error} 40%, transparent);
+  --vpm-tile-current: ${primarySoft};
+  --vpm-tile-current-color: ${curTxt};
+  --vpm-tile-current-border: ${theme.primary};
+  --vpm-tile-empty: rgba(255,255,255,0.02);
+  --vpm-tile-empty-border: rgba(255,255,255,0.05);`;
+  }
+
+  // ── Light Mode 2.0 ───────────────────────────────────────────────────────
+  // Mehr Tiefe durch dezente Flächen + feine Borders. Statusfarben satter und
+  // klar lesbar, aber ohne kräftige Vollflächen. Nur Oberflächen/Primary sind
+  // theme-spezifisch — die Status-Tönungen sind projektweit fix (§34/§40).
+  static _themeVarsLight(theme) {
+    const success = '#16A34A', warning = '#D97706', error = '#DC2626', pause = '#0284C7';
+    // Statuspunkte (etwas weicher als die Textfarbe)
+    const sDot = '#E09A16', cDot = '#DC4C4C', nDot = '#4CAF62';
+    const primarySoft = 'color-mix(in srgb, ' + theme.primary + ' 9%, #fff)';
+    const primaryBorder = 'color-mix(in srgb, ' + theme.primary + ' 30%, #fff)';
+    const headerBg = 'linear-gradient(180deg, #FFFFFF 0%, color-mix(in srgb, ' + theme.bg + ' 45%, #fff) 100%)';
+    return `
+  /* Oberflächen (Theme) — mehrstufige Helligkeits-Hierarchie */
+  --vpm-bg: ${theme.bg};
+  --vpm-card: ${theme.card};
+  --vpm-surface: ${theme.surface};
+  --vpm-elevated: ${theme.elevated};
+  --vpm-popup-bg: ${theme.card};
+  --vpm-border: ${theme.border};
+  --vpm-border-strong: rgba(15,23,42,0.14);
+  --vpm-hairline: rgba(15,23,42,0.08);
+  /* Light Mode: kräftigere Außen-Card + Trennlinien (nur diese) */
+  --vpm-card-border: rgba(15,23,42,0.14);
+  --vpm-divider: rgba(15,23,42,0.10);
+  --vpm-hover: rgba(15,23,42,0.04);
+  --vpm-shadow: ${theme.shadow};
+  --vpm-shadow-popup: 0 12px 40px rgba(15,23,42,0.12);
+  --vpm-header-bg: ${headerBg};
+  /* Text-Hierarchie */
+  --vpm-text: ${theme.text};
+  --vpm-text-muted: color-mix(in srgb, ${theme.text_secondary} 85%, #000);
+  --vpm-text-faint: color-mix(in srgb, ${theme.text_muted} 70%, #000);
+  /* Primary-Akzent (Theme) */
+  --vpm-primary: ${theme.primary};
+  --vpm-primary-2: ${theme.primary_2 || theme.primary};
+  --vpm-primary-soft: ${primarySoft};
+  --vpm-primary-border: ${primaryBorder};
+  /* Statusfarben — fix, projektweit konsistent */
+  --vpm-success: ${success};
+  --vpm-warning: ${warning};
+  --vpm-error: ${error};
+  --vpm-pause: ${pause};
+  --vpm-info: ${theme.primary};
+  --vpm-c-normal: ${nDot};
+  --vpm-c-sub: ${sDot};
+  --vpm-c-cancel: ${cDot};
+  --vpm-c-current: ${theme.primary};
+  --vpm-c-holiday: ${sDot};
+  /* Tiles — dezent getönt, feine sichtbare Borders (Light Mode 2.0) */
+  --vpm-tile-bg: ${theme.surface};
+  --vpm-tile-normal: #F6FBF8;
+  --vpm-tile-normal-color: #17221A;
+  --vpm-tile-normal-border: #B7DDBF;
+  --vpm-tile-sub: #FFF8E8;
+  --vpm-tile-sub-color: #9A6500;
+  --vpm-tile-sub-border: #E6C879;
+  --vpm-tile-cancelled: #FFF1F1;
+  --vpm-tile-cancelled-color: #C62828;
+  --vpm-tile-cancelled-border: #F0B4B4;
+  --vpm-tile-current: #EEF3FF;
+  --vpm-tile-current-color: #17347A;
+  --vpm-tile-current-border: ${theme.primary};
+  --vpm-tile-empty: #F8FAFC;
+  --vpm-tile-empty-border: #E6EAF0;`;
+  }
+
+  static _designTokens(theme, hasExplicitTheme) {
+    // Radien + Motion sind theme-unabhängig.
+    const shared = `
+  --vpm-radius-card: 20px;
+  --vpm-radius-popup: 20px;
+  --vpm-radius-surface: 12px;
+  --vpm-radius-tile: 10px;
+  --vpm-radius-btn: 11px;
+  --vpm-radius-pill: 999px;
+  --vpm-t-fast: 150ms; --vpm-t-hover: 180ms; --vpm-t-theme: 200ms;`;
+
+    const THEMES = VpMobile24Card._THEMES;
+
+    // Explizites Theme gewählt → dessen Palette fest anwenden.
+    if (hasExplicitTheme && theme) {
+      return `:host{${shared}${VpMobile24Card._themeVars(theme)}}`;
+    }
+
+    // Kein explizites Theme → Standard Navy Dark, aber automatisch Light
+    // (Theme "Light") per System-Präferenz.
+    return `:host{${shared}${VpMobile24Card._themeVars(THEMES.navy)}}
+@media (prefers-color-scheme: light){ :host{${VpMobile24Card._themeVars(THEMES.light)}} }`;
   }
 
   _handleClick(e) {
@@ -321,21 +625,7 @@ class VpMobile24Card extends HTMLElement {
         // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
         { name: "show_header", default: true, selector: { boolean: {} } },
         { name: "theme", default: "navy", selector: { select: { options: [
-          { value: "navy",        label: "🌑 Navy Dark (Standard)" },
-          { value: "dark",        label: "⬛ Dark" },
-          { value: "dark_blue",   label: "🔵 Dark Blue" },
-          { value: "dark_purple", label: "🟣 Dark Purple" },
-          { value: "dark_green",  label: "🌿 Dark Green" },
-          { value: "dark_red",    label: "🔴 Dark Red" },
-          { value: "dark_orange", label: "🟠 Dark Orange" },
-          { value: "dark_teal",   label: "🩵 Dark Teal" },
-          { value: "dark_pink",   label: "🩷 Dark Pink" },
-          { value: "light",       label: "☀️ Light" },
-          { value: "light_blue",  label: "🔵 Light Blue" },
-          { value: "light_green", label: "🟢 Light Green" },
-          { value: "light_purple",label: "🟣 Light Purple" },
-          { value: "light_pink",  label: "🩷 Light Pink" },
-          { value: "light_orange",label: "🟠 Light Orange" },
+          ...VpMobile24Card._themeSelectOptions(),
         ] } } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
           schema: [
@@ -698,20 +988,9 @@ class VpMobile24Card extends HTMLElement {
   // Update only table body without destroying popup
   _updateTableOnly() {
     if (!this._hass || !this._config) return;
-    // Keep CSS variables in sync with current theme
-    const th = this._getTheme();
-    const hostEl = this.shadowRoot.host || this;
-    this.style.setProperty('--vpm-bg', th.bg);
-    this.style.setProperty('--vpm-tile-bg', th.tile_bg);
-    this.style.setProperty('--vpm-tile-normal', th.tile_normal);
-    this.style.setProperty('--vpm-tile-normal-color', th.tile_normal_color);
-    this.style.setProperty('--vpm-tile-normal-border', th.tile_normal_border);
-    this.style.setProperty('--vpm-tile-sub', th.tile_sub);
-    this.style.setProperty('--vpm-tile-sub-color', th.tile_sub_color);
-    this.style.setProperty('--vpm-tile-cancelled', th.tile_cancelled);
-    this.style.setProperty('--vpm-tile-cancelled-color', th.tile_cancelled_color);
-    this.style.setProperty('--vpm-tile-current', th.tile_current);
-    this.style.setProperty('--vpm-tile-current-color', th.tile_current_color);
+    // Design-Tokens werden im :host-Block via _designTokens() gesetzt.
+    // Die Design-Tokens liegen vollständig im :host-Block (via _designTokens),
+    // daher ist hier kein Nachsetzen einzelner --vpm-* Variablen mehr nötig.
     const entity = this._hass.states[this._config.entity];
     if (!entity) return;
     const weekOffset = this._weekOffset || 0;
@@ -1028,11 +1307,11 @@ class VpMobile24Card extends HTMLElement {
 
     const entity = this._hass.states[this._config.entity];
     if (!entity) {
-      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#ef4444">' + t.entityNotFound + ': ' + this._config.entity + '</div></ha-card>';
+      this.shadowRoot.innerHTML = '<style>' + VpMobile24Card._designTokens(th, !!(this._config && this._config.theme)) + '</style><ha-card style="background:var(--vpm-card);color:var(--vpm-text);border-radius:var(--vpm-radius-card)"><div style="padding:20px;color:var(--vpm-error)">' + t.entityNotFound + ': ' + this._config.entity + '</div></ha-card>';
       return;
     }
     if (!entity.attributes || !entity.attributes.week_table) {
-      this.shadowRoot.innerHTML = '<ha-card><div style="padding:20px;color:#94a3b8">' + t.noData + '</div></ha-card>';
+      this.shadowRoot.innerHTML = '<style>' + VpMobile24Card._designTokens(th, !!(this._config && this._config.theme)) + '</style><ha-card style="background:var(--vpm-card);color:var(--vpm-text);border-radius:var(--vpm-radius-card)"><div style="padding:20px;color:var(--vpm-text-muted)">' + t.noData + '</div></ha-card>';
       return;
     }
 
@@ -1076,24 +1355,25 @@ class VpMobile24Card extends HTMLElement {
       const nextStr  = haLang === 'en' ? 'Next' : haLang === 'fr' ? 'Prochain' : 'Nächste';
       this.shadowRoot.innerHTML = `
 <style>
+${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}
 :host { display: block; }
 ha-card {
-  background: linear-gradient(135deg, #0f1729 0%, #1a2a1a 100%) !important;
-  border-radius: 16px !important; overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6) !important;
+  background: var(--vpm-card) !important;
+  border-radius: var(--vpm-radius-card) !important; overflow: hidden;
+  box-shadow: var(--vpm-shadow) !important;
   border: 1px solid rgba(245,158,11,.3) !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #e2e8f0 !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--vpm-text) !important;
 }
 .hol-wrap {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; text-align: center;
   padding: 40px 24px; min-height: 220px; gap: 12px;
 }
-.hol-icon { font-size: 3.5em; margin-bottom: 4px; }
-.hol-title { font-size: 1.6em; font-weight: 800; color: #fde68a; }
-.hol-sub { font-size: .9em; color: #94a3b8; }
-.hol-next { font-size: .82em; color: #64748b; margin-top: 8px; }
+.hol-icon { font-size: 3.5em; margin-bottom: 4px; color: var(--vpm-warning); }
+.hol-title { font-size: 1.6em; font-weight: 800; color: var(--vpm-warning); }
+.hol-sub { font-size: .9em; color: var(--vpm-text-muted); }
+.hol-next { font-size: .82em; color: var(--vpm-text-faint); margin-top: 8px; }
 .hol-hdr {
   display: flex; align-items: center; gap: 10px;
   padding: 13px 16px 10px;
@@ -1106,9 +1386,9 @@ ha-card {
   border-radius: 10px; display: flex; align-items: center;
   justify-content: center; font-size: 1.2em;
 }
-.hol-hdr-title { font-size: 1.1em; font-weight: 800; color: #fff; }
+.hol-hdr-title { font-size: 1.1em; font-weight: 800; color: var(--vpm-text); }
 .hol-hdr-class {
-  font-size: .72em; font-weight: 700; color: #f59e0b;
+  font-size: .72em; font-weight: 700; color: var(--vpm-warning);
   background: rgba(245,158,11,.13); border: 1px solid rgba(245,158,11,.25);
   border-radius: 6px; padding: 2px 8px;
 }
@@ -1140,9 +1420,8 @@ ha-card {
 
     // If next/next_next week data not yet available, show loading state
     if (weekOffset >= 1 && !weekTable) {
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:32px 20px;text-align:center;color:#94a3b8;font-family:-apple-system,sans-serif">
-        <div style="font-size:1.5em;margin-bottom:12px">⏳</div>
-        <div style="font-weight:600;color:#e2e8f0;margin-bottom:6px">${t.nextWeek}</div>
+      this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style><ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card)"><div style="padding:32px 20px;text-align:center;color:var(--vpm-text-muted);font-family:'Inter',-apple-system,sans-serif">
+        <div style="font-weight:600;color:var(--vpm-text);margin-bottom:6px">${t.nextWeek}</div>
         <div style="font-size:.85em">Daten werden geladen…</div>
       </div></ha-card>`;
       return;
@@ -1464,46 +1743,20 @@ ha-card {
       }
     }
 
+    const _hasTheme = !!(this._config && this._config.theme);
     this.shadowRoot.innerHTML = `
 <style>
-:host {
-  display: block;
-  --vpm-bg: ${th.bg};
-  --vpm-tile-bg: ${th.tile_bg};
-  --vpm-tile-normal: ${th.tile_normal};
-  --vpm-tile-normal-color: ${th.tile_normal_color};
-  --vpm-tile-normal-border: ${th.tile_normal_border};
-  --vpm-tile-sub: ${th.tile_sub};
-  --vpm-tile-sub-color: ${th.tile_sub_color};
-  --vpm-tile-cancelled: ${th.tile_cancelled};
-  --vpm-tile-cancelled-color: ${th.tile_cancelled_color};
-  --vpm-tile-current: ${th.tile_current};
-  --vpm-tile-current-color: ${th.tile_current_color};
-  --vpm-text: ${th.text || '#f8fafc'};
-  --vpm-text-muted: ${th.text_muted || '#94a3b8'};
-  --vpm-text-faint: ${th.text_muted ? th.text_muted : '#64748b'};
-  --vpm-header-bg: ${th.header_bg || 'linear-gradient(180deg,rgba(79,124,255,0.08) 0%,rgba(15,23,41,0) 100%)'};
-  /* Status accent colors (consistent across themes) */
-  --vpm-c-normal: #22c55e;
-  --vpm-c-sub: #f59e0b;
-  --vpm-c-cancel: #ef4444;
-  --vpm-c-current: #4f7cff;
-  --vpm-c-holiday: #8b5cf6;
-  /* Design tokens */
-  --vpm-radius-card: 20px;
-  --vpm-radius-tile: 13px;
-  --vpm-radius-pill: 999px;
-  --vpm-border: 1px solid rgba(255,255,255,0.07);
-  --vpm-hairline: rgba(255,255,255,0.06);
-}
+${VpMobile24Card._designTokens(th, _hasTheme)}
+:host { display: block; }
 ha-card {
-  background: var(--vpm-bg) !important;
+  background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.20) !important;
-  border: var(--vpm-border) !important;
+  box-shadow: var(--vpm-shadow) !important;
+  border: 1px solid var(--vpm-card-border) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
+  transition: background var(--vpm-t-theme), color var(--vpm-t-theme), border-color var(--vpm-t-theme);
 }
 
 /* ══ HEADER ══════════════════════════════════════════════════════════════ */
@@ -1512,12 +1765,12 @@ ha-card {
   align-items: center; gap: 12px;
   padding: 16px 18px 14px;
   background: var(--vpm-header-bg);
-  border-bottom: var(--vpm-border);
+  border-bottom: 1px solid var(--vpm-divider);
   flex-wrap: wrap;
 }
 .vp-hdr-icon {
   width: 46px; height: 46px; flex-shrink: 0;
-  background: linear-gradient(135deg,#4f7cff,#6d5dfb);
+  background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2));
   border-radius: 14px; display: flex; align-items: center;
   justify-content: center; font-size: 1.35em;
   box-shadow: 0 6px 18px rgba(79,124,255,0.35);
@@ -1529,8 +1782,8 @@ ha-card {
   letter-spacing: -0.4px; line-height: 1.15;
 }
 .vp-hdr-class {
-  font-size: .7em; font-weight: 700; color: var(--vpm-c-current);
-  background: rgba(79,124,255,0.12); border: 1px solid rgba(79,124,255,0.25);
+  font-size: .7em; font-weight: 700; color: var(--vpm-primary);
+  background: var(--vpm-primary-soft); border: 1px solid var(--vpm-primary-border);
   border-radius: var(--vpm-radius-pill); padding: 3px 10px;
 }
 .vp-hdr-sub {
@@ -1544,7 +1797,7 @@ ha-card {
 .vp-hdr-ausfall {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .72em; font-weight: 700; white-space: nowrap;
-  color: #fca5a5; background: rgba(239,68,68,.12);
+  color: var(--vpm-error); background: rgba(239,68,68,.12);
   border: 1px solid rgba(239,68,68,.28); border-radius: var(--vpm-radius-pill);
   padding: 3px 10px;
 }
@@ -1558,24 +1811,24 @@ ha-card {
 /* ── Pills ── */
 .vp-pill {
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
+  background: var(--vpm-hover);
+  border: 1px solid var(--vpm-border);
   border-radius: var(--vpm-radius-pill); padding: 7px 14px;
   font-size: 0.75em; font-weight: 600; color: var(--vpm-text-muted);
   white-space: nowrap; cursor: pointer; font-family: inherit;
   transition: background .18s, color .18s, border-color .18s, transform .18s;
   line-height: 1.2; min-height: 34px;
 }
-.vp-pill:hover { background: rgba(255,255,255,0.11); color: var(--vpm-text); transform: translateY(-1px); }
-.vp-pill:focus-visible { outline: 2px solid var(--vpm-c-current); outline-offset: 2px; }
+.vp-pill:hover { background: var(--vpm-border-strong); color: var(--vpm-text); transform: translateY(-1px); }
+.vp-pill:focus-visible { outline: 2px solid var(--vpm-primary); outline-offset: 2px; }
 /* Icon-Pill (Reload): nahezu quadratisch, gleiche Höhe wie die Text-Pill */
 .vp-pill-icon { width: 34px; padding: 7px 0; font-size: .95em; }
-.vp-pill-blue  { color: #9db8ff; border-color: rgba(79,124,255,0.3); background: rgba(79,124,255,0.10); }
-.vp-pill-blue:hover  { background: rgba(79,124,255,0.2); border-color: #4f7cff; color: #c3d2ff; }
-.vp-pill-green { color: #86efac; border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
-.vp-pill-green:hover { background: rgba(34,197,94,0.2); border-color: #22c55e; }
-.vp-pill-amber { color: #fcd34d; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.09); }
-.vp-pill-amber:hover { background: rgba(245,158,11,0.2); border-color: #f59e0b; }
+.vp-pill-blue  { color: var(--vpm-primary); border-color: var(--vpm-primary-border); background: var(--vpm-primary-soft); }
+.vp-pill-blue:hover  { background: rgba(79,124,255,0.2); border-color: var(--vpm-primary); }
+.vp-pill-green { color: var(--vpm-success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
+.vp-pill-green:hover { background: rgba(34,197,94,0.2); border-color: var(--vpm-success); }
+.vp-pill-amber { color: var(--vpm-warning); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.09); }
+.vp-pill-amber:hover { background: rgba(245,158,11,0.2); border-color: var(--vpm-warning); }
 .vp-pill-amber.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
 @keyframes vp-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
@@ -1614,11 +1867,11 @@ ha-card {
   content: ''; width: 7px; height: 7px; border-radius: 50%;
   background: currentColor; flex-shrink: 0; opacity: .9;
 }
-.vp-hint-red    { background: rgba(239,68,68,.12);  color: #fca5a5; border: 1px solid rgba(239,68,68,.2); }
-.vp-hint-yellow { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.2); }
-.vp-hint-blue   { background: rgba(79,124,255,.12); color: #9db8ff; border: 1px solid rgba(79,124,255,.2); }
-.vp-hint-green  { background: rgba(34,197,94,.12);  color: #86efac; border: 1px solid rgba(34,197,94,.2); }
-.vp-hint-holiday { background: rgba(139,92,246,.14); color: #c4b5fd; border: 1px solid rgba(139,92,246,.3); font-weight: 700; }
+.vp-hint-red    { background: rgba(239,68,68,.12);  color: var(--vpm-error);   border: 1px solid rgba(239,68,68,.2); }
+.vp-hint-yellow { background: rgba(245,158,11,.12); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.2); }
+.vp-hint-blue   { background: rgba(79,124,255,.12); color: var(--vpm-primary); border: 1px solid rgba(79,124,255,.2); }
+.vp-hint-green  { background: rgba(34,197,94,.12);  color: var(--vpm-success); border: 1px solid rgba(34,197,94,.2); }
+.vp-hint-holiday { background: rgba(139,92,246,.14); color: #7c3aed; border: 1px solid rgba(139,92,246,.3); font-weight: 700; }
 
 /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
 /* table-layout:fixed => alle Tages-Spalten exakt gleich breit, unabhängig
@@ -1627,19 +1880,19 @@ ha-card {
 .vp-table th {
   padding: 6px 3px 10px; text-align: center;
   font-size: 0.72em; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: var(--vpm-text-muted);
+  letter-spacing: .6px; color: var(--vpm-text);
   background: transparent; line-height: 1.3;
 }
 /* Alle 5 Tages-Spalten teilen sich die Restbreite zu gleichen Teilen */
 .vp-table th:not(.vp-th-num),
 .vp-table td:not(.vp-td-num) { width: calc((100% - 50px) / 5); }
 .vp-th-num { width: 50px; min-width: 50px; }
-.vp-th-day  { display: block; font-size: .92em; }
-.vp-th-date { display: block; font-size: .82em; color: var(--vpm-text-faint); font-weight: 500;
+.vp-th-day  { display: block; font-size: .92em; color: var(--vpm-text); }
+.vp-th-date { display: block; font-size: .82em; color: var(--vpm-text-muted); font-weight: 600;
               text-transform: none; letter-spacing: 0; margin-top: 2px; }
 .vp-today-pill {
   display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
-  background: linear-gradient(135deg, #4f7cff, #6d5dfb);
+  background: linear-gradient(135deg, var(--vpm-primary), var(--vpm-primary-2));
   color: #fff; border-radius: 10px; padding: 5px 12px;
   font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .5px;
   box-shadow: 0 4px 12px rgba(79,124,255,0.4);
@@ -1648,8 +1901,8 @@ ha-card {
 
 .vp-table td { padding: 0; text-align: center; vertical-align: middle; background: transparent; }
 .vp-td-num  { width: 50px; min-width: 50px; padding: 3px 4px; }
-.vp-snum    { font-size: .92em; font-weight: 800; color: var(--vpm-text-muted); line-height: 1.25; }
-.vp-stime   { font-size: .62em; color: var(--vpm-text-faint); margin-top: 1px; white-space: nowrap; }
+.vp-snum    { font-size: .92em; font-weight: 800; color: var(--vpm-text); line-height: 1.25; }
+.vp-stime   { font-size: .66em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-today-col td,
 .vp-today-col    { background: rgba(79,124,255,0.05) !important; border-radius: var(--vpm-radius-tile); }
 
@@ -1746,20 +1999,20 @@ ha-card {
 }
 .vp-tile.vp-supervision::after { background: var(--vpm-c-holiday); }
 .vp-dayinfo-tr td { padding: 3px 4px; vertical-align: middle; }
-.vp-dayinfo-num { color: #93c5fd; text-align: center; font-size: 14px; }
+.vp-dayinfo-num { color: var(--vpm-primary); text-align: center; font-size: 14px; }
 /* The td is a positioning context with a fixed height; the info pill is
    absolutely positioned inside it so its text can NEVER widen the column. */
 .vp-dayinfo-td { position: relative; height: 26px; padding: 3px 4px; }
 .vp-dayinfo-cell {
   position: absolute; inset: 3px 4px;
   display: flex; align-items: center; gap: 4px;
-  background: rgba(59,130,246,0.14); color: #bfdbfe;
-  border: 1px solid rgba(59,130,246,0.32); border-radius: 6px;
+  background: var(--vpm-primary-soft); color: var(--vpm-primary);
+  border: 1px solid var(--vpm-primary-border); border-radius: 6px;
   padding: 0 6px; font-size: 10.5px; line-height: 1.2;
   cursor: pointer; overflow: visible;
   transition: background .15s ease, border-color .15s ease;
 }
-.vp-dayinfo-cell:hover { background: rgba(59,130,246,0.28); border-color: rgba(59,130,246,0.6); }
+.vp-dayinfo-cell:hover { background: rgba(79,124,255,0.20); border-color: var(--vpm-primary); }
 .vp-dayinfo-ico { flex: 0 0 auto; font-size: 11px; }
 .vp-dayinfo-txt {
   flex: 1 1 auto; min-width: 0;
@@ -1784,9 +2037,9 @@ ha-card {
 .vp-dayinfo-cell:hover .vp-dayinfo-tooltip { opacity: 1; visibility: visible; }
 /* Day heading inside the info popup */
 .vp-info-day-head {
-  font-size: 13px; font-weight: 700; color: #93c5fd;
+  font-size: 13px; font-weight: 700; color: var(--vpm-primary);
   margin: 0 0 8px; padding-bottom: 6px;
-  border-bottom: 1px solid rgba(148,163,184,0.2);
+  border-bottom: 1px solid var(--vpm-border);
 }
 /* AUSFALL: dezente rote Tönung, linker Rand, Punkt — kein knallrotes Rechteck */
 .vp-tile.vp-cancelled {
@@ -1829,7 +2082,7 @@ ha-card {
   text-align: center; color: var(--vpm-text-faint); font-size: .72em;
   padding: 5px 0; font-weight: 500;
   background: transparent;
-  border-top: 1px solid var(--vpm-hairline);
+  border-top: 1px solid var(--vpm-divider);
   border-bottom: none;
   letter-spacing: 0.3px;
 }
@@ -1838,7 +2091,7 @@ ha-card {
 .vp-legend {
   display: flex; gap: 8px; flex-wrap: wrap;
   padding: 10px 16px 14px; font-size: .72em;
-  border-top: var(--vpm-border);
+  border-top: 1px solid var(--vpm-divider);
 }
 .vp-legend-item {
   display: flex; align-items: center; gap: 6px; color: var(--vpm-text-muted);
@@ -1866,22 +2119,22 @@ ha-card {
 }
 .vp-mob-tab {
   flex: 1; border: none; border-radius: 9px;
-  background: rgba(255,255,255,.05); color: #475569;
+  background: var(--vpm-hover); color: var(--vpm-text-faint);
   font-size: .72em; font-weight: 700; cursor: pointer;
   font-family: inherit; transition: all .15s;
   text-transform: uppercase; letter-spacing: .3px;
   display: flex; flex-direction: column; align-items: center;
   gap: 1px; padding: 7px 3px;
 }
-.vp-mob-tab:hover { background: rgba(255,255,255,.09); color: #94a3b8; }
-.vp-mob-tab-active { background: linear-gradient(135deg,#2563eb,#1d4ed8) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(37,99,235,.4); }
+.vp-mob-tab:hover { background: var(--vpm-border-strong); color: var(--vpm-text-muted); }
+.vp-mob-tab-active { background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2)) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(79,124,255,.4); }
 .vp-mob-tab-day  { font-size: .85em; font-weight: 800; line-height: 1.2; }
 .vp-mob-tab-date { font-size: .7em;  font-weight: 500; opacity: .8; line-height: 1.2; }
 
 /* Mobile lesson rows */
 .vp-mob-lesson {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.04);
+  padding: 9px 14px; border-bottom: 1px solid var(--vpm-hairline);
   transition: background .12s;
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
@@ -1890,26 +2143,26 @@ ha-card {
 .vp-mob-current   { background: rgba(79,124,255,.10); border-left: 3px solid var(--vpm-c-current); }
 .vp-mob-empty     { opacity: .4; }
 .vp-mob-left { display: flex; flex-direction: column; align-items: center; min-width: 42px; }
-.vp-mob-left-current .vp-mob-num  { color: #86efac !important; }
-.vp-mob-left-current .vp-mob-time { color: #4ade80 !important; }
-.vp-mob-num  { font-size: .88em; font-weight: 800; color: #64748b; line-height: 1.2; }
-.vp-mob-time { font-size: .6em;  color: #334155; margin-top: 1px; white-space: nowrap; }
+.vp-mob-left-current .vp-mob-num  { color: var(--vpm-success) !important; }
+.vp-mob-left-current .vp-mob-time { color: var(--vpm-success) !important; }
+.vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
+.vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: .92em; font-weight: 600; color: #e2e8f0;
-  background: var(--vpm-tile-bg); border-radius: 8px;
+  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-text);
+  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
 .vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
 .vp-mob-subj-sub      { background: var(--vpm-tile-sub) !important; color: var(--vpm-tile-sub-color) !important; }
 .vp-mob-subj-cancelled{ background: var(--vpm-tile-cancelled) !important; color: var(--vpm-tile-cancelled-color) !important; font-weight: 700; }
-.vp-mob-subj-current  { background: linear-gradient(135deg, rgba(79,124,255,0.22), rgba(109,93,251,0.18)) !important; color: var(--vpm-text) !important; font-weight: 800; box-shadow: 0 0 0 1px rgba(79,124,255,0.5); }
-.vp-mob-subj-empty    { background: rgba(255,255,255,.03) !important; color: #334155 !important; }
+.vp-mob-subj-current  { background: var(--vpm-tile-current) !important; color: var(--vpm-tile-current-color) !important; font-weight: 800; box-shadow: inset 0 0 0 1px var(--vpm-tile-current-border); }
+.vp-mob-subj-empty    { background: var(--vpm-tile-empty) !important; color: var(--vpm-text-faint) !important; }
 .vp-mob-pause-row {
   text-align: center; padding: 7px 14px;
-  border-top: 1px solid rgba(37,99,235,0.25);
-  border-bottom: 1px solid rgba(37,99,235,0.25);
-  background: rgba(37,99,235,0.07);
-  color: #60a5fa; font-size: .74em; font-style: italic; font-weight: 600;
+  border-top: 1px solid var(--vpm-divider);
+  border-bottom: 1px solid var(--vpm-divider);
+  background: var(--vpm-primary-soft);
+  color: var(--vpm-primary); font-size: .74em; font-style: italic; font-weight: 600;
 }
 .vp-mob-clickable { cursor: pointer; }
 .vp-mob-clickable:hover { filter: brightness(1.1); }
@@ -1921,10 +2174,10 @@ ha-card {
 }
 .vp-popup {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  background: #131f38; border-radius: 18px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  background: var(--vpm-popup-bg); border-radius: var(--vpm-radius-popup);
+  box-shadow: var(--vpm-shadow-popup);
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
-  border: 1px solid rgba(255,255,255,.08); color: #e2e8f0; overflow: hidden;
+  border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
   max-height: 85vh; display: flex; flex-direction: column;
   animation: vp-popup-in .18s ease;
 }
@@ -1941,13 +2194,13 @@ ha-card {
 .vp-detail-fach   { font-size: 1.7em; font-weight: 800; color: var(--vpm-text); letter-spacing: -0.5px; line-height: 1; }
 .vp-detail-headtime { font-size: .86em; font-weight: 500; color: var(--vpm-text-muted); }
 .vp-detail-badge  { font-size: .7em; font-weight: 700; padding: 5px 11px; border-radius: 999px; white-space: nowrap; }
-.vp-detail-now    { background: rgba(79,124,255,.16); color: #9db8ff; border: 1px solid rgba(79,124,255,.4); }
+.vp-detail-now    { background: var(--vpm-primary-soft); color: var(--vpm-primary); border: 1px solid var(--vpm-primary-border); }
 
 /* Detail-Grid: Icon + Label + Wert als Blöcke */
 .vp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 18px 4px; }
 .vp-detail-cell {
-  background: #151C2B; border: 1px solid rgba(255,255,255,.06);
-  border-radius: 12px; padding: 11px 13px;
+  background: var(--vpm-surface); border: 1px solid var(--vpm-border);
+  border-radius: var(--vpm-radius-surface); padding: 11px 13px;
   display: flex; flex-direction: column; gap: 5px;
 }
 .vp-detail-cell-top { display: flex; align-items: center; gap: 7px; }
@@ -1962,10 +2215,11 @@ ha-card {
 .vp-detail-info-row .vp-detail-val { font-weight: 500; font-size: .9em; }
 .vp-detail-empty  { padding: 18px 22px; color: var(--vpm-text-faint); font-size: .88em; text-align: center; }
 
-.vp-popup-footer  { padding: 16px 18px 18px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn     { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
-.vp-popup-btn:hover { background: #6d5dfb; transform: translateY(-1px); }
-.vp-popup-btn:focus-visible { outline: 2px solid #9db8ff; outline-offset: 2px; }
+.vp-popup-footer  { padding: 16px 18px 18px; text-align: right; border-top: 1px solid var(--vpm-border); }
+.vp-popup-btn     { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
+.vp-popup-btn:active { transform: scale(.98); }
+.vp-popup-btn:focus-visible { outline: 2px solid rgba(79,124,255,0.5); outline-offset: 2px; }
 
 /* Aktuelle Stunde: dezenter blauer Akzentrahmen */
 .vp-popup-current { border-color: rgba(79,124,255,.45) !important; box-shadow: 0 0 0 1px rgba(79,124,255,.25), 0 20px 60px rgba(0,0,0,.6) !important; }
@@ -1980,8 +2234,8 @@ ha-card {
   font-size: .82em; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
   padding: 7px 16px; border-radius: 999px;
 }
-.vp-status-badge-cancel { background: rgba(239,68,68,.14); color: #fca5a5; border: 1px solid rgba(239,68,68,.4); }
-.vp-status-badge-sub    { background: rgba(245,158,11,.14); color: #fcd34d; border: 1px solid rgba(245,158,11,.4); }
+.vp-status-badge-cancel { background: rgba(239,68,68,.14); color: var(--vpm-error); border: 1px solid rgba(239,68,68,.4); }
+.vp-status-badge-sub    { background: rgba(245,158,11,.14); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.4); }
 /* Statuspunkt in Badges (ersetzt Emojis) */
 .vp-status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; display: inline-block; }
 .vp-detail-badge { display: inline-flex; align-items: center; gap: 6px; }
@@ -2002,8 +2256,8 @@ ha-card {
 .vp-info-popup-title::before {
   content: 'i'; display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 30px; flex-shrink: 0; font-size: .8em; font-weight: 800; font-style: italic;
-  background: rgba(79,124,255,0.14); color: #9db8ff;
-  border: 1px solid rgba(79,124,255,0.28); border-radius: 9px;
+  background: var(--vpm-primary-soft); color: var(--vpm-primary);
+  border: 1px solid var(--vpm-primary-border); border-radius: 9px;
 }
 #info-popup-content { overflow-y: auto; flex: 1; padding-bottom: 6px; }
 /* Dünne, dezente Scrollbar passend zum Dark-Theme */
@@ -2016,7 +2270,7 @@ ha-card {
 .vp-info-day-head {
   font-size: .82em; font-weight: 600; color: var(--vpm-text-muted);
   padding: 0 20px 12px; margin: 0;
-  border-bottom: var(--vpm-border);
+  border-bottom: 1px solid var(--vpm-border);
 }
 .vp-info-section { padding: 14px 20px 4px; }
 .vp-info-section-label {
@@ -2031,11 +2285,11 @@ ha-card {
   font-size: .9em; color: var(--vpm-text); line-height: 1.5;
   transition: background .15s;
 }
-.vp-info-entry:hover { background: rgba(255,255,255,0.04); }
+.vp-info-entry:hover { background: var(--vpm-hover); }
 .vp-info-entry::before {
   content: ''; flex-shrink: 0; margin-top: .55em;
   width: 6px; height: 6px; border-radius: 50%;
-  background: #9db8ff;
+  background: var(--vpm-primary);
 }
 .vp-info-none {
   padding: 22px 20px; color: var(--vpm-text-faint);
@@ -2163,13 +2417,7 @@ class VpMobile24CurrentCard extends HTMLElement {
         { name: 'week_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
         { name: 'title',       default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
         { name: 'theme', default: 'navy', selector: { select: { options: [
-          { value: 'navy',   label: '🌑 Navy Dark (Standard)' },
-          { value: 'dark',   label: '⬛ Dark' },
-          { value: 'blue',   label: '🔵 Blue' },
-          { value: 'purple', label: '🟣 Purple' },
-          { value: 'light',  label: '☀️ Light' },
-          { value: 'red',    label: '🔴 Red' },
-          { value: 'forest', label: '🌿 Forest' },
+          ...VpMobile24Card._themeSelectOptions(),
         ]}}},
         { name: 'show_progress',  default: true, selector: { boolean: {} } },
         { name: 'show_countdown', default: true, selector: { boolean: {} } },
@@ -2464,17 +2712,17 @@ class VpMobile24CurrentCard extends HTMLElement {
       flag:   'M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6z',
       beach:  'M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z'
     };
-    // Design-System-Farben (blau primär), an die Stundenplan-Card angeglichen
+    // Design-System-Farben (blau primär) — als Tokens, damit Dark/Light automatisch stimmt
     const themes = {
-      lesson:  { color:'#4f7cff', bg:'rgba(79,124,255,.10)',  border:'rgba(79,124,255,.35)',  icon:_ic(MDI.book),  label: tc.currentLesson },
-      sub:     { color:'#f59e0b', bg:'rgba(245,158,11,.10)',  border:'rgba(245,158,11,.35)',  icon:_ic(MDI.swap),  label: tc.sub },
-      free:    { color: isBeforeSchool ? '#94a3b8' : '#8b5cf6',
-                 bg:    isBeforeSchool ? 'rgba(148,163,184,.10)' : 'rgba(139,92,246,.10)',
-                 border:isBeforeSchool ? 'rgba(148,163,184,.25)' : 'rgba(139,92,246,.35)',
+      lesson:  { color:'var(--vpm-primary)', bg:'var(--vpm-primary-soft)',   border:'var(--vpm-primary-border)',  icon:_ic(MDI.book),  label: tc.currentLesson },
+      sub:     { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)',      border:'rgba(245,158,11,.35)',       icon:_ic(MDI.swap),  label: tc.sub },
+      free:    { color: isBeforeSchool ? 'var(--vpm-text-muted)' : 'var(--vpm-pause)',
+                 bg:    isBeforeSchool ? 'rgba(148,163,184,.10)' : 'rgba(56,189,248,.10)',
+                 border:isBeforeSchool ? 'rgba(148,163,184,.25)' : 'rgba(56,189,248,.35)',
                  icon:  isBeforeSchool ? _ic(MDI.moon) : _ic(MDI.pause),
                  label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
-      done:    { color:'#22c55e', bg:'rgba(34,197,94,.10)', border:'rgba(34,197,94,.28)', icon:_ic(MDI.flag), label: tc.done },
-      holiday: { color:'#8b5cf6', bg:'rgba(139,92,246,.10)', border:'rgba(139,92,246,.35)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
+      done:    { color:'var(--vpm-success)', bg:'rgba(34,197,94,.10)', border:'rgba(34,197,94,.28)', icon:_ic(MDI.flag), label: tc.done },
+      holiday: { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.35)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
     };
     const effectiveType = isHoliday ? 'holiday' : s.type;
     const lessonTh = themes[effectiveType] || themes.done;
@@ -2561,23 +2809,25 @@ class VpMobile24CurrentCard extends HTMLElement {
       dayHtml = `<div class="vc-day">`;
       if (s.gesamt)        dayHtml += `<span class="vc-chip vc-chip-sm">${s.gesamt} ${tc.lessons}</span>`;
       if (s.verbleibend)   dayHtml += `<span class="vc-chip vc-chip-sm">${s.verbleibend} ${tc.remaining2}</span>`;
-      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:#f59e0b">${s.nVertretung}× ${tc.subst}</span>`;
+      if (s.nVertretung)   dayHtml += `<span class="vc-chip vc-chip-sm" style="color:var(--vpm-warning)">${s.nVertretung}× ${tc.subst}</span>`;
       if (s.unterrichtsEnde) dayHtml += `<span class="vc-chip vc-chip-sm">${tc.endAt} ${s.unterrichtsEnde}</span>`;
       dayHtml += `</div>`;
     }
 
+    const _hasTheme = !!(this._config && this._config.theme);
     this.shadowRoot.innerHTML = `
 <style>
+${VpMobile24Card._designTokens(th, _hasTheme)}
 :host { display: block; }
 ha-card {
-  background: var(--card-background-color, #111827) !important;
-  border-radius: 20px !important;
+  background: var(--vpm-card) !important;
+  border-radius: var(--vpm-radius-card) !important;
   overflow: hidden;
   border: 1px solid ${lessonTh.border} !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.18) !important;
+  box-shadow: var(--vpm-shadow) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: var(--primary-text-color, #f8fafc) !important;
-  transition: border-color .3s, box-shadow .3s;
+  color: var(--vpm-text) !important;
+  transition: border-color var(--vpm-t-theme), box-shadow var(--vpm-t-theme), background var(--vpm-t-theme);
 }
 .vc-main {
   display: flex; align-items: flex-start; gap: 14px;
@@ -2588,7 +2838,7 @@ ha-card {
 .vc-icon {
   width: 44px; height: 44px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--vpm-radius-surface);
   background: ${lessonTh.bg};
   border: 1px solid ${lessonTh.border};
   color: ${lessonTh.color};
@@ -2608,11 +2858,11 @@ ha-card {
 }
 @keyframes vc-dot { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
 .vc-title-badge {
-  font-size: .7em; font-weight: 600; background: rgba(255,255,255,.06);
-  border-radius: 999px; padding: 2px 9px; color: var(--secondary-text-color, #94a3b8);
+  font-size: .7em; font-weight: 600; background: var(--vpm-hover);
+  border-radius: var(--vpm-radius-pill); padding: 2px 9px; color: var(--vpm-text-muted);
 }
 .vc-subject {
-  font-size: 1.5em; font-weight: 800; color: var(--primary-text-color, #f8fafc);
+  font-size: 1.5em; font-weight: 800; color: var(--vpm-text);
   letter-spacing: -0.3px;
   line-height: 1.2; margin-bottom: 7px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -2620,14 +2870,14 @@ ha-card {
 .vc-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
 .vc-chip {
   display: inline-flex; align-items: center; gap: 3px;
-  font-size: .72em; font-weight: 600; color: var(--secondary-text-color, #94a3b8);
-  background: rgba(148,163,184,.10); border-radius: 999px; padding: 3px 10px;
+  font-size: .72em; font-weight: 600; color: var(--vpm-text-muted);
+  background: rgba(148,163,184,.10); border-radius: var(--vpm-radius-pill); padding: 3px 10px;
   border: 1px solid rgba(148,163,184,.14);
 }
 .vc-chip-sm { font-size: .68em; padding: 2px 8px; }
-.vc-info { font-size: .78em; color: #f59e0b; margin-bottom: 5px; }
+.vc-info { font-size: .78em; color: var(--vpm-warning); margin-bottom: 5px; }
 .vc-countdown {
-  font-size: .84em; color: var(--secondary-text-color, #94a3b8); margin-top: 2px;
+  font-size: .84em; color: var(--vpm-text-muted); margin-top: 2px;
 }
 .vc-countdown strong { color: ${lessonTh.color}; }
 /* Progress bar (dezent) */
@@ -2648,17 +2898,17 @@ ha-card {
 .vc-next {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   padding: 10px 20px;
-  border-top: 1px solid var(--divider-color, rgba(255,255,255,.07));
+  border-top: 1px solid var(--vpm-divider);
   font-size: .78em;
 }
-.vc-next-label { font-weight: 700; color: var(--secondary-text-color, #64748b); text-transform: uppercase; letter-spacing: .06em; }
-.vc-next-fach  { font-weight: 700; color: var(--primary-text-color, #e2e8f0); }
+.vc-next-label { font-weight: 700; color: var(--vpm-text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.vc-next-fach  { font-weight: 700; color: var(--vpm-text); }
 .vc-next-time  { color: ${lessonTh.color}; font-weight: 600; }
 /* Day info */
 .vc-day {
   display: flex; gap: 6px; flex-wrap: wrap;
   padding: 10px 20px 14px;
-  border-top: 1px solid var(--divider-color, rgba(255,255,255,.07));
+  border-top: 1px solid var(--vpm-divider);
 }
 </style>
 <ha-card>
@@ -2750,13 +3000,7 @@ class VpMobile24MultiCard extends HTMLElement {
         { name: 'show_week_nav',    default: true, selector: { boolean: {} } },
         { name: 'show_legend',      default: true, selector: { boolean: {} } },
         { name: 'theme', default: 'navy', selector: { select: { options: [
-          { value: 'navy',   label: '🌑 Navy Dark (Standard)' },
-          { value: 'dark',   label: '⬛ Dark' },
-          { value: 'blue',   label: '🔵 Blue' },
-          { value: 'purple', label: '🟣 Purple' },
-          { value: 'light',  label: '☀️ Light' },
-          { value: 'red',    label: '🔴 Red' },
-          { value: 'forest', label: '🌿 Forest' },
+          ...VpMobile24Card._themeSelectOptions(),
         ]}}},
       ],
       computeLabel: (s) => ({
@@ -3061,27 +3305,20 @@ class VpMobile24MultiCard extends HTMLElement {
   _render() {
     if (!this._hass || !this._config) return;
     const mcTh = this._getTheme();
-    const isLight = /^#?[ef]/i.test((mcTh.bg || '').replace('#','')) && parseInt((mcTh.bg||'#000').slice(1,3),16) > 200;
+    const _hasTheme = !!(this._config && this._config.theme);
 
-    // ── Design-system palette (Dark + Light aware) ───────────────────────
-    const PAL = isLight ? {
-      primary:'#2563eb', success:'#16a34a', warning:'#b45309', error:'#dc2626',
-      txt:'#0f172a', txt2:'#64748b', txt3:'#94a3b8',
-      border:'rgba(15,23,42,.10)', surface:'rgba(15,23,42,.03)', surfaceH:'rgba(15,23,42,.06)',
-      curBg:'rgba(37,99,235,.14)', curTxt:'#1e3a8a', curRing:'#2563eb',
-      nBg:'rgba(22,163,74,.10)', nTxt:'#166534', nBorder:'rgba(22,163,74,.28)',
-      sBg:'rgba(180,83,9,.12)',  sTxt:'#92400e', sBorder:'rgba(180,83,9,.30)',
-      cBg:'rgba(220,38,38,.10)', cTxt:'#b91c1c', cBorder:'rgba(220,38,38,.28)',
-      empty:'rgba(15,23,42,.02)', emptyTxt:'rgba(15,23,42,.22)'
-    } : {
-      primary:'#4F7CFF', success:'#22C55E', warning:'#F59E0B', error:'#EF4444',
-      txt:'#F8FAFC', txt2:'#94A3B8', txt3:'#64748B',
-      border:'rgba(255,255,255,.07)', surface:'rgba(255,255,255,.03)', surfaceH:'rgba(255,255,255,.06)',
-      curBg:'rgba(79,124,255,.16)', curTxt:'#c7d6ff', curRing:'#4F7CFF',
-      nBg:'rgba(34,197,94,.10)', nTxt:'#86efac', nBorder:'rgba(34,197,94,.22)',
-      sBg:'rgba(245,158,11,.12)', sTxt:'#fcd34d', sBorder:'rgba(245,158,11,.28)',
-      cBg:'rgba(239,68,68,.10)',  cTxt:'#fca5a5', cBorder:'rgba(239,68,68,.24)',
-      empty:'rgba(255,255,255,.02)', emptyTxt:'rgba(148,163,184,.35)'
+    // ── Palette als CSS-Token-Referenzen (Dark/Light automatisch) ────────
+    // Alle Werte zeigen auf das globale --vpm-* Designsystem, damit die
+    // Multi-Card exakt wie die anderen Karten aussieht und Dark/Light folgt.
+    const PAL = {
+      primary:'var(--vpm-primary)', success:'var(--vpm-success)', warning:'var(--vpm-warning)', error:'var(--vpm-error)',
+      txt:'var(--vpm-text)', txt2:'var(--vpm-text-muted)', txt3:'var(--vpm-text-faint)',
+      border:'var(--vpm-border)', surface:'var(--vpm-hover)', surfaceH:'var(--vpm-border-strong)',
+      curBg:'var(--vpm-tile-current)', curTxt:'var(--vpm-tile-current-color)', curRing:'var(--vpm-tile-current-border)',
+      nBg:'var(--vpm-tile-normal)', nTxt:'var(--vpm-tile-normal-color)', nBorder:'var(--vpm-tile-normal-border)',
+      sBg:'var(--vpm-tile-sub)', sTxt:'var(--vpm-tile-sub-color)', sBorder:'var(--vpm-tile-sub-border)',
+      cBg:'var(--vpm-tile-cancelled)', cTxt:'var(--vpm-tile-cancelled-color)', cBorder:'var(--vpm-tile-cancelled-border)',
+      empty:'var(--vpm-tile-empty)', emptyTxt:'var(--vpm-text-faint)'
     };
 
     const entities      = this._sortedEntities(this._config.entities);
@@ -3302,15 +3539,17 @@ class VpMobile24MultiCard extends HTMLElement {
     // ── Full HTML ─────────────────────────────────────────────────────────
     this.shadowRoot.innerHTML = `
 <style>
+${VpMobile24Card._designTokens(mcTh, _hasTheme)}
 :host { display: block; }
 ha-card {
-  background: ${mcTh.bg} !important;
-  border-radius: 20px !important;
+  background: var(--vpm-card) !important;
+  border-radius: var(--vpm-radius-card) !important;
   overflow: hidden;
-  border: 1px solid ${PAL.border} !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.20) !important;
+  border: 1px solid var(--vpm-card-border) !important;
+  box-shadow: var(--vpm-shadow) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: ${PAL.txt} !important;
+  transition: background var(--vpm-t-theme), color var(--vpm-t-theme);
 }
 /* ── HEADER ── */
 .mc-hdr {
@@ -3320,7 +3559,7 @@ ha-card {
 }
 .mc-hdr-icon {
   width: 38px; height: 38px; flex-shrink: 0;
-  background: linear-gradient(135deg,${PAL.primary},#6d5dfb);
+  background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2));
   border-radius: 11px; display: flex; align-items: center;
   justify-content: center;
   box-shadow: 0 4px 14px rgba(79,124,255,.30);
@@ -3448,49 +3687,50 @@ ha-card {
 .mc-legend {
   display: flex; gap: 16px; flex-wrap: wrap;
   padding: 10px 18px 14px; font-size: .74em; color: ${PAL.txt2};
-  border-top: 1px solid ${PAL.border};
+  border-top: 1px solid var(--vpm-divider);
 }
 .mc-leg-item { display: flex; align-items: center; gap: 6px; }
 .mc-leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-/* ── POPUP — same style as main card ── */
-.vp-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 9998; backdrop-filter: blur(3px); }
+/* ── POPUP — einheitliches Design-System ── */
+.vp-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 9998; backdrop-filter: blur(3px); }
 .vp-popup {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  background: #131f38; border-radius: 18px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  background: var(--vpm-popup-bg); border-radius: var(--vpm-radius-popup);
+  box-shadow: var(--vpm-shadow-popup);
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
-  border: 1px solid rgba(255,255,255,.08); color: #e2e8f0; overflow: hidden;
+  border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
   animation: vp-popup-in .18s ease;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 .vp-popup-title {
-  font-size: 1em; font-weight: 700; color: #fff;
+  font-size: 1em; font-weight: 700; color: var(--vpm-text);
   padding: 18px 20px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid var(--vpm-border);
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-.vp-detail-num  { font-size: .75em; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,.07); padding: 3px 8px; border-radius: 6px; }
-.vp-detail-fach { font-size: 1.1em; font-weight: 800; color: #fff; }
+.vp-detail-num  { font-size: .75em; font-weight: 700; color: var(--vpm-text-muted); background: var(--vpm-hover); padding: 3px 8px; border-radius: 6px; }
+.vp-detail-fach { font-size: 1.1em; font-weight: 800; color: var(--vpm-text); }
 .vp-detail-badge{ font-size: .68em; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-.vp-detail-sub  { background: rgba(234,179,8,.15); color: #fde68a; border: 1px solid rgba(234,179,8,.3); }
-.vp-detail-row  { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); }
+.vp-detail-sub  { background: rgba(245,158,11,.15); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.3); }
+.vp-detail-row  { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid var(--vpm-border); }
 .vp-detail-row:last-child { border-bottom: none; }
 .vp-detail-info-row { background: rgba(245,158,11,.06); }
 .vp-detail-icon { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
-.vp-detail-label{ font-size: .76em; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; min-width: 54px; }
-.vp-detail-val  { font-size: .92em; font-weight: 500; color: #e2e8f0; flex: 1; }
-.vp-detail-empty{ padding: 16px 20px; color: #475569; font-size: .86em; font-style: italic; }
-.vp-popup-footer{ padding: 12px 20px 16px; text-align: right; border-top: 1px solid rgba(255,255,255,.06); }
-.vp-popup-btn   { background: #4f7cff; color: #fff; border: none; border-radius: 11px; padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
-.vp-popup-btn:hover { background: #6d5dfb; transform: translateY(-1px); }
+.vp-detail-label{ font-size: .76em; font-weight: 700; color: var(--vpm-text-faint); text-transform: uppercase; letter-spacing: .5px; min-width: 54px; }
+.vp-detail-val  { font-size: .92em; font-weight: 500; color: var(--vpm-text); flex: 1; }
+.vp-detail-empty{ padding: 16px 20px; color: var(--vpm-text-faint); font-size: .86em; font-style: italic; }
+.vp-popup-footer{ padding: 12px 20px 16px; text-align: right; border-top: 1px solid var(--vpm-border); }
+.vp-popup-btn   { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
+.vp-popup-btn:active { transform: scale(.98); }
 .vp-popup-ausfall {
-  background: #131f38 !important;
+  background: var(--vpm-popup-bg) !important;
   border-color: rgba(239,68,68,.45) !important;
   box-shadow: 0 0 0 1px rgba(239,68,68,.22), 0 20px 60px rgba(239,68,68,.16) !important;
   display: flex !important; flex-direction: column !important;
 }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
-.vp-ausfall-block { color: #fca5a5; font-size: 1.3em; font-weight: 800; letter-spacing: 1px; text-align: center; padding: 28px 20px 12px; }
+.vp-ausfall-block { color: var(--vpm-error); font-size: 1.3em; font-weight: 800; letter-spacing: 1px; text-align: center; padding: 28px 20px 12px; }
 .hidden { display: none !important; }
 </style>
 <ha-card>
@@ -3506,7 +3746,7 @@ ha-card {
   </div>
 
   <!-- Holiday banner -->
-  ${isHoliday ? `<div style="margin:6px 16px 2px;padding:10px 14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:${isLight ? '#6d28d9' : '#c4b5fd'};font-size:.9em"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg> ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
+  ${isHoliday ? `<div style="margin:6px 16px 2px;padding:10px 14px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.30);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:var(--vpm-warning);font-size:.9em"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg> ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
 
   <!-- Class sections grid -->
   <div class="mc-sections-grid">
