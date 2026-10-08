@@ -24,6 +24,7 @@ from .const import (
     CONF_TEACHER_SHORT,
     CONF_USER_MODE,
     CONF_DEMO_MODE,
+    CONF_ENABLE_CALENDAR,
     DEFAULT_BASE_URL,
     DOWNLOAD_SERVERS,
     DOMAIN,
@@ -36,17 +37,77 @@ _LOGGER = logging.getLogger(__name__)
 def _is_course_group(s: str) -> bool:
     """Return True if this looks like a parallel course group.
 
-    Course groups in stundenplan24 are a subject/course label ending in a
-    group number, e.g. "la1", "ma2", "7INb1", "789WB12". The reliable signal
-    is: the label ends with a digit AND contains at least one letter. This
-    also correctly catches short upper-secondary courses like "la1" (which the
-    old ``len(s) > 3`` heuristic missed). Plain subjects like "EN", "MA", "PH"
-    do not end in a digit, so they are not treated as course groups.
+    Two signals mark a course group the user should opt into:
+    1. A per-teacher course label like "InfPA (Mn)" — a course name with a
+       teacher abbreviation in parentheses (produced from the <Kurse> block).
+       This lets identically-named courses taught by different teachers be
+       selected separately.
+    2. A subject/course label ending in a group number, e.g. "la1", "ma2",
+       "7INb1", "789WB12" — ends with a digit AND contains a letter. This also
+       catches short upper-secondary courses like "la1".
+
+    Plain subjects like "EN", "MA", "PH" match neither, so they stay normal
+    subjects (default ON, uncheck to exclude).
     """
     s = (s or "").strip()
     if len(s) < 2:
         return False
+    # Per-teacher label "Course (Teacher)"
+    if s.endswith(")") and "(" in s:
+        return True
     return s[-1].isdigit() and any(c.isalpha() for c in s)
+
+
+async def _collect_selectable_labels(api, check_date: date, class_name: str) -> set[str]:
+    """Collect selectable subject/course labels for one date.
+
+    Returns a set containing:
+      * plain subjects (e.g. "MA", "EN") — default ON, uncheck to exclude;
+      * per-teacher course labels from the <Kurse> catalogue and from the plan
+        (e.g. "InfPA (Mn)", "InfPA (Mrt)", "la1") — default OFF, opt-in.
+    """
+    found: set[str] = set()
+    try:
+        schedule_data = await api.async_get_schedule(
+            target_date=check_date,
+            class_name=class_name,
+        )
+    except Exception as err:  # noqa: BLE001
+        _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
+        return found
+
+    def _valid_subject(subject: str) -> bool:
+        return bool(
+            subject
+            and not subject.startswith("KPL")
+            and not subject.startswith("---")
+            and not subject.startswith("Pause")
+            and not subject.startswith("Mittagspause")
+            and not subject.lower().startswith("frei")
+            and 2 <= len(subject) <= 10
+        )
+
+    # 1) Course catalogue (<Kurse>): each course+teacher combination.
+    for course in schedule_data.get("courses", []):
+        label = (course.get("label") or "").strip()
+        if label and 2 <= len(label) <= 24:
+            found.add(label)
+
+    # 2) Plan entries: plain subjects + per-teacher course keys.
+    for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
+        subject = (entry.get("subject") or "").strip()
+        course_key = (entry.get("course_key") or "").strip()
+        if _valid_subject(subject):
+            found.add(subject)
+        if (
+            course_key
+            and not course_key.startswith("KPL")
+            and not course_key.startswith("---")
+            and 2 <= len(course_key) <= 24
+            and course_key != subject
+        ):
+            found.add(course_key)
+    return found
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -313,40 +374,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     today = date.today()
                     dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
 
-                    async def _fetch_subjects_for_date(check_date: date) -> set[str]:
-                        found: set[str] = set()
-                        try:
-                            schedule_data = await self._api.async_get_schedule(
-                                target_date=check_date,
-                                class_name=class_name,
-                            )
-                            for entry in schedule_data.get("lessons", []) + schedule_data.get("changes", []):
-                                subject = (entry.get("subject") or "").strip()
-                                course  = (entry.get("course")  or "").strip()
-                                if (
-                                    subject
-                                    and not subject.startswith("KPL")
-                                    and not subject.startswith("---")
-                                    and not subject.startswith("Pause")
-                                    and not subject.startswith("Mittagspause")
-                                    and not subject.lower().startswith("frei")
-                                    and 2 <= len(subject) <= 10
-                                ):
-                                    found.add(subject)
-                                # Also include course (Ku2) so parallel groups can be deselected
-                                if (
-                                    course
-                                    and not course.startswith("KPL")
-                                    and not course.startswith("---")
-                                    and 2 <= len(course) <= 12
-                                    and course != subject
-                                ):
-                                    found.add(course)
-                        except Exception as err:
-                            _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
-                        return found
-
-                    results = await asyncio.gather(*[_fetch_subjects_for_date(d) for d in dates_to_check])
+                    results = await asyncio.gather(*[
+                        _collect_selectable_labels(self._api, d, class_name) for d in dates_to_check
+                    ])
                     for s in results:
                         all_subjects.update(s)
                     self._available_subjects = sorted(list(all_subjects))
@@ -556,9 +586,17 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             change_holidays    = user_input.get("change_holidays", False)
             change_credentials = user_input.get("change_credentials", False)
             change_teacher     = user_input.get("change_teacher", False)
+            enable_calendar    = user_input.get(CONF_ENABLE_CALENDAR, True)
+
+            # Save enable_calendar immediately (it doesn't require further steps)
+            new_options = dict(self._config_entry.options)
+            new_options[CONF_ENABLE_CALENDAR] = enable_calendar
+            self.hass.config_entries.async_update_entry(
+                self._config_entry, options=new_options
+            )
 
             if not any([change_class, change_subjects, change_holidays, change_credentials, change_teacher]):
-                return self.async_create_entry(title="", data={})
+                return self.async_create_entry(title="", data=new_options)
 
             if change_credentials:
                 return await self.async_step_change_credentials()
@@ -594,6 +632,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         schema_dict: dict = {
             vol.Optional("change_holidays", default=False): bool,
             vol.Optional("change_credentials", default=False): bool,
+            vol.Optional(
+                CONF_ENABLE_CALENDAR,
+                default=self._config_entry.options.get(CONF_ENABLE_CALENDAR, True),
+            ): bool,
         }
         if is_teacher_mode:
             schema_dict[vol.Optional("change_teacher", default=False)] = bool
@@ -916,42 +958,9 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             today = date.today()
             dates_to_check = [today + timedelta(days=i) for i in range(-7, 21)]
 
-            async def _fetch(check_date: date) -> set[str]:
-                found: set[str] = set()
-                try:
-                    schedule_data = await api.async_get_schedule(
-                        target_date=check_date,
-                        class_name=self._new_class_name,
-                    )
-                    for entry in (
-                        schedule_data.get("lessons", []) + schedule_data.get("changes", [])
-                    ):
-                        subject = (entry.get("subject") or "").strip()
-                        course  = (entry.get("course")  or "").strip()
-                        if (
-                            subject
-                            and not subject.startswith("KPL")
-                            and not subject.startswith("---")
-                            and not subject.startswith("Pause")
-                            and not subject.startswith("Mittagspause")
-                            and not subject.lower().startswith("frei")
-                            and 2 <= len(subject) <= 10
-                        ):
-                            found.add(subject)
-                        # Also include course (Ku2) so parallel groups can be deselected
-                        if (
-                            course
-                            and not course.startswith("KPL")
-                            and not course.startswith("---")
-                            and 2 <= len(course) <= 12
-                            and course != subject
-                        ):
-                            found.add(course)
-                except Exception:
-                    pass
-                return found
-
-            results = await asyncio.gather(*[_fetch(d) for d in dates_to_check])
+            results = await asyncio.gather(*[
+                _collect_selectable_labels(api, d, self._new_class_name) for d in dates_to_check
+            ])
             for s in results:
                 all_subjects.update(s)
 

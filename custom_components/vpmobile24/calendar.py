@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_ENABLE_CALENDAR
 
 
 CALENDAR_NAMES = {
@@ -27,6 +27,10 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the calendar platform."""
+    # Respect the enable_calendar option (default True for backwards compatibility)
+    if not config_entry.options.get(CONF_ENABLE_CALENDAR, True):
+        return
+
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
 
     ha_lang = getattr(hass.config, "language", "en") or "en"

@@ -95,7 +95,8 @@
           "change_class": "Change class",
           "change_holidays": "Change federal state (holidays)",
           "change_credentials": "Change credentials / server",
-          "change_teacher": "Change teacher abbreviation"
+          "change_teacher": "Change teacher abbreviation",
+          "enable_calendar": "Enable calendar entity (uncheck to hide timetable from calendar view)"
         }
       },
       "change_class": {

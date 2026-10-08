@@ -78,7 +78,8 @@
           "change_class": "Modifier la classe",
           "change_holidays": "Modifier le Land (vacances)",
           "change_credentials": "Modifier les identifiants / serveur",
-          "change_teacher": "Modifier l'abréviation enseignant"
+          "change_teacher": "Modifier l'abréviation enseignant",
+          "enable_calendar": "Activer l'entité calendrier (décocher pour masquer l'emploi du temps dans la vue calendrier)"
         }
       },
       "change_class": {

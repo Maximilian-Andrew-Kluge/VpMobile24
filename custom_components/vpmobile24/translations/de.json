@@ -95,7 +95,8 @@
           "change_class": "Klasse ändern",
           "change_holidays": "Bundesland (Ferien) ändern",
           "change_credentials": "Zugangsdaten / Server ändern",
-          "change_teacher": "Lehrerkürzel ändern"
+          "change_teacher": "Lehrerkürzel ändern",
+          "enable_calendar": "Kalender-Entität aktivieren (Haken entfernen, um den Stundenplan aus der Kalenderübersicht auszublenden)"
         }
       },
       "change_class": {

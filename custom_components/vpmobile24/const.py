@@ -14,6 +14,7 @@ CONF_CUSTOM_HOLIDAYS = "custom_holidays"    # list of {name, start, end} dicts
 CONF_TEACHER_SHORT = "teacher_short"        # teacher abbreviation for teacher mode (e.g. "MUS")
 CONF_USER_MODE = "user_mode"                # "student" or "teacher"
 CONF_DEMO_MODE = "demo_mode"                # True wenn Demo-Modus aktiv
+CONF_ENABLE_CALENDAR = "enable_calendar"    # True = Kalender-Entität anlegen (default True)
 
 # Default values
 DEFAULT_UPDATE_INTERVAL = 15  # minutes
