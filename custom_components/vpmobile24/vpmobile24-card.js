@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.3
-console.info('%c VpMobile24-CARD %c v2.6.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.4
+console.info('%c VpMobile24-CARD %c v2.6.4 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -212,11 +212,11 @@ class VpMobile24Card extends HTMLElement {
     if (themes[name]) return name;
     const alias = VpMobile24Card._THEME_ALIASES[name];
     if (alias && themes[alias]) return alias;
-    return 'navy';
+    return 'ha_default';
   }
 
   _getTheme() {
-    const themeName = (this._config && this._config.theme) || 'navy';
+    const themeName = (this._config && this._config.theme) || 'ha_default';
     return VpMobile24Card._THEMES[VpMobile24Card._resolveThemeId(themeName)];
   }
 
@@ -231,7 +231,7 @@ class VpMobile24Card extends HTMLElement {
     ];
     return order.map((id) => {
       const t = THEMES[id];
-      const suffix = id === 'navy' ? ' (Standard)' : '';
+      const suffix = id === 'ha_default' ? ' (Standard)' : '';
       return { value: id, label: `${t.category} · ${t.name}${suffix} — ${t.keywords}` };
     });
   }
@@ -2390,8 +2390,8 @@ class VpMobile24CurrentCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'navy';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+    const n = (this._config && this._config.theme) || 'ha_default';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
   }
 
   static getStubConfig() {
@@ -2962,8 +2962,8 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'navy';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+    const n = (this._config && this._config.theme) || 'ha_default';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
   }
 
   // ── Config form ──────────────────────────────────────────────────────────
