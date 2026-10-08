@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.2
-console.info('%c VpMobile24-CARD %c v2.6.2 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.3
+console.info('%c VpMobile24-CARD %c v2.6.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -30,7 +30,7 @@ class VpMobile24Card extends HTMLElement {
       ha_default: {
         name: 'HA Standard', category: 'System', light: null,
         description: 'Folgt dem aktiven Home Assistant Theme (keine eigenen Farben)',
-        keywords: 'Standard · HA · System',
+        keywords: 'Home Assistant · System · Automatisch',
         bg: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
         card: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
         surface: 'var(--secondary-background-color, rgba(255,255,255,0.05))',
@@ -46,34 +46,34 @@ class VpMobile24Card extends HTMLElement {
       },
       // ── DARK THEMES ──────────────────────────────────────────────────────
       navy: {
-        name: 'Navy Dark', category: 'Dark', light: false,
+        name: 'Standard (Dunkel)', category: 'Dark', light: false,
         description: 'Modernes VpMobile24 Standard-Theme',
-        keywords: 'Navy · Blau · Neutral',
+        keywords: 'Standard · Blau · Dunkel',
         bg: '#0B0F19', card: '#111827', surface: '#151C2B', elevated: '#1A2233',
         primary: '#4F7CFF', primary_2: '#6D8DFF',
         text: '#F8FAFC', text_secondary: '#94A3B8', text_muted: '#64748B',
         border: 'rgba(255,255,255,0.07)', shadow: '0 8px 30px rgba(0,0,0,0.18)',
       },
       graphite: {
-        name: 'Graphite', category: 'Dark', light: false,
+        name: 'Anthrazit', category: 'Dark', light: false,
         description: 'Neutrales Anthrazit-Theme',
-        keywords: 'Grau · Schwarz · Minimal',
+        keywords: 'Anthrazit · Grau · Minimal',
         bg: '#090A0C', card: '#121416', surface: '#191B1F', elevated: '#202328',
         primary: '#E5E7EB', primary_2: '#F3F4F6',
         text: '#F5F5F5', text_secondary: '#A1A1AA', text_muted: '#71717A',
         border: 'rgba(255,255,255,0.08)', shadow: '0 8px 30px rgba(0,0,0,0.30)',
       },
       ocean_blue: {
-        name: 'Ocean Blue', category: 'Dark', light: false,
+        name: 'Ozeanblau', category: 'Dark', light: false,
         description: 'Tiefblaues modernes Theme',
-        keywords: 'Blau · Navy · Technisch',
+        keywords: 'Blau · Ozean · Dunkel',
         bg: '#07111F', card: '#0D1A2B', surface: '#12253B', elevated: '#172E47',
         primary: '#3B82F6', primary_2: '#60A5FA',
         text: '#F8FAFC', text_secondary: '#93C5FD', text_muted: '#64748B',
         border: 'rgba(96,165,250,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
       deep_purple: {
-        name: 'Deep Purple', category: 'Dark', light: false,
+        name: 'Violett', category: 'Dark', light: false,
         description: 'Elegantes Theme mit violetten Akzenten',
         keywords: 'Violett · Dunkel · Elegant',
         bg: '#0F0B18', card: '#171222', surface: '#211A30', elevated: '#291F3B',
@@ -82,16 +82,16 @@ class VpMobile24Card extends HTMLElement {
         border: 'rgba(167,139,250,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
       forest_green: {
-        name: 'Forest Green', category: 'Dark', light: false,
+        name: 'Waldgrün', category: 'Dark', light: false,
         description: 'Ruhiges Theme mit natürlichen Grüntönen',
-        keywords: 'Grün · Natur · Ruhig',
+        keywords: 'Grün · Natur · Dunkel',
         bg: '#07130D', card: '#0D1E16', surface: '#14281F', elevated: '#193428',
         primary: '#22C55E', primary_2: '#4ADE80',
         text: '#F0FDF4', text_secondary: '#86EFAC', text_muted: '#5B7466',
         border: 'rgba(74,222,128,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
       ruby: {
-        name: 'Ruby', category: 'Dark', light: false,
+        name: 'Rubinrot', category: 'Dark', light: false,
         description: 'Dunkles Theme mit tiefrotem Akzent',
         keywords: 'Rot · Dunkel · Elegant',
         bg: '#13090B', card: '#211013', surface: '#2A1619', elevated: '#341A1F',
@@ -100,25 +100,25 @@ class VpMobile24Card extends HTMLElement {
         border: 'rgba(248,113,113,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
       sunset: {
-        name: 'Sunset', category: 'Dark', light: false,
+        name: 'Sonnenuntergang', category: 'Dark', light: false,
         description: 'Warmes Theme mit orangefarbenem Akzent',
-        keywords: 'Orange · Warm · Modern',
+        keywords: 'Orange · Warm · Dunkel',
         bg: '#140D08', card: '#21160D', surface: '#2A1D12', elevated: '#352317',
         primary: '#F97316', primary_2: '#FB923C',
         text: '#FFF7ED', text_secondary: '#FDBA74', text_muted: '#8A7259',
         border: 'rgba(251,146,60,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.24)',
       },
       deep_teal: {
-        name: 'Deep Teal', category: 'Dark', light: false,
+        name: 'Petrol', category: 'Dark', light: false,
         description: 'Modernes Teal-Theme mit kühlen Türkistönen',
-        keywords: 'Türkis · Kühl · Technisch',
+        keywords: 'Türkis · Petrol · Dunkel',
         bg: '#061315', card: '#0C1F22', surface: '#122C30', elevated: '#17373B',
         primary: '#14B8A6', primary_2: '#2DD4BF',
         text: '#F0FDFA', text_secondary: '#5EEAD4', text_muted: '#5B7A78',
         border: 'rgba(45,212,191,0.14)', shadow: '0 8px 30px rgba(0,0,0,0.22)',
       },
       dark_rose: {
-        name: 'Dark Rose', category: 'Dark', light: false,
+        name: 'Rosé Dunkel', category: 'Dark', light: false,
         description: 'Elegantes Theme mit dezenten Rosé-Akzenten',
         keywords: 'Rosé · Dunkel · Elegant',
         bg: '#140B11', card: '#21121A', surface: '#2A1722', elevated: '#351D29',
@@ -128,54 +128,54 @@ class VpMobile24Card extends HTMLElement {
       },
       // ── LIGHT THEMES ─────────────────────────────────────────────────────
       light: {
-        name: 'Light', category: 'Light', light: true,
+        name: 'Standard (Hell)', category: 'Light', light: true,
         description: 'Klares Standard-Theme',
-        keywords: 'Weiß · Grau · Blau',
+        keywords: 'Standard · Hell · Blau',
         bg: '#F1F4F8', card: '#FFFFFF', surface: '#F8FAFC', elevated: '#FFFFFF',
         primary: '#4F6FE8', primary_2: '#4169E1',
         text: '#0F172A', text_secondary: '#64748B', text_muted: '#94A3B8',
         border: 'rgba(15,23,42,0.08)', shadow: '0 8px 30px rgba(15,23,42,0.08)',
       },
       sky_blue: {
-        name: 'Sky Blue', category: 'Light', light: true,
+        name: 'Himmelblau', category: 'Light', light: true,
         description: 'Helles, frisches Theme mit blauen Akzenten',
-        keywords: 'Blau · Frisch · Hell',
+        keywords: 'Blau · Hell · Frisch',
         bg: '#F1F7FF', card: '#FFFFFF', surface: '#F5F9FF', elevated: '#FFFFFF',
         primary: '#2563EB', primary_2: '#3B82F6',
         text: '#0F172A', text_secondary: '#64748B', text_muted: '#94A3B8',
         border: 'rgba(37,99,235,0.12)', shadow: '0 6px 24px rgba(15,23,42,0.07)',
       },
       fresh_green: {
-        name: 'Fresh Green', category: 'Light', light: true,
+        name: 'Frühlingsgrün', category: 'Light', light: true,
         description: 'Helles, natürliches Theme mit grünen Akzenten',
-        keywords: 'Grün · Natur · Hell',
+        keywords: 'Grün · Hell · Natur',
         bg: '#F1FAF4', card: '#FFFFFF', surface: '#F6FBF8', elevated: '#FFFFFF',
         primary: '#16A34A', primary_2: '#22C55E',
         text: '#102017', text_secondary: '#64746A', text_muted: '#94A39A',
         border: 'rgba(22,163,74,0.12)', shadow: '0 6px 24px rgba(16,32,23,0.07)',
       },
       soft_purple: {
-        name: 'Soft Purple', category: 'Light', light: true,
+        name: 'Lavendel', category: 'Light', light: true,
         description: 'Helles, elegantes Theme mit violetten Akzenten',
-        keywords: 'Violett · Elegant · Hell',
+        keywords: 'Violett · Hell · Elegant',
         bg: '#F7F4FC', card: '#FFFFFF', surface: '#FAF8FD', elevated: '#FFFFFF',
         primary: '#7C3AED', primary_2: '#8B5CF6',
         text: '#18111F', text_secondary: '#64596F', text_muted: '#948AA0',
         border: 'rgba(124,58,237,0.12)', shadow: '0 6px 24px rgba(24,17,31,0.07)',
       },
       soft_rose: {
-        name: 'Soft Rose', category: 'Light', light: true,
+        name: 'Rosé Hell', category: 'Light', light: true,
         description: 'Helles, warmes Theme mit Rosé-Akzenten',
-        keywords: 'Rosé · Warm · Hell',
+        keywords: 'Rosé · Hell · Warm',
         bg: '#FFF5F8', card: '#FFFFFF', surface: '#FFF9FB', elevated: '#FFFFFF',
         primary: '#DB2777', primary_2: '#EC4899',
         text: '#1F1118', text_secondary: '#6F5963', text_muted: '#A08A94',
         border: 'rgba(219,39,119,0.12)', shadow: '0 6px 24px rgba(31,17,24,0.07)',
       },
       warm_orange: {
-        name: 'Warm Orange', category: 'Light', light: true,
+        name: 'Herbst', category: 'Light', light: true,
         description: 'Helles, freundliches Theme mit orangenen Akzenten',
-        keywords: 'Orange · Warm · Hell',
+        keywords: 'Orange · Hell · Warm',
         bg: '#FFF8F1', card: '#FFFFFF', surface: '#FFFAF6', elevated: '#FFFFFF',
         primary: '#EA580C', primary_2: '#F97316',
         text: '#1C120B', text_secondary: '#6F5B4E', text_muted: '#A0907E',
@@ -413,27 +413,27 @@ class VpMobile24Card extends HTMLElement {
   --vpm-error: ${error};
   --vpm-pause: ${pause};
   --vpm-info: ${theme.primary};
-  --vpm-c-normal: ${nDot};
-  --vpm-c-sub: ${sDot};
-  --vpm-c-cancel: ${cDot};
+  --vpm-c-normal: #16A34A;
+  --vpm-c-sub: #B45309;
+  --vpm-c-cancel: #DC2626;
   --vpm-c-current: ${theme.primary};
   --vpm-c-holiday: ${sDot};
-  /* Tiles — dezent getönt, feine sichtbare Borders (Light Mode 2.0) */
-  --vpm-tile-bg: ${theme.surface};
-  --vpm-tile-normal: #F6FBF8;
-  --vpm-tile-normal-color: #17221A;
-  --vpm-tile-normal-border: #B7DDBF;
-  --vpm-tile-sub: #FFF8E8;
-  --vpm-tile-sub-color: #9A6500;
-  --vpm-tile-sub-border: #E6C879;
-  --vpm-tile-cancelled: #FFF1F1;
-  --vpm-tile-cancelled-color: #C62828;
-  --vpm-tile-cancelled-border: #F0B4B4;
-  --vpm-tile-current: #EEF3FF;
-  --vpm-tile-current-color: #17347A;
+  /* Tiles — deutlich sichtbare Borders, weißer Hintergrund für normale Zellen */
+  --vpm-tile-bg: #FFFFFF;
+  --vpm-tile-normal: #FFFFFF;
+  --vpm-tile-normal-color: #111827;
+  --vpm-tile-normal-border: #86C997;
+  --vpm-tile-sub: #FFFBEB;
+  --vpm-tile-sub-color: #7C4A00;
+  --vpm-tile-sub-border: #D4A017;
+  --vpm-tile-cancelled: #FEF2F2;
+  --vpm-tile-cancelled-color: #991B1B;
+  --vpm-tile-cancelled-border: #F87171;
+  --vpm-tile-current: #EFF6FF;
+  --vpm-tile-current-color: #1E3A8A;
   --vpm-tile-current-border: ${theme.primary};
-  --vpm-tile-empty: #F8FAFC;
-  --vpm-tile-empty-border: #E6EAF0;`;
+  --vpm-tile-empty: transparent;
+  --vpm-tile-empty-border: transparent;`;
   }
 
   static _designTokens(theme, hasExplicitTheme) {
@@ -1773,7 +1773,7 @@ ha-card {
   background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2));
   border-radius: 14px; display: flex; align-items: center;
   justify-content: center; font-size: 1.35em;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 .vp-hdr-body { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 3px; }
 .vp-hdr-top  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
