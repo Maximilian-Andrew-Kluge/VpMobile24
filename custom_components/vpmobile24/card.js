@@ -27,23 +27,6 @@ class VpMobile24Card extends HTMLElement {
     // Kein Pink/Magenta außerhalb von Dark Rose / Soft Rose.
     return {
       // ── SYSTEM THEME ─────────────────────────────────────────────────────
-      ha_default: {
-        name: 'HA Standard', category: 'System', light: null,
-        description: 'Folgt dem aktiven Home Assistant Theme (keine eigenen Farben)',
-        keywords: 'Home Assistant · System · Automatisch',
-        bg: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
-        card: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
-        surface: 'var(--secondary-background-color, rgba(255,255,255,0.05))',
-        elevated: 'var(--card-background-color, var(--ha-card-background, #1c1c1c))',
-        primary: 'var(--primary-color, #03a9f4)',
-        primary_2: 'var(--accent-color, var(--primary-color, #03a9f4))',
-        text: 'var(--primary-text-color, #fff)',
-        text_secondary: 'var(--secondary-text-color, #9b9b9b)',
-        text_muted: 'var(--disabled-text-color, var(--secondary-text-color, #9b9b9b))',
-        border: 'var(--divider-color, rgba(255,255,255,0.12))',
-        shadow: 'var(--ha-card-box-shadow, none)',
-        ha_mode: true,
-      },
       // ── DARK THEMES ──────────────────────────────────────────────────────
       navy: {
         name: 'Standard (Dunkel)', category: 'Dark', light: false,
@@ -188,9 +171,10 @@ class VpMobile24Card extends HTMLElement {
   // bereits konfigurierte Karten mit theme: dark_blue etc.).
   static get _THEME_ALIASES() {
     return {
-      ha: 'ha_default',
-      home_assistant: 'ha_default',
-      system: 'ha_default',
+      ha: 'navy',
+      home_assistant: 'navy',
+      system: 'navy',
+      ha_default: 'navy',
       dark: 'graphite',
       dark_blue: 'ocean_blue',
       dark_purple: 'deep_purple',
@@ -225,14 +209,15 @@ class VpMobile24Card extends HTMLElement {
   static _themeSelectOptions() {
     const THEMES = VpMobile24Card._THEMES;
     const order = [
-      'ha_default', 'navy', 'graphite', 'ocean_blue', 'deep_purple', 'forest_green',
+      'navy', 'graphite', 'ocean_blue', 'deep_purple', 'forest_green',
       'ruby', 'sunset', 'deep_teal', 'dark_rose',
       'light', 'sky_blue', 'fresh_green', 'soft_purple', 'soft_rose', 'warm_orange',
     ];
     return order.map((id) => {
       const t = THEMES[id];
-      const suffix = id === 'navy' ? ' (Standard)' : '';
-      return { value: id, label: `${t.category} · ${t.name}${suffix} — ${t.keywords}` };
+      const suffix = id === 'navy' ? ' ★' : '';
+      const cat = t.light ? '☀️' : '🌙';
+      return { value: id, label: `${cat} ${t.name}${suffix}` };
     });
   }
 
@@ -245,67 +230,11 @@ class VpMobile24Card extends HTMLElement {
   // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
   // dem Theme. Tile-Tokens werden daraus abgeleitet.
   static _themeVars(theme) {
-    if (theme.ha_mode) return VpMobile24Card._themeVarsHA(theme);
     const light = !!theme.light;
     if (light) return VpMobile24Card._themeVarsLight(theme);
     return VpMobile24Card._themeVarsDark(theme);
   }
 
-  // ── HA-Standard-Modus ────────────────────────────────────────────────────
-  // Delegiert alle Farben an das aktive HA-Theme via CSS-Variablen.
-  static _themeVarsHA(theme) {
-    const success = 'var(--success-color, #22C55E)';
-    const warning = 'var(--warning-color, #F59E0B)';
-    const error = 'var(--error-color, #DB4437)';
-    const pause = 'var(--info-color, #38BDF8)';
-    return `
-  --vpm-bg: var(--card-background-color, var(--ha-card-background, #1c1c1c));
-  --vpm-card: var(--card-background-color, var(--ha-card-background, #1c1c1c));
-  --vpm-surface: var(--secondary-background-color, rgba(255,255,255,0.04));
-  --vpm-elevated: var(--card-background-color, #1c1c1c);
-  --vpm-popup-bg: var(--card-background-color, #1c1c1c);
-  --vpm-border: var(--divider-color, rgba(255,255,255,0.12));
-  --vpm-border-strong: var(--divider-color, rgba(255,255,255,0.2));
-  --vpm-hairline: var(--divider-color, rgba(255,255,255,0.07));
-  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(255,255,255,0.12)));
-  --vpm-divider: var(--divider-color, rgba(255,255,255,0.07));
-  --vpm-hover: rgba(128,128,128,0.08);
-  --vpm-shadow: var(--ha-card-box-shadow, none);
-  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,.4);
-  --vpm-header-bg: transparent;
-  --vpm-text: var(--primary-text-color, #fff);
-  --vpm-text-muted: var(--secondary-text-color, #9b9b9b);
-  --vpm-text-faint: color-mix(in srgb, var(--secondary-text-color, #9b9b9b) 60%, transparent);
-  --vpm-primary: var(--primary-color, #03a9f4);
-  --vpm-primary-2: var(--accent-color, var(--primary-color, #03a9f4));
-  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
-  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 35%, transparent);
-  --vpm-success: ${success};
-  --vpm-warning: ${warning};
-  --vpm-error: ${error};
-  --vpm-pause: ${pause};
-  --vpm-info: var(--primary-color, #03a9f4);
-  --vpm-c-normal: ${success};
-  --vpm-c-sub: ${warning};
-  --vpm-c-cancel: ${error};
-  --vpm-c-current: var(--primary-color, #03a9f4);
-  --vpm-c-holiday: ${warning};
-  --vpm-tile-bg: var(--secondary-background-color, rgba(255,255,255,0.04));
-  --vpm-tile-normal: color-mix(in srgb, ${success} 10%, transparent);
-  --vpm-tile-normal-color: var(--primary-text-color, #fff);
-  --vpm-tile-normal-border: color-mix(in srgb, ${success} 30%, transparent);
-  --vpm-tile-sub: color-mix(in srgb, ${warning} 12%, transparent);
-  --vpm-tile-sub-color: color-mix(in srgb, ${warning} 90%, #fff);
-  --vpm-tile-sub-border: color-mix(in srgb, ${warning} 35%, transparent);
-  --vpm-tile-cancelled: color-mix(in srgb, ${error} 12%, transparent);
-  --vpm-tile-cancelled-color: color-mix(in srgb, ${error} 80%, #fff);
-  --vpm-tile-cancelled-border: color-mix(in srgb, ${error} 40%, transparent);
-  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
-  --vpm-tile-current-color: color-mix(in srgb, var(--primary-color, #03a9f4) 45%, #fff);
-  --vpm-tile-current-border: var(--primary-color, #03a9f4);
-  --vpm-tile-empty: rgba(128,128,128,0.03);
-  --vpm-tile-empty-border: var(--divider-color, rgba(255,255,255,0.05));`;
-  }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
   static _themeVarsDark(theme) {
