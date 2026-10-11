@@ -19,12 +19,54 @@ from .api_new import Stundenplan24API, Stundenplan24AuthError
 
 _LOGGER = logging.getLogger(__name__)
 
+def _looks_like_course_group(label: str) -> bool:
+    """True if a label denotes a selectable parallel course group.
+
+    Matches per-teacher labels like "InfPA (Mn)" and numbered groups like
+    "la1"/"7INb1". Plain subjects ("MA", "EN") are not course groups.
+    """
+    label = (label or "").strip()
+    if len(label) < 2:
+        return False
+    if label.endswith(")") and "(" in label:
+        return True
+    return label[-1].isdigit() and any(c.isalpha() for c in label)
+
+
+def _course_selection_excludes(lesson: dict, selected_courses) -> bool:
+    """Return True if a lesson belongs to a course group the user did NOT pick.
+
+    Teacher-aware: prefers the lesson's ``course_key`` ("Course (Teacher)"),
+    and stays backward compatible with selections stored as the plain course
+    name (Ku2). Only course groups are whitelisted — plain subjects are never
+    dropped by this function.
+    """
+    if not selected_courses:
+        return False
+    selected = set(selected_courses)
+    course_key = (lesson.get("course_key") or "").strip()
+    course = (lesson.get("course") or "").strip()
+
+    # If either identifier is explicitly selected, keep the lesson.
+    if course_key and course_key in selected:
+        return False
+    if course and course in selected:
+        return False
+
+    # Otherwise: drop it only if it actually looks like a course group.
+    if course_key and _looks_like_course_group(course_key):
+        return True
+    if course and _looks_like_course_group(course):
+        return True
+    return False
+
+
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.CALENDAR, Platform.BUTTON]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 # The canonical URL for the card resource (versioned for cache-busting)
-CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.6.1"
+CARD_URL_WWW = "/local/vpmobile24/vpmobile24-card.js?v=2.6.3"
 
 # All known URL patterns that belong to this card (old or alternative paths)
 _CARD_URL_PATTERNS = [
@@ -528,6 +570,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         for lesson in self._week_data_cache[date_str].get("lessons", []):
                             subj   = lesson.get("subject", "")
                             course = lesson.get("course", "")
+                            course_key = lesson.get("course_key", "")
                             is_chg = lesson.get("is_change", False)
                             if is_chg:
                                 continue
@@ -535,6 +578,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                 continue
                             if course:
                                 student_courses.add(course)
+                            if course_key:
+                                student_courses.add(course_key)
                             student_courses.add(subj)
 
             _LOGGER.debug(f"Student courses: {sorted(student_courses)}")
@@ -560,11 +605,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period  = lesson.get("period", "")
                             lesson_course = lesson.get("course", "")
 
-                            # Whitelist filter: if selected_courses is set, skip lessons
-                            # that belong to a different course group (course groups have digits)
-                            if self.selected_courses and lesson_course and lesson_course not in self.selected_courses:
-                                if any(c.isdigit() for c in lesson_course):
-                                    continue
+                            # Whitelist filter (teacher-aware): skip lessons of a
+                            # course group the user did not select. Matches on
+                            # "Course (Teacher)" and stays backward compatible.
+                            if _course_selection_excludes(lesson, self.selected_courses):
+                                continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 # Cancelled lesson
@@ -593,10 +638,10 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             period  = change.get("period", "")
                             change_course = change.get("course", "")
 
-                            # Whitelist filter: skip changes for other course groups
-                            if self.selected_courses and change_course and change_course not in self.selected_courses:
-                                if any(c.isdigit() for c in change_course):
-                                    continue
+                            # Whitelist filter (teacher-aware): skip changes for a
+                            # course group the user did not select.
+                            if _course_selection_excludes(change, self.selected_courses):
+                                continue
 
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 if change_course and change_course in self.excluded_subjects:
