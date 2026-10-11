@@ -1,6 +1,19 @@
 """Constants for the vpmobile24 integration."""
+import json
+import os
 
 DOMAIN = "vpmobile24"
+
+# Version aus manifest.json lesen – so gibt es nur eine einzige Stelle
+def _read_version() -> str:
+    try:
+        manifest_path = os.path.join(os.path.dirname(__file__), "manifest.json")
+        with open(manifest_path, encoding="utf-8") as f:
+            return json.load(f).get("version", "unknown")
+    except Exception:
+        return "unknown"
+
+VERSION = _read_version()
 
 # Configuration keys
 CONF_SCHOOL_ID = "school_id"

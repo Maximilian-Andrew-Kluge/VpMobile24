@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers import device_registry as dr
 from homeassistant.exceptions import ConfigEntryAuthFailed
 
-from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE
+from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE, VERSION
 from .api_new import Stundenplan24API, Stundenplan24AuthError
 
 _LOGGER = logging.getLogger(__name__)
@@ -241,7 +241,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=device_name,
         manufacturer="VpMobile24",
         model="Stundenplan Integration",
-        sw_version="2.6.1",
+        sw_version=VERSION,
     )
 
     # Options update listener — apply new class/subjects immediately without HA restart

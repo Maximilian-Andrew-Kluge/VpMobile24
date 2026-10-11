@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class VpMobile24ReloadButton(CoordinatorEntity, ButtonEntity):
             "name": name,
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.9",
+            "sw_version": VERSION,
         }
 
     async def async_press(self) -> None:

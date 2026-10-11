@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ def _device_info(config_entry) -> dict:
         "name": name,
         "manufacturer": "VpMobile24",
         "model": "Stundenplan Integration",
-        "sw_version": "2.5.6.1",
+        "sw_version": VERSION,
     }
 
 

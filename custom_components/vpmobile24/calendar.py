@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, CONF_ENABLE_CALENDAR
+from .const import DOMAIN, CONF_ENABLE_CALENDAR, VERSION
 
 
 CALENDAR_NAMES = {
@@ -72,7 +72,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             "name": name,
             "manufacturer": "VpMobile24",
             "model": "Stundenplan Integration",
-            "sw_version": "2.4.9",
+            "sw_version": VERSION,
         }
 
     @property
