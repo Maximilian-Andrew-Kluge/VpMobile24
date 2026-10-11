@@ -215,9 +215,9 @@ class VpMobile24Card extends HTMLElement {
     ];
     return order.map((id) => {
       const t = THEMES[id];
-      const suffix = id === 'navy' ? ' ★' : '';
-      const cat = t.light ? '☀️' : '🌙';
-      return { value: id, label: `${cat} ${t.name}${suffix}` };
+      const suffix = id === 'navy' ? ' (Standard)' : '';
+      const cat = t.light ? 'Hell' : 'Dunkel';
+      return { value: id, label: `${t.name}${suffix} – ${cat}` };
     });
   }
 
