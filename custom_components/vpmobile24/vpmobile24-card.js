@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.4
-console.info('%c VpMobile24-CARD %c v2.6.4 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.5
+console.info('%c VpMobile24-CARD %c v2.6.5 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -290,21 +290,21 @@ class VpMobile24Card extends HTMLElement {
   --vpm-c-cancel: ${error};
   --vpm-c-current: var(--primary-color, #03a9f4);
   --vpm-c-holiday: ${warning};
-  --vpm-tile-bg: var(--secondary-background-color, rgba(255,255,255,0.04));
-  --vpm-tile-normal: color-mix(in srgb, ${success} 10%, transparent);
-  --vpm-tile-normal-color: var(--primary-text-color, #fff);
-  --vpm-tile-normal-border: color-mix(in srgb, ${success} 30%, transparent);
-  --vpm-tile-sub: color-mix(in srgb, ${warning} 12%, transparent);
-  --vpm-tile-sub-color: color-mix(in srgb, ${warning} 90%, #fff);
-  --vpm-tile-sub-border: color-mix(in srgb, ${warning} 35%, transparent);
-  --vpm-tile-cancelled: color-mix(in srgb, ${error} 12%, transparent);
-  --vpm-tile-cancelled-color: color-mix(in srgb, ${error} 80%, #fff);
-  --vpm-tile-cancelled-border: color-mix(in srgb, ${error} 40%, transparent);
-  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
-  --vpm-tile-current-color: color-mix(in srgb, var(--primary-color, #03a9f4) 45%, #fff);
+  --vpm-tile-bg: var(--secondary-background-color, rgba(128,128,128,0.08));
+  --vpm-tile-normal: var(--secondary-background-color, rgba(128,128,128,0.08));
+  --vpm-tile-normal-color: var(--primary-text-color, #212121);
+  --vpm-tile-normal-border: var(--divider-color, rgba(0,0,0,0.15));
+  --vpm-tile-sub: color-mix(in srgb, var(--warning-color, #F59E0B) 15%, var(--card-background-color, #fff));
+  --vpm-tile-sub-color: color-mix(in srgb, var(--warning-color, #B45309) 100%, transparent);
+  --vpm-tile-sub-border: color-mix(in srgb, var(--warning-color, #F59E0B) 50%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, var(--error-color, #DB4437) 12%, var(--card-background-color, #fff));
+  --vpm-tile-cancelled-color: var(--error-color, #991B1B);
+  --vpm-tile-cancelled-border: color-mix(in srgb, var(--error-color, #DB4437) 50%, transparent);
+  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 15%, var(--card-background-color, #fff));
+  --vpm-tile-current-color: var(--primary-text-color, #212121);
   --vpm-tile-current-border: var(--primary-color, #03a9f4);
-  --vpm-tile-empty: rgba(128,128,128,0.03);
-  --vpm-tile-empty-border: var(--divider-color, rgba(255,255,255,0.05));`;
+  --vpm-tile-empty: transparent;
+  --vpm-tile-empty-border: transparent;`;
   }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
