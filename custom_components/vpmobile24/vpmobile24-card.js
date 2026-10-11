@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.7
-console.info('%c VpMobile24-CARD %c v2.6.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.3
+console.info('%c VpMobile24-CARD %c v2.6.3 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -212,11 +212,11 @@ class VpMobile24Card extends HTMLElement {
     if (themes[name]) return name;
     const alias = VpMobile24Card._THEME_ALIASES[name];
     if (alias && themes[alias]) return alias;
-    return 'ha_default';
+    return 'navy';
   }
 
   _getTheme() {
-    const themeName = (this._config && this._config.theme) || 'ha_default';
+    const themeName = (this._config && this._config.theme) || 'navy';
     return VpMobile24Card._THEMES[VpMobile24Card._resolveThemeId(themeName)];
   }
 
@@ -231,7 +231,7 @@ class VpMobile24Card extends HTMLElement {
     ];
     return order.map((id) => {
       const t = THEMES[id];
-      const suffix = id === 'ha_default' ? ' (Standard)' : '';
+      const suffix = id === 'navy' ? ' (Standard)' : '';
       return { value: id, label: `${t.category} · ${t.name}${suffix} — ${t.keywords}` };
     });
   }
@@ -259,52 +259,52 @@ class VpMobile24Card extends HTMLElement {
     const error = 'var(--error-color, #DB4437)';
     const pause = 'var(--info-color, #38BDF8)';
     return `
-  --vpm-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
-  --vpm-card: var(--card-background-color, var(--ha-card-background, #ffffff));
-  --vpm-surface: var(--secondary-background-color, #f5f5f5);
-  --vpm-elevated: var(--card-background-color, #ffffff);
-  --vpm-popup-bg: var(--card-background-color, #ffffff);
-  --vpm-border: var(--divider-color, rgba(0,0,0,0.12));
-  --vpm-border-strong: var(--divider-color, rgba(0,0,0,0.18));
-  --vpm-hairline: var(--divider-color, rgba(0,0,0,0.08));
-  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
-  --vpm-divider: var(--divider-color, rgba(0,0,0,0.08));
-  --vpm-hover: rgba(0,0,0,0.04);
+  --vpm-bg: var(--card-background-color, var(--ha-card-background, #1c1c1c));
+  --vpm-card: var(--card-background-color, var(--ha-card-background, #1c1c1c));
+  --vpm-surface: var(--secondary-background-color, rgba(255,255,255,0.04));
+  --vpm-elevated: var(--card-background-color, #1c1c1c);
+  --vpm-popup-bg: var(--card-background-color, #1c1c1c);
+  --vpm-border: var(--divider-color, rgba(255,255,255,0.12));
+  --vpm-border-strong: var(--divider-color, rgba(255,255,255,0.2));
+  --vpm-hairline: var(--divider-color, rgba(255,255,255,0.07));
+  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(255,255,255,0.12)));
+  --vpm-divider: var(--divider-color, rgba(255,255,255,0.07));
+  --vpm-hover: rgba(128,128,128,0.08);
   --vpm-shadow: var(--ha-card-box-shadow, none);
-  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.12);
+  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,.4);
   --vpm-header-bg: transparent;
-  --vpm-text: var(--primary-text-color, #212121);
-  --vpm-text-muted: var(--secondary-text-color, #727272);
-  --vpm-text-faint: var(--disabled-text-color, #9e9e9e);
+  --vpm-text: var(--primary-text-color, #fff);
+  --vpm-text-muted: var(--secondary-text-color, #9b9b9b);
+  --vpm-text-faint: color-mix(in srgb, var(--secondary-text-color, #9b9b9b) 60%, transparent);
   --vpm-primary: var(--primary-color, #03a9f4);
-  --vpm-primary-2: var(--accent-color, #03a9f4);
-  --vpm-primary-soft: rgba(3,169,244,0.12);
-  --vpm-primary-border: rgba(3,169,244,0.4);
-  --vpm-success: #16A34A;
-  --vpm-warning: #D97706;
-  --vpm-error: #DC2626;
-  --vpm-pause: #0284C7;
+  --vpm-primary-2: var(--accent-color, var(--primary-color, #03a9f4));
+  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 35%, transparent);
+  --vpm-success: ${success};
+  --vpm-warning: ${warning};
+  --vpm-error: ${error};
+  --vpm-pause: ${pause};
   --vpm-info: var(--primary-color, #03a9f4);
-  --vpm-c-normal: #16A34A;
-  --vpm-c-sub: #B45309;
-  --vpm-c-cancel: #DC2626;
+  --vpm-c-normal: ${success};
+  --vpm-c-sub: ${warning};
+  --vpm-c-cancel: ${error};
   --vpm-c-current: var(--primary-color, #03a9f4);
-  --vpm-c-holiday: #D97706;
-  --vpm-tile-bg: #F5F5F5;
-  --vpm-tile-normal: #FFFFFF;
-  --vpm-tile-normal-color: #111827;
-  --vpm-tile-normal-border: #86C997;
-  --vpm-tile-sub: #FFFBEB;
-  --vpm-tile-sub-color: #7C4A00;
-  --vpm-tile-sub-border: #D4A017;
-  --vpm-tile-cancelled: #FEF2F2;
-  --vpm-tile-cancelled-color: #991B1B;
-  --vpm-tile-cancelled-border: #F87171;
-  --vpm-tile-current: #EFF6FF;
-  --vpm-tile-current-color: #1E3A8A;
+  --vpm-c-holiday: ${warning};
+  --vpm-tile-bg: var(--secondary-background-color, rgba(255,255,255,0.04));
+  --vpm-tile-normal: color-mix(in srgb, ${success} 10%, transparent);
+  --vpm-tile-normal-color: var(--primary-text-color, #fff);
+  --vpm-tile-normal-border: color-mix(in srgb, ${success} 30%, transparent);
+  --vpm-tile-sub: color-mix(in srgb, ${warning} 12%, transparent);
+  --vpm-tile-sub-color: color-mix(in srgb, ${warning} 90%, #fff);
+  --vpm-tile-sub-border: color-mix(in srgb, ${warning} 35%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, ${error} 12%, transparent);
+  --vpm-tile-cancelled-color: color-mix(in srgb, ${error} 80%, #fff);
+  --vpm-tile-cancelled-border: color-mix(in srgb, ${error} 40%, transparent);
+  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-tile-current-color: color-mix(in srgb, var(--primary-color, #03a9f4) 45%, #fff);
   --vpm-tile-current-border: var(--primary-color, #03a9f4);
-  --vpm-tile-empty: transparent;
-  --vpm-tile-empty-border: transparent;`;
+  --vpm-tile-empty: rgba(128,128,128,0.03);
+  --vpm-tile-empty-border: var(--divider-color, rgba(255,255,255,0.05));`;
   }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
@@ -1974,9 +1974,9 @@ ha-card {
 }
 /* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
 .vp-tile.vp-normal {
-  background: var(--vpm-tile-normal);
-  color: var(--vpm-tile-normal-color);
-  border-left: 3px solid var(--vpm-tile-normal-border);
+  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent);
+  color: var(--vpm-text);
+  border-left: 3px solid color-mix(in srgb, var(--vpm-c-normal) 55%, transparent);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
@@ -2148,8 +2148,8 @@ ha-card {
 .vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-tile-normal-color);
-  background: var(--vpm-tile-normal); border-radius: 8px;
+  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-text);
+  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
 .vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
@@ -2390,8 +2390,8 @@ class VpMobile24CurrentCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'ha_default';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
+    const n = (this._config && this._config.theme) || 'navy';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
   }
 
   static getStubConfig() {
@@ -2962,8 +2962,8 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'ha_default';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
+    const n = (this._config && this._config.theme) || 'navy';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
   }
 
   // ── Config form ──────────────────────────────────────────────────────────
