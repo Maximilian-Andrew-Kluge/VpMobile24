@@ -22,15 +22,27 @@ _LOGGER = logging.getLogger(__name__)
 def _looks_like_course_group(label: str) -> bool:
     """True if a label denotes a selectable parallel course group.
 
-    Matches per-teacher labels like "InfPA (Mn)" and numbered groups like
-    "la1"/"7INb1". Plain subjects ("MA", "EN") are not course groups.
+    Matches:
+    - Per-teacher labels like "InfPA (Mn)"
+    - Labels ending in a digit: "la1", "7INb1", "6cTC2"
+    - Labels starting with one or more digits followed by letters: "6acdSPA",
+      "6LRS", "67DaZ" (year-group prefixed courses)
+
+    Plain subjects ("MA", "EN", "PH") match none of the above.
     """
     label = (label or "").strip()
     if len(label) < 2:
         return False
+    # Per-teacher label "Course (Teacher)"
     if label.endswith(")") and "(" in label:
         return True
-    return label[-1].isdigit() and any(c.isalpha() for c in label)
+    # Ends with a digit and has letters: "la1", "7INb1", "6cTC2"
+    if label[-1].isdigit() and any(c.isalpha() for c in label):
+        return True
+    # Starts with digit(s) followed by letters: "6acdSPA", "6LRS", "67DaZ"
+    if label[0].isdigit() and any(c.isalpha() for c in label):
+        return True
+    return False
 
 
 def _course_selection_excludes(lesson: dict, selected_courses) -> bool:
@@ -648,10 +660,15 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                     continue
                                 if change_course and change_course not in student_courses:
                                     continue
+                                # No course field: try to resolve via base_schedule
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, change_course
                                 )
                                 if original_subject and original_subject in self.excluded_subjects:
+                                    continue
+                                # If no course and no original subject resolvable, and
+                                # selected_courses is active, skip phantom "---" entries
+                                if not change_course and not original_subject and self.selected_courses:
                                     continue
                             elif subject in self.excluded_subjects:
                                 continue

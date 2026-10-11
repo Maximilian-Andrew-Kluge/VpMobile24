@@ -446,7 +446,11 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                 return False
             if label.endswith(")") and "(" in label:
                 return True  # per-teacher label "Course (Teacher)"
-            return label[-1].isdigit() and any(c.isalpha() for c in label)
+            if label[-1].isdigit() and any(c.isalpha() for c in label):
+                return True  # ends with digit: "la1", "7INb1"
+            if label[0].isdigit() and any(c.isalpha() for c in label):
+                return True  # starts with digit: "6acdSPA", "6LRS"
+            return False
 
         def _selection_excludes(lesson: dict) -> bool:
             """True if lesson's course group was not selected (teacher-aware)."""

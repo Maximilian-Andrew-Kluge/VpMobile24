@@ -39,15 +39,12 @@ def _is_course_group(s: str) -> bool:
 
     Two signals mark a course group the user should opt into:
     1. A per-teacher course label like "InfPA (Mn)" — a course name with a
-       teacher abbreviation in parentheses (produced from the <Kurse> block).
-       This lets identically-named courses taught by different teachers be
-       selected separately.
-    2. A subject/course label ending in a group number, e.g. "la1", "ma2",
-       "7INb1", "789WB12" — ends with a digit AND contains a letter. This also
-       catches short upper-secondary courses like "la1".
+       teacher abbreviation in parentheses.
+    2. A label ending in a digit: "la1", "7INb1", "6cTC2".
+    3. A label starting with digit(s) followed by letters: "6acdSPA", "6LRS",
+       "67DaZ" — year-group prefixed courses.
 
-    Plain subjects like "EN", "MA", "PH" match neither, so they stay normal
-    subjects (default ON, uncheck to exclude).
+    Plain subjects like "EN", "MA", "PH" match none of the above.
     """
     s = (s or "").strip()
     if len(s) < 2:
@@ -55,7 +52,13 @@ def _is_course_group(s: str) -> bool:
     # Per-teacher label "Course (Teacher)"
     if s.endswith(")") and "(" in s:
         return True
-    return s[-1].isdigit() and any(c.isalpha() for c in s)
+    # Ends with a digit and has letters: "la1", "7INb1"
+    if s[-1].isdigit() and any(c.isalpha() for c in s):
+        return True
+    # Starts with digit(s) followed by letters: "6acdSPA", "6LRS", "67DaZ"
+    if s[0].isdigit() and any(c.isalpha() for c in s):
+        return True
+    return False
 
 
 async def _collect_selectable_labels(api, check_date: date, class_name: str) -> set[str]:
