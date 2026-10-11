@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.6
-console.info('%c VpMobile24-CARD %c v2.6.6 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.7
+console.info('%c VpMobile24-CARD %c v2.6.7 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -258,53 +258,50 @@ class VpMobile24Card extends HTMLElement {
     const warning = 'var(--warning-color, #F59E0B)';
     const error = 'var(--error-color, #DB4437)';
     const pause = 'var(--info-color, #38BDF8)';
-    // Tile-Basis: 10% des primären Textes gemischt in den Kartenhintergrund.
-    // Funktioniert in beiden Modi: hell (schwarz→leicht grau) und dunkel (weiß→leicht hell).
-    const tileBg = 'color-mix(in srgb, var(--primary-text-color, #212121) 10%, var(--card-background-color, #1c1c1c))';
     return `
-  --vpm-bg: var(--card-background-color, var(--ha-card-background, #1c1c1c));
-  --vpm-card: var(--card-background-color, var(--ha-card-background, #1c1c1c));
-  --vpm-surface: var(--secondary-background-color, rgba(128,128,128,0.08));
-  --vpm-elevated: var(--card-background-color, #1c1c1c);
-  --vpm-popup-bg: var(--card-background-color, #1c1c1c);
-  --vpm-border: var(--divider-color, rgba(128,128,128,0.2));
-  --vpm-border-strong: var(--divider-color, rgba(128,128,128,0.3));
-  --vpm-hairline: var(--divider-color, rgba(128,128,128,0.12));
-  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(128,128,128,0.2)));
-  --vpm-divider: var(--divider-color, rgba(128,128,128,0.12));
-  --vpm-hover: rgba(128,128,128,0.08);
+  --vpm-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --vpm-card: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --vpm-surface: var(--secondary-background-color, #f5f5f5);
+  --vpm-elevated: var(--card-background-color, #ffffff);
+  --vpm-popup-bg: var(--card-background-color, #ffffff);
+  --vpm-border: var(--divider-color, rgba(0,0,0,0.12));
+  --vpm-border-strong: var(--divider-color, rgba(0,0,0,0.18));
+  --vpm-hairline: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
+  --vpm-divider: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-hover: rgba(0,0,0,0.04);
   --vpm-shadow: var(--ha-card-box-shadow, none);
-  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,.4);
+  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.12);
   --vpm-header-bg: transparent;
   --vpm-text: var(--primary-text-color, #212121);
   --vpm-text-muted: var(--secondary-text-color, #727272);
-  --vpm-text-faint: color-mix(in srgb, var(--secondary-text-color, #727272) 70%, var(--card-background-color, #fff));
+  --vpm-text-faint: var(--disabled-text-color, #9e9e9e);
   --vpm-primary: var(--primary-color, #03a9f4);
-  --vpm-primary-2: var(--accent-color, var(--primary-color, #03a9f4));
-  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, var(--card-background-color, #fff));
-  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 40%, transparent);
-  --vpm-success: ${success};
-  --vpm-warning: ${warning};
-  --vpm-error: ${error};
-  --vpm-pause: ${pause};
+  --vpm-primary-2: var(--accent-color, #03a9f4);
+  --vpm-primary-soft: rgba(3,169,244,0.12);
+  --vpm-primary-border: rgba(3,169,244,0.4);
+  --vpm-success: #16A34A;
+  --vpm-warning: #D97706;
+  --vpm-error: #DC2626;
+  --vpm-pause: #0284C7;
   --vpm-info: var(--primary-color, #03a9f4);
-  --vpm-c-normal: var(--success-color, #22C55E);
-  --vpm-c-sub: var(--warning-color, #F59E0B);
-  --vpm-c-cancel: var(--error-color, #DB4437);
+  --vpm-c-normal: #16A34A;
+  --vpm-c-sub: #B45309;
+  --vpm-c-cancel: #DC2626;
   --vpm-c-current: var(--primary-color, #03a9f4);
-  --vpm-c-holiday: var(--warning-color, #F59E0B);
-  --vpm-tile-bg: ${tileBg};
-  --vpm-tile-normal: ${tileBg};
-  --vpm-tile-normal-color: var(--primary-text-color, #212121);
-  --vpm-tile-normal-border: color-mix(in srgb, var(--primary-text-color, #212121) 18%, transparent);
-  --vpm-tile-sub: color-mix(in srgb, var(--warning-color, #F59E0B) 22%, var(--card-background-color, #fff));
-  --vpm-tile-sub-color: var(--primary-text-color, #212121);
-  --vpm-tile-sub-border: color-mix(in srgb, var(--warning-color, #F59E0B) 65%, transparent);
-  --vpm-tile-cancelled: color-mix(in srgb, var(--error-color, #DB4437) 18%, var(--card-background-color, #fff));
-  --vpm-tile-cancelled-color: var(--primary-text-color, #212121);
-  --vpm-tile-cancelled-border: color-mix(in srgb, var(--error-color, #DB4437) 65%, transparent);
-  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 22%, var(--card-background-color, #fff));
-  --vpm-tile-current-color: var(--primary-text-color, #212121);
+  --vpm-c-holiday: #D97706;
+  --vpm-tile-bg: #F5F5F5;
+  --vpm-tile-normal: #FFFFFF;
+  --vpm-tile-normal-color: #111827;
+  --vpm-tile-normal-border: #86C997;
+  --vpm-tile-sub: #FFFBEB;
+  --vpm-tile-sub-color: #7C4A00;
+  --vpm-tile-sub-border: #D4A017;
+  --vpm-tile-cancelled: #FEF2F2;
+  --vpm-tile-cancelled-color: #991B1B;
+  --vpm-tile-cancelled-border: #F87171;
+  --vpm-tile-current: #EFF6FF;
+  --vpm-tile-current-color: #1E3A8A;
   --vpm-tile-current-border: var(--primary-color, #03a9f4);
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
