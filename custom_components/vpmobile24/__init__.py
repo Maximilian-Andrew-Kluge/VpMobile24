@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers import device_registry as dr
 from homeassistant.exceptions import ConfigEntryAuthFailed
 
@@ -744,17 +744,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             ) from auth_err
         except Exception as e:
             _LOGGER.error(f"Error updating data: {e}")
-            from datetime import date
-            today_str = date.today().isoformat()
-            return {
-                "lessons": [],
-                "changes": [],
-                "additional_info": [],
-                "date": today_str,
-                "timestamp": "",
-                "week_lessons": [],
-                "week_changes": []
-            }
+            raise UpdateFailed(f"Error updating VpMobile24 data: {e}") from e
 
     async def _async_update_holidays(self) -> None:
         """Fetch school holidays from ferien-api.de for the configured state."""
