@@ -1056,7 +1056,7 @@ class VpMobile24HolidaySensor(SensorEntity):
     def state(self) -> str:
         if self._current_holiday:
             return self._current_holiday.get("name", "Ferien")
-        return "Kein Ferien"
+        return "Keine Ferien"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
