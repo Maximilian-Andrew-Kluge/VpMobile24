@@ -193,7 +193,7 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 ### 🗓️ Stundenplan
 
 <div align="center">
-  <img src="docs/week-card.svg" alt="VpMobile24 Stundenplan-Karte" width="380"/>
+  <img src="docs/overview.png" alt="VpMobile24 Stundenplan-Karte" width="380"/>
 </div>
 
 Die Wochenkarte zeigt alle Stunden auf einen Blick – mit Vertretungen (gelb), Ausfällen (rot), der aktuellen Stunde (blau) und Tagesinfos direkt in der Tabelle.
