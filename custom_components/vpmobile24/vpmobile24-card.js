@@ -657,6 +657,23 @@ class VpMobile24Card extends HTMLElement {
         this._render();
       }
     }
+    // Start the Heute-time interval once
+    if (!this._timeInterval) {
+      this._timeInterval = setInterval(() => {
+        const el = this.shadowRoot && this.shadowRoot.getElementById('dcHeuteInline');
+        if (el && this._weekOffset === 0) {
+          const now = new Date();
+          const h = String(now.getHours()).padStart(2,'0');
+          const m = String(now.getMinutes()).padStart(2,'0');
+          const tObj = this._t;
+          const todayLabel = tObj ? tObj.today : 'Heute';
+          el.textContent = '· ' + todayLabel + ' · ' + h + ':' + m;
+          el.style.display = '';
+        } else if (el) {
+          el.style.display = 'none';
+        }
+      }, 60000);
+    }
   }
   get hass() { return this._hass; }
   getCardSize() { return 6; }
@@ -1674,7 +1691,6 @@ ha-card {
       headerCancelCount = nCancel;
       // Ausfälle wandern in eine Header-Pill (siehe unten); Vertretungen bleiben als Hint
       if (nSub > 0)    smartHints.push(`<span class="vp-hint vp-hint-yellow">${nSub}× ${t.sub}</span>`);
-      if (lastEnd)     smartHints.push(`<span class="vp-hint vp-hint-blue">${t.today}: ${lastEnd}</span>`);
     }
     // Next lesson — show during active lesson OR during pause/free time today
     if (todayIdx >= 0 && weekTable) {
@@ -1753,6 +1769,11 @@ ha-card {
 .vp-hdr-kw {
   font-size: .78em; font-weight: 600; color: var(--vpm-text-muted);
   white-space: nowrap;
+}
+.dc-heute-inline {
+  color: var(--vpm-primary, #4F7CFF);
+  font-weight: 600;
+  font-size: inherit;
 }
 /* Kompakte Ausfall-Pill im Header, neben dem Wochenstatus */
 .vp-hdr-ausfall {
@@ -2132,6 +2153,7 @@ ha-card {
 .vp-popup-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.65);
   z-index: 9998; backdrop-filter: blur(3px);
+  will-change: transform;
 }
 .vp-popup {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -2283,7 +2305,7 @@ ha-card {
         ${className ? `<span class="vp-hdr-class">${t.classLabel} ${className}</span>` : ''}
       </div>
       <div class="vp-hdr-sub">
-        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'} · ${headerDateStr}</span>
+        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'} · ${headerDateStr}${weekOffset === 0 ? ` <span class="dc-heute-inline" id="dcHeuteInline">· ${t.today} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</span>` : ''}</span>
         ${headerCancelCount > 0 ? `<span class="vp-hdr-ausfall">${headerCancelCount}× ${t.cancelled}</span>` : ''}
       </div>
     </div>
@@ -2334,6 +2356,10 @@ ha-card {
     // ── Restore popup if it was open before this render ──────────────────
     // NOTE: popup state is managed separately via _popupOpen/_popupData
     // _render() never restores popups — user must re-click to open them
+  }
+
+  disconnectedCallback() {
+    if (this._timeInterval) { clearInterval(this._timeInterval); this._timeInterval = null; }
   }
 }
 
