@@ -7,7 +7,7 @@
 <br/><br/>
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Version](https://img.shields.io/badge/Stable-v2.5.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+[![Version](https://img.shields.io/badge/Stable-v2.6.4-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
 [![Beta](https://img.shields.io/badge/Beta-v2.6.1-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
@@ -189,6 +189,24 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 ---
 
 ## 📸 Screenshots
+
+### 🗓️ Stundenplan
+
+<div align="center">
+  <img src="docs/week-card.png" alt="VpMobile24 Stundenplan-Karte" width="320"/>
+</div>
+
+Die Wochenkarte zeigt alle Stunden auf einen Blick – mit Vertretungen (gelb), Ausfällen (rot), der aktuellen Stunde (blau) und Tagesinfos direkt in der Tabelle.
+
+### 🏖️ Ferienansicht
+
+<div align="center">
+  <img src="docs/holiday-card.png" alt="VpMobile24 Ferienansicht" width="320"/>
+</div>
+
+Wenn Schulferien erkannt werden, zeigt die Karte automatisch den Feriennamen und das Enddatum – kein leerer Plan, kein Fehler.
+
+### Weitere Ansichten
 
 <table>
 <tr>
