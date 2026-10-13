@@ -1637,6 +1637,16 @@ ha-card {
       return Math.round((d - startW1) / 604800000) + 1;
     })();
 
+    // ── Header date string (e.g. "Di, 13.10." or "Mo, 20.10.") ─────────
+    const headerDateStr = (() => {
+      const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+      const locale = haLang === 'en' ? 'en-GB' : haLang === 'fr' ? 'fr-FR' : 'de-DE';
+      const d = weekOffset === 0 ? new Date(now) : new Date(monday);
+      const dayShort = d.toLocaleDateString(locale, { weekday: 'short' });
+      const dateStr  = d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
+      return dayShort + ', ' + dateStr;
+    })();
+
     // Smart hints: count today's substitutions & cancellations
     let smartHints = [];
     let headerCancelCount = 0;  // Ausfälle heute → kompakte Header-Pill
@@ -2273,7 +2283,7 @@ ha-card {
         ${className ? `<span class="vp-hdr-class">${t.classLabel} ${className}</span>` : ''}
       </div>
       <div class="vp-hdr-sub">
-        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'}</span>
+        <span class="vp-hdr-kw">KW ${kwNum} · ${weekOffset === 0 ? t.today.replace('Heute','') || 'Aktuell' : weekOffset === 1 ? t.nextWeek.replace(' →','') : t.nextWeek.replace(' →','') + '+'} · ${headerDateStr}</span>
         ${headerCancelCount > 0 ? `<span class="vp-hdr-ausfall">${headerCancelCount}× ${t.cancelled}</span>` : ''}
       </div>
     </div>
