@@ -1290,52 +1290,74 @@ ha-card {
   background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important; overflow: hidden;
   box-shadow: var(--vpm-shadow) !important;
-  border: 1px solid rgba(245,158,11,.3) !important;
+  border: 1px solid rgba(245,158,11,.22) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
 }
-.hol-wrap {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center;
-  padding: 40px 24px; min-height: 220px; gap: 12px;
-}
-.hol-icon { font-size: 3.5em; margin-bottom: 4px; color: var(--vpm-warning); }
-.hol-title { font-size: 1.6em; font-weight: 800; color: var(--vpm-warning); }
-.hol-sub { font-size: .9em; color: var(--vpm-text-muted); }
-.hol-next { font-size: .82em; color: var(--vpm-text-faint); margin-top: 8px; }
+/* ── Header ── */
 .hol-hdr {
-  display: flex; align-items: center; gap: 10px;
-  padding: 13px 16px 10px;
-  border-bottom: 1px solid rgba(245,158,11,.15);
-  background: rgba(245,158,11,.05);
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(245,158,11,.12);
 }
 .hol-hdr-icon {
-  width: 40px; height: 40px; flex-shrink: 0;
+  width: 42px; height: 42px; flex-shrink: 0;
   background: linear-gradient(135deg,#f59e0b,#d97706);
-  border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 1.2em;
+  border-radius: 11px; display: flex; align-items: center; justify-content: center;
 }
-.hol-hdr-title { font-size: 1.1em; font-weight: 800; color: var(--vpm-text); }
+.hol-hdr-body { display: flex; flex-direction: column; gap: 4px; }
+.hol-hdr-title { font-size: 1.05em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .hol-hdr-class {
+  display: inline-flex; align-items: center;
   font-size: .72em; font-weight: 700; color: var(--vpm-warning);
-  background: rgba(245,158,11,.13); border: 1px solid rgba(245,158,11,.25);
-  border-radius: 6px; padding: 2px 8px;
+  background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.22);
+  border-radius: 20px; padding: 2px 10px; width: fit-content;
+}
+/* ── Body ── */
+.hol-body {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 18px;
+}
+.hol-sun {
+  width: 56px; height: 56px; flex-shrink: 0;
+  background: rgba(245,158,11,.10);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  color: #f59e0b;
+}
+.hol-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.hol-name { font-size: 1.18em; font-weight: 800; color: #f59e0b; letter-spacing: -.01em; line-height: 1.2; }
+.hol-until {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .82em; font-weight: 500; color: var(--vpm-text-muted);
+}
+.hol-until-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+.hol-next {
+  font-size: .76em; color: var(--vpm-text-faint);
+  border-top: 1px solid rgba(245,158,11,.10);
+  padding: 10px 18px 12px;
 }
 </style>
 <ha-card>
   <div class="hol-hdr">
     <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
-    <div>
+    <div class="hol-hdr-body">
       <div class="hol-hdr-title">${title}</div>
       ${className ? `<span class="hol-hdr-class">${t.classLabel || 'Klasse'} ${className}</span>` : ''}
     </div>
   </div>
-  <div class="hol-wrap">
-    <div class="hol-icon"><svg viewBox="0 0 24 24" width="52" height="52" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01zM2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg></div>
-    <div class="hol-title">${holidayName}</div>
-    ${endDate ? `<div class="hol-sub">${untilStr} ${fmtDate(endDate)}</div>` : ''}
-    ${nextName && nextStart && !isHolidayFromSensor ? `<div class="hol-next">${nextStr}: ${nextName} ab ${fmtDate(nextStart)}</div>` : ''}
+  <div class="hol-body">
+    <div class="hol-sun" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+        <path d="M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7m0-2a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1m0 14a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1m9-9h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2M4 11H3a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2m15.07-6.07-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41M5.64 18.36l-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41m12.73 0a1 1 0 0 0-1.41 1.41l.71.71a1 1 0 0 0 1.41-1.41zm-13.45-14A1 1 0 1 0 3.51 5.77l.71.71a1 1 0 0 0 1.41-1.41z"/>
+      </svg>
+    </div>
+    <div class="hol-info">
+      <div class="hol-name">${holidayName}</div>
+      ${endDate ? `<div class="hol-until"><span class="hol-until-dot"></span>${untilStr} ${fmtDate(endDate)}</div>` : ''}
+    </div>
   </div>
+  ${nextName && nextStart && !isHolidayFromSensor ? `<div class="hol-next">${nextStr}: ${nextName} · ${fmtDate(nextStart)}</div>` : ''}
 </ha-card>`;
       return;
     }
