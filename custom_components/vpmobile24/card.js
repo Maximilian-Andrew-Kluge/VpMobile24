@@ -3255,6 +3255,12 @@ class VpMobile24MultiCard extends HTMLElement {
   // ── Main render ───────────────────────────────────────────────────────────
   _render() {
     if (!this._hass || !this._config) return;
+    const haLang = (this._hass && this._hass.language) ? this._hass.language.substring(0,2).toLowerCase() : 'de';
+    const fmtDate = (ds) => {
+      if (!ds) return '';
+      try { return new Date(ds).toLocaleDateString(haLang === 'en' ? 'en-GB' : haLang === 'fr' ? 'fr-FR' : 'de-DE', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+      catch(e) { return ds; }
+    };
     const mcTh = this._getTheme();
     const _hasTheme = !!(this._config && this._config.theme);
 
@@ -3284,13 +3290,6 @@ class VpMobile24MultiCard extends HTMLElement {
     const dayFull       = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
     const mc = this._getMcT();
 
-    // ── Auto-detect holiday entity from first entity's ID ─────────────
-    const firstEntityId = (this._config.entities || [])[0] || '';
-    const holidayEntityId = this._config.holiday_entity
-      || (firstEntityId ? firstEntityId.replace(/_week_table$/, '_ferien').replace(/_wochentabelle$/, '_ferien') : null);
-    const holidayEnt  = holidayEntityId ? this._hass.states[holidayEntityId] : null;
-    const isHoliday   = !!(holidayEnt && holidayEnt.attributes && holidayEnt.attributes.ist_ferien);
-    const holidayName = isHoliday ? (holidayEnt.state || 'Ferien') : '';
 
     const now       = new Date();
     const todayDow  = now.getDay();
@@ -3308,6 +3307,13 @@ class VpMobile24MultiCard extends HTMLElement {
       return cn.includes(this._search);
     });
 
+    const anyClassVisible = filtered.some(eid => {
+      const fEid = this._config['holiday_entity_' + eid]
+        || eid.replace(/_week_table$/, '_ferien').replace(/_wochentabelle$/, '_ferien');
+      const fEnt = this._hass.states[fEid];
+      return !(fEnt && fEnt.attributes && fEnt.attributes.ist_ferien);
+    });
+
     // Responsive columns CSS
     const colsMap = { '1':'1fr', '2':'repeat(2,1fr)', '3':'repeat(3,1fr)', 'auto':'repeat(auto-fill,minmax(320px,1fr))' };
     const gridCols = colsMap[colsCfg] || colsMap['auto'];
@@ -3320,6 +3326,14 @@ class VpMobile24MultiCard extends HTMLElement {
         sectionsHtml += `<div class="mc-section mc-error">Entity nicht gefunden: ${entityId}</div>`;
         continue;
       }
+      // Per-class holiday detection
+      const ferienEntityId = this._config['holiday_entity_' + entityId]
+        || entityId.replace(/_week_table$/, '_ferien').replace(/_wochentabelle$/, '_ferien');
+      const ferienEnt = this._hass.states[ferienEntityId] || null;
+      const classIsHoliday = !!(ferienEnt && ferienEnt.attributes && ferienEnt.attributes.ist_ferien);
+      const classHolidayName = classIsHoliday ? (ferienEnt.state || 'Ferien') : '';
+      const classHolidayEnd = classIsHoliday && ferienEnt.attributes && ferienEnt.attributes.end
+        ? ferienEnt.attributes.end : null;
       const weekTable  = this._getWeekTable(entity);
       const className  = this._className(entity, entityId);
       const isCollapsed = this._collapsed[entityId] !== undefined
@@ -3350,7 +3364,12 @@ class VpMobile24MultiCard extends HTMLElement {
       // Build the timetable grid for this class
       let gridHtml = '';
       if (!isCollapsed) {
-        if (!weekTable) {
+        if (classIsHoliday) {
+          gridHtml = `<div class="mc-holiday-row">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7m0-2a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1m0 14a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1m9-9h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2M4 11H3a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2m15.07-6.07-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41M5.64 18.36l-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41m12.73 0a1 1 0 0 0-1.41 1.41l.71.71a1 1 0 0 0 1.41-1.41zm-13.45-14A1 1 0 1 0 3.51 5.77l.71.71a1 1 0 0 0 1.41-1.41z"/></svg>
+      <span class="mc-holiday-text">${classHolidayName}${classHolidayEnd ? ' \u00b7 Bis ' + fmtDate(classHolidayEnd) : ''}</span>
+    </div>`;
+        } else if (!weekTable) {
           gridHtml = '<div class="mc-no-data">Keine Wochendaten verfügbar</div>';
         } else {
           // Collect periods that have at least one lesson (incl. period 0)
@@ -3462,9 +3481,12 @@ class VpMobile24MultiCard extends HTMLElement {
               ${nextBadge}
             </div>
             <div class="mc-section-stats">
-              ${nNormal ? `<span class="mc-stat" title="${mc.lesson}"><span class="mc-stat-dot" style="background:${PAL.success}"></span>${nNormal}</span>` : ''}
-              ${nSub    ? `<span class="mc-stat" title="${mc.subFull}"><span class="mc-stat-dot" style="background:${PAL.warning}"></span>${nSub}</span>` : ''}
-              ${nCancel ? `<span class="mc-stat" title="${mc.cancel}"><span class="mc-stat-dot" style="background:${PAL.error}"></span>${nCancel}</span>` : ''}
+              ${classIsHoliday
+                ? '<span class="mc-holiday-badge">Ferien</span>'
+                : `${nNormal ? `<span class="mc-stat" title="${mc.lesson}"><span class="mc-stat-dot" style="background:${PAL.success}"></span>${nNormal}</span>` : ''}
+                   ${nSub    ? `<span class="mc-stat" title="${mc.subFull}"><span class="mc-stat-dot" style="background:${PAL.warning}"></span>${nSub}</span>` : ''}
+                   ${nCancel ? `<span class="mc-stat" title="${mc.cancel}"><span class="mc-stat-dot" style="background:${PAL.error}"></span>${nCancel}</span>` : ''}`
+              }
             </div>
           </div>
           <div class="mc-section-body${isCollapsed ? ' hidden' : ''}">
@@ -3479,7 +3501,7 @@ class VpMobile24MultiCard extends HTMLElement {
 
     const weekLabel = `${mc.kw} ${kw}`;
 
-    const legendHtml = showLegend ? `
+    const legendHtml = (showLegend && anyClassVisible) ? `
       <div class="mc-legend">
         <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.success}"></span>${mc.lesson}</span>
         <span class="mc-leg-item"><span class="mc-leg-dot" style="background:${PAL.warning}"></span>${mc.subFull}</span>
@@ -3682,6 +3704,30 @@ ha-card {
 }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
 .vp-ausfall-block { color: var(--vpm-error); font-size: 1.3em; font-weight: 800; letter-spacing: 1px; text-align: center; padding: 28px 20px 12px; }
+/* Holiday row per class */
+.mc-holiday-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+  color: var(--vpm-warning, #F59E0B);
+  font-size: .88em; font-weight: 600;
+}
+.mc-holiday-text { color: var(--vpm-warning, #F59E0B); }
+.mc-holiday-badge {
+  font-size: .7em; font-weight: 700;
+  color: var(--vpm-warning, #F59E0B);
+  background: rgba(245,158,11,.12);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 20px; padding: 2px 8px;
+}
+/* All-holiday banner */
+.mc-all-holiday {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px 10px;
+  color: var(--vpm-warning, #F59E0B);
+  font-size: .9em; font-weight: 700;
+  border-bottom: 1px solid rgba(245,158,11,.15);
+  background: rgba(245,158,11,.05);
+}
 .hidden { display: none !important; }
 </style>
 <ha-card>
@@ -3697,7 +3743,10 @@ ha-card {
   </div>
 
   <!-- Holiday banner -->
-  ${isHoliday ? `<div style="margin:6px 16px 2px;padding:10px 14px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.30);border-radius:10px;display:flex;align-items:center;gap:8px;font-weight:700;color:var(--vpm-warning);font-size:.9em"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M13.13 14.56 14.7 13l-2.29-2.28c1.29-1.29 3.03-1.7 4.28-.86l.86-.86c-1.94-1.53-4.72-1.29-6.7.7L8.56 6.11 7 7.68zm4.95-9.05a10.08 10.08 0 0 0-3.7 2.35l7.06 7.06a10.08 10.08 0 0 0 2.35-3.7c1.05-2.83.5-5.7-1.34-7.54s-4.71-2.39-7.54-1.34c-.68.25-1.34.6-1.97 1.01M2.81 20.9a10.08 10.08 0 0 0 3.7-2.35L2.5 14.55l-1.51 1.51 2.29 2.29A10.4 10.4 0 0 0 2.81 20.9M3 22l4.4-1.6 12.6-12.6-2.8-2.8L4.6 17.6z"/></svg> ${holidayName}${holidayEnt && holidayEnt.attributes.end ? ' · ' + (mc.until || 'bis') + ' ' + new Date(holidayEnt.attributes.end).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : ''}</div>` : ''}
+  ${!anyClassVisible && filtered.length > 0 ? `<div class="mc-all-holiday">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7m0-2a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1m0 14a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1m9-9h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2M4 11H3a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2m15.07-6.07-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41M5.64 18.36l-.71.71a1 1 0 1 0 1.41 1.41l.71-.71a1 1 0 0 0-1.41-1.41m12.73 0a1 1 0 0 0-1.41 1.41l.71.71a1 1 0 0 0 1.41-1.41zm-13.45-14A1 1 0 1 0 3.51 5.77l.71.71a1 1 0 0 0 1.41-1.41z"/></svg>
+  <div class="mc-all-holiday-text">Alle Klassen haben aktuell Ferien</div>
+</div>` : ''}
 
   <!-- Class sections grid -->
   <div class="mc-sections-grid">
