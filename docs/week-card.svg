@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="860" viewBox="0 0 520 860">
+  <defs>
+    <linearGradient id="iconG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4F7CFF"/>
+      <stop offset="100%" stop-color="#6D8DFF"/>
+    </linearGradient>
+    <linearGradient id="todayG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4F7CFF"/>
+      <stop offset="100%" stop-color="#6D8DFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Card -->
+  <rect width="520" height="860" rx="18" fill="#111827"/>
+  <rect width="518" height="858" x="1" y="1" rx="17.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- ── HEADER ── -->
+  <!-- Icon -->
+  <rect x="14" y="14" width="44" height="44" rx="11" fill="url(#iconG)"/>
+  <g transform="translate(22,22) scale(1.17)">
+    <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z" fill="white"/>
+  </g>
+  <!-- Title + class -->
+  <text x="68" y="36" font-family="Inter,-apple-system,sans-serif" font-size="19" font-weight="800" fill="#F8FAFC">Stundenplan</text>
+  <rect x="68" y="43" width="76" height="20" rx="10" fill="rgba(79,124,255,0.15)" stroke="rgba(79,124,255,0.3)" stroke-width="1"/>
+  <text x="106" y="57" font-family="Inter,-apple-system,sans-serif" font-size="11.5" font-weight="700" fill="#93C5FD" text-anchor="middle">Klasse 10b</text>
+  <!-- KW line -->
+  <text x="68" y="74" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="500" fill="#64748B">KW 42 · Aktuell</text>
+  <!-- Next week button -->
+  <rect x="330" y="20" width="130" height="34" rx="17" fill="rgba(79,124,255,0.12)" stroke="rgba(79,124,255,0.3)" stroke-width="1"/>
+  <text x="395" y="41" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#93C5FD" text-anchor="middle">Nächste Woche →</text>
+  <!-- Reload button -->
+  <rect x="468" y="20" width="34" height="34" rx="17" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="485" y="41" font-family="Inter,-apple-system,sans-serif" font-size="16" fill="#94A3B8" text-anchor="middle">↺</text>
+
+  <!-- Heute pill -->
+  <rect x="14" y="84" width="100" height="22" rx="11" fill="rgba(79,124,255,0.12)" stroke="rgba(79,124,255,0.25)" stroke-width="1"/>
+  <circle cx="26" cy="95" r="4" fill="#4F7CFF"/>
+  <text x="35" y="99" font-family="Inter,-apple-system,sans-serif" font-size="11.5" font-weight="600" fill="#93C5FD">Heute: 13:30</text>
+
+  <!-- ── DIVIDER ── -->
+  <line x1="0" y1="114" x2="520" y2="114" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- ── COLUMN HEADERS ── -->
+  <!-- # col -->
+  <text x="28" y="138" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#475569" text-anchor="middle">#</text>
+
+  <!-- Day headers: MO DI MI DO FR -->
+  <!-- MO -->
+  <text x="112" y="130" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#64748B" text-anchor="middle">MO</text>
+  <text x="112" y="143" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#475569" text-anchor="middle">12</text>
+  <!-- DI (today) -->
+  <rect x="183" y="118" width="38" height="38" rx="19" fill="url(#todayG)"/>
+  <text x="202" y="133" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle">DI</text>
+  <text x="202" y="147" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="white" text-anchor="middle">13</text>
+  <!-- MI -->
+  <text x="292" y="130" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#64748B" text-anchor="middle">MI</text>
+  <text x="292" y="143" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#475569" text-anchor="middle">14</text>
+  <!-- DO -->
+  <text x="382" y="130" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#64748B" text-anchor="middle">DO</text>
+  <text x="382" y="143" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#475569" text-anchor="middle">15</text>
+  <!-- FR -->
+  <text x="472" y="130" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#64748B" text-anchor="middle">FR</text>
+  <text x="472" y="143" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#475569" text-anchor="middle">16</text>
+
+  <!-- Info pills row -->
+  <text x="28" y="170" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#475569" text-anchor="middle">ⓘ</text>
+  <rect x="80" y="158" width="70" height="20" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <text x="115" y="172" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#64748B" text-anchor="middle">Schulh…</text>
+  <rect x="168" y="158" width="70" height="20" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <text x="203" y="172" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#64748B" text-anchor="middle">Schulh…</text>
+
+  <!-- helper macro: tile(x,y,text,type) -->
+  <!-- type: n=normal, s=sub(amber), c=cancel(red), cur=current(blue), e=empty -->
+
+  <!-- ── ROW 1 · 07:45–08:30 ── -->
+  <text x="14" y="202" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">1</text>
+  <text x="14" y="215" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">07:45</text>
+  <text x="14" y="225" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">08:30</text>
+  <!-- MO: Mathematik (normal) -->
+  <rect x="50" y="185" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="192" r="4" fill="#22C55E"/>
+  <text x="89" y="207" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Mathe-</text>
+  <text x="89" y="222" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+  <!-- DI: Biologie (normal) -->
+  <rect x="168" y="185" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="238" cy="192" r="4" fill="#22C55E"/>
+  <text x="207" y="215" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Biologie</text>
+  <!-- MI: Deutsch -->
+  <rect x="258" y="185" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="328" cy="192" r="4" fill="#22C55E"/>
+  <text x="297" y="215" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Deutsch</text>
+  <!-- DO: Physik -->
+  <rect x="348" y="185" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="418" cy="192" r="4" fill="#22C55E"/>
+  <text x="387" y="215" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Physik</text>
+  <!-- FR: Biologie -->
+  <rect x="438" y="185" width="72" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="502" cy="192" r="4" fill="#22C55E"/>
+  <text x="474" y="215" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Biologie</text>
+
+  <!-- ── ROW 2 · 08:40–09:25 ── -->
+  <text x="14" y="256" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">2</text>
+  <text x="14" y="269" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">08:40</text>
+  <text x="14" y="279" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">09:25</text>
+  <rect x="50" y="243" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="250" r="4" fill="#22C55E"/>
+  <text x="89" y="271" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Deutsch</text>
+  <rect x="168" y="243" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="238" cy="250" r="4" fill="#22C55E"/>
+  <text x="207" y="263" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Mathe-</text>
+  <text x="207" y="278" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+  <rect x="258" y="243" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="328" cy="250" r="4" fill="#22C55E"/>
+  <text x="297" y="271" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Englisch</text>
+  <rect x="348" y="243" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="418" cy="250" r="4" fill="#22C55E"/>
+  <text x="387" y="263" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Ge-</text>
+  <text x="387" y="278" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">schichte</text>
+  <rect x="438" y="243" width="72" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="502" cy="250" r="4" fill="#22C55E"/>
+  <text x="474" y="263" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Mathe-</text>
+  <text x="474" y="278" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+
+  <!-- ── ROW 3 · 09:25–10:10 ── -->
+  <text x="14" y="312" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">3</text>
+  <text x="14" y="325" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">09:25</text>
+  <text x="14" y="335" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">10:10</text>
+  <rect x="50" y="299" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="306" r="4" fill="#22C55E"/>
+  <text x="89" y="328" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Englisch</text>
+  <rect x="168" y="299" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="238" cy="306" r="4" fill="#22C55E"/>
+  <text x="207" y="328" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Kunst</text>
+  <rect x="258" y="299" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="328" cy="306" r="4" fill="#22C55E"/>
+  <text x="297" y="328" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Sport</text>
+  <rect x="348" y="299" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="418" cy="306" r="4" fill="#22C55E"/>
+  <text x="387" y="328" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Deutsch</text>
+  <rect x="438" y="299" width="72" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="502" cy="306" r="4" fill="#22C55E"/>
+  <text x="474" y="321" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Infor-</text>
+  <text x="474" y="336" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+
+  <!-- Pause -->
+  <text x="260" y="367" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#475569" text-anchor="middle">Pause 10:10–10:30</text>
+
+  <!-- ── ROW 4 · 10:30–11:15 ── -->
+  <text x="14" y="394" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">4</text>
+  <text x="14" y="407" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">10:30</text>
+  <text x="14" y="417" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">11:15</text>
+  <rect x="50" y="381" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="388" r="4" fill="#22C55E"/>
+  <text x="89" y="410" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Physik</text>
+  <!-- DI empty -->
+  <rect x="168" y="381" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="258" y="381" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="328" cy="388" r="4" fill="#22C55E"/>
+  <text x="297" y="410" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Musik</text>
+  <rect x="348" y="381" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="418" cy="388" r="4" fill="#22C55E"/>
+  <text x="387" y="410" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Englisch</text>
+  <rect x="438" y="381" width="72" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="502" cy="388" r="4" fill="#22C55E"/>
+  <text x="474" y="410" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Sport</text>
+
+  <!-- ── ROW 5 · 11:25–12:10 ── -->
+  <text x="14" y="452" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">5</text>
+  <text x="14" y="465" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">11:25</text>
+  <text x="14" y="475" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">12:10</text>
+  <rect x="50" y="439" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="446" r="4" fill="#22C55E"/>
+  <text x="89" y="468" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Chemie</text>
+  <!-- DI: Informatik (normal) -->
+  <rect x="168" y="439" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="238" cy="446" r="4" fill="#22C55E"/>
+  <text x="207" y="461" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Infor-</text>
+  <text x="207" y="476" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+  <!-- MI: Mathematik -->
+  <rect x="258" y="439" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="328" cy="446" r="4" fill="#22C55E"/>
+  <text x="297" y="461" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Mathe-</text>
+  <text x="297" y="476" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">matik</text>
+  <!-- DO: Chemie (sub/Vertretung) -->
+  <rect x="348" y="439" width="78" height="52" rx="10" fill="rgba(245,158,11,0.10)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+  <circle cx="418" cy="446" r="4" fill="#F59E0B"/>
+  <text x="387" y="468" font-family="Inter,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#FCD34D" text-anchor="middle">Chemie</text>
+  <!-- FR: Kunst fällt aus (cancelled) -->
+  <rect x="438" y="439" width="72" height="52" rx="10" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.4)" stroke-width="1.5"/>
+  <circle cx="502" cy="446" r="4" fill="#EF4444"/>
+  <text x="474" y="458" font-family="Inter,-apple-system,sans-serif" font-size="11" font-weight="600" fill="#FCA5A5" text-anchor="middle">Kunst</text>
+  <text x="474" y="471" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#FCA5A5" text-anchor="middle">fällt</text>
+  <text x="474" y="483" font-family="Inter,-apple-system,sans-serif" font-size="10" fill="#FCA5A5" text-anchor="middle">aus</text>
+
+  <!-- Pause 2 -->
+  <text x="260" y="509" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#475569" text-anchor="middle">Pause 12:15–12:45</text>
+
+  <!-- ── ROW 6 · 12:45–13:30 ── -->
+  <text x="14" y="536" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">6</text>
+  <text x="14" y="549" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">12:45</text>
+  <text x="14" y="559" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">13:30</text>
+  <rect x="50" y="523" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="120" cy="530" r="4" fill="#22C55E"/>
+  <text x="89" y="545" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Ge-</text>
+  <text x="89" y="560" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">schichte</text>
+  <rect x="168" y="523" width="78" height="52" rx="10" fill="rgba(34,197,94,0.08)" stroke="rgba(34,197,94,0.3)" stroke-width="1"/>
+  <circle cx="238" cy="530" r="4" fill="#22C55E"/>
+  <text x="207" y="552" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#F8FAFC" text-anchor="middle">Religion</text>
+  <!-- MI DO FR empty -->
+  <rect x="258" y="523" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="348" y="523" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="438" y="523" width="72" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <!-- ── ROW 7 · 13:40–14:25 ── -->
+  <text x="14" y="594" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">7</text>
+  <text x="14" y="607" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">13:40</text>
+  <text x="14" y="617" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">14:25</text>
+  <rect x="50" y="581" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="168" y="581" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="258" y="581" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="348" y="581" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="438" y="581" width="72" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <!-- ── ROW 8 · 14:35–15:20 ── -->
+  <text x="14" y="652" font-family="Inter,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#F8FAFC">8</text>
+  <text x="14" y="665" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">14:35</text>
+  <text x="14" y="675" font-family="Inter,-apple-system,sans-serif" font-size="9" fill="#475569">15:20</text>
+  <rect x="50" y="639" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="168" y="639" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="258" y="639" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="348" y="639" width="78" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <rect x="438" y="639" width="72" height="52" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <!-- ── LEGEND ── -->
+  <line x1="0" y1="706" x2="520" y2="706" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <circle cx="24" cy="722" r="5" fill="#4F7CFF"/>
+  <text x="34" y="726" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#94A3B8">Heute</text>
+  <circle cx="104" cy="722" r="5" fill="#F59E0B"/>
+  <text x="114" y="726" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#94A3B8">Vertretung</text>
+  <circle cx="214" cy="722" r="5" fill="#EF4444"/>
+  <text x="224" y="726" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#94A3B8">Ausfall</text>
+  <circle cx="294" cy="722" r="5" fill="#4F7CFF"/>
+  <text x="304" y="726" font-family="Inter,-apple-system,sans-serif" font-size="11" fill="#94A3B8">Jetzt</text>
+</svg>

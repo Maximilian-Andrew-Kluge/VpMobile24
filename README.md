@@ -193,7 +193,7 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 ### 🗓️ Stundenplan
 
 <div align="center">
-  <img src="docs/week-card.png" alt="VpMobile24 Stundenplan-Karte" width="320"/>
+  <img src="docs/week-card.svg" alt="VpMobile24 Stundenplan-Karte" width="380"/>
 </div>
 
 Die Wochenkarte zeigt alle Stunden auf einen Blick – mit Vertretungen (gelb), Ausfällen (rot), der aktuellen Stunde (blau) und Tagesinfos direkt in der Tabelle.
@@ -201,7 +201,7 @@ Die Wochenkarte zeigt alle Stunden auf einen Blick – mit Vertretungen (gelb), 
 ### 🏖️ Ferienansicht
 
 <div align="center">
-  <img src="docs/holiday-card.png" alt="VpMobile24 Ferienansicht" width="320"/>
+  <img src="docs/holiday-card.svg" alt="VpMobile24 Ferienansicht" width="500"/>
 </div>
 
 Wenn Schulferien erkannt werden, zeigt die Karte automatisch den Feriennamen und das Enddatum – kein leerer Plan, kein Fehler.

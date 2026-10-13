@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="iconGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <clipPath id="card"><rect width="600" height="200" rx="16"/></clipPath>
+  </defs>
+
+  <!-- Card background -->
+  <rect width="600" height="200" rx="16" fill="#0D1220"/>
+  <rect width="598" height="198" x="1" y="1" rx="15.5" fill="none" stroke="#2A3550" stroke-width="1"/>
+
+  <!-- Header section -->
+  <rect width="600" height="96" rx="0" fill="#111827"/>
+  <rect width="600" height="96" rx="0" fill="none" stroke="none"/>
+  <!-- top corners -->
+  <rect width="16" height="16" fill="#0D1220"/>
+  <rect x="584" width="16" height="16" fill="#0D1220"/>
+  <rect width="600" height="96" rx="16" fill="#111827" clip-path="url(#topHalf)"/>
+
+  <!-- Simpler approach: two rows -->
+  <!-- Row 1: Header -->
+  <rect x="0" y="0" width="600" height="97" fill="#111827" rx="0"/>
+  <rect x="0" y="0" width="600" height="16" rx="16" fill="#111827"/>
+  <rect x="0" y="81" width="600" height="16" fill="#111827"/>
+
+  <!-- Divider -->
+  <line x1="0" y1="97" x2="600" y2="97" stroke="#1E2D4A" stroke-width="1"/>
+
+  <!-- Row 1: Calendar icon -->
+  <rect x="18" y="18" width="52" height="52" rx="13" fill="url(#iconGrad)"/>
+  <!-- Calendar icon SVG path scaled -->
+  <g transform="translate(29, 29) scale(1.25)">
+    <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z" fill="white"/>
+  </g>
+
+  <!-- Title -->
+  <text x="86" y="44" font-family="Inter, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#F8FAFC" letter-spacing="-0.3">Stundenplan</text>
+
+  <!-- Class badge -->
+  <rect x="86" y="53" width="84" height="24" rx="6" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+  <text x="128" y="69" font-family="Inter, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#F59E0B" text-anchor="middle">Klasse 09f</text>
+
+  <!-- Row 2: Holiday section -->
+  <rect x="0" y="97" width="600" height="103" fill="#0D1220" rx="0"/>
+  <rect x="0" y="181" width="600" height="19" rx="0" fill="#0D1220"/>
+  <rect x="0" y="181" width="600" height="19" rx="16" fill="#0D1220"/>
+
+  <!-- Sun icon background -->
+  <rect x="18" y="116" width="52" height="52" rx="13" fill="rgba(245,158,11,0.15)" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
+  <!-- Sun icon -->
+  <g transform="translate(29, 127) scale(1.25)">
+    <circle cx="12" cy="12" r="5" fill="none" stroke="#F59E0B" stroke-width="2"/>
+    <line x1="12" y1="2" x2="12" y2="5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="12" y1="19" x2="12" y2="22" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="2" y1="12" x2="5" y2="12" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="19" y1="12" x2="22" y2="12" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="4.9" y1="4.9" x2="7" y2="7" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="17" y1="17" x2="19.1" y2="19.1" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="4.9" y1="19.1" x2="7" y2="17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    <line x1="17" y1="7" x2="19.1" y2="4.9" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Holiday name -->
+  <text x="86" y="146" font-family="Inter, -apple-system, sans-serif" font-size="22" font-weight="800" fill="#F59E0B" letter-spacing="-0.3">Herbstferien Sachsen</text>
+
+  <!-- Until date -->
+  <circle cx="92" cy="165" r="5" fill="#F59E0B"/>
+  <text x="104" y="170" font-family="Inter, -apple-system, sans-serif" font-size="15" font-weight="500" fill="#94A3B8">Bis 24.10.2026</text>
+</svg>
