@@ -27,6 +27,14 @@ class VpMobile24Card extends HTMLElement {
     // Kein Pink/Magenta außerhalb von Dark Rose / Soft Rose.
     return {
       // ── SYSTEM THEME ─────────────────────────────────────────────────────
+      ha_default: {
+        name: 'HA Standard', category: 'System', light: null,
+        description: 'Folgt dem aktiven Home Assistant Theme automatisch',
+        keywords: 'Home Assistant · System · Automatisch',
+        bg: '', card: '', surface: '', elevated: '', primary: '', primary_2: '',
+        text: '', text_secondary: '', text_muted: '', border: '', shadow: '',
+        ha_mode: true,
+      },
       // ── DARK THEMES ──────────────────────────────────────────────────────
       navy: {
         name: 'Standard (Dunkel)', category: 'Dark', light: false,
@@ -171,10 +179,10 @@ class VpMobile24Card extends HTMLElement {
   // bereits konfigurierte Karten mit theme: dark_blue etc.).
   static get _THEME_ALIASES() {
     return {
-      ha: 'navy',
-      home_assistant: 'navy',
-      system: 'navy',
-      ha_default: 'navy',
+      ha: 'ha_default',
+      home_assistant: 'ha_default',
+      system: 'ha_default',
+      ha_default: 'ha_default',
       dark: 'graphite',
       dark_blue: 'ocean_blue',
       dark_purple: 'deep_purple',
@@ -209,12 +217,14 @@ class VpMobile24Card extends HTMLElement {
   static _themeSelectOptions() {
     const THEMES = VpMobile24Card._THEMES;
     const order = [
+      'ha_default',
       'navy', 'graphite', 'ocean_blue', 'deep_purple', 'forest_green',
       'ruby', 'sunset', 'deep_teal', 'dark_rose',
       'light', 'sky_blue', 'fresh_green', 'soft_purple', 'soft_rose', 'warm_orange',
     ];
     return order.map((id) => {
       const t = THEMES[id];
+      if (id === 'ha_default') return { value: id, label: 'HA Standard – folgt dem aktiven HA Theme' };
       const suffix = id === 'navy' ? ' (Standard)' : '';
       const cat = t.light ? 'Hell' : 'Dunkel';
       return { value: id, label: `${t.name}${suffix} – ${cat}` };
@@ -230,11 +240,78 @@ class VpMobile24Card extends HTMLElement {
   // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
   // dem Theme. Tile-Tokens werden daraus abgeleitet.
   static _themeVars(theme) {
+    if (theme.ha_mode) return VpMobile24Card._themeVarsHA();
     const light = !!theme.light;
     if (light) return VpMobile24Card._themeVarsLight(theme);
     return VpMobile24Card._themeVarsDark(theme);
   }
 
+
+  // ── HA Standard Theme (folgt dem aktiven HA Theme) ─────────────────────
+  // Layer 1: :host liest HA-Variablen mit sicheren Fallbacks ein (--ha-*).
+  // Layer 2: --vpm-* nutzen nur die --ha-*-Variablen, die auf :host definiert
+  //          und damit im Shadow DOM zuverlässig verfügbar sind.
+  // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
+  static _themeVarsHA() {
+    return `
+  /* Layer 1: HA-Variablen mit Fallbacks in den Shadow DOM einlesen */
+  --ha-primary-text: var(--primary-text-color, #212121);
+  --ha-secondary-text: var(--secondary-text-color, #727272);
+  --ha-card-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --ha-primary-color: var(--primary-color, #03a9f4);
+  --ha-divider: var(--divider-color, rgba(128,128,128,0.15));
+  --ha-success: var(--success-color, #4CAF50);
+  --ha-warning: var(--warning-color, #FF9800);
+  --ha-error: var(--error-color, #F44336);
+  /* Layer 2: --vpm-* aus den zuverlässigen --ha-*-Variablen */
+  --vpm-bg: var(--ha-card-bg);
+  --vpm-card: var(--ha-card-bg);
+  --vpm-surface: var(--secondary-background-color, rgba(128,128,128,0.08));
+  --vpm-elevated: var(--ha-card-bg);
+  --vpm-popup-bg: var(--ha-card-bg);
+  --vpm-border: var(--ha-divider);
+  --vpm-border-strong: var(--ha-divider);
+  --vpm-hairline: var(--ha-divider);
+  --vpm-card-border: var(--ha-card-border-color, var(--ha-divider));
+  --vpm-divider: var(--ha-divider);
+  --vpm-hover: rgba(128,128,128,0.06);
+  --vpm-shadow: var(--ha-card-box-shadow, none);
+  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.15);
+  --vpm-header-bg: transparent;
+  --vpm-text: var(--ha-primary-text);
+  --vpm-text-muted: var(--ha-secondary-text);
+  --vpm-text-faint: var(--ha-secondary-text);
+  --vpm-primary: var(--ha-primary-color);
+  --vpm-primary-2: var(--accent-color, var(--ha-primary-color));
+  --vpm-primary-soft: rgba(3,169,244,0.12);
+  --vpm-primary-border: rgba(3,169,244,0.35);
+  --vpm-success: var(--ha-success);
+  --vpm-warning: var(--ha-warning);
+  --vpm-error: var(--ha-error);
+  --vpm-pause: var(--info-color, #38BDF8);
+  --vpm-info: var(--ha-primary-color);
+  --vpm-c-normal: var(--ha-success);
+  --vpm-c-sub: var(--ha-warning);
+  --vpm-c-cancel: var(--ha-error);
+  --vpm-c-current: var(--ha-primary-color);
+  --vpm-c-holiday: var(--ha-warning);
+  /* Tiles: feste rgba()-Werte, kein color-mix() mit CSS-Variablen */
+  --vpm-tile-bg: rgba(128,128,128,0.08);
+  --vpm-tile-normal: rgba(128,128,128,0.08);
+  --vpm-tile-normal-color: var(--ha-primary-text);
+  --vpm-tile-normal-border: var(--ha-divider);
+  --vpm-tile-sub: rgba(255,152,0,0.12);
+  --vpm-tile-sub-color: var(--ha-primary-text);
+  --vpm-tile-sub-border: rgba(255,152,0,0.5);
+  --vpm-tile-cancelled: rgba(244,67,54,0.12);
+  --vpm-tile-cancelled-color: var(--ha-primary-text);
+  --vpm-tile-cancelled-border: rgba(244,67,54,0.5);
+  --vpm-tile-current: rgba(3,169,244,0.14);
+  --vpm-tile-current-color: var(--ha-primary-text);
+  --vpm-tile-current-border: var(--ha-primary-color);
+  --vpm-tile-empty: transparent;
+  --vpm-tile-empty-border: transparent;`;
+  }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
   static _themeVarsDark(theme) {
@@ -367,6 +444,10 @@ class VpMobile24Card extends HTMLElement {
 
   static _designTokens(theme, hasExplicitTheme) {
     // Radien + Motion sind theme-unabhängig.
+    // --ha-* lesen HA-CSS-Custom-Properties mit Fallbacks in den Shadow DOM
+    // ein, damit _themeVarsHA() darauf zugreifen kann (Shadow DOM erbt
+    // Custom Properties von Light-DOM-Vorfahren; das Umdefinieren auf :host
+    // macht sie zuverlässig auch in jedem Browser verfügbar).
     const shared = `
   --vpm-radius-card: 20px;
   --vpm-radius-popup: 20px;
@@ -374,7 +455,15 @@ class VpMobile24Card extends HTMLElement {
   --vpm-radius-tile: 10px;
   --vpm-radius-btn: 11px;
   --vpm-radius-pill: 999px;
-  --vpm-t-fast: 150ms; --vpm-t-hover: 180ms; --vpm-t-theme: 200ms;`;
+  --vpm-t-fast: 150ms; --vpm-t-hover: 180ms; --vpm-t-theme: 200ms;
+  --ha-primary-text: var(--primary-text-color, #212121);
+  --ha-secondary-text: var(--secondary-text-color, #727272);
+  --ha-card-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --ha-primary-color: var(--primary-color, #03a9f4);
+  --ha-divider: var(--divider-color, rgba(128,128,128,0.15));
+  --ha-success: var(--success-color, #4CAF50);
+  --ha-warning: var(--warning-color, #FF9800);
+  --ha-error: var(--error-color, #F44336);`;
 
     const THEMES = VpMobile24Card._THEMES;
 
@@ -1956,9 +2045,9 @@ ha-card {
 }
 /* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
 .vp-tile.vp-normal {
-  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent);
-  color: var(--vpm-text);
-  border-left: 3px solid color-mix(in srgb, var(--vpm-c-normal) 55%, transparent);
+  background: var(--vpm-tile-normal);
+  color: var(--vpm-tile-normal-color);
+  border-left: 3px solid var(--vpm-tile-normal-border);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
@@ -2130,8 +2219,8 @@ ha-card {
 .vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-text);
-  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent); border-radius: 8px;
+  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-tile-normal-color);
+  background: var(--vpm-tile-normal); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
 .vp-mob-meta { font-size: .72em; font-weight: 400; opacity: 0.7; margin-top: 2px; }
