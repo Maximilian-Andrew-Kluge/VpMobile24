@@ -1990,7 +1990,7 @@ ha-card {
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   transition: background .15s, transform .15s, box-shadow .15s;
-  background: color-mix(in srgb, var(--vpm-tile-bg) 55%, transparent);
+  background: transparent;
   border: 1px solid var(--vpm-hairline);
   line-height: 1.2; text-align: center;
   /* Text darf die feste Zellengröße niemals verändern: fester Höhenrahmen +
@@ -2045,17 +2045,17 @@ ha-card {
 }
 /* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
 .vp-tile.vp-normal {
-  background: var(--vpm-tile-normal);
-  color: var(--vpm-tile-normal-color);
+  background: var(--vpm-tile-normal) !important;
+  color: var(--vpm-tile-normal-color) !important;
   border-left: 3px solid var(--vpm-tile-normal-border);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
 /* VERTRETUNG: leichte amber-Tönung + linker Rand + Punkt */
 .vp-tile.vp-sub {
-  background: rgba(245,158,11,0.10);
-  color: var(--vpm-tile-sub-color);
-  border: 1px solid rgba(245,158,11,0.18);
+  background: var(--vpm-tile-sub) !important;
+  color: var(--vpm-tile-sub-color) !important;
+  border: 1px solid var(--vpm-tile-sub-border);
   border-left: 3px solid var(--vpm-c-sub);
   font-weight: 700;
 }
@@ -2114,16 +2114,15 @@ ha-card {
 }
 /* AUSFALL: dezente rote Tönung, linker Rand, Punkt — kein knallrotes Rechteck */
 .vp-tile.vp-cancelled {
-  background: rgba(239,68,68,0.10);
-  color: var(--vpm-tile-cancelled-color);
-  border: 1px solid rgba(239,68,68,0.2);
+  background: var(--vpm-tile-cancelled) !important;
+  color: var(--vpm-tile-cancelled-color) !important;
+  border: 1px solid var(--vpm-tile-cancelled-border);
   border-left: 3px solid var(--vpm-c-cancel);
   font-weight: 700;
-  /* Ausfalltext etwas kleiner, damit lange Meldungen in ~3 Zeilen passen */
   font-size: .82em; line-height: 1.15;
 }
 .vp-tile.vp-cancelled::after { background: var(--vpm-c-cancel); }
-.vp-today-col .vp-tile.vp-cancelled { background: rgba(239,68,68,0.15); }
+.vp-today-col .vp-tile.vp-cancelled { background: var(--vpm-tile-cancelled) !important; }
 /* AKTUELLE STUNDE: klar hervorgehoben, dezenter blauer Glow (kein Überglühen) */
 .vp-tile.vp-current {
   background: linear-gradient(135deg, rgba(79,124,255,0.22), rgba(109,93,251,0.18)) !important;
