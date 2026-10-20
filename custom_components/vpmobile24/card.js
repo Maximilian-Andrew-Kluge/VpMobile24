@@ -278,9 +278,9 @@ class VpMobile24Card extends HTMLElement {
   --vpm-shadow: var(--ha-card-box-shadow, none);
   --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.15);
   --vpm-header-bg: transparent;
-  --vpm-text: var(--ha-primary-text);
-  --vpm-text-muted: var(--ha-secondary-text);
-  --vpm-text-faint: var(--ha-secondary-text);
+  --vpm-text: var(--primary-text-color, #212121);
+  --vpm-text-muted: var(--secondary-text-color, #616161);
+  --vpm-text-faint: var(--secondary-text-color, #9e9e9e);
   --vpm-primary: var(--ha-primary-color);
   --vpm-primary-2: var(--accent-color, var(--ha-primary-color));
   --vpm-primary-soft: rgba(3,169,244,0.12);
@@ -2023,8 +2023,12 @@ ha-card {
   max-width: 100%;
 }
 .vp-tile.vp-empty {
-  background: transparent;
-  border: 1px solid transparent;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: transparent;
+  cursor: default;
+  pointer-events: none;
+}
   color: transparent;
 }
 .vp-tile-class {
