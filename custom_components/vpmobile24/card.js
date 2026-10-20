@@ -295,19 +295,19 @@ class VpMobile24Card extends HTMLElement {
   --vpm-c-cancel: var(--ha-error);
   --vpm-c-current: var(--ha-primary-color);
   --vpm-c-holiday: var(--ha-warning);
-  /* Tiles: feste rgba()-Werte, kein color-mix() mit CSS-Variablen */
-  --vpm-tile-bg: rgba(128,128,128,0.08);
-  --vpm-tile-normal: rgba(128,128,128,0.08);
-  --vpm-tile-normal-color: var(--ha-primary-text);
-  --vpm-tile-normal-border: var(--ha-divider);
-  --vpm-tile-sub: rgba(255,152,0,0.12);
-  --vpm-tile-sub-color: var(--ha-primary-text);
-  --vpm-tile-sub-border: rgba(255,152,0,0.5);
-  --vpm-tile-cancelled: rgba(244,67,54,0.12);
-  --vpm-tile-cancelled-color: var(--ha-primary-text);
-  --vpm-tile-cancelled-border: rgba(244,67,54,0.5);
-  --vpm-tile-current: rgba(3,169,244,0.14);
-  --vpm-tile-current-color: var(--ha-primary-text);
+  /* Tiles: ausreichend Kontrast in beiden HA-Modi (hell + dunkel) */
+  --vpm-tile-bg: rgba(128,128,128,0.12);
+  --vpm-tile-normal: rgba(128,128,128,0.12);
+  --vpm-tile-normal-color: #1a1a1a;
+  --vpm-tile-normal-border: rgba(0,0,0,0.25);
+  --vpm-tile-sub: rgba(255,152,0,0.20);
+  --vpm-tile-sub-color: #6b3a00;
+  --vpm-tile-sub-border: rgba(255,152,0,0.6);
+  --vpm-tile-cancelled: rgba(244,67,54,0.18);
+  --vpm-tile-cancelled-color: #7f1111;
+  --vpm-tile-cancelled-border: rgba(244,67,54,0.6);
+  --vpm-tile-current: rgba(3,169,244,0.18);
+  --vpm-tile-current-color: #003d5c;
   --vpm-tile-current-border: var(--ha-primary-color);
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
