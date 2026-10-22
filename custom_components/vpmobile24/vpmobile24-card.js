@@ -3094,6 +3094,10 @@ class VpMobile24MultiCard extends HTMLElement {
     };
   }
 
+  disconnectedCallback() {
+    if (this._nextWeekRetry) { clearTimeout(this._nextWeekRetry); this._nextWeekRetry = null; }
+  }
+
   setConfig(config) {
     if (!config || !config.entities || !Array.isArray(config.entities) || !config.entities.length)
       throw new Error('Mindestens eine Entity erforderlich');
@@ -3200,9 +3204,24 @@ class VpMobile24MultiCard extends HTMLElement {
 
   _getWeekTable(entity) {
     if (!entity || !entity.attributes) return null;
-    return this._weekOffset === 1
-      ? entity.attributes.next_week_table || null
-      : entity.attributes.week_table || null;
+    if (this._weekOffset === 2) return entity.attributes.next_next_week_table || null;
+    if (this._weekOffset === 1) {
+      const tbl = entity.attributes.next_week_table || null;
+      // If next_week_table is missing but week_table exists, the sensor may not have
+      // loaded next week data yet (e.g. HA app reconnecting). Schedule a retry render.
+      if (!tbl && entity.attributes.week_table) {
+        if (!this._nextWeekRetry) {
+          this._nextWeekRetry = setTimeout(() => {
+            this._nextWeekRetry = null;
+            if (this._weekOffset === 1) this._render();
+          }, 3000);
+        }
+      } else {
+        if (this._nextWeekRetry) { clearTimeout(this._nextWeekRetry); this._nextWeekRetry = null; }
+      }
+      return tbl;
+    }
+    return entity.attributes.week_table || null;
   }
 
   _mondayOfWeek(offset) {
@@ -3498,7 +3517,12 @@ class VpMobile24MultiCard extends HTMLElement {
       <span class="mc-holiday-text">${classHolidayName}${classHolidayEnd ? ' \u00b7 Bis ' + fmtDate(classHolidayEnd) : ''}</span>
     </div>`;
         } else if (!weekTable) {
-          gridHtml = '<div class="mc-no-data">Keine Wochendaten verfügbar</div>';
+          // Show loading hint with retry info instead of generic "no data"
+          const isNextWeek = this._weekOffset >= 1;
+          gridHtml = `<div class="mc-no-data mc-loading-hint">
+            ${isNextWeek ? '⏳ Daten für nächste Woche werden geladen…' : 'Keine Wochendaten verfügbar'}
+            ${isNextWeek ? '<br><small>Wird automatisch aktualisiert.</small>' : ''}
+          </div>`;
         } else {
           // Collect periods that have at least one lesson (incl. period 0)
           const maxPeriod = 10;
