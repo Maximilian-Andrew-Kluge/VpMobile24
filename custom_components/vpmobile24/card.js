@@ -1477,10 +1477,14 @@ ha-card {
 
     // If next/next_next week data not yet available, show loading state
     if (weekOffset >= 1 && !weekTable) {
-      this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style><ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card)"><div style="padding:32px 20px;text-align:center;color:var(--vpm-text-muted);font-family:'Inter',-apple-system,sans-serif">
-        <div style="font-weight:600;color:var(--vpm-text);margin-bottom:6px">${t.nextWeek}</div>
-        <div style="font-size:.85em">Daten werden geladen…</div>
-      </div></ha-card>`;
+      this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style>
+<ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card);border:1px solid var(--vpm-card-border)">
+  <div style="padding:32px 20px;text-align:center;font-family:'Inter',-apple-system,sans-serif">
+    <div style="font-weight:700;font-size:1em;color:#212121;margin-bottom:8px">${t.nextWeek}</div>
+    <div style="font-size:.85em;color:#616161">Daten werden geladen…</div>
+    <div style="font-size:.78em;color:#9e9e9e;margin-top:6px">Bitte kurz warten oder Reload-Button drücken.</div>
+  </div>
+</ha-card>`;
       return;
     }
 
