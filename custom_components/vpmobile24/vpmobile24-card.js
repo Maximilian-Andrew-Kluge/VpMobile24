@@ -306,11 +306,11 @@ class VpMobile24Card extends HTMLElement {
   /* HA Standard Dark-Overrides — im :host eingebettet via _designTokens */
   static _themeVarsHADark() {
     return `
-  --vpm-bg: #0B0F19;
-  --vpm-card: #111827;
-  --vpm-surface: #151C2B;
-  --vpm-elevated: #1A2233;
-  --vpm-popup-bg: #111827;
+  --vpm-bg: #1d1d1d;
+  --vpm-card: #1d1d1d;
+  --vpm-surface: #252525;
+  --vpm-elevated: #2a2a2a;
+  --vpm-popup-bg: #1d1d1d;
   --vpm-border: rgba(255,255,255,0.07);
   --vpm-border-strong: rgba(255,255,255,0.12);
   --vpm-hairline: rgba(255,255,255,0.06);
