@@ -351,7 +351,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-tile-current-color: #BAE6FD;
   --vpm-tile-current-border: #03a9f4;
   --vpm-tile-empty: rgba(255,255,255,0.02);
-  --vpm-tile-empty-border: rgba(255,255,255,0.05);
+  --vpm-tile-empty-border: rgba(255,255,255,0.05);`;
   }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
