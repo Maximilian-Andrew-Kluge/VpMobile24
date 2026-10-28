@@ -666,10 +666,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                 )
                                 if original_subject and original_subject in self.excluded_subjects:
                                     continue
-                                # If no course and no original subject resolvable, and
-                                # selected_courses is active, skip phantom "---" entries
-                                if not change_course and not original_subject and self.selected_courses:
-                                    continue
                             elif subject in self.excluded_subjects:
                                 continue
 
