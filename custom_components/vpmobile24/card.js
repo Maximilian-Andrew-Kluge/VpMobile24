@@ -337,8 +337,8 @@ class VpMobile24Card extends HTMLElement {
   --vpm-c-cancel: #EF4444;
   --vpm-c-current: #03a9f4;
   --vpm-c-holiday: #F59E0B;
-  --vpm-tile-bg: #1A2233;
-  --vpm-tile-normal: rgba(34,197,94,0.10);
+  --vpm-tile-bg: #2a2a2a;
+  --vpm-tile-normal: #2a2a2a;
   --vpm-tile-normal-color: #F8FAFC;
   --vpm-tile-normal-border: rgba(34,197,94,0.30);
   --vpm-tile-sub: rgba(245,158,11,0.12);
