@@ -254,12 +254,12 @@ class VpMobile24Card extends HTMLElement {
   // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
   static _themeVarsHA() {
     return `
-  /* HA Standard: Light-Werte als Default */
+  /* HA Standard: Light-Werte als Default, nutzt aufgelöste HA-Farben wenn verfügbar */
   --vpm-bg: #f5f5f5;
-  --vpm-card: #ffffff;
+  --vpm-card: var(--ha-resolved-card-bg, #ffffff);
   --vpm-surface: #f0f0f0;
-  --vpm-elevated: #ffffff;
-  --vpm-popup-bg: #ffffff;
+  --vpm-elevated: var(--ha-resolved-card-bg, #ffffff);
+  --vpm-popup-bg: var(--ha-resolved-card-bg, #ffffff);
   --vpm-border: rgba(0,0,0,0.12);
   --vpm-border-strong: rgba(0,0,0,0.20);
   --vpm-hairline: rgba(0,0,0,0.08);
@@ -269,22 +269,22 @@ class VpMobile24Card extends HTMLElement {
   --vpm-shadow: none;
   --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.15);
   --vpm-header-bg: transparent;
-  --vpm-text: #212121;
+  --vpm-text: var(--ha-resolved-text, #212121);
   --vpm-text-muted: #616161;
   --vpm-text-faint: #9e9e9e;
-  --vpm-primary: #03a9f4;
-  --vpm-primary-2: #0288d1;
+  --vpm-primary: var(--ha-resolved-primary, #03a9f4);
+  --vpm-primary-2: var(--ha-resolved-primary, #0288d1);
   --vpm-primary-soft: rgba(3,169,244,0.12);
   --vpm-primary-border: rgba(3,169,244,0.35);
   --vpm-success: #4CAF50;
   --vpm-warning: #FF9800;
   --vpm-error: #F44336;
   --vpm-pause: #0284C7;
-  --vpm-info: #03a9f4;
+  --vpm-info: var(--ha-resolved-primary, #03a9f4);
   --vpm-c-normal: #16A34A;
   --vpm-c-sub: #B45309;
   --vpm-c-cancel: #DC2626;
-  --vpm-c-current: #03a9f4;
+  --vpm-c-current: var(--ha-resolved-primary, #03a9f4);
   --vpm-c-holiday: #D97706;
   --vpm-tile-bg: #FFFFFF;
   --vpm-tile-normal: #FFFFFF;
@@ -298,7 +298,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-tile-cancelled-border: #F87171;
   --vpm-tile-current: #EFF6FF;
   --vpm-tile-current-color: #1E3A8A;
-  --vpm-tile-current-border: #03a9f4;
+  --vpm-tile-current-border: var(--ha-resolved-primary, #03a9f4);
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
   }
@@ -779,6 +779,20 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    // Wenn ha_default Theme aktiv: HA-Farben aus dem Light DOM auslesen und
+    // als CSS-Variablen auf :host setzen, damit sie im Shadow DOM verfügbar sind.
+    if (this._config && this._config.theme === 'ha_default') {
+      try {
+        const styles = window.getComputedStyle(document.documentElement);
+        const primary = styles.getPropertyValue('--primary-color').trim();
+        const cardBg  = styles.getPropertyValue('--card-background-color').trim()
+                     || styles.getPropertyValue('--ha-card-background').trim();
+        const textCol = styles.getPropertyValue('--primary-text-color').trim();
+        if (primary)  this.style.setProperty('--ha-resolved-primary', primary);
+        if (cardBg)   this.style.setProperty('--ha-resolved-card-bg', cardBg);
+        if (textCol)  this.style.setProperty('--ha-resolved-text', textCol);
+      } catch(e) {}
+    }
     if (this._config) {
       const dow = new Date().getDay();
       // Auto-switch to next week on weekends — but only if user hasn't navigated manually
