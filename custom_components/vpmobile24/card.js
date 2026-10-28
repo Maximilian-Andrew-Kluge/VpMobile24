@@ -254,16 +254,7 @@ class VpMobile24Card extends HTMLElement {
   // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
   static _themeVarsHA() {
     return `
-  /* Layer 1: HA-Variablen mit Fallbacks in den Shadow DOM einlesen */
-  --ha-primary-text: var(--primary-text-color, #212121);
-  --ha-secondary-text: var(--secondary-text-color, #727272);
-  --ha-card-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
-  --ha-primary-color: var(--primary-color, #03a9f4);
-  --ha-divider: var(--divider-color, rgba(128,128,128,0.15));
-  --ha-success: var(--success-color, #4CAF50);
-  --ha-warning: var(--warning-color, #FF9800);
-  --ha-error: var(--error-color, #F44336);
-  /* Layer 2: --vpm-* aus den zuverlässigen --ha-*-Variablen */
+  /* HA Standard: Light-Werte als Default */
   --vpm-bg: #f5f5f5;
   --vpm-card: #ffffff;
   --vpm-surface: #f0f0f0;
@@ -275,7 +266,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-card-border: rgba(0,0,0,0.12);
   --vpm-divider: rgba(0,0,0,0.08);
   --vpm-hover: rgba(0,0,0,0.04);
-  --vpm-shadow: var(--ha-card-box-shadow, none);
+  --vpm-shadow: none;
   --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.15);
   --vpm-header-bg: transparent;
   --vpm-text: #212121;
@@ -295,7 +286,6 @@ class VpMobile24Card extends HTMLElement {
   --vpm-c-cancel: #DC2626;
   --vpm-c-current: #03a9f4;
   --vpm-c-holiday: #D97706;
-  /* Tiles: identisch zu Standard (Hell) Theme für konsistentes Aussehen */
   --vpm-tile-bg: #FFFFFF;
   --vpm-tile-normal: #FFFFFF;
   --vpm-tile-normal-color: #111827;
@@ -311,6 +301,57 @@ class VpMobile24Card extends HTMLElement {
   --vpm-tile-current-border: #03a9f4;
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
+  }
+
+  /* HA Standard Dark-Overrides — im :host eingebettet via _designTokens */
+  static _themeVarsHADark() {
+    return `
+  --vpm-bg: #0B0F19;
+  --vpm-card: #111827;
+  --vpm-surface: #151C2B;
+  --vpm-elevated: #1A2233;
+  --vpm-popup-bg: #111827;
+  --vpm-border: rgba(255,255,255,0.07);
+  --vpm-border-strong: rgba(255,255,255,0.12);
+  --vpm-hairline: rgba(255,255,255,0.06);
+  --vpm-card-border: rgba(255,255,255,0.07);
+  --vpm-divider: rgba(255,255,255,0.06);
+  --vpm-hover: rgba(255,255,255,0.04);
+  --vpm-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  --vpm-shadow-popup: 0 20px 60px rgba(0,0,0,0.4);
+  --vpm-header-bg: transparent;
+  --vpm-text: #F8FAFC;
+  --vpm-text-muted: #94A3B8;
+  --vpm-text-faint: #64748B;
+  --vpm-primary: #03a9f4;
+  --vpm-primary-2: #0288d1;
+  --vpm-primary-soft: rgba(3,169,244,0.16);
+  --vpm-primary-border: rgba(3,169,244,0.35);
+  --vpm-success: #22C55E;
+  --vpm-warning: #F59E0B;
+  --vpm-error: #EF4444;
+  --vpm-pause: #38BDF8;
+  --vpm-info: #03a9f4;
+  --vpm-c-normal: #22C55E;
+  --vpm-c-sub: #F59E0B;
+  --vpm-c-cancel: #EF4444;
+  --vpm-c-current: #03a9f4;
+  --vpm-c-holiday: #F59E0B;
+  --vpm-tile-bg: #1A2233;
+  --vpm-tile-normal: rgba(34,197,94,0.10);
+  --vpm-tile-normal-color: #F8FAFC;
+  --vpm-tile-normal-border: rgba(34,197,94,0.30);
+  --vpm-tile-sub: rgba(245,158,11,0.12);
+  --vpm-tile-sub-color: #FCD34D;
+  --vpm-tile-sub-border: rgba(245,158,11,0.35);
+  --vpm-tile-cancelled: rgba(239,68,68,0.12);
+  --vpm-tile-cancelled-color: #FCA5A5;
+  --vpm-tile-cancelled-border: rgba(239,68,68,0.40);
+  --vpm-tile-current: rgba(3,169,244,0.14);
+  --vpm-tile-current-color: #BAE6FD;
+  --vpm-tile-current-border: #03a9f4;
+  --vpm-tile-empty: rgba(255,255,255,0.02);
+  --vpm-tile-empty-border: rgba(255,255,255,0.05);
   }
 
   // ── Dark-Zweig (unverändert) ─────────────────────────────────────────────
@@ -469,6 +510,11 @@ class VpMobile24Card extends HTMLElement {
 
     // Explizites Theme gewählt → dessen Palette fest anwenden.
     if (hasExplicitTheme && theme) {
+      if (theme.ha_mode) {
+        // HA Standard: Light als Default, Dark per Media Query
+        return `:host{${shared}${VpMobile24Card._themeVarsHA()}}
+@media (prefers-color-scheme: dark){ :host{${VpMobile24Card._themeVarsHADark()}} }`;
+      }
       return `:host{${shared}${VpMobile24Card._themeVars(theme)}}`;
     }
 
