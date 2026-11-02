@@ -688,7 +688,7 @@ class VpMobile24Card extends HTMLElement {
 
         // ── Header & Anzeige (ausgeklappt) ────────────────────────────────
         { name: "show_header", default: true, selector: { boolean: {} } },
-        { name: "theme", default: "navy", selector: { select: { options: [
+        { name: "theme", default: "ha_default", selector: { select: { options: [
           ...VpMobile24Card._themeSelectOptions(),
         ] } } },
         { type: "expandable", name: "header_settings", title: st.header_settings, collapsed: false,
@@ -2559,7 +2559,7 @@ class VpMobile24CurrentCard extends HTMLElement {
         { name: 'next_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
         { name: 'week_entity', required: false, selector: { entity: { filter: [{ integration: 'vpmobile24' }] } } },
         { name: 'title',       default: 'Aktueller Unterricht', selector: { text: { type: 'text' } } },
-        { name: 'theme', default: 'navy', selector: { select: { options: [
+        { name: 'theme', default: 'ha_default', selector: { select: { options: [
           ...VpMobile24Card._themeSelectOptions(),
         ]}}},
         { name: 'show_progress',  default: true, selector: { boolean: {} } },
@@ -3142,7 +3142,7 @@ class VpMobile24MultiCard extends HTMLElement {
         { name: 'default_expanded', default: true, selector: { boolean: {} } },
         { name: 'show_week_nav',    default: true, selector: { boolean: {} } },
         { name: 'show_legend',      default: true, selector: { boolean: {} } },
-        { name: 'theme', default: 'navy', selector: { select: { options: [
+        { name: 'theme', default: 'ha_default', selector: { select: { options: [
           ...VpMobile24Card._themeSelectOptions(),
         ]}}},
       ],
