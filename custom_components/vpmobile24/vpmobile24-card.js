@@ -208,7 +208,7 @@ class VpMobile24Card extends HTMLElement {
   }
 
   _getTheme() {
-    const themeName = (this._config && this._config.theme) || 'navy';
+    const themeName = (this._config && this._config.theme) || 'ha_default';
     return VpMobile24Card._THEMES[VpMobile24Card._resolveThemeId(themeName)];
   }
 
@@ -747,7 +747,7 @@ class VpMobile24Card extends HTMLElement {
 
   static getStubConfig() {
     return { entity:'sensor.vpmobile24_week_table', show_header:true, show_time:true,
-      highlight_today:true, use_custom_times:false, theme:'navy',
+      highlight_today:true, use_custom_times:false, theme:'ha_default',
       header_settings:{ title:'Stundenplan', class_name:'5a' } };
   }
 
@@ -2533,8 +2533,8 @@ class VpMobile24CurrentCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'navy';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+    const n = (this._config && this._config.theme) || 'ha_default';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
   }
 
   static getStubConfig() {
@@ -3105,8 +3105,8 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _getTheme() {
-    const n = (this._config && this._config.theme) || 'navy';
-    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.navy;
+    const n = (this._config && this._config.theme) || 'ha_default';
+    return VpMobile24Card._THEMES[n] || VpMobile24Card._THEMES.ha_default;
   }
 
   // ── Config form ──────────────────────────────────────────────────────────
