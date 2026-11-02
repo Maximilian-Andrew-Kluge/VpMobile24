@@ -627,7 +627,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                                 # Cancelled lesson
                                 if lesson_course and lesson_course in self.excluded_subjects:
                                     continue
-                                if lesson_course and lesson_course not in student_courses:
+                                # Only filter by student_courses if this looks like a course group
+                                if lesson_course and lesson_course not in student_courses and _looks_like_course_group(lesson_course):
                                     continue
                                 original_subject = self._resolve_original_subject(
                                     base_schedule, weekday_index, period, lesson_course
@@ -658,7 +659,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             if not subject or subject.strip() in ["\u2014", "", " "]:
                                 if change_course and change_course in self.excluded_subjects:
                                     continue
-                                if change_course and change_course not in student_courses:
+                                # Only filter by student_courses if this looks like a course group
+                                if change_course and change_course not in student_courses and _looks_like_course_group(change_course):
                                     continue
                                 # No course field: try to resolve via base_schedule
                                 original_subject = self._resolve_original_subject(
