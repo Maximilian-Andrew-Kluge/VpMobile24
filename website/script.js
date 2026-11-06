@@ -1181,19 +1181,6 @@
     // Vollständige Site-weite Überschreibung aller CSS-Variablen
     // Demo colors are scoped to the preview. The website keeps its own theme.
 
-    // Demo-Karte direkt stylen (--dc-* werden von renderDemo() verwendet)
-    var dc = document.getElementById("demoCard");
-    if (dc) {
-      dc.style.background = t.bg;
-      dc.style.setProperty("--dc-primary", t.primary);
-      dc.style.setProperty("--dc-success", t.success);
-      dc.style.setProperty("--dc-warning", t.warning);
-      dc.style.setProperty("--dc-error", t.danger);
-      dc.style.setProperty("--dc-txt", t.txt);
-      dc.style.setProperty("--dc-txt2", t.txt2);
-      dc.style.setProperty("--dc-border", t.bg === "#000000" ? "rgba(255,255,255,.2)" : "rgba(255,255,255,.07)");
-    }
-
     try { localStorage.setItem("vpm24-demo-theme", themeId); } catch(e) {}
     renderThemePreview(t);
     renderDemoThemeGrid(themeId);
@@ -1309,6 +1296,7 @@
   renderDemoThemeGrid(_savedDemoTheme);
   applyDemoTheme(_savedDemoTheme);
   renderDemo();
+  applyCc();
 
   document.getElementById("addLessonBtn") && document.getElementById("addLessonBtn").addEventListener("click", addLesson);
   document.getElementById("addBreakBtn") && document.getElementById("addBreakBtn").addEventListener("click", addBreak);
