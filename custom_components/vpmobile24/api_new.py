@@ -132,26 +132,30 @@ class Stundenplan24API:
             raise
 
     async def async_get_teachers(self) -> list[str]:
-        """Get list of all teacher abbreviations.
+        """Get the complete teacher list from the class catalogue and daily plans.
 
-        Strategy:
-        1. Try daily schedule XMLs (PlanKl{date}.xml) with parallel batch
-           requests (5 at a time) over a ±30 day window.
-        2. If no schedule XML has data (e.g. school year transition / holidays),
-           fall back to Klassen.xml which contains teacher abbreviations inside
-           <Unterricht><UeNr>/<UeFa>/<UeLe> blocks for each class.
+        Klassen.xml is the stable catalogue: it contains teachers regardless of
+        whether they have a lesson or cover assignment on a specific date.
+        Daily plans are merged in for schools that expose additional abbreviations
+        there.
         """
         try:
             session = await self.async_get_session()
             auth = BasicAuth(self.username, self.password)
-            teachers: set[str] = set()
 
-            # Build candidate dates: today ± 30 days
+            # Always read the full catalogue first. The old implementation only
+            # used it when no daily plan was available, which omitted teachers
+            # absent from the first available day's plan.
+            teachers = await self._async_get_teachers_from_klassen(session, auth)
+
+            # One available daily plan can supplement the catalogue. Search in
+            # small parallel batches, stopping after the first batch with data.
             today = date.today()
-            candidates = [today + timedelta(days=i) for i in range(0, 30)] + \
-                         [today - timedelta(days=i) for i in range(1, 31)]
-
-            # Fetch in parallel batches of 5
+            candidates = (
+                [today + timedelta(days=i) for i in range(0, 30)]
+                + [today - timedelta(days=i) for i in range(1, 31)]
+            )
+            schedule_teachers: set[str] = set()
             batch_size = 5
             for i in range(0, len(candidates), batch_size):
                 batch = candidates[i:i + batch_size]
@@ -161,14 +165,11 @@ class Stundenplan24API:
                 )
                 for result in results:
                     if isinstance(result, set):
-                        teachers.update(result)
-                if teachers:
-                    break  # found data — stop searching
+                        schedule_teachers.update(result)
+                if schedule_teachers:
+                    break
 
-            # Fallback: extract teachers from Klassen.xml if no schedule was found
-            if not teachers:
-                teachers = await self._async_get_teachers_from_klassen(session, auth)
-
+            teachers.update(schedule_teachers)
             return sorted(teachers)
         except Exception as ex:
             _LOGGER.error("Error fetching teachers: %s", ex)
