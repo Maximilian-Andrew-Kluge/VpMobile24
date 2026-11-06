@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="de" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20261106-redesign" />
 
   <!-- Structured data -->
   <script type="application/ld+json">
@@ -132,19 +132,19 @@
       <div class="hero-glow"></div>
       <div class="container hero-inner">
         <div class="hero-text">
-          <span class="eyebrow"><span class="dot"></span> Open Source · Schüler &amp; Lehrermodus · Home Assistant</span>
-          <h1>Dein Stundenplan.<br/><span class="grad">Direkt in Home Assistant.</span></h1>
-          <p class="hero-sub">VpMobile24 verbindet deinen Stundenplan von Stundenplan24 mit Home Assistant – automatisch, übersichtlich und genau dort, wo du ihn brauchst.</p>
+          <span class="eyebrow"><span class="dot"></span> STUNDENPLAN24 × HOME ASSISTANT</span>
+          <h1>Schule im Blick.<br/><span class="grad">Zuhause verbunden.</span></h1>
+          <p class="hero-sub">Der nächste Unterricht, spontane Vertretungen und die Ferien: VpMobile24 bringt deinen Schulalltag auf ein Dashboard. Für Schüler, Lehrkräfte und Familien.</p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="#installation">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-              Jetzt installieren
+              Mit HACS starten
             </a>
             <a class="btn btn-secondary" href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 016 0C17.3 5 18.3 5.3 18.3 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
               GitHub ansehen
             </a>
-            <a class="btn btn-outline" href="#features">Alle Funktionen</a>
+            <a class="btn btn-outline" href="#demo">Karte live ausprobieren ↗</a>
           </div>
           <p class="hero-note"><span>Kostenlos</span><span class="sep">·</span><span>Open Source &amp; HACS</span><span class="sep">·</span><span>Schüler &amp; Lehrer</span></p>
         </div>
@@ -202,6 +202,13 @@
       </div>
     </header>
 
+    <section class="release-strip" aria-labelledby="releaseHeading">
+      <div class="container release-layout">
+        <div><span class="section-label">AKTUELL · 06. NOVEMBER 2026</span><h2 id="releaseHeading">Kleine Fixes.<br/>Ein besserer Schulalltag.</h2></div>
+        <div class="release-detail"><span class="release-tag">v2.6.7 Beta</span><p>Eine vollständigere Lehrerauswahl und aktualisierte Kartenressourcen für das Home-Assistant-Theme.</p><a href="https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.6.7-beta" target="_blank" rel="noopener">Alle Änderungen ansehen ↗</a></div>
+        <div class="release-detail"><span class="release-tag stable-tag">Stable · v2.6.5</span><p>Du möchtest die stabile Version? Installiere VpMobile24 wie gewohnt über HACS.</p><a href="#installation">Zur Einrichtung ↓</a></div>
+      </div>
+    </section>
     <!-- ===== STATS ===== -->
     <section class="stats" aria-label="Kennzahlen">
       <div class="container stats-inner">
@@ -255,7 +262,7 @@
       <div class="container">
         <div class="section-label reveal">Features</div>
         <h2 class="section-title reveal">Alles, was du brauchst.</h2>
-        <p class="section-desc reveal">VpMobile24 bringt deinen Stundenplan mit modernem Design und smarten Funktionen direkt ins Dashboard.</p>
+        <p class="section-desc reveal">Vom ersten Unterricht bis zu den nächsten Ferien. Alle Informationen, die du täglich brauchst.</p>
 
         <!-- Aktueller Unterricht -->
         <div class="showcase reveal">
@@ -396,7 +403,7 @@
     <section class="section" id="demo">
       <div class="container">
         <div class="section-label reveal">Card Creator</div>
-        <h2 class="section-title reveal">Bau dir deine Karte.</h2>
+        <h2 class="section-title reveal">Dein Dashboard. Deine Karte.</h2>
         <p class="section-desc reveal">Stell deine VpMobile24-Karte zusammen, sieh die Vorschau live und kopiere die fertige YAML direkt in Home Assistant. (Vorschau mit Beispieldaten)</p>
 
         <!-- Card-Typ Umschalter -->
@@ -461,7 +468,7 @@
     <section class="section section-alt" id="demoConfig">
       <div class="container">
         <div class="section-label reveal">Demo-Einstellungen</div>
-        <h2 class="section-title reveal">Demo anpassen.</h2>
+        <h2 class="section-title reveal">Vorschau anpassen.</h2>
         <p class="section-desc reveal">Wähle ein Theme und passe die Unterrichtszeiten an – die Demo oben aktualisiert sich sofort.</p>
 
         <div class="demo-config-tabs reveal" role="tablist">
@@ -543,7 +550,7 @@
             <div class="step">
               <div class="step-num">2</div>
               <div class="step-body">
-                <h3>Integration installieren &amp; HA neu starten</h3>
+                <h3>Integration installieren &amp; HA neu starten</h3><div class="beta-install"><strong>Beta ausprobieren?</strong> Aktiviere in HACS für dieses Repository die Anzeige von Beta-Versionen und wähle <code>v2.6.7-beta</code>. Nach dem Update Home Assistant neu starten.</div>
                 <p>Suche in HACS nach <strong>VpMobile24</strong>, klicke auf <strong>Installieren</strong> und starte Home Assistant anschließend neu.</p>
                 <div class="info-box"><span>💡</span><span>Nach dem Neustart erscheint die Integration automatisch in der Integrationsliste.</span></div>
               </div>
@@ -698,7 +705,7 @@
       <div class="container">
         <div class="section-label reveal">Lovelace Card</div>
         <h2 class="section-title reveal">Die Stundenplan-Card einrichten.</h2>
-        <p class="section-desc reveal">Die Card wird automatisch mit der Integration installiert. Du musst nur noch die Ressource registrieren.</p>
+        <p class="section-desc reveal">Die Karte wird mit der Integration installiert. Die Integration registriert die Ressource automatisch; falls die Karte nicht erscheint, kannst du sie hier manuell ergänzen.</p>
 
         <div class="steps">
           <div class="step">
@@ -716,7 +723,7 @@
                 </div>
                 <div class="config-field"><span class="cf-label">Ressourcentyp</span><span class="cf-desc"><strong>JavaScript-Modul</strong></span></div>
               </div>
-              <div class="info-box"><span>💡</span><span>Die Card-Datei wird beim Start von Home Assistant automatisch nach <code>/config/www/vpmobile24/</code> kopiert. Du musst nichts manuell kopieren!</span></div>
+              <div class="info-box"><span>💡</span><span>Die Kartendatei wird beim Start von Home Assistant automatisch nach <code>/config/www/vpmobile24/</code> kopiert. Du musst nichts manuell kopieren!</span></div>
             </div>
           </div>
 
@@ -1396,6 +1403,6 @@ action:
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
   </button>
 
-  <script src="script.js?v=2.6.7-beta" defer></script>
+  <script src="script.js?v=20261106-redesign" defer></script>
 </body>
 </html>
