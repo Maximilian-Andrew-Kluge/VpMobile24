@@ -151,8 +151,10 @@ class Stundenplan24API:
             # One available daily plan can supplement the catalogue. Search in
             # small parallel batches, stopping after the first batch with data.
             today = date.today()
-            candidates = [today + timedelta(days=i) for i in range(0, 30)] + \\
-                         [today - timedelta(days=i) for i in range(1, 31)]
+            candidates = (
+                [today + timedelta(days=i) for i in range(0, 30)]
+                + [today - timedelta(days=i) for i in range(1, 31)]
+            )
             schedule_teachers: set[str] = set()
             batch_size = 5
             for i in range(0, len(candidates), batch_size):
