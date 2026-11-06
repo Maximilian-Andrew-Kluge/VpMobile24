@@ -794,10 +794,10 @@
         if (status && announcement) {
           status.textContent = announcement.prerelease ? " ist als Beta verfügbar!" : " ist jetzt verfügbar!";
         }
-        if (stable) $(".gh-version-stable").forEach(el => el.textContent = stable.tag_name);
+        if (stable) $$(".gh-version-stable").forEach(el => el.textContent = stable.tag_name);
         if (beta && stable && beta.tag_name !== stable.tag_name) {
-          $(".gh-version-beta").forEach(el => el.textContent = beta.tag_name);
-          $(".version-beta-block").forEach(el => { el.style.display = "inline-flex"; });
+          $$(".gh-version-beta").forEach(el => el.textContent = beta.tag_name);
+          $$(".version-beta-block").forEach(el => { el.style.display = "inline-flex"; });
         }
       })
       .catch(() => { /* keep static fallback */ });
