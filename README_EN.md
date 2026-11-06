@@ -37,7 +37,9 @@
 >
 > 📥 Update now via HACS.
 >
-> 🧪 **Beta v2.6.7** — teacher list and Home Assistant theme fixes.\n>\n> 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+> 🧪 **Beta v2.6.7** — teacher list and Home Assistant theme fixes.
+>
+> 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
 
 ---
 
