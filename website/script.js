@@ -783,13 +783,21 @@
           if (stable && beta) break;
         }
         const newest = stable || releases[0];
+        const announcement = beta || newest;
         const av = $("#announceVersion"), al = $("#announceLink");
-        if (newest && av) av.textContent = "VpMobile24 " + (newest.tag_name || newest.name);
-        if (newest && al) al.href = newest.html_url;
-        if (stable) $$(".gh-version-stable").forEach(el => el.textContent = stable.tag_name);
+        const status = $("#announceStatus");
+        if (announcement && av) {
+          const version = (announcement.tag_name || announcement.name || "").replace(/-beta(?:\.\d+)?$/i, " Beta");
+          av.textContent = "VpMobile24 " + version;
+        }
+        if (announcement && al) al.href = announcement.html_url;
+        if (status && announcement) {
+          status.textContent = announcement.prerelease ? " ist als Beta verfügbar!" : " ist jetzt verfügbar!";
+        }
+        if (stable) $(".gh-version-stable").forEach(el => el.textContent = stable.tag_name);
         if (beta && stable && beta.tag_name !== stable.tag_name) {
-          $$(".gh-version-beta").forEach(el => el.textContent = beta.tag_name);
-          $$(".version-beta-block").forEach(el => { el.style.display = "inline-flex"; });
+          $(".gh-version-beta").forEach(el => el.textContent = beta.tag_name);
+          $(".version-beta-block").forEach(el => { el.style.display = "inline-flex"; });
         }
       })
       .catch(() => { /* keep static fallback */ });
