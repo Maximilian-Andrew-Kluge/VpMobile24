@@ -8,7 +8,7 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
   /* ---------- Theme switcher (dark / light / system) ---------- */
-  const THEME_KEY = "vpm24-theme";
+  const THEME_KEY = "vpm24-theme-v2";
   const root = document.documentElement;
   const themeBtn = $("#themeBtn");
   const order = ["dark", "light", "system"];
@@ -23,12 +23,13 @@
     if (meta) meta.setAttribute("content", effective === "dark" ? "#070B14" : "#F5F7FB");
     if (themeBtn) themeBtn.title = "Theme: " + mode + " (klicken zum Wechseln)";
   }
-  let themeMode = localStorage.getItem(THEME_KEY) || "dark";
+  let themeMode = "light";
+  try { themeMode = localStorage.getItem(THEME_KEY) || "light"; } catch (e) {}
   applyTheme(themeMode);
   if (themeBtn) {
     themeBtn.addEventListener("click", () => {
       themeMode = order[(order.indexOf(themeMode) + 1) % order.length];
-      localStorage.setItem(THEME_KEY, themeMode);
+      try { localStorage.setItem(THEME_KEY, themeMode); } catch (e) {}
       applyTheme(themeMode);
     });
   }
@@ -391,6 +392,7 @@
   // Next-Gen Theme-System — identisch zur echten Card (bg/card/primary +
   // fixe Statusfarbe je Dark/Light für die Vorschau-Punkte).
   const CC_THEMES = [
+    { v: "ha_default", name: "HA Standard", category: "Light", kw: "Folgt deinem Home-Assistant-Theme", bg: "#fafafa", card: "#ffffff", tile: "#f0f2f4", primary: "#03a9f4", status: "#16865b", light: true },
     // Dark
     { v: "navy",        name: "Navy Dark",   category: "Dark",  kw: "Navy · Blau · Neutral",     bg: "#0B0F19", card: "#111827", tile: "#1A2233", primary: "#4F7CFF", status: "#22C55E", light: false },
     { v: "graphite",    name: "Graphite",    category: "Dark",  kw: "Grau · Schwarz · Minimal",  bg: "#090A0C", card: "#121416", tile: "#202328", primary: "#E5E7EB", status: "#22C55E", light: false },
@@ -419,7 +421,7 @@
       entity: "sensor.vpmobile24_week_table",
       title: "Stundenplan",
       class_name: "09f",
-      theme: "navy",
+      theme: "ha_default",
       show_header: true,
       show_time: true,
       highlight_today: true,
@@ -430,7 +432,7 @@
       next_entity: "sensor.vpmobile24_naechste_stunde",
       week_entity: "sensor.vpmobile24_wochentabelle",
       title: "",
-      theme: "navy",
+      theme: "ha_default",
       show_progress: true,
       show_countdown: true,
       show_next: true,
@@ -441,7 +443,7 @@
     multi: {
       entities: ["sensor.vpmobile24_09f_week_table", "sensor.vpmobile24_07a_week_table"],
       title: "Stundenplan Übersicht",
-      theme: "navy",
+      theme: "ha_default",
       columns: "auto",
       show_week_nav: true,
       show_legend: true
@@ -1177,9 +1179,7 @@
     if (!t) t = DEMO_THEMES[0];
 
     // Vollständige Site-weite Überschreibung aller CSS-Variablen
-    var vars = _themeVars(t);
-    var root = document.documentElement;
-    Object.keys(vars).forEach(function(k) { root.style.setProperty(k, vars[k]); });
+    // Demo colors are scoped to the preview. The website keeps its own theme.
 
     // Demo-Karte direkt stylen (--dc-* werden von renderDemo() verwendet)
     var dc = document.getElementById("demoCard");
