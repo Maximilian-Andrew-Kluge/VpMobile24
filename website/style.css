@@ -1182,3 +1182,8 @@ p{ text-wrap:pretty }
 /* Keep theme choices within the configuration column. */
 .cc-layout > *{min-width:0}.cc-th-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cc-th{min-width:0;width:100%;overflow:hidden}.cc-th-name{overflow:hidden;text-overflow:ellipsis}.cc-th-preview{width:32px;height:34px}.cc-th-check{width:14px}.cc-th{padding:8px;gap:6px}.cc-th-kw{max-width:100%}
 @media(max-width:500px){.cc-th-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Readable status text on light timetable cells. */
+.demo-card.dc-light .dc-cell.dc-c,.demo-card.dc-light .dc-cell.dc-c .dc-note{color:#972831}
+.demo-card.dc-light .dc-cell.dc-s .dc-note{color:#775000}
+.dc-num span{font-size:.5rem;letter-spacing:-.02em}
