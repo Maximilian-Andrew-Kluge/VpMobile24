@@ -2,13 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.6.7] - 2026-11-06 (Beta)
 
 ### Fixed
 
-- Teacher mode combines teacher abbreviations from `Klassen.xml` with the daily schedule so the selector does not omit staff without assignments on the first available day (#26)
-- Lovelace card resource cache key follows the integration version so theme updates such as `ha_default` load after upgrading (#24)
-
+- Vollständige Lehrerliste: Kürzel aus `Klassen.xml` werden mit den Tagesplänen zusammengeführt (#26)
+- HA-Theme-Auswahl: Kartenressource erhält bei jeder Integrationsversion einen neuen Cache-Schlüssel (#24)
+- Ausfall-Pill bleibt direkt neben dem Wochenstatus stehen und rutscht nur bei Platzmangel um
 
 ## \[2.6.2\] - 2026-10-05
 
@@ -24,12 +24,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Kontraste für Wochentag-Beschriftungen (Mo–Fr) und Stundenzeiten in allen Themes erhöht – besser lesbar auf großen Displays und aus Distanz
-
-## \[2.6.7\] - 2026-08-27
-
-### Changed
-
--   Ausfall-Pill bleibt jetzt zuverlässig direkt rechts neben dem Wochenstatus („KW · Aktuell") stehen und rutscht nur bei echtem Platzmangel um
 
 ## \[2.6.6\] - 2026-08-27
 
