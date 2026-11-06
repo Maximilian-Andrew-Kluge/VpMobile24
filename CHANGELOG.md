@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Teacher mode combines teacher abbreviations from `Klassen.xml` with the daily schedule so the selector does not omit staff without assignments on the first available day (#26)
+- Lovelace card resource cache key follows the integration version so theme updates such as `ha_default` load after upgrading (#24)
+
+
 ## \[2.6.2\] - 2026-10-05
 
 ### Fixed
