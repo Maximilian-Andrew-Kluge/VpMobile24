@@ -1,6 +1,7 @@
 """Calendar platform for vpmobile24."""
 from __future__ import annotations
 
+import logging
 from datetime import datetime, date, timedelta
 from typing import Any
 
@@ -13,6 +14,8 @@ from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, CONF_ENABLE_CALENDAR, VERSION
 
+
+_LOGGER = logging.getLogger(__name__)
 
 CALENDAR_NAMES = {
     "de": "VpMobile24 Wochenkalender",
@@ -85,7 +88,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
         # Find next event
         now = dt_util.now()
         for event in events:
-            if event.start_datetime_local > now:
+            if event.end_datetime_local > now:
                 return event
         
         return None
@@ -101,7 +104,7 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
 
     def _get_week_events(self) -> list[CalendarEvent]:
         """Get all events for the current week."""
-        today = date.today()
+        today = dt_util.now().date()
         start_of_week = today - timedelta(days=today.weekday())  # Monday
         end_of_week = start_of_week + timedelta(days=6)  # Sunday
         
@@ -120,8 +123,8 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             return events
         
         # Get lessons for each day in the range
-        current_date = start_date.date()
-        end_date_only = end_date.date()
+        current_date = dt_util.as_local(start_date).date()
+        end_date_only = dt_util.as_local(end_date).date()
         
         while current_date <= end_date_only:
             # Skip weekends
@@ -132,6 +135,9 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             current_date += timedelta(days=1)
         
         # Sort events by start time
+        events = [event for event in events
+                  if event.start_datetime_local < end_date
+                  and event.end_datetime_local > start_date]
         events.sort(key=lambda x: x.start_datetime_local)
         
         return events
@@ -202,6 +208,9 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
                 # Default to 45 minutes if no end time
                 end_datetime = start_datetime + timedelta(minutes=45)
             
+            if end_datetime <= start_datetime:
+                return None
+
             # Create summary
             summary = subject
             if is_change:
@@ -248,3 +257,4 @@ class VpMobile24WeekCalendar(CoordinatorEntity, CalendarEntity):
             "timestamp": self.coordinator.data.get("timestamp"),
             "class": self.coordinator.class_name,
         }
+
