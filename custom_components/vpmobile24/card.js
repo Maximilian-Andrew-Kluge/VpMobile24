@@ -239,6 +239,58 @@ class VpMobile24Card extends HTMLElement {
   // oder @media-Selektor) aus einem Theme-Objekt. Statusfarben sind fix je
   // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
   // dem Theme. Tile-Tokens werden daraus abgeleitet.
+  // Resolve contrast against the actual rendered surfaces, including custom HA
+  // themes whose light mode retains dark text variables. Recalculate on hass
+  // updates so mode switches do not retain corrections from the previous mode.
+  static _scheduleContrast(card) {
+    if (card._contrastFrame) cancelAnimationFrame(card._contrastFrame);
+    card._contrastFrame = requestAnimationFrame(() => {
+      card._contrastFrame = null;
+      if (!card.isConnected || !card.shadowRoot) return;
+      const pairs = [
+        ['text', 'card'], ['text-muted', 'card'], ['text-faint', 'card'],
+        ['primary', 'card'], ['success', 'card'], ['warning', 'card'], ['error', 'card'], ['info', 'card'], ['pause', 'card'],
+        ['tile-normal-color', 'tile-normal'], ['tile-sub-color', 'tile-sub'],
+        ['tile-cancelled-color', 'tile-cancelled'], ['tile-current-color', 'tile-current'],
+        ['on-primary', 'primary'],
+      ];
+      for (const [fg] of pairs) card.style.removeProperty('--vpm-' + fg);
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
+      card.shadowRoot.append(probe);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext('2d', {willReadFrequently:true});
+      const read = token => {
+        probe.style.color = 'var(--vpm-' + token + ')';
+        ctx.clearRect(0,0,1,1);
+        ctx.fillStyle = getComputedStyle(probe).color;
+        ctx.fillRect(0,0,1,1);
+        const v = ctx.getImageData(0,0,1,1).data;
+        return [v[0],v[1],v[2],v[3]/255];
+      };
+      const blend = (a,b) => a.slice(0,3).map((v,i) => v*a[3]+b[i]*(1-a[3]));
+      const lum = rgb => rgb.slice(0,3).map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4).reduce((v,c,i) => v+c*[.2126,.7152,.0722][i],0);
+      const ratio = (a,b) => (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+      try {
+        const base = blend(read('card'), card._hass?.themes?.darkMode ? [28,28,28] : [255,255,255]);
+        for (const [fg,bg] of pairs) {
+          const surface = blend(read(bg), base), color = blend(read(fg),surface);
+          if (ratio(color,surface) < 4.5) {
+            const dark = [0,0,0], light = [255,255,255];
+            const chosen = ratio(dark,surface) > ratio(light,surface) ? dark : light;
+            let adjusted = chosen;
+            for (let step=1; step<=20; step++) {
+              const candidate = color.map((v,i) => Math.round(v+(chosen[i]-v)*step/20));
+              if (ratio(candidate,surface) >= 4.5) { adjusted = candidate; break; }
+            }
+            card.style.setProperty('--vpm-' + fg, 'rgb(' + adjusted.join(',') + ')');
+          }
+        }
+      } finally { probe.remove(); }
+    });
+  }
+
   static _onPrimary(color) {
     const rgb = color.replace('#', '').match(/../g).map(v => parseInt(v, 16) / 255);
     const linear = rgb.map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
@@ -713,7 +765,7 @@ class VpMobile24Card extends HTMLElement {
     this._infoPopupOpen = false;
     this._mobDayIdx = null;
     this._weekOffset = 0;
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   _switchWeek(offset) {
@@ -733,6 +785,7 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    VpMobile24Card._scheduleContrast(this);
     if (this._config) {
       const dow = new Date().getDay();
       // Auto-switch to next week on weekends — but only if user hasn't navigated manually
@@ -2546,11 +2599,12 @@ class VpMobile24CurrentCard extends HTMLElement {
   setConfig(config) {
     if (!config || !config.entity) throw new Error('Entity erforderlich');
     this._config = config;
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   set hass(hass) {
     this._hass = hass;
+    VpMobile24Card._scheduleContrast(this);
     if (this._config) this._render();
     // Auto-update every minute for countdown/progress
     if (!this._timer) {
@@ -3121,11 +3175,12 @@ class VpMobile24MultiCard extends HTMLElement {
     this._config = config;
     // init collapse state from localStorage
     this._loadCollapseState();
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   set hass(hass) {
     this._hass = hass;
+    VpMobile24Card._scheduleContrast(this);
     const dow = new Date().getDay();
     // Auto-switch on weekends only if user hasn't navigated manually
     if ((dow === 0 || dow === 6) && this._weekOffset === 0 && !this._manualWeekOffset) this._weekOffset = 1;
@@ -3935,3 +3990,4 @@ ha-card {
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
 console.log('✅ VpMobile24 Card v2.6.8 loaded');
+
