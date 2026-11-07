@@ -27,9 +27,12 @@
       },
       "teacher": {
         "title": "Abréviation de l'enseignant",
-        "description": "Entrez votre abréviation (ex. MUS, SCH). Tous vos cours et remplacements seront affichés automatiquement.",
+        "description": "Sélectionnez votre abréviation ou saisissez-la si elle ne figure pas dans les suggestions. Les cours, remplacements et surveillances sont filtrés selon cette abréviation.",
         "data": {
           "teacher_short": "Abréviation enseignant"
+        },
+        "data_description": {
+          "teacher_short": "Vous pouvez saisir une abréviation absente de la liste. Utilisez celle de votre établissement ; la casse est ignorée."
         }
       },
       "class": {
@@ -61,7 +64,8 @@
     "error": {
       "cannot_connect": "Connexion échouée.",
       "invalid_auth": "Nom d'utilisateur ou mot de passe incorrect.",
-      "unknown": "Une erreur inconnue s'est produite."
+      "unknown": "Une erreur inconnue s'est produite.",
+      "invalid_teacher": "Saisissez une abréviation d’enseignant."
     },
     "abort": {
       "already_configured": "Cette classe est déjà configurée.",
@@ -106,9 +110,12 @@
       },
       "change_teacher": {
         "title": "Modifier l'abréviation enseignant",
-        "description": "Sélectionnez votre abréviation dans la liste.",
+        "description": "Sélectionnez votre abréviation ou saisissez-la si elle ne figure pas dans les suggestions. Les cours, remplacements et surveillances sont filtrés selon cette abréviation.",
         "data": {
           "teacher_short": "Abréviation enseignant"
+        },
+        "data_description": {
+          "teacher_short": "Vous pouvez saisir une abréviation absente de la liste. Utilisez celle de votre établissement ; la casse est ignorée."
         }
       },
       "change_holidays": {
@@ -120,7 +127,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Connexion à VpMobile24 échouée."
+      "cannot_connect": "Connexion à VpMobile24 échouée.",
+      "invalid_teacher": "Saisissez une abréviation d’enseignant."
     }
   },
   "issues": {
