@@ -2,11 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Lehrerkürzel können beim Einrichten und in den Optionen auch manuell eingegeben werden, wenn die Vorschlagsliste unvollständig ist (#26).
+- Bereits gespeicherte Kürzel bleiben in den Optionen auswählbar, auch wenn sie im aktuellen Stundenplan fehlen.
+
 ## [2.6.7] - 2026-11-06 (Beta)
 
 ### Fixed
 
-- Vollständige Lehrerliste: Kürzel aus `Klassen.xml` werden mit den Tagesplänen zusammengeführt (#26)
+- Erweiterte Lehrerliste: Kürzel aus `Klassen.xml` werden mit den Tagesplänen zusammengeführt (#26)
 - HA-Theme-Auswahl: Kartenressource erhält bei jeder Integrationsversion einen neuen Cache-Schlüssel (#24)
 - Ausfall-Pill bleibt direkt neben dem Wochenstatus stehen und rutscht nur bei Platzmangel um
 
