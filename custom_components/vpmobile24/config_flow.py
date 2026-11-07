@@ -11,6 +11,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import selector
 
 from .api_new import Stundenplan24API
 from .const import (
@@ -320,13 +321,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         user_input: dict[str, Any] | None = None,
     ) -> FlowResult:
-        """Step 2b — teacher mode: select teacher abbreviation from dropdown."""
+        """Select a suggested teacher abbreviation or enter a missing one."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
             teacher_short = user_input.get(CONF_TEACHER_SHORT, "").strip().upper()
             if not teacher_short:
-                errors[CONF_TEACHER_SHORT] = "cannot_connect"
+                errors[CONF_TEACHER_SHORT] = "invalid_teacher"
             else:
                 self._config_data[CONF_TEACHER_SHORT] = teacher_short
                 school_id = self._config_data.get(CONF_SCHOOL_ID, "")
@@ -345,7 +346,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if self._available_teachers:
             schema = vol.Schema({
-                vol.Required(CONF_TEACHER_SHORT): vol.In(self._available_teachers),
+                vol.Required(CONF_TEACHER_SHORT): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=self._available_teachers,
+                        custom_value=True,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             })
         else:
             # Fallback to text input if no teachers found
@@ -785,7 +792,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             teacher_short = user_input.get(CONF_TEACHER_SHORT, "").strip().upper()
             if not teacher_short:
-                errors[CONF_TEACHER_SHORT] = "cannot_connect"
+                errors[CONF_TEACHER_SHORT] = "invalid_teacher"
             else:
                 new_data = dict(self._config_entry.data)
                 new_data[CONF_TEACHER_SHORT] = teacher_short
@@ -820,7 +827,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         if teachers:
             schema = vol.Schema({
-                vol.Required(CONF_TEACHER_SHORT, default=current_teacher): vol.In(teachers),
+                vol.Required(CONF_TEACHER_SHORT, default=current_teacher): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=sorted(set(teachers) | ({current_teacher} if current_teacher else set())),
+                        custom_value=True,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             })
         else:
             schema = vol.Schema({
