@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- HA Standard card theme now follows the active Home Assistant theme variables, including explicit dark themes such as Nordic, instead of the browser color-scheme preference.
+
 ## [2.6.8] - 2026-11-07 (Beta)
 
 ### Added
