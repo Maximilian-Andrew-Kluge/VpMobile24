@@ -13,9 +13,10 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers import device_registry as dr
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE, VERSION
-from .api_new import Stundenplan24API, Stundenplan24AuthError
+from .api_new import Stundenplan24API, Stundenplan24AuthError, Stundenplan24NotFoundError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -217,7 +218,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         teacher_short=entry.data.get("teacher_short"),
         is_demo=entry.data.get(CONF_DEMO_MODE, False),
     )
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except Exception:
+        await api.async_close()
+        raise
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
@@ -349,6 +354,10 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self._week_data_cache = {}
         self._current_week_monday = None
         self._holiday_data: list = []
+        self._holiday_cache_key = None
+        self._holiday_next_fetch = None
+        self.last_successful_update = None
+        self.failed_dates: list[str] = []
         self._force_refresh = False  # set by reload button to bypass the day cache
         super().__init__(
             hass,
@@ -404,6 +413,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         try:
             _LOGGER.debug("Starting data update...")
 
+            self.failed_dates = []
+
             # ── Demo mode: return static test data ───────────────────────────
             if getattr(self, "is_demo", False):
                 from .demo import get_demo_data_student, get_demo_data_teacher
@@ -429,10 +440,11 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     if d not in self._week_data_cache:
                         self._week_data_cache[d] = {"lessons": [], "changes": [], "additional_info": [], "timestamp": data.get("timestamp", "")}
                     self._week_data_cache[d]["additional_info"].append(info)
+                self.last_successful_update = dt_util.utcnow()
                 return data
 
             from datetime import date
-            today = date.today()
+            today = dt_util.now().date()
             today_str = today.isoformat()
 
             days_since_monday = today.weekday()
@@ -487,11 +499,13 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
 
             _LOGGER.debug(f"Loading dates: {[d.isoformat() for d in dates_to_load]}")
 
+            successful_requests = 0
             for target_date in dates_to_load:
                 try:
                     date_str = target_date.isoformat()
                     _LOGGER.debug(f"Fetching schedule for {date_str}")
                     day_data = await self.api.async_get_schedule(target_date, self.class_name, self.teacher_short)
+                    successful_requests += 1
                     self._week_data_cache[date_str] = {
                         "lessons": day_data.get("lessons", []),
                         "changes": day_data.get("changes", []),
@@ -499,14 +513,18 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         "timestamp": day_data.get("timestamp", "")
                     }
                     _LOGGER.debug(f"Cached {date_str}: {len(day_data.get('lessons', []))} lessons, {len(day_data.get('additional_info', []))} additional_info")
+                except Stundenplan24AuthError:
+                    self.failed_dates.append(date_str)
+                    raise
                 except Exception as ex:
-                    ex_str = str(ex)
-                    if "404" in ex_str:
+                    if isinstance(ex, Stundenplan24NotFoundError):
+                        successful_requests += 1
                         _LOGGER.debug("No schedule for %s (404 - weekend/holiday)", target_date)
                         # A day that used to have data but now 404s (schedule
                         # withdrawn) must lose its stale cache entry.
                         self._week_data_cache.pop(date_str, None)
                     else:
+                        self.failed_dates.append(date_str)
                         _LOGGER.warning("Could not fetch schedule for %s: %s", target_date, ex)
                     continue
 
@@ -517,14 +535,12 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             for i in range(5):
                 d1 = (next_monday + timedelta(days=i)).isoformat()
                 d2 = (next_next_monday + timedelta(days=i)).isoformat()
-                if d1 not in self._week_data_cache:
-                    prefetch_dates.append(d1)
-                if d2 not in self._week_data_cache:
-                    prefetch_dates.append(d2)
+                prefetch_dates.extend([d1, d2])
             for date_str in prefetch_dates:
                 try:
                     target = date.fromisoformat(date_str)
                     day_data = await self.api.async_get_schedule(target, self.class_name, self.teacher_short)
+                    successful_requests += 1
                     self._week_data_cache[date_str] = {
                         "lessons": day_data.get("lessons", []),
                         "changes": day_data.get("changes", []),
@@ -532,11 +548,22 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                         "timestamp": day_data.get("timestamp", "")
                     }
                     _LOGGER.debug("Pre-fetched %s", date_str)
+                except Stundenplan24AuthError:
+                    self.failed_dates.append(date_str)
+                    raise
+                except Stundenplan24NotFoundError:
+                    successful_requests += 1
+                    self._week_data_cache.pop(date_str, None)
                 except Exception as ex:
-                    ex_str = str(ex)
-                    if "404" not in ex_str:
-                        _LOGGER.debug("Could not pre-fetch %s: %s", date_str, ex)
-                    continue
+                    self.failed_dates.append(date_str)
+                    _LOGGER.debug("Could not pre-fetch %s: %s", date_str, ex)
+
+            # Missing plans are valid responses; transport/server errors are not.
+            await self._async_update_holidays()
+            if not successful_requests:
+                raise UpdateFailed("No schedule requests succeeded; retaining previous data")
+            if not self.failed_dates:
+                self.last_successful_update = dt_util.utcnow()
 
             # ----------------------------------------------------------------
             # Build base_schedule: normal timetable without substitutions.
@@ -730,9 +757,6 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("Data update completed successfully")
 
             # ── Fetch school holidays from ferien-api.de ────────────────────
-            _LOGGER.debug("VpMobile24: calling _async_update_holidays")
-            await self._async_update_holidays()
-
             return today_data
 
         except Stundenplan24AuthError as auth_err:
@@ -740,6 +764,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed(
                 "Authentication failed. Please update your password."
             ) from auth_err
+        except UpdateFailed:
+            raise
         except Exception as e:
             _LOGGER.error(f"Error updating data: {e}")
             raise UpdateFailed(f"Error updating VpMobile24 data: {e}") from e
@@ -759,6 +785,9 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("VpMobile24 holidays: entry_id=%s state_code=%s", self._entry_id, state_code)
 
             if not state_code:
+                self._holiday_data = []
+                self._holiday_cache_key = None
+                self._holiday_next_fetch = None
                 _LOGGER.debug("VpMobile24: no state_code configured, skipping holiday fetch")
                 return
 
@@ -769,10 +798,21 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("VpMobile24: fetching holidays for state %s", state_code)
 
             from datetime import date
-            today = date.today()
+            today = dt_util.now().date()
             year = today.year
 
+            cache_key = (state_code, year)
+            now = dt_util.utcnow()
+            if self._holiday_cache_key != cache_key:
+                self._holiday_data = []
+                self._holiday_cache_key = cache_key
+                self._holiday_next_fetch = None
+            if self._holiday_next_fetch and now < self._holiday_next_fetch:
+                return
+            # Back off on errors; successful complete fetches are valid for a day.
+            self._holiday_next_fetch = now + timedelta(hours=1)
             all_holidays = []
+            successful_years = 0
             rate_limited = False
             import aiohttp
             async with aiohttp.ClientSession() as session:
@@ -783,6 +823,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                             if resp.status == 200:
                                 data = await resp.json()
                                 if isinstance(data, list):
+                                    successful_years += 1
                                     for h in data:
                                         all_holidays.append({
                                             "startDate": h.get("start", ""),
@@ -799,8 +840,14 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                     except Exception as err:
                         _LOGGER.debug("VpMobile24: could not fetch holidays for %s/%s: %s", state_code, y, err)
 
-            if all_holidays:
+            if successful_years == 2:
+                self._holiday_next_fetch = now + timedelta(days=1)
                 self._holiday_data = all_holidays
+            elif all_holidays:
+                # Preserve the previously fetched year if only one request worked.
+                merged = {(h["startDate"], h["endDate"]): h for h in self._holiday_data}
+                merged.update({(h["startDate"], h["endDate"]): h for h in all_holidays})
+                self._holiday_data = list(merged.values())
                 _LOGGER.debug("VpMobile24: total %d holiday entries loaded for %s", len(self._holiday_data), state_code)
             elif rate_limited:
                 # Don't wipe previously loaded holidays just because of a temporary 429
@@ -810,3 +857,4 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug("VpMobile24: no holiday data loaded for %s", state_code)
         except Exception as err:
             _LOGGER.debug("VpMobile24: could not fetch holidays: %s", err)
+
