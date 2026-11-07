@@ -255,6 +255,7 @@ class VpMobile24Card extends HTMLElement {
         ['on-primary', 'primary'],
       ];
       for (const [fg] of pairs) card.style.removeProperty('--vpm-' + fg);
+      for (const token of ['surface','elevated','tile-bg','tile-normal','popup-bg']) card.style.removeProperty('--vpm-' + token);
       const probe = document.createElement('span');
       probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
       card.shadowRoot.append(probe);
@@ -274,6 +275,19 @@ class VpMobile24Card extends HTMLElement {
       const ratio = (a,b) => (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
       try {
         const base = blend(read('card'), card._hass?.themes?.darkMode ? [28,28,28] : [255,255,255]);
+        // A dialog must remain opaque even with translucent HA card themes.
+        card.style.setProperty('--vpm-popup-bg', 'rgb(' + base.join(',') + ')');
+        const selected = VpMobile24Card._resolveThemeId(card._config?.theme || 'ha_default');
+        if (selected === 'ha_default') {
+          // Derive subordinate surfaces from the active card background. Some
+          // HA themes leave secondary-background-color dark in light mode.
+          const target = lum(base) > .179 ? 0 : 255;
+          const amount = lum(base) > .179 ? .035 : .055;
+          const surface = base.map(v => Math.round(v+(target-v)*amount));
+          for (const token of ['surface','elevated','tile-bg','tile-normal']) {
+            card.style.setProperty('--vpm-' + token, 'rgb(' + surface.join(',') + ')');
+          }
+        }
         for (const [fg,bg] of pairs) {
           const surface = blend(read(bg), base), color = blend(read(fg),surface);
           if (ratio(color,surface) < 4.5) {
@@ -491,6 +505,43 @@ class VpMobile24Card extends HTMLElement {
   }
 
   static _designTokens(theme, hasExplicitTheme) {
+    return VpMobile24Card._baseDesignTokens(theme, hasExplicitTheme) + `
+:host .vp-popup {
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+  border: 1px solid var(--vpm-border); border-radius: 22px;
+  width: min(480px, calc(100vw - 32px)); max-width: 480px;
+  max-height: calc(100dvh - 40px); overflow: auto;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 24px 80px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+:host .vp-popup-overlay { background: rgba(0,0,0,.38); backdrop-filter: blur(4px); }
+:host .vp-popup-title, :host .vp-info-popup-title {
+  padding: 24px; border-bottom: 1px solid var(--vpm-border);
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+}
+:host .vp-detail-head { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+:host .vp-detail-head-left { gap: 10px; min-width: 0; }
+:host .vp-detail-fach { font-size: 1.65rem; line-height: 1.2; overflow-wrap: anywhere; }
+:host .vp-detail-num { color: var(--vpm-text-muted); font-size: .75rem; letter-spacing: .025em; }
+:host .vp-detail-grid { padding: 20px 24px; gap: 12px; }
+:host .vp-detail-cell { background: var(--vpm-surface); padding: 16px; gap: 10px; border-radius: 14px; min-width: 0; }
+:host .vp-detail-label { color: var(--vpm-text-muted); font-size: .72rem; letter-spacing: .025em; }
+:host .vp-detail-val { color: var(--vpm-text); font-size: 1rem; line-height: 1.5; }
+:host .vp-detail-info-row { margin: 0 24px 20px; padding: 16px; line-height: 1.5; }
+:host .vp-popup-footer { padding: 16px 24px; background: var(--vpm-popup-bg); border-top: 1px solid var(--vpm-border); }
+:host .vp-popup-btn { min-height: 44px; border-radius: 12px; padding: 10px 24px; }
+:host .vp-popup-btn:hover { background: var(--vpm-primary); filter: brightness(.95); transform: none; }
+@media(max-width:480px) {
+  :host .vp-popup { width: calc(100vw - 24px); border-radius: 18px; }
+  :host .vp-detail-grid { padding: 16px; gap: 8px; }
+  :host .vp-popup-title, :host .vp-info-popup-title { padding: 20px 16px; }
+  :host .vp-detail-cell { padding: 12px; }
+  :host .vp-popup-footer { padding: 12px 16px; }
+  :host .vp-popup-btn { width: 100%; }
+}`;
+  }
+
+  static _baseDesignTokens(theme, hasExplicitTheme) {
     // Radien + Motion sind theme-unabhängig.
     // --ha-* lesen HA-CSS-Custom-Properties mit Fallbacks in den Shadow DOM
     // ein, damit _themeVarsHA() darauf zugreifen kann (Shadow DOM erbt
@@ -989,45 +1040,8 @@ class VpMobile24Card extends HTMLElement {
     // Reset accent classes each render
     popup.classList.remove('vp-popup-ausfall', 'vp-popup-sub', 'vp-popup-current');
 
-    // ── AUSFALL: kompaktes, akzentuiertes Popup ──
-    if (isActuallyCancelled) {
-      title.innerHTML = ''; title.style.display = 'none';
-      const lines = [];
-      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
-      if (info)   lines.push(esc(info));
-      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
-      content.innerHTML =
-        '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-cancel"><span class="vp-status-dot"></span>' + esc(t.cancel) + '</div>' +
-          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
-          meta +
-        '</div>';
-      popup.classList.add('vp-popup-ausfall');
-      popup.classList.remove('hidden');
-      overlay.classList.remove('hidden');
-      return;
-    }
-
-    // ── VERTRETUNG: gleiches System, amber Akzent ──
-    if (isVertretung) {
-      title.innerHTML = ''; title.style.display = 'none';
-      const lines = [];
-      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
-      if (zeit)   lines.push(esc(zeit));
-      if (info)   lines.push(esc(info));
-      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
-      content.innerHTML =
-        '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-sub"><span class="vp-status-dot"></span>' + esc(t.substitution) + '</div>' +
-          '<div class="vp-status-fach">' + esc(fach) + '</div>' +
-          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
-          meta +
-        '</div>';
-      popup.classList.add('vp-popup-sub');
-      popup.classList.remove('hidden');
-      overlay.classList.remove('hidden');
-      return;
-    }
+    if (isActuallyCancelled) popup.classList.add('vp-popup-ausfall');
+    else if (isVertretung) popup.classList.add('vp-popup-sub');
 
     // ── NORMAL / AKTUELL: modernes Detail-Popup ──
     // Aktuelle Stunde erkennen (Zeitfenster jetzt?)
@@ -1043,16 +1057,18 @@ class VpMobile24Card extends HTMLElement {
     }
     if (isCurrentNow) popup.classList.add('vp-popup-current');
     title.style.display = '';
-    const nowBadge = isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
+    const nowBadge = isActuallyCancelled ? '<span class="vp-status-badge vp-status-badge-cancel">' + esc(t.cancel) + '</span>' : isVertretung ? '<span class="vp-status-badge vp-status-badge-sub">' + esc(t.substitution) + '</span>' : isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
     title.innerHTML =
       '<div class="vp-detail-head">' +
         '<div class="vp-detail-head-left">' +
-          '<span class="vp-detail-num">' + esc(slotPeriod) + '. ' + esc(t.period) + '</span>' +
-          '<span class="vp-detail-fach">' + esc(fach) + '</span>' +
+          '<span class="vp-detail-num">' + (dayName ? esc(dayName) + ' · ' : '') + esc(slotPeriod) + '. ' + esc(t.period) + '</span>' +
+          '<span class="vp-detail-fach">' + esc(isActuallyCancelled ? t.cancel : fach) + '</span>' +
         '</div>' +
         nowBadge +
-      '</div>' +
-      (zeit ? '<div class="vp-detail-headtime">' + esc(zeit) + '</div>' : '');
+      '</div>';
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    popup.setAttribute('aria-labelledby', 'popup-title');
 
     const cell = (icon, label, val) =>
       '<div class="vp-detail-cell">' +
@@ -1067,7 +1083,7 @@ class VpMobile24Card extends HTMLElement {
     if (klasse) cells += cell(IC.school, t.classLabel, klasse);
     let rows = '<div class="vp-detail-grid">' + cells + '</div>';
     if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">' + IC.info + '</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
-    if (!lehrer && !raum && !klasse && !info) rows = '<div class="vp-detail-empty">' + esc(t.noDetail) + '</div>';
+
     content.innerHTML = rows;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
@@ -2389,9 +2405,9 @@ ha-card {
 .vp-status-meta    { font-size: .9em; font-weight: 500; color: var(--vpm-text-muted); line-height: 1.55; }
 
 .vp-popup-ausfall { border-color: color-mix(in srgb, var(--vpm-error) 50%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-error) 25%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-error) 18%, transparent) !important; }
-.vp-popup-ausfall .vp-popup-title { display: none !important; }
+
 .vp-popup-sub { border-color: color-mix(in srgb, var(--vpm-warning) 45%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-warning) 22%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-warning) 16%, transparent) !important; }
-.vp-popup-sub .vp-popup-title { display: none !important; }
+
 /* ── Info popup (modernes Informations-Panel) ── */
 .vp-info-popup-title {
   padding: 18px 20px 6px; font-size: 1.12em; font-weight: 800; color: var(--vpm-text);
