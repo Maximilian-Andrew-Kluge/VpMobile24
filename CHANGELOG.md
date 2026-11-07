@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.6.8] - 2026-11-07 (Beta)
+
+### Added
+
+- Änderungsmeldungen für neue Vertretungen und Ausfälle mit Automation-Blueprint, Filteroptionen und Ruhezeiten. Erster Abruf und Neustart erzeugen eine stille Ausgangsbasis.
+- Diagnosebericht mit Datenschutz-Allowlist.
+- Datenstatus mit Hinweis auf veraltete Stundenplandaten.
+
+### Fixed
+
+- Einrichtung prüft verfügbare Pläne und erklärt leere oder noch nicht veröffentlichte Pläne.
+- Geänderte Stunden werden für den Kalender korrekt ermittelt.
+- Ferien- und Wochenplanabruf, Kalenderzeiten sowie Fehlerbehandlung verbessert.
+- README-Dokumentation auf Deutsch und Englisch aktualisiert.
+
+### Validation
+
+- Automatische Python-, HACS- und Hassfest-Prüfungen erfolgreich.
+- Vollständiger Live-Test in Home Assistant abhängig von realer Installation; visuelle Karte im Browser geprüft.
+
+
+
 ### Added
 
 - Opt-in timetable change events with duplicate suppression, structured before/after values and German/English messages.

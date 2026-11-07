@@ -8,7 +8,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.6.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.6.7-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.6.8-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -28,7 +28,7 @@
 
 ## Unveröffentlichte Verbesserungen auf `main`
 
-Diese Funktionen sind im Entwicklungsstand enthalten, **nicht im bereits veröffentlichten Release v2.6.7 Beta**. Für HACS-Nutzer werden sie erst mit einem neuen Release verfügbar. Die bestehende Installation muss nicht gelöscht werden.
+Diese Funktionen sind im Entwicklungsstand enthalten, **im Beta-Release v2.6.8 enthalten**. Die Änderungen sind über HACS als Beta verfügbar. Die bestehende Installation muss nicht gelöscht werden.
 
 ### Gezielte Änderungsmeldungen
 
@@ -59,7 +59,7 @@ Automatische Regressionstests prüfen Fehlerfälle und Änderungsvergleiche. Ein
 ## 🚀 Was ist neu in v2.6.x?
 
 > [!IMPORTANT]
-> **VpMobile24 v2.6.5** ist das aktuelle Stable Release. **v2.6.7** ist die aktuelle Beta mit Fehlerkorrekturen für die Lehrerliste und das HA-Theme.
+> **VpMobile24 v2.6.5** ist das aktuelle Stable Release. **v2.6.8** ist die aktuelle Beta mit Änderungsmeldungen, verbesserter Einrichtung und Datenschutz-Diagnose.
 >
 > 🔗 [Alle Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
