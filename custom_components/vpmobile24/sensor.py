@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.util import dt as dt_util
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -98,6 +99,7 @@ async def async_setup_entry(
     language = lang_short if lang_short in ("de", "en", "fr") else "en"
 
     async_add_entities([
+        VpMobile24DataStatusSensor(coordinator, config_entry, language),
         VpMobile24NextLessonSensor(coordinator, config_entry, language),
         VpMobile24WeekScheduleSensor(coordinator, config_entry, language),
         VpMobile24WeekTableSensor(coordinator, config_entry, language),
@@ -1005,19 +1007,19 @@ _KMK_HOLIDAYS: dict = {
 }
 
 
-class VpMobile24HolidaySensor(SensorEntity):
+class VpMobile24HolidaySensor(CoordinatorEntity, SensorEntity):
     """Sensor für Schulferien – nutzt hardcodierte KMK-Daten mit API-Update."""
 
     def __init__(self, coordinator, config_entry, language: str = "en") -> None:
+        super().__init__(coordinator)
         self._config_entry = config_entry
         self._language = language
         self._attr_name = "VpMobile24 Ferien"
         self._attr_unique_id = f"{config_entry.entry_id}_ferien"
         self._attr_icon = "mdi:beach"
-        self._attr_should_poll = True
+        self._attr_should_poll = False
         self._current_holiday: dict | None = None
         self._next_holiday: dict | None = None
-        self._last_fetch_date: str = ""
         # Initialize immediately from fallback data
         self._compute_holidays_from_data(_KMK_HOLIDAYS.get(self._state_code(), []))
 
@@ -1036,8 +1038,7 @@ class VpMobile24HolidaySensor(SensorEntity):
 
     def _compute_holidays_from_data(self, holidays: list) -> None:
         """Compute current and next holiday from a list of {start, end, name} dicts."""
-        from datetime import date as _date
-        today = _date.today()
+        today = dt_util.now().date()
         self._current_holiday = None
         self._next_holiday = None
         for h in sorted(holidays, key=lambda x: x.get("start", "")):
@@ -1054,12 +1055,14 @@ class VpMobile24HolidaySensor(SensorEntity):
 
     @property
     def state(self) -> str:
+        self._refresh_holidays()
         if self._current_holiday:
             return self._current_holiday.get("name", "Ferien")
         return "Keine Ferien"
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
+        self._refresh_holidays()
         ch = self._current_holiday
         nh = self._next_holiday
         return {
@@ -1072,52 +1075,22 @@ class VpMobile24HolidaySensor(SensorEntity):
             "naechste_ferien_end":   nh.get("end")   if nh else None,
             "bundesland": self._state_code(),
             "manuell": False,
+            "datenquelle": "API" if self.coordinator._holiday_data else "Fallback",
         }
 
-    async def async_update(self) -> None:
-        """Try to update from ferien-api.de, fall back to KMK data."""
-        state_code = self._state_code()
-        if not state_code:
-            return
+    @property
+    def available(self) -> bool:
+        # A school-server outage does not invalidate independently cached holidays.
+        return True
 
-        from datetime import date
-        today = date.today()
-        today_str = today.isoformat()
-
-        # Always compute from fallback first so sensor is never empty
-        fallback = _KMK_HOLIDAYS.get(state_code, [])
-        self._compute_holidays_from_data(fallback)
-
-        # Only try API once per day
-        if self._last_fetch_date == today_str:
-            return
-
-        try:
-            import aiohttp
-            year = today.year
-            all_holidays: list = []
-            headers = {"User-Agent": "VpMobile24-HA/2.5 (github.com/Maximilian-Andrew-Kluge/VpMobile24)"}
-
-            async with aiohttp.ClientSession(headers=headers) as session:
-                for y in [year, year + 1]:
-                    url = f"https://ferien-api.de/api/v1/holidays/{state_code}/{y}"
-                    try:
-                        async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                            if resp.status == 200:
-                                data = await resp.json()
-                                if isinstance(data, list):
-                                    all_holidays.extend(data)
-                            # On 429 or error: fallback already set above
-                    except Exception:
-                        pass
-
-            if all_holidays:
-                self._compute_holidays_from_data(all_holidays)
-
-            self._last_fetch_date = today_str
-
-        except Exception as err:
-            _LOGGER.debug("VpMobile24HolidaySensor: API error, using KMK fallback: %s", err)
+    def _refresh_holidays(self) -> None:
+        data = self.coordinator._holiday_data
+        if data:
+            holidays = [{"start": h["startDate"], "end": h["endDate"],
+                         "name": h["name"][0]["text"]} for h in data]
+        else:
+            holidays = _KMK_HOLIDAYS.get(self._state_code(), [])
+        self._compute_holidays_from_data(holidays)
 
 
 class VpMobile24TeacherClassesSensor(CoordinatorEntity, SensorEntity):
@@ -1187,3 +1160,46 @@ class VpMobile24TeacherClassesSensor(CoordinatorEntity, SensorEntity):
 
     def _is_cancelled(self, fach: str) -> bool:
         return not fach or fach.strip() in ["—", "---", "", "-"]
+
+
+
+class VpMobile24DataStatusSensor(CoordinatorEntity, SensorEntity):
+    """Expose fetch health even when timetable entities are unavailable."""
+
+    def __init__(self, coordinator, config_entry, language="en"):
+        super().__init__(coordinator)
+        self._config_entry = config_entry
+        self._language = language
+        self._attr_name = {"de": "VpMobile24 Datenstatus", "en": "VpMobile24 Data Status",
+                           "fr": "VpMobile24 État des données"}[language]
+        self._attr_unique_id = f"{config_entry.entry_id}_data_status"
+        self._attr_icon = "mdi:cloud-sync-outline"
+
+    @property
+    def device_info(self):
+        return _device_info(self._config_entry)
+
+    @property
+    def available(self):
+        return True
+
+    @property
+    def state(self):
+        stale = self._is_stale()
+        return {"de": ("Aktuell", "Daten veraltet"),
+                "en": ("Up to date", "Data stale"),
+                "fr": ("À jour", "Données périmées")}[self._language][stale]
+
+    def _is_stale(self):
+        last = self.coordinator.last_successful_update
+        return bool(not self.coordinator.last_update_success
+                    or self.coordinator.failed_dates or last is None
+                    or dt_util.utcnow() - last > timedelta(minutes=30))
+
+    @property
+    def extra_state_attributes(self):
+        last = self.coordinator.last_successful_update
+        return {"last_successful_update": last.isoformat() if last else None,
+                "data_stale": self._is_stale(),
+                "failed_dates": self.coordinator.failed_dates,
+                "demo": self.coordinator.is_demo}
