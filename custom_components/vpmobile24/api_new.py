@@ -19,6 +19,10 @@ class Stundenplan24AuthError(Exception):
     """Raised when the API returns 401/403 (invalid credentials)."""
 
 
+class Stundenplan24NotFoundError(Exception):
+    """The requested daily plan has not been published (HTTP 404)."""
+
+
 class Stundenplan24API:
     """API client for stundenplan24.de."""
 
@@ -254,11 +258,12 @@ class Stundenplan24API:
                     raise Stundenplan24AuthError(
                         f"Authentication failed (HTTP {response.status}) for {target_date}"
                     )
+                if response.status == 404:
+                    raise Stundenplan24NotFoundError(f"No schedule for {target_date}")
                 raise Exception(f"HTTP {response.status} - Schedule not available for {target_date}")
 
         except Exception as ex:
-            ex_str = str(ex)
-            if "404" in ex_str:
+            if isinstance(ex, Stundenplan24NotFoundError):
                 _LOGGER.debug("Schedule not available for %s (404 - weekend/holiday)", target_date)
             else:
                 _LOGGER.debug("Error fetching schedule for %s: %s", target_date, ex)
@@ -289,3 +294,4 @@ class Stundenplan24API:
         if self.session:
             await self.session.close()
             self.session = None
+
