@@ -409,6 +409,10 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
         return _device_info(self._config_entry)
 
     @property
+    def available(self):
+        return bool(self.coordinator.data)
+
+    @property
     def state(self) -> str | None:
         if not self.coordinator.data:
             return STATE_MESSAGES[self._language]["no_data"]
@@ -511,6 +515,10 @@ class VpMobile24WeekTableSensor(CoordinatorEntity, SensorEntity):
                     next_next_week_lessons.append(lesson_copy)
 
         return {
+            "last_successful_update": self.coordinator.last_successful_update.isoformat() if self.coordinator.last_successful_update else None,
+            "data_stale": bool(not self.coordinator.last_update_success or self.coordinator.failed_dates
+                               or self.coordinator.last_successful_update is None
+                               or dt_util.utcnow() - self.coordinator.last_successful_update > timedelta(minutes=30)),
             "week_table": self._create_week_table(all_lessons),
             "next_week_table": self._create_week_table(next_week_lessons),
             "next_next_week_table": self._create_week_table(next_next_week_lessons),

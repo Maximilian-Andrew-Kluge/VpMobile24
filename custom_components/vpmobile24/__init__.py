@@ -17,6 +17,7 @@ from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, CONF_EXCLUDED_SUBJECTS, CONF_CLASS_NAME, CONF_SELECTED_COURSES, CONF_SERVER, DEFAULT_BASE_URL, DOWNLOAD_SERVERS, CONF_DEMO_MODE, VERSION
 from .api_new import Stundenplan24API, Stundenplan24AuthError, Stundenplan24NotFoundError
+from .changes import snapshot, compare_day
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -296,6 +297,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                     new_identifiers={(DOMAIN, device_id)},
                 )
 
+        coord._change_baseline = {}  # Configuration edits are not timetable changes.
         coord.excluded_subjects = new_excluded
         coord.selected_courses  = new_selected
         # If state_code changed, refresh holiday data immediately
@@ -358,6 +360,7 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
         self._holiday_next_fetch = None
         self.last_successful_update = None
         self.failed_dates: list[str] = []
+        self._change_baseline = {}
         self._force_refresh = False  # set by reload button to bypass the day cache
         super().__init__(
             hass,
@@ -365,6 +368,35 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             name=DOMAIN,
             update_interval=timedelta(minutes=15),
         )
+
+    def _publish_changes(self, today):
+        """Compare successfully fetched days; first sight and restarts stay silent."""
+        entry = self.hass.config_entries.async_get_entry(self._entry_id)
+        enabled = bool(entry and entry.options.get("enable_change_events", False))
+        if not enabled or self.is_demo:
+            self._change_baseline = {}
+            return
+        self._change_baseline = {d: v for d, v in self._change_baseline.items() if d >= today}
+        # A withdrawn/unpublished day is not evidence of cancelled lessons.
+        for day in set(self._change_baseline) - set(self._week_data_cache):
+            if day not in self.failed_dates:
+                self._change_baseline.pop(day, None)
+        for day, data in sorted(self._week_data_cache.items()):
+            if day < today or day in self.failed_dates:
+                continue
+            lessons = [item for item in data.get("lessons", []) + data.get("changes", [])
+                       if not _course_selection_excludes(item, self.selected_courses)
+                       and item.get("subject") not in self.excluded_subjects
+                       and item.get("course") not in self.excluded_subjects]
+            current = snapshot(lessons)
+            previous = self._change_baseline.get(day)
+            self._change_baseline[day] = current
+            if previous is None:
+                continue
+            for change in compare_day(previous, current, day):
+                self.hass.bus.async_fire("vpmobile24_schedule_changed", {
+                    "entry_id": self._entry_id, **change,
+                })
 
     async def async_force_refresh(self) -> None:
         """Force a full reload: clear the day cache so every day is re-fetched.
@@ -731,6 +763,8 @@ class VpMobile24DataUpdateCoordinator(DataUpdateCoordinator):
             today_changes = [c for c in all_changes if c.get("date") == today_str]
 
             _LOGGER.debug(f"Today's data extracted: {len(today_lessons)} lessons, {len(today_changes)} changes")
+
+            self._publish_changes(today_str)
 
             if not all_lessons and not all_changes:
                 _LOGGER.info("No schedule data available (possibly school holidays)")

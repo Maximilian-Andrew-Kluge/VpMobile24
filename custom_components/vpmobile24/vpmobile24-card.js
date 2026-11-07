@@ -1175,7 +1175,7 @@ class VpMobile24Card extends HTMLElement {
             const fachSpan = isTeacherMode
               ? '<span class="vp-tile-fach">' + lesson.fach + '</span>'
               : lesson.fach;
-            text = fachSpan + klasseLabel + raumLabel;
+            text = fachSpan + klasseLabel + raumLabel + (isVertretung ? '<small class="vp-change-label">' + t.substitution + '</small>' : '');
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             if (isCurrent)         cls += ' vp-current';
             else if (isVertretung) cls += ' vp-sub';
@@ -1184,7 +1184,7 @@ class VpMobile24Card extends HTMLElement {
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             const tileInfo = lesson && lesson.zusatzinfo;
-            text = tileInfo ? tileInfo : '—';
+            text = t.cancelled + (tileInfo ? '<small class="vp-change-label">' + tileInfo + '</small>' : '');
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
             cls += ' vp-empty';
@@ -1395,6 +1395,18 @@ class VpMobile24Card extends HTMLElement {
     return slots;
   }
 
+  _dataStatus(entity) {
+    const attr = entity.attributes || {};
+    const last = Date.parse(attr.last_successful_update || '');
+    const stale = attr.data_stale === true || entity.state === 'unavailable' ||
+      (Number.isFinite(last) && Date.now() - last > 30 * 60000);
+    if (!stale) return '';
+    const lang = (this._hass.language || 'de').slice(0, 2);
+    const label = lang === 'en' ? 'Data stale · last successful fetch: ' : lang === 'fr' ? 'Données périmées · dernière récupération : ' : 'Daten veraltet · letzter erfolgreicher Abruf: ';
+    const time = Number.isFinite(last) ? new Date(last).toLocaleString() : '—';
+    return `<div role="status" style="padding:12px 16px;border-bottom:2px solid var(--vpm-error);color:var(--vpm-text);font-size:13px">⚠ ${label}${time}</div>`;
+  }
+
   _render() {
     if (!this._hass || !this._config) return;
     const t = this._buildTranslations();
@@ -1504,7 +1516,7 @@ ha-card {
   padding: 10px 18px 12px;
 }
 </style>
-<ha-card>
+<ha-card>${this._dataStatus(entity)}
   <div class="hol-hdr">
     <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="hol-hdr-body">
@@ -1538,7 +1550,7 @@ ha-card {
     // If next/next_next week data not yet available, show loading state
     if (weekOffset >= 1 && !weekTable) {
       this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style>
-<ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card);border:1px solid var(--vpm-card-border)">
+<ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card);border:1px solid var(--vpm-card-border)">${this._dataStatus(entity)}
   <div style="padding:32px 20px;text-align:center;font-family:'Inter',-apple-system,sans-serif">
     <div style="font-weight:700;font-size:1em;color:#212121;margin-bottom:8px">${t.nextWeek}</div>
     <div style="font-size:.85em;color:#616161">Daten werden geladen…</div>
@@ -1693,7 +1705,7 @@ ha-card {
             const fachSpan2 = isTeacherModeRender
               ? '<span class="vp-tile-fach">' + lesson.fach + '</span>'
               : lesson.fach;
-            text = fachSpan2 + klasseLabel2 + raumLabel2;
+            text = fachSpan2 + klasseLabel2 + raumLabel2 + (isVertretung ? '<small class="vp-change-label">' + t.substitution + '</small>' : '');
             const isCurrent = isToday && slot.lessonNumber === currentLessonNum;
             const isSupervision = !!(lesson && lesson.ist_aufsicht);
             if (isCurrent)       cls += ' vp-current';
@@ -1704,7 +1716,7 @@ ha-card {
             cls += ' vp-tile-clickable';
           } else if (isCancelled) {
             const tileInfo2 = lesson && lesson.zusatzinfo;
-            text = tileInfo2 ? tileInfo2 : '—';
+            text = t.cancelled + (tileInfo2 ? '<small class="vp-change-label">' + tileInfo2 + '</small>' : '');
             cls += ' vp-cancelled vp-tile-clickable';
           } else {
             cls += ' vp-empty';
@@ -2120,6 +2132,7 @@ ha-card {
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
 /* VERTRETUNG: leichte amber-Tönung + linker Rand + Punkt */
+.vp-change-label { display:block; font-size:10px; line-height:1.3; font-weight:500; }
 .vp-tile.vp-sub {
   background: var(--vpm-tile-sub) !important;
   color: var(--vpm-tile-sub-color) !important;
@@ -2450,7 +2463,7 @@ ha-card {
   .vp-tile.vp-current::after { animation: none !important; }
 }
 </style>
-<ha-card>
+<ha-card>${this._dataStatus(entity)}
 
   <!-- ── Header ── -->
   <div class="vp-hdr">
