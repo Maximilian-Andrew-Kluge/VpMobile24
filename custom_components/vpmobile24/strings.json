@@ -34,12 +34,12 @@
       },
       "teacher": {
         "title": "Enter teacher abbreviation",
-        "description": "Enter your teacher abbreviation (e.g. MUS, SCH). All lessons and substitutions with this abbreviation will be shown automatically.",
+        "description": "Select your teacher abbreviation or type it manually if it is missing from the suggestions. Lessons, substitutions and supervisions are filtered by this abbreviation.",
         "data": {
           "teacher_short": "Teacher abbreviation"
         },
         "data_description": {
-          "teacher_short": "Your abbreviation exactly as it appears in the substitution plan (case insensitive)."
+          "teacher_short": "You can enter an abbreviation that is not listed. Enter it exactly as used by your school; matching is case insensitive."
         }
       },
       "demo": {
@@ -78,7 +78,8 @@
     "error": {
       "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
       "invalid_auth": "Invalid password.",
-      "unknown": "An unknown error occurred."
+      "unknown": "An unknown error occurred.",
+      "invalid_teacher": "Enter a teacher abbreviation."
     },
     "abort": {
       "already_configured": "This class is already configured for this school.",
@@ -130,9 +131,12 @@
       },
       "change_teacher": {
         "title": "Change teacher abbreviation",
-        "description": "Select your teacher abbreviation from the list.",
+        "description": "Select your teacher abbreviation or type it manually if it is missing from the suggestions. Lessons, substitutions and supervisions are filtered by this abbreviation.",
         "data": {
           "teacher_short": "Teacher abbreviation"
+        },
+        "data_description": {
+          "teacher_short": "You can enter an abbreviation that is not listed. Enter it exactly as used by your school; matching is case insensitive."
         }
       },
       "change_holidays": {
@@ -144,7 +148,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials."
+      "cannot_connect": "Connection to VpMobile24 failed. Please check your credentials.",
+      "invalid_teacher": "Enter a teacher abbreviation."
     }
   },
   "issues": {
