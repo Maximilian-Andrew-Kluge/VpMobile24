@@ -239,25 +239,28 @@ class VpMobile24Card extends HTMLElement {
   // oder @media-Selektor) aus einem Theme-Objekt. Statusfarben sind fix je
   // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
   // dem Theme. Tile-Tokens werden daraus abgeleitet.
+  static _onPrimary(color) {
+    const rgb = color.replace('#', '').match(/../g).map(v => parseInt(v, 16) / 255);
+    const linear = rgb.map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const luminance = linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+    return luminance > 0.179 ? '#111111' : '#ffffff';
+  }
+
   static _themeVars(theme) {
     if (theme.ha_mode) return VpMobile24Card._themeVarsHA();
     const light = !!theme.light;
-    if (light) return VpMobile24Card._themeVarsLight(theme);
-    return VpMobile24Card._themeVarsDark(theme);
+    if (light) return VpMobile24Card._themeVarsLight(theme) + '--vpm-on-primary: ' + VpMobile24Card._onPrimary(theme.primary) + ';';
+    return VpMobile24Card._themeVarsDark(theme) + '--vpm-on-primary: ' + VpMobile24Card._onPrimary(theme.primary) + ';';
   }
 
 
-  // ── HA Standard Theme (folgt dem aktiven HA Theme) ─────────────────────
-  // Layer 1: :host liest HA-Variablen mit sicheren Fallbacks ein (--ha-*).
-  // Layer 2: --vpm-* nutzen nur die --ha-*-Variablen, die auf :host definiert
-  //          und damit im Shadow DOM zuverlässig verfügbar sind.
-  // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
   // ── HA Standard Theme: follow the active Home Assistant theme ──────────
   // Resolve the selected HA theme through inherited CSS variables. This works
   // for both explicit light/dark HA modes and theme-specific palettes, regardless
   // of the browser's prefers-color-scheme setting.
   static _themeVarsHA() {
     return `
+  --vpm-on-primary: var(--text-primary-color, #ffffff);
   --vpm-bg: var(--primary-background-color, #fafafa);
   --vpm-card: var(--ha-card-background, var(--card-background-color, #ffffff));
   --vpm-surface: var(--secondary-background-color, #f5f5f5);
@@ -730,8 +733,6 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Wenn ha_default Theme aktiv: HA-Farben aus dem Light DOM auslesen und
-    // als CSS-Variablen auf :host setzen, damit sie im Shadow DOM verfügbar sind.
     if (this._config) {
       const dow = new Date().getDay();
       // Auto-switch to next week on weekends — but only if user hasn't navigated manually
@@ -1407,7 +1408,7 @@ ha-card {
   background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important; overflow: hidden;
   box-shadow: var(--vpm-shadow) !important;
-  border: 1px solid rgba(245,158,11,.22) !important;
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 22%, transparent) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
 }
@@ -1415,11 +1416,11 @@ ha-card {
 .hol-hdr {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px 12px;
-  border-bottom: 1px solid rgba(245,158,11,.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-warning) 12%, transparent);
 }
 .hol-hdr-icon {
   width: 42px; height: 42px; flex-shrink: 0;
-  background: linear-gradient(135deg,#f59e0b,#d97706);
+  background: linear-gradient(135deg,var(--vpm-warning),var(--vpm-warning));
   border-radius: 11px; display: flex; align-items: center; justify-content: center;
 }
 .hol-hdr-body { display: flex; flex-direction: column; gap: 4px; }
@@ -1427,7 +1428,7 @@ ha-card {
 .hol-hdr-class {
   display: inline-flex; align-items: center;
   font-size: .72em; font-weight: 700; color: var(--vpm-warning);
-  background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.22);
+  background: color-mix(in srgb, var(--vpm-warning) 12%, transparent); border: 1px solid color-mix(in srgb, var(--vpm-warning) 22%, transparent);
   border-radius: 20px; padding: 2px 10px; width: fit-content;
 }
 /* ── Body ── */
@@ -1437,27 +1438,27 @@ ha-card {
 }
 .hol-sun {
   width: 56px; height: 56px; flex-shrink: 0;
-  background: rgba(245,158,11,.10);
-  border: 1px solid rgba(245,158,11,.25);
+  background: color-mix(in srgb, var(--vpm-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 25%, transparent);
   border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  color: #f59e0b;
+  color: var(--vpm-warning);
 }
 .hol-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.hol-name { font-size: 1.18em; font-weight: 800; color: #f59e0b; letter-spacing: -.01em; line-height: 1.2; }
+.hol-name { font-size: 1.18em; font-weight: 800; color: var(--vpm-warning); letter-spacing: -.01em; line-height: 1.2; }
 .hol-until {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .82em; font-weight: 500; color: var(--vpm-text-muted);
 }
-.hol-until-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+.hol-until-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vpm-warning); flex-shrink: 0; }
 .hol-next {
   font-size: .76em; color: var(--vpm-text-faint);
-  border-top: 1px solid rgba(245,158,11,.10);
+  border-top: 1px solid color-mix(in srgb, var(--vpm-warning) 10%, transparent);
   padding: 10px 18px 12px;
 }
 </style>
 <ha-card>${this._dataStatus(entity)}
   <div class="hol-hdr">
-    <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="hol-hdr-body">
       <div class="hol-hdr-title">${title}</div>
       ${className ? `<span class="hol-hdr-class">${t.classLabel || 'Klasse'} ${className}</span>` : ''}
@@ -1491,9 +1492,9 @@ ha-card {
       this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style>
 <ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card);border:1px solid var(--vpm-card-border)">${this._dataStatus(entity)}
   <div style="padding:32px 20px;text-align:center;font-family:'Inter',-apple-system,sans-serif">
-    <div style="font-weight:700;font-size:1em;color:#212121;margin-bottom:8px">${t.nextWeek}</div>
-    <div style="font-size:.85em;color:#616161">Daten werden geladen…</div>
-    <div style="font-size:.78em;color:#9e9e9e;margin-top:6px">Bitte kurz warten oder Reload-Button drücken.</div>
+    <div style="font-weight:700;font-size:1em;color:var(--vpm-text);margin-bottom:8px">${t.nextWeek}</div>
+    <div style="font-size:.85em;color:var(--vpm-text-muted)">Daten werden geladen…</div>
+    <div style="font-size:.78em;color:var(--vpm-text-faint);margin-top:6px">Bitte kurz warten oder Reload-Button drücken.</div>
   </div>
 </ha-card>`;
       return;
@@ -1883,8 +1884,8 @@ ha-card {
 .vp-hdr-ausfall {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .72em; font-weight: 700; white-space: nowrap;
-  color: var(--vpm-error); background: rgba(239,68,68,.12);
-  border: 1px solid rgba(239,68,68,.28); border-radius: var(--vpm-radius-pill);
+  color: var(--vpm-error); background: color-mix(in srgb, var(--vpm-error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-error) 28.000000000000004%, transparent); border-radius: var(--vpm-radius-pill);
   padding: 3px 10px;
 }
 .vp-hdr-ausfall::before {
@@ -1910,15 +1911,15 @@ ha-card {
 /* Icon-Pill (Reload): nahezu quadratisch, gleiche Höhe wie die Text-Pill */
 .vp-pill-icon { width: 34px; padding: 7px 0; font-size: .95em; }
 .vp-pill-blue  { color: var(--vpm-primary); border-color: var(--vpm-primary-border); background: var(--vpm-primary-soft); }
-.vp-pill-blue:hover  { background: rgba(79,124,255,0.2); border-color: var(--vpm-primary); }
-.vp-pill-green { color: var(--vpm-success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
-.vp-pill-green:hover { background: rgba(34,197,94,0.2); border-color: var(--vpm-success); }
-.vp-pill-amber { color: var(--vpm-warning); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.09); }
-.vp-pill-amber:hover { background: rgba(245,158,11,0.2); border-color: var(--vpm-warning); }
+.vp-pill-blue:hover  { background: color-mix(in srgb, var(--vpm-primary) 20%, transparent); border-color: var(--vpm-primary); }
+.vp-pill-green { color: var(--vpm-success); border-color: color-mix(in srgb, var(--vpm-success) 30%, transparent); background: color-mix(in srgb, var(--vpm-success) 9%, transparent); }
+.vp-pill-green:hover { background: color-mix(in srgb, var(--vpm-success) 20%, transparent); border-color: var(--vpm-success); }
+.vp-pill-amber { color: var(--vpm-warning); border-color: color-mix(in srgb, var(--vpm-warning) 30%, transparent); background: color-mix(in srgb, var(--vpm-warning) 9%, transparent); }
+.vp-pill-amber:hover { background: color-mix(in srgb, var(--vpm-warning) 20%, transparent); border-color: var(--vpm-warning); }
 .vp-pill-amber.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
 @keyframes vp-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
-  50%      { box-shadow: 0 0 0 5px rgba(245,158,11,0); }
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-warning) 40%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--vpm-warning) 0%, transparent); }
 }
 @keyframes vpm-spin {
   0%   { transform: rotate(0deg); }
@@ -1929,9 +1930,9 @@ ha-card {
   100% { transform: rotate(-360deg); }
 }
 .vp-pill-reloading {
-  background: rgba(34,197,94,0.25) !important;
-  color: #22c55e !important;
-  border-color: rgba(34,197,94,0.6) !important;
+  background: color-mix(in srgb, var(--vpm-success) 25%, transparent) !important;
+  color: var(--vpm-success) !important;
+  border-color: color-mix(in srgb, var(--vpm-success) 60%, transparent) !important;
 }
 .vp-pill-reloading .vp-reload-icon {
   animation: vpm-spin-ccw 0.8s linear !important;
@@ -1953,11 +1954,11 @@ ha-card {
   content: ''; width: 7px; height: 7px; border-radius: 50%;
   background: currentColor; flex-shrink: 0; opacity: .9;
 }
-.vp-hint-red    { background: rgba(239,68,68,.12);  color: var(--vpm-error);   border: 1px solid rgba(239,68,68,.2); }
-.vp-hint-yellow { background: rgba(245,158,11,.12); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.2); }
-.vp-hint-blue   { background: rgba(79,124,255,.12); color: var(--vpm-primary); border: 1px solid rgba(79,124,255,.2); }
-.vp-hint-green  { background: rgba(34,197,94,.12);  color: var(--vpm-success); border: 1px solid rgba(34,197,94,.2); }
-.vp-hint-holiday { background: rgba(139,92,246,.14); color: #7c3aed; border: 1px solid rgba(139,92,246,.3); font-weight: 700; }
+.vp-hint-red    { background: color-mix(in srgb, var(--vpm-error) 12%, transparent);  color: var(--vpm-error);   border: 1px solid color-mix(in srgb, var(--vpm-error) 20%, transparent); }
+.vp-hint-yellow { background: color-mix(in srgb, var(--vpm-warning) 12%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 20%, transparent); }
+.vp-hint-blue   { background: color-mix(in srgb, var(--vpm-primary) 12%, transparent); color: var(--vpm-primary); border: 1px solid color-mix(in srgb, var(--vpm-primary) 20%, transparent); }
+.vp-hint-green  { background: color-mix(in srgb, var(--vpm-success) 12%, transparent);  color: var(--vpm-success); border: 1px solid color-mix(in srgb, var(--vpm-success) 20%, transparent); }
+.vp-hint-holiday { background: color-mix(in srgb, var(--vpm-info) 14.000000000000002%, transparent); color: var(--vpm-info); border: 1px solid color-mix(in srgb, var(--vpm-info) 30%, transparent); font-weight: 700; }
 
 /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
 /* table-layout:fixed => alle Tages-Spalten exakt gleich breit, unabhängig
@@ -1979,7 +1980,7 @@ ha-card {
 .vp-today-pill {
   display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
   background: linear-gradient(135deg, var(--vpm-primary), var(--vpm-primary-2));
-  color: #fff; border-radius: 10px; padding: 5px 12px;
+  color: var(--vpm-on-primary); border-radius: 10px; padding: 5px 12px;
   font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .5px;
   box-shadow: none;
 }
@@ -1990,7 +1991,7 @@ ha-card {
 .vp-snum    { font-size: .92em; font-weight: 800; color: var(--vpm-text); line-height: 1.25; }
 .vp-stime   { font-size: .66em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-today-col td,
-.vp-today-col    { background: rgba(79,124,255,0.05) !important; border-radius: var(--vpm-radius-tile); }
+.vp-today-col    { background: color-mix(in srgb, var(--vpm-primary) 5%, transparent) !important; border-radius: var(--vpm-radius-tile); }
 
 /* ── Tiles ── */
 /* Ruhiges Grunddesign: dezenter Hintergrund, Status als linker Rand + Punkt
@@ -2060,7 +2061,7 @@ ha-card {
 }
 .vp-today-col .vp-tile.vp-empty {
   background: transparent;
-  border: 1px dashed rgba(79,124,255,0.18);
+  border: 1px dashed color-mix(in srgb, var(--vpm-primary) 18%, transparent);
 }
 /* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
 .vp-tile.vp-normal {
@@ -2069,7 +2070,7 @@ ha-card {
   border-left: 3px solid var(--vpm-tile-normal-border);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
-.vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
+.vp-tile.vp-today-tile { background: color-mix(in srgb, var(--vpm-primary) 14.000000000000002%, transparent); color: var(--vpm-text); }
 /* VERTRETUNG: leichte amber-Tönung + linker Rand + Punkt */
 .vp-change-label { display:block; font-size:10px; line-height:1.3; font-weight:500; }
 .vp-tile.vp-sub {
@@ -2082,9 +2083,9 @@ ha-card {
 .vp-tile.vp-sub::after { background: var(--vpm-c-sub); }
 /* AUFSICHT: violette Tönung */
 .vp-tile.vp-supervision {
-  background: rgba(139,92,246,0.10);
-  color: #c4b5fd;
-  border: 1px solid rgba(139,92,246,0.2);
+  background: color-mix(in srgb, var(--vpm-info) 10%, transparent);
+  color: var(--vpm-info);
+  border: 1px solid color-mix(in srgb, var(--vpm-info) 20%, transparent);
   border-left: 3px solid var(--vpm-c-holiday);
   font-weight: 700;
 }
@@ -2103,7 +2104,7 @@ ha-card {
   cursor: pointer; overflow: visible;
   transition: background .15s ease, border-color .15s ease;
 }
-.vp-dayinfo-cell:hover { background: rgba(79,124,255,0.20); border-color: var(--vpm-primary); }
+.vp-dayinfo-cell:hover { background: color-mix(in srgb, var(--vpm-primary) 20%, transparent); border-color: var(--vpm-primary); }
 .vp-dayinfo-ico { flex: 0 0 auto; font-size: 11px; }
 .vp-dayinfo-txt {
   flex: 1 1 auto; min-width: 0;
@@ -2113,8 +2114,8 @@ ha-card {
 .vp-dayinfo-tooltip {
   position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
   z-index: 50; min-width: 120px; max-width: 240px; width: max-content;
-  background: #0f1729; color: #e2e8f0;
-  border: 1px solid rgba(59,130,246,0.5); border-radius: 8px;
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+  border: 1px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent); border-radius: 8px;
   padding: 7px 10px; font-size: 11px; line-height: 1.35;
   white-space: normal; text-align: left;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -2123,7 +2124,7 @@ ha-card {
 }
 .vp-dayinfo-tooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  border: 6px solid transparent; border-top-color: #0f1729;
+  border: 6px solid transparent; border-top-color: var(--vpm-popup-bg);
 }
 .vp-dayinfo-cell:hover .vp-dayinfo-tooltip { opacity: 1; visibility: visible; }
 /* Day heading inside the info popup */
@@ -2145,9 +2146,9 @@ ha-card {
 .vp-today-col .vp-tile.vp-cancelled { background: var(--vpm-tile-cancelled) !important; }
 /* AKTUELLE STUNDE: klar hervorgehoben, dezenter blauer Glow (kein Überglühen) */
 .vp-tile.vp-current {
-  background: linear-gradient(135deg, rgba(79,124,255,0.22), rgba(109,93,251,0.18)) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--vpm-primary) 22%, transparent), color-mix(in srgb, var(--vpm-primary) 18%, transparent)) !important;
   color: var(--vpm-text) !important; font-weight: 800;
-  border: 1px solid rgba(79,124,255,0.5) !important;
+  border: 1px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent) !important;
   border-left: 3px solid var(--vpm-c-current) !important;
   box-shadow: none !important;
 }
@@ -2155,12 +2156,12 @@ ha-card {
   content: ''; position: absolute; top: 6px; right: 6px;
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--vpm-c-current);
-  box-shadow: 0 0 0 0 rgba(79,124,255,0.6);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-primary) 60%, transparent);
   animation: vp-dot-pulse 2s ease-in-out infinite;
 }
 @keyframes vp-dot-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(79,124,255,0.5); }
-  50%      { box-shadow: 0 0 0 5px rgba(79,124,255,0); }
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-primary) 50%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--vpm-primary) 0%, transparent); }
 }
 .vp-tile-clickable { cursor: pointer; }
 .vp-tile-clickable:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
@@ -2185,14 +2186,14 @@ ha-card {
 }
 .vp-legend-item {
   display: flex; align-items: center; gap: 6px; color: var(--vpm-text-muted);
-  background: rgba(255,255,255,0.04); border-radius: var(--vpm-radius-pill);
+  background: color-mix(in srgb, var(--vpm-text) 4%, transparent); border-radius: var(--vpm-radius-pill);
   padding: 4px 10px;
 }
 .vp-ldot { width: 8px; height: 8px; border-radius: 50%; }
 .vp-ldot-today   { background: var(--vpm-c-current); }
 .vp-ldot-sub     { background: var(--vpm-c-sub); }
 .vp-ldot-cancel  { background: var(--vpm-c-cancel); }
-.vp-ldot-current { background: var(--vpm-c-current); box-shadow: 0 0 5px rgba(79,124,255,.6); }
+.vp-ldot-current { background: var(--vpm-c-current); box-shadow: 0 0 5px color-mix(in srgb, var(--vpm-primary) 60%, transparent); }
 .vp-lbl-today, .vp-lbl-sub, .vp-lbl-cancel, .vp-lbl-current { color: var(--vpm-text-muted); font-weight: 600; }
 
 /* ══ MOBILE ══════════════════════════════════════════════════════════════ */
@@ -2217,7 +2218,7 @@ ha-card {
   gap: 1px; padding: 7px 3px;
 }
 .vp-mob-tab:hover { background: var(--vpm-border-strong); color: var(--vpm-text-muted); }
-.vp-mob-tab-active { background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2)) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(79,124,255,.4); }
+.vp-mob-tab-active { background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2)) !important; color: var(--vpm-on-primary) !important; box-shadow: 0 2px 8px color-mix(in srgb, var(--vpm-primary) 40%, transparent); }
 .vp-mob-tab-day  { font-size: .85em; font-weight: 800; line-height: 1.2; }
 .vp-mob-tab-date { font-size: .7em;  font-weight: 500; opacity: .8; line-height: 1.2; }
 
@@ -2228,9 +2229,9 @@ ha-card {
   transition: background .12s;
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
-.vp-mob-sub       { background: rgba(245,158,11,.08); border-left: 3px solid var(--vpm-c-sub); }
-.vp-mob-cancelled { background: rgba(239,68,68,.08);  border-left: 3px solid var(--vpm-c-cancel); }
-.vp-mob-current   { background: rgba(79,124,255,.10); border-left: 3px solid var(--vpm-c-current); }
+.vp-mob-sub       { background: color-mix(in srgb, var(--vpm-warning) 8%, transparent); border-left: 3px solid var(--vpm-c-sub); }
+.vp-mob-cancelled { background: color-mix(in srgb, var(--vpm-error) 8%, transparent);  border-left: 3px solid var(--vpm-c-cancel); }
+.vp-mob-current   { background: color-mix(in srgb, var(--vpm-primary) 10%, transparent); border-left: 3px solid var(--vpm-c-current); }
 .vp-mob-empty     { opacity: .4; }
 .vp-mob-left { display: flex; flex-direction: column; align-items: center; min-width: 42px; }
 .vp-mob-left-current .vp-mob-num  { color: var(--vpm-success) !important; }
@@ -2276,7 +2277,7 @@ ha-card {
 /* ── Popup: einheitliches Design-System (Normal / Aktuell / Vertretung / Ausfall) ── */
 .vp-popup-title {
   padding: 20px 22px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-text) 6%, transparent);
   display: flex; flex-direction: column; gap: 6px;
 }
 .vp-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -2301,19 +2302,19 @@ ha-card {
 .vp-detail-info-row {
   display: flex; align-items: flex-start; gap: 9px;
   margin: 8px 18px 0; padding: 11px 13px;
-  background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 12px;
+  background: color-mix(in srgb, var(--vpm-warning) 8%, transparent); border: 1px solid color-mix(in srgb, var(--vpm-warning) 20%, transparent); border-radius: 12px;
 }
 .vp-detail-info-row .vp-detail-val { font-weight: 500; font-size: .9em; }
 .vp-detail-empty  { padding: 18px 22px; color: var(--vpm-text-faint); font-size: .88em; text-align: center; }
 
 .vp-popup-footer  { padding: 16px 18px 18px; text-align: right; border-top: 1px solid var(--vpm-border); }
-.vp-popup-btn     { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn     { background: var(--vpm-primary); color: var(--vpm-on-primary); border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
 .vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
 .vp-popup-btn:active { transform: scale(.98); }
-.vp-popup-btn:focus-visible { outline: 2px solid rgba(79,124,255,0.5); outline-offset: 2px; }
+.vp-popup-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent); outline-offset: 2px; }
 
 /* Aktuelle Stunde: dezenter blauer Akzentrahmen */
-.vp-popup-current { border-color: rgba(79,124,255,.45) !important; box-shadow: 0 0 0 1px rgba(79,124,255,.25), 0 20px 60px rgba(0,0,0,.6) !important; }
+.vp-popup-current { border-color: color-mix(in srgb, var(--vpm-primary) 45%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-primary) 25%, transparent), 0 20px 60px rgba(0,0,0,.6) !important; }
 
 /* Status-Popups (Ausfall/Vertretung): kompakt, zentriert, Akzent statt Vollfläche */
 .vp-status-body {
@@ -2325,8 +2326,8 @@ ha-card {
   font-size: .82em; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
   padding: 7px 16px; border-radius: 999px;
 }
-.vp-status-badge-cancel { background: rgba(239,68,68,.14); color: var(--vpm-error); border: 1px solid rgba(239,68,68,.4); }
-.vp-status-badge-sub    { background: rgba(245,158,11,.14); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.4); }
+.vp-status-badge-cancel { background: color-mix(in srgb, var(--vpm-error) 14.000000000000002%, transparent); color: var(--vpm-error); border: 1px solid color-mix(in srgb, var(--vpm-error) 40%, transparent); }
+.vp-status-badge-sub    { background: color-mix(in srgb, var(--vpm-warning) 14.000000000000002%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 40%, transparent); }
 /* Statuspunkt in Badges (ersetzt Emojis) */
 .vp-status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; display: inline-block; }
 .vp-detail-badge { display: inline-flex; align-items: center; gap: 6px; }
@@ -2334,9 +2335,9 @@ ha-card {
 .vp-status-teacher { font-size: 1.05em; font-weight: 600; color: var(--vpm-text); }
 .vp-status-meta    { font-size: .9em; font-weight: 500; color: var(--vpm-text-muted); line-height: 1.55; }
 
-.vp-popup-ausfall { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 20px 60px rgba(239,68,68,.18) !important; }
+.vp-popup-ausfall { border-color: color-mix(in srgb, var(--vpm-error) 50%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-error) 25%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-error) 18%, transparent) !important; }
 .vp-popup-ausfall .vp-popup-title { display: none !important; }
-.vp-popup-sub { border-color: rgba(245,158,11,0.45) !important; box-shadow: 0 0 0 1px rgba(245,158,11,.22), 0 20px 60px rgba(245,158,11,.16) !important; }
+.vp-popup-sub { border-color: color-mix(in srgb, var(--vpm-warning) 45%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-warning) 22%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-warning) 16%, transparent) !important; }
 .vp-popup-sub .vp-popup-title { display: none !important; }
 /* ── Info popup (modernes Informations-Panel) ── */
 .vp-info-popup-title {
@@ -2352,10 +2353,10 @@ ha-card {
 }
 #info-popup-content { overflow-y: auto; flex: 1; padding-bottom: 6px; }
 /* Dünne, dezente Scrollbar passend zum Dark-Theme */
-#info-popup-content { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+#info-popup-content { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--vpm-text) 18%, transparent) transparent; }
 #info-popup-content::-webkit-scrollbar { width: 7px; }
-#info-popup-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; }
-#info-popup-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); }
+#info-popup-content::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--vpm-text) 16%, transparent); border-radius: 999px; }
+#info-popup-content::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--vpm-text) 26%, transparent); }
 #info-popup-content::-webkit-scrollbar-track { background: transparent; }
 /* Tages-Überschrift unter dem Titel */
 .vp-info-day-head {
@@ -2406,7 +2407,7 @@ ha-card {
 
   <!-- ── Header ── -->
   <div class="vp-hdr">
-    <div class="vp-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="vp-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="vp-hdr-body">
       <div class="vp-hdr-top">
         <span class="vp-hdr-title">${title}</span>
@@ -2810,14 +2811,14 @@ class VpMobile24CurrentCard extends HTMLElement {
     // Design-System-Farben (blau primär) — als Tokens, damit Dark/Light automatisch stimmt
     const themes = {
       lesson:  { color:'var(--vpm-primary)', bg:'var(--vpm-primary-soft)',   border:'var(--vpm-primary-border)',  icon:_ic(MDI.book),  label: tc.currentLesson },
-      sub:     { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)',      border:'rgba(245,158,11,.35)',       icon:_ic(MDI.swap),  label: tc.sub },
+      sub:     { color:'var(--vpm-warning)', bg:'color-mix(in srgb, var(--vpm-warning) 10%, transparent)',      border:'color-mix(in srgb, var(--vpm-warning) 35%, transparent)',       icon:_ic(MDI.swap),  label: tc.sub },
       free:    { color: isBeforeSchool ? 'var(--vpm-text-muted)' : 'var(--vpm-pause)',
-                 bg:    isBeforeSchool ? 'rgba(148,163,184,.10)' : 'rgba(56,189,248,.10)',
-                 border:isBeforeSchool ? 'rgba(148,163,184,.25)' : 'rgba(56,189,248,.35)',
+                 bg:    isBeforeSchool ? 'color-mix(in srgb, var(--vpm-text-muted) 10%, transparent)' : 'color-mix(in srgb, var(--vpm-pause) 10%, transparent)',
+                 border:isBeforeSchool ? 'color-mix(in srgb, var(--vpm-text-muted) 25%, transparent)' : 'color-mix(in srgb, var(--vpm-pause) 35%, transparent)',
                  icon:  isBeforeSchool ? _ic(MDI.moon) : _ic(MDI.pause),
                  label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
-      done:    { color:'var(--vpm-success)', bg:'rgba(34,197,94,.10)', border:'rgba(34,197,94,.28)', icon:_ic(MDI.flag), label: tc.done },
-      holiday: { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.35)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
+      done:    { color:'var(--vpm-success)', bg:'color-mix(in srgb, var(--vpm-success) 10%, transparent)', border:'color-mix(in srgb, var(--vpm-success) 28.000000000000004%, transparent)', icon:_ic(MDI.flag), label: tc.done },
+      holiday: { color:'var(--vpm-warning)', bg:'color-mix(in srgb, var(--vpm-warning) 10%, transparent)', border:'color-mix(in srgb, var(--vpm-warning) 35%, transparent)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
     };
     const effectiveType = isHoliday ? 'holiday' : s.type;
     const lessonTh = themes[effectiveType] || themes.done;
@@ -2966,8 +2967,8 @@ ha-card {
 .vc-chip {
   display: inline-flex; align-items: center; gap: 3px;
   font-size: .72em; font-weight: 600; color: var(--vpm-text-muted);
-  background: rgba(148,163,184,.10); border-radius: var(--vpm-radius-pill); padding: 3px 10px;
-  border: 1px solid rgba(148,163,184,.14);
+  background: color-mix(in srgb, var(--vpm-text-muted) 10%, transparent); border-radius: var(--vpm-radius-pill); padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--vpm-text-muted) 14.000000000000002%, transparent);
 }
 .vc-chip-sm { font-size: .68em; padding: 2px 8px; }
 .vc-info { font-size: .78em; color: var(--vpm-warning); margin-bottom: 5px; }
@@ -2978,7 +2979,7 @@ ha-card {
 /* Progress bar (dezent) */
 .vc-progress-wrap {
   margin-top: 12px; height: 4px;
-  background: rgba(148,163,184,.15); border-radius: 999px;
+  background: color-mix(in srgb, var(--vpm-text-muted) 15%, transparent); border-radius: 999px;
   overflow: hidden; position: relative;
 }
 .vc-progress-bar {
@@ -3183,11 +3184,11 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _statusColor(type) {
-    return { normal:'#22c55e', sub:'#eab308', cancelled:'#ef4444', empty:'transparent' }[type] || '#22c55e';
+    return { normal:'var(--vpm-success)', sub:'var(--vpm-warning)', cancelled:'var(--vpm-error)', empty:'transparent' }[type] || 'var(--vpm-success)';
   }
 
   _statusBg(type) {
-    return { normal:'rgba(34,197,94,.12)', sub:'rgba(234,179,8,.13)', cancelled:'rgba(239,68,68,.15)', empty:'transparent' }[type] || 'rgba(34,197,94,.12)';
+    return { normal:'color-mix(in srgb, var(--vpm-success) 12%, transparent)', sub:'color-mix(in srgb, var(--vpm-warning) 13%, transparent)', cancelled:'color-mix(in srgb, var(--vpm-error) 15%, transparent)', empty:'transparent' }[type] || 'color-mix(in srgb, var(--vpm-success) 12%, transparent)';
   }
 
   _className(entity, entityId) {
@@ -3399,7 +3400,7 @@ class VpMobile24MultiCard extends HTMLElement {
     pop.innerHTML = '<div class="vp-popup-title">'
       + '<span class="vp-detail-num">' + period + '. Stunde</span>'
       + '<span class="vp-detail-fach">' + fach + '</span>' + badge
-      + '<span style="margin-left:auto;font-size:.72em;color:#64748b;background:rgba(255,255,255,.07);padding:2px 8px;border-radius:5px">' + className + '</span>'
+      + '<span style="margin-left:auto;font-size:.72em;color:var(--vpm-text-muted);background:color-mix(in srgb, var(--vpm-text) 7.000000000000001%, transparent);padding:2px 8px;border-radius:5px">' + className + '</span>'
       + '</div>'
       + '<div>' + rows + '</div>'
       + '<div class="vp-popup-footer"><button class="vp-popup-btn" data-mc="close-detail">Schließen</button></div>';
@@ -3718,19 +3719,19 @@ ha-card {
 .mc-controls {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-text) 5%, transparent);
   flex-wrap: wrap;
 }
 .mc-search {
   flex: 1; min-width: 120px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.1);
+  background: color-mix(in srgb, var(--vpm-text) 7.000000000000001%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-text) 10%, transparent);
   border-radius: 20px; padding: 6px 14px;
-  color: #e2e8f0; font-size: .82em; font-family: inherit;
+  color: var(--vpm-text); font-size: .82em; font-family: inherit;
   outline: none; transition: border .2s;
 }
-.mc-search:focus { border-color: #3b82f6; background: rgba(59,130,246,.1); }
-.mc-search::placeholder { color: #475569; }
+.mc-search:focus { border-color: var(--vpm-primary); background: color-mix(in srgb, var(--vpm-primary) 10%, transparent); }
+.mc-search::placeholder { color: var(--vpm-text-faint); }
 .mc-pill {
   display: inline-flex; align-items: center; gap: 4px;
   background: ${PAL.surface};
@@ -3741,10 +3742,10 @@ ha-card {
   transition: all .18s; line-height: 1.3;
 }
 .mc-pill:hover { background: ${PAL.surfaceH}; color: ${PAL.txt}; }
-.mc-pill-blue { color: ${PAL.primary}; border-color: rgba(79,124,255,.35); background: rgba(79,124,255,.08); }
-.mc-pill-blue:hover { background: rgba(79,124,255,.16); border-color: ${PAL.primary}; }
-.mc-pill-green { color: ${PAL.success}; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); }
-.mc-pill-green:hover { background: rgba(34,197,94,.16); border-color: ${PAL.success}; }
+.mc-pill-blue { color: ${PAL.primary}; border-color: color-mix(in srgb, var(--vpm-primary) 35%, transparent); background: color-mix(in srgb, var(--vpm-primary) 8%, transparent); }
+.mc-pill-blue:hover { background: color-mix(in srgb, var(--vpm-primary) 16%, transparent); border-color: ${PAL.primary}; }
+.mc-pill-green { color: ${PAL.success}; border-color: color-mix(in srgb, var(--vpm-success) 35%, transparent); background: color-mix(in srgb, var(--vpm-success) 8%, transparent); }
+.mc-pill-green:hover { background: color-mix(in srgb, var(--vpm-success) 16%, transparent); border-color: ${PAL.success}; }
 /* ── GRID LAYOUT for sections ── */
 .mc-sections-grid {
   display: grid;
@@ -3783,7 +3784,7 @@ ha-card {
 .mc-section-body { padding: 0; }
 .mc-section-body.hidden { display: none; }
 .mc-no-data { padding: 14px 16px; color: ${PAL.txt3}; font-size: .85em; font-style: italic; }
-.mc-error { padding: 14px; color: ${PAL.error}; font-size: .82em; border: 1px solid rgba(239,68,68,.2); border-radius: 12px; }
+.mc-error { padding: 14px; color: ${PAL.error}; font-size: .82em; border: 1px solid color-mix(in srgb, var(--vpm-error) 20%, transparent); border-radius: 12px; }
 /* ── TIMETABLE ── */
 .mc-grid-wrap { overflow-x: auto; padding: 2px 4px 6px; }
 .mc-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
@@ -3793,11 +3794,11 @@ ha-card {
   text-align: center;
 }
 .mc-th-today { display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
-  background: ${PAL.primary}; color: #fff; border-radius: 8px; padding: 3px 10px;
+  background: ${PAL.primary}; color: var(--vpm-on-primary); border-radius: 8px; padding: 3px 10px;
   font-size: .9em; font-weight: 700; }
 .mc-th-day  { display: block; font-size: .9em; }
 .mc-th-date { display: block; font-size: .82em; color: ${PAL.txt3}; font-weight: 500; }
-.mc-th-today .mc-th-date { color: rgba(255,255,255,.8); }
+.mc-th-today .mc-th-date { color: color-mix(in srgb, var(--vpm-text) 80%, transparent); }
 .mc-td-num { width: 42px; min-width: 42px; padding: 3px 4px; text-align: center; }
 .mc-pnum  { font-size: .82em; font-weight: 700; color: ${PAL.txt2}; line-height: 1.3; }
 .mc-ptime { font-size: .58em; color: ${PAL.txt3}; white-space: nowrap; margin-top: 1px; }
@@ -3852,22 +3853,22 @@ ha-card {
 .vp-detail-num  { font-size: .75em; font-weight: 700; color: var(--vpm-text-muted); background: var(--vpm-hover); padding: 3px 8px; border-radius: 6px; }
 .vp-detail-fach { font-size: 1.1em; font-weight: 800; color: var(--vpm-text); }
 .vp-detail-badge{ font-size: .68em; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-.vp-detail-sub  { background: rgba(245,158,11,.15); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.3); }
+.vp-detail-sub  { background: color-mix(in srgb, var(--vpm-warning) 15%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 30%, transparent); }
 .vp-detail-row  { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid var(--vpm-border); }
 .vp-detail-row:last-child { border-bottom: none; }
-.vp-detail-info-row { background: rgba(245,158,11,.06); }
+.vp-detail-info-row { background: color-mix(in srgb, var(--vpm-warning) 6%, transparent); }
 .vp-detail-icon { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
 .vp-detail-label{ font-size: .76em; font-weight: 700; color: var(--vpm-text-faint); text-transform: uppercase; letter-spacing: .5px; min-width: 54px; }
 .vp-detail-val  { font-size: .92em; font-weight: 500; color: var(--vpm-text); flex: 1; }
 .vp-detail-empty{ padding: 16px 20px; color: var(--vpm-text-faint); font-size: .86em; font-style: italic; }
 .vp-popup-footer{ padding: 12px 20px 16px; text-align: right; border-top: 1px solid var(--vpm-border); }
-.vp-popup-btn   { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn   { background: var(--vpm-primary); color: var(--vpm-on-primary); border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
 .vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
 .vp-popup-btn:active { transform: scale(.98); }
 .vp-popup-ausfall {
   background: var(--vpm-popup-bg) !important;
-  border-color: rgba(239,68,68,.45) !important;
-  box-shadow: 0 0 0 1px rgba(239,68,68,.22), 0 20px 60px rgba(239,68,68,.16) !important;
+  border-color: color-mix(in srgb, var(--vpm-error) 45%, transparent) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-error) 22%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-error) 16%, transparent) !important;
   display: flex !important; flex-direction: column !important;
 }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
@@ -3876,32 +3877,32 @@ ha-card {
 .mc-holiday-row {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 16px;
-  color: var(--vpm-warning, #F59E0B);
+  color: var(--vpm-warning, var(--vpm-warning));
   font-size: .88em; font-weight: 600;
 }
-.mc-holiday-text { color: var(--vpm-warning, #F59E0B); }
+.mc-holiday-text { color: var(--vpm-warning, var(--vpm-warning)); }
 .mc-holiday-badge {
   font-size: .7em; font-weight: 700;
-  color: var(--vpm-warning, #F59E0B);
-  background: rgba(245,158,11,.12);
-  border: 1px solid rgba(245,158,11,.25);
+  color: var(--vpm-warning, var(--vpm-warning));
+  background: color-mix(in srgb, var(--vpm-warning) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 25%, transparent);
   border-radius: 20px; padding: 2px 8px;
 }
 /* All-holiday banner */
 .mc-all-holiday {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 18px 10px;
-  color: var(--vpm-warning, #F59E0B);
+  color: var(--vpm-warning, var(--vpm-warning));
   font-size: .9em; font-weight: 700;
-  border-bottom: 1px solid rgba(245,158,11,.15);
-  background: rgba(245,158,11,.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-warning) 15%, transparent);
+  background: color-mix(in srgb, var(--vpm-warning) 5%, transparent);
 }
 .hidden { display: none !important; }
 </style>
 <ha-card>
   <!-- Header -->
   <div class="mc-hdr">
-    <div class="mc-hdr-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="mc-hdr-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
