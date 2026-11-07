@@ -1907,7 +1907,7 @@ ha-card {
   border: 1px solid var(--vpm-card-border) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
-  transition: background var(--vpm-t-theme), color var(--vpm-t-theme), border-color var(--vpm-t-theme);
+  transition: none;
 }
 
 /* ══ HEADER ══════════════════════════════════════════════════════════════ */
@@ -1972,7 +1972,7 @@ ha-card {
   border-radius: var(--vpm-radius-pill); padding: 7px 14px;
   font-size: 0.75em; font-weight: 600; color: var(--vpm-text-muted);
   white-space: nowrap; cursor: pointer; font-family: inherit;
-  transition: background .18s, color .18s, border-color .18s, transform .18s;
+  transition: transform .18s, border-color .18s;
   line-height: 1.2; min-height: 34px;
 }
 .vp-pill:hover { background: var(--vpm-border-strong); color: var(--vpm-text); transform: translateY(-1px); }
@@ -2074,7 +2074,7 @@ ha-card {
   height: 58px; min-height: 58px; max-height: 58px;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
-  transition: background .15s, transform .15s, box-shadow .15s;
+  transition: transform .15s, box-shadow .15s;
   background: transparent;
   border: 1px solid var(--vpm-hairline);
   line-height: 1.2; text-align: center;
@@ -2171,7 +2171,7 @@ ha-card {
   border: 1px solid var(--vpm-primary-border); border-radius: 6px;
   padding: 0 6px; font-size: 10.5px; line-height: 1.2;
   cursor: pointer; overflow: visible;
-  transition: background .15s ease, border-color .15s ease;
+  transition: border-color .15s ease;
 }
 .vp-dayinfo-cell:hover { background: color-mix(in srgb, var(--vpm-primary) 20%, transparent); border-color: var(--vpm-primary); }
 .vp-dayinfo-ico { flex: 0 0 auto; font-size: 11px; }
@@ -2340,7 +2340,7 @@ ha-card {
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
   border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
   max-height: 85vh; display: flex; flex-direction: column;
-  animation: vp-popup-in .18s ease;
+  animation: none;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 /* ── Popup: einheitliches Design-System (Normal / Aktuell / Vertretung / Ausfall) ── */
@@ -3762,7 +3762,7 @@ ha-card {
   box-shadow: var(--vpm-shadow) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: ${PAL.txt} !important;
-  transition: background var(--vpm-t-theme), color var(--vpm-t-theme);
+  transition: none;
 }
 /* ── HEADER ── */
 .mc-hdr {
@@ -3833,7 +3833,7 @@ ha-card {
   display: flex; align-items: center; justify-content: space-between;
   padding: 11px 8px; cursor: pointer;
   background: transparent;
-  transition: background .15s; user-select: none; gap: 10px;
+  transition: none; user-select: none; gap: 10px;
   border-radius: 10px;
 }
 .mc-section-head:hover { background: ${PAL.surface}; }
@@ -3912,7 +3912,7 @@ ha-card {
   box-shadow: var(--vpm-shadow-popup);
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
   border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
-  animation: vp-popup-in .18s ease;
+  animation: none;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 .vp-popup-title {
@@ -4006,4 +4006,5 @@ ha-card {
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
 console.log('✅ VpMobile24 Card v2.6.8 loaded');
+
 
