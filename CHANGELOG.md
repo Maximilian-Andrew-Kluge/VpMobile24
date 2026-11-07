@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Opt-in timetable change events with duplicate suppression, structured before/after values and German/English messages.
+- Notification blueprint with selectable change types and quiet hours; quiet-hour notifications are discarded, not replayed.
+- Seven-day setup preview distinguishing missing plans, empty results, authentication failures and connection problems.
+- Weekly-card stale-data banner and explicit cancellation/substitution labels.
+- Allowlisted technical diagnostics without credentials, identifiers or timetable contents.
+- Matching German/English README instructions and regression tests; live HA validation remains outstanding.
+
 ### Fixed
 
 - Anmeldefehler lösen wieder die erneute Anmeldung aus; komplette Abrufausfälle werden als Fehler gemeldet, fehlende Pläne separat behandelt.

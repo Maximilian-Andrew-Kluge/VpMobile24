@@ -61,7 +61,12 @@ jobs:
           python-version: "3.13"
 
       - name: Install test dependencies
-        run: pip install pytest
+        run: pip install pytest pyyaml jinja2
 
-      - name: Run parser unit tests
+      - name: Run integration regression tests
         run: python -m pytest tests/ -v
+
+      - name: Check card JavaScript and status banner
+        run: |
+          node --check custom_components/vpmobile24/card.js
+          node tests/test_card_status.cjs

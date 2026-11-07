@@ -67,6 +67,36 @@
 
 ---
 
+## Unreleased improvements on `main`
+
+These features are included in the development branch, **not in the published v2.6.7 Beta release**. HACS users will receive them with a future release. There is no need to delete an existing installation.
+
+### Targeted change notifications
+
+Under **Settings → Devices & services → VpMobile24 → Configure**, enable **Enable timetable change events for automations**. It is off by default. The integration then emits local `vpmobile24_schedule_changed` events; it does not send push notifications itself.
+
+Comparison covers successfully fetched days from today, including preview weeks. It detects cancellations, reinstatements, room changes and other updates to previously known lessons. Identical fetches do not emit another event. The first fetch after startup/restart, newly loaded days and changed filters establish a silent baseline. Changes made while HA was stopped are therefore not replayed. Failed days retain their baseline; withdrawn plans do not imply cancellations. Ambiguous parallel lessons are not guessed. Added/removed lessons without an unambiguous match are not reported.
+
+[Automation blueprint with quiet hours and change-type selection](blueprints/automation/vpmobile24_changes.yaml): import the file as a blueprint, copy the integration's `entry_id` from an event, and select your notification action. Use `{{ message }}` in its message field. German and English are supported. Observe events in **Developer tools → Events**. Events contain personal timetable data; do not share them publicly.
+
+Quiet hours default to 22:00–06:00; identical start and end disable them. Notifications during quiet hours are discarded, not queued for later. Use one automation per recipient to avoid duplicate pushes from multiple automations.
+
+### Setup, cards and data status
+
+After class/teacher selection, setup checks the next seven days and displays the count and result: entries found, no matching lessons, unpublished plans, partial fetch, connection failure or authentication failure. No matching lessons do not prove an invalid abbreviation: holidays and days off are possible. Leave confirmation unchecked to return to the selection. Restart setup to correct invalid credentials.
+
+During a fetch problem, the weekly card retains the last cached timetable and displays **Data stale** with the last fully successful fetch time. Partial/failed fetches and more than 30 minutes without complete success count as stale. This in-memory cache does not survive HA restarts. The data-status sensor exposes `data_stale`, `last_successful_update` and `failed_dates`. Cancellations and substitutions already have text labels in addition to color.
+
+### Privacy-friendly diagnostics
+
+Select **Download diagnostics** from the integration entry's menu. Diagnostics contain only version, operating mode, fetch status/time and counts of cached/failed days and holidays. They exclude credentials, school IDs, class/teacher abbreviations, URLs and timetables. Review the content before attaching it to an issue.
+
+### Validation before a stable release
+
+Automated regression tests cover failure handling and change comparisons. Full testing in a running Home Assistant instance with real school data remains outstanding. Check student and teacher setup, empty plans/holidays, restart, password change/reauthentication, week rollover, server outage/recovery, and one real timetable change with one notification. This is a checklist, not a claim that those checks passed.
+
+---
+
 ## 📌 Description
 
 **VpMobile24** is a modern Home Assistant integration for **Stundenplan24.de / VpMobil24**.

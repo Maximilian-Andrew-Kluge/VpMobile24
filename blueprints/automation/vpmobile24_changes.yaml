@@ -1,0 +1,71 @@
+blueprint:
+  name: VpMobile24 – timetable changes / Stundenplanänderungen
+  description: >-
+    Enable change events in the integration options first. Select a notification
+    action below. Quiet hours suppress notifications; they are not queued.
+    Änderungen zuerst in den Integrationsoptionen aktivieren. Ruhezeiten
+    unterdrücken Meldungen; sie werden nicht später nachgesendet.
+  domain: automation
+  input:
+    config_entry:
+      name: Integration entry ID / Eintrags-ID
+      description: Copy the entry_id from a vpmobile24_schedule_changed event in Developer Tools.
+      selector:
+        text:
+    kinds:
+      name: Change types / Änderungsarten
+      default: [cancelled, restored, room, updated]
+      selector:
+        select:
+          multiple: true
+          options: [cancelled, restored, room, updated]
+    language:
+      name: Language / Sprache
+      default: de
+      selector:
+        select:
+          options: [de, en]
+    quiet_start:
+      name: Quiet hours start / Ruhezeit ab
+      default: '22:00:00'
+      selector:
+        time:
+    quiet_end:
+      name: Quiet hours end / Ruhezeit bis
+      default: '06:00:00'
+      selector:
+        time:
+    notify_actions:
+      name: Notification action / Benachrichtigungsaktion
+      description: 'Use {{ message }} as the notification message / als Nachricht verwenden.'
+      selector:
+        action:
+variables:
+  selected_entry: !input config_entry
+  selected_kinds: !input kinds
+  language: !input language
+  quiet_start: !input quiet_start
+  quiet_end: !input quiet_end
+triggers:
+  - trigger: event
+    event_type: vpmobile24_schedule_changed
+conditions:
+  - condition: template
+    value_template: '{{ trigger.event.data.entry_id == selected_entry }}'
+  - condition: template
+    value_template: '{{ trigger.event.data.kind in selected_kinds }}'
+  - condition: template
+    value_template: >-
+      {% set current = now().strftime('%H:%M:%S') %}
+      {% if quiet_start == quiet_end %}true
+      {% elif quiet_start < quiet_end %}
+        {{ not (quiet_start <= current < quiet_end) }}
+      {% else %}
+        {{ not (current >= quiet_start or current < quiet_end) }}
+      {% endif %}
+actions:
+  - variables:
+      message: "{{ trigger.event.data['message_' ~ language] }}"
+  - sequence: !input notify_actions
+mode: queued
+max: 50

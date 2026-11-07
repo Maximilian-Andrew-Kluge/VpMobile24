@@ -73,6 +73,13 @@
         "data": {
           "password": "Neues Passwort"
         }
+      },
+      "preview": {
+        "title": "Stundenplan prüfen",
+        "description": "{status}\n\nEinträge in den nächsten 7 Tagen: {count}. Ohne Bestätigung gelangst du zurück zur Auswahl.",
+        "data": {
+          "continue_setup": "Mit dieser Auswahl fortfahren"
+        }
       }
     },
     "error": {
@@ -97,7 +104,8 @@
           "change_holidays": "Bundesland (Ferien) ändern",
           "change_credentials": "Zugangsdaten / Server ändern",
           "change_teacher": "Lehrerkürzel ändern",
-          "enable_calendar": "Kalender-Entität aktivieren (Haken entfernen, um den Stundenplan aus der Kalenderübersicht auszublenden)"
+          "enable_calendar": "Kalender-Entität aktivieren (Haken entfernen, um den Stundenplan aus der Kalenderübersicht auszublenden)",
+          "enable_change_events": "Änderungsereignisse für Automationen aktivieren"
         }
       },
       "change_class": {

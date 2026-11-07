@@ -59,6 +59,13 @@
         "data": {
           "password": "Nouveau mot de passe"
         }
+      },
+      "preview": {
+        "title": "Check timetable",
+        "description": "{status}\n\nEntries in the next 7 days: {count}. Leave unchecked to return to your selection.",
+        "data": {
+          "continue_setup": "Continue with this selection"
+        }
       }
     },
     "error": {
@@ -83,7 +90,8 @@
           "change_holidays": "Modifier le Land (vacances)",
           "change_credentials": "Modifier les identifiants / serveur",
           "change_teacher": "Modifier l'abréviation enseignant",
-          "enable_calendar": "Activer l'entité calendrier (décocher pour masquer l'emploi du temps dans la vue calendrier)"
+          "enable_calendar": "Activer l'entité calendrier (décocher pour masquer l'emploi du temps dans la vue calendrier)",
+          "enable_change_events": "Enable timetable change events for automations"
         }
       },
       "change_class": {

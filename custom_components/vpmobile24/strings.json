@@ -73,6 +73,13 @@
         "data": {
           "password": "New password"
         }
+      },
+      "preview": {
+        "title": "Check timetable",
+        "description": "{status}\n\nEntries in the next 7 days: {count}. Leave unchecked to return to your selection.",
+        "data": {
+          "continue_setup": "Continue with this selection"
+        }
       }
     },
     "error": {
@@ -97,7 +104,8 @@
           "change_holidays": "Change federal state (holidays)",
           "change_credentials": "Change credentials / server",
           "change_teacher": "Change teacher abbreviation",
-          "enable_calendar": "Enable calendar entity (uncheck to hide timetable from calendar view)"
+          "enable_calendar": "Enable calendar entity (uncheck to hide timetable from calendar view)",
+          "enable_change_events": "Enable timetable change events for automations"
         }
       },
       "change_class": {

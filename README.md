@@ -26,6 +26,36 @@
 
 ---
 
+## Unveröffentlichte Verbesserungen auf `main`
+
+Diese Funktionen sind im Entwicklungsstand enthalten, **nicht im bereits veröffentlichten Release v2.6.7 Beta**. Für HACS-Nutzer werden sie erst mit einem neuen Release verfügbar. Die bestehende Installation muss nicht gelöscht werden.
+
+### Gezielte Änderungsmeldungen
+
+Unter **Einstellungen → Geräte & Dienste → VpMobile24 → Konfigurieren** die Option **Änderungsereignisse für Automationen aktivieren** einschalten. Sie ist standardmäßig ausgeschaltet. Die Integration stellt dann lokale Ereignisse `vpmobile24_schedule_changed` bereit; sie verschickt selbst keine Push-Nachrichten.
+
+Der Vergleich umfasst erfolgreich geladene Tage ab heute einschließlich Vorschauwochen. Er erkennt Ausfall, Wiederaufnahme, Raumwechsel und andere Änderungen an bereits bekannten Stunden. Ein unveränderter Abruf erzeugt keine neue Meldung. Der erste Abruf nach Start/Neustart, neu geladene Tage und geänderte Filter bilden eine neue Vergleichsbasis und bleiben still. Änderungen während einer Abschaltung werden daher nicht nachträglich gemeldet. Fehlgeschlagene Tage behalten ihre Vergleichsbasis; zurückgezogene Pläne gelten nicht als Ausfall. Mehrdeutige Parallelstunden werden nicht geraten. Neu hinzugefügte/entfernte Stunden ohne eindeutige Zuordnung werden nicht gemeldet.
+
+[Automation-Blueprint mit Ruhezeiten und Änderungsarten](blueprints/automation/vpmobile24_changes.yaml): Datei als Blueprint importieren, die Eintrags-ID (`entry_id`) aus einem Ereignis übernehmen und eine Benachrichtigungsaktion wählen. In deren Nachrichtenfeld `{{ message }}` verwenden. Die Sprache kann Deutsch oder Englisch sein. Ereignisse lassen sich unter **Entwicklerwerkzeuge → Ereignisse** beobachten. Sie enthalten persönliche Stundenplandaten; diese nicht öffentlich teilen.
+
+Ruhezeit standardmäßig 22:00–06:00; gleicher Beginn und Ende deaktiviert sie. Meldungen während der Ruhezeit werden verworfen, nicht nachgesendet. Eine Automation pro Empfänger verhindert doppelte Push-Nachrichten durch mehrere Automationen.
+
+### Einrichtung, Karten und Datenstatus
+
+Nach der Klassen-/Lehrerauswahl prüft die Einrichtung die nächsten sieben Tage und zeigt Anzahl sowie Ergebnis: Daten gefunden, keine passenden Stunden, noch nicht veröffentlichte Pläne, Teilabruf, Verbindungs- oder Anmeldefehler. Keine passenden Stunden beweisen kein falsches Kürzel – Ferien und freie Tage sind möglich. Mit nicht gesetzter Bestätigung geht es zurück zur Auswahl. Bei falschen Zugangsdaten die Einrichtung neu starten.
+
+Die Wochenkarte zeigt bei Problemen den letzten gespeicherten Plan mit **Daten veraltet** und Zeitpunkt des letzten vollständig erfolgreichen Abrufs. Mehr als 30 Minuten ohne vollständigen Erfolg, Teilfehler und Abruffehler gelten als veraltet. Dieser Cache liegt im Arbeitsspeicher und überlebt keinen HA-Neustart. Der Datenstatus-Sensor liefert `data_stale`, `last_successful_update` und `failed_dates`. Ausfall und Vertretung sind zusätzlich zur Farbe bereits mit Text gekennzeichnet.
+
+### Datenschutzfreundliche Diagnose
+
+Über das Menü des Integrationseintrags **Diagnose herunterladen**. Die Diagnose enthält nur Version, Betriebsmodus, Abrufstatus/-zeit sowie Anzahlen gespeicherter oder fehlgeschlagener Tage und Ferien. Sie enthält keine Zugangsdaten, Schul-ID, Klassen-/Lehrerkürzel, URLs oder Stundenpläne. Vor dem Anhängen an ein Issue trotzdem den Inhalt ansehen.
+
+### Prüfung vor einem stabilen Release
+
+Automatische Regressionstests prüfen Fehlerfälle und Änderungsvergleiche. Ein vollständiger Praxistest in einer laufenden HA-Instanz mit echten Schuldaten steht aus. Zu prüfen: Einrichtung für Schüler und Lehrer, leerer Plan/Ferien, Neustart, Passwortwechsel/erneute Anmeldung, Wochenwechsel, Serverausfall und Wiederverbindung, eine echte Planänderung und ihre einmalige Benachrichtigung. Nicht als bereits bestanden verstehen.
+
+---
+
 ## 🚀 Was ist neu in v2.6.x?
 
 > [!IMPORTANT]

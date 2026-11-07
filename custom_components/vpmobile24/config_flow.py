@@ -13,7 +13,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 
-from .api_new import Stundenplan24API
+from .api_new import Stundenplan24API, Stundenplan24AuthError, Stundenplan24NotFoundError
 from .const import (
     CONF_SCHOOL_ID,
     CONF_CLASS_NAME,
@@ -76,6 +76,8 @@ async def _collect_selectable_labels(api, check_date: date, class_name: str) -> 
             target_date=check_date,
             class_name=class_name,
         )
+    except Stundenplan24AuthError:
+        raise
     except Exception as err:  # noqa: BLE001
         _LOGGER.debug("Could not fetch schedule for %s: %s", check_date, err)
         return found
@@ -333,9 +335,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 school_id = self._config_data.get(CONF_SCHOOL_ID, "")
                 await self.async_set_unique_id(f"{school_id}_lehrer_{teacher_short}")
                 self._abort_if_unique_id_configured()
-                if self._api:
-                    await self._api.async_close()
-                return await self.async_step_holidays()
+                self._preview_next = "holidays"
+                return await self.async_step_preview()
 
         # Load teacher list if not yet loaded
         if not hasattr(self, "_available_teachers"):
@@ -390,16 +391,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     for s in results:
                         all_subjects.update(s)
                     self._available_subjects = sorted(list(all_subjects))
-                    await self._api.async_close()
-                    return await self.async_step_subjects()
-                except Exception as err:
-                    _LOGGER.error("Error fetching subjects: %s", err)
-                    await self._api.async_close()
-                    school_id = self._config_data.get(CONF_SCHOOL_ID, "")
-                    entry_title = f"VpMobile24 \u2013 {class_name} ({school_id})"
-                    await self.async_set_unique_id(f"{school_id}_{class_name}")
-                    self._abort_if_unique_id_configured()
-                    return self.async_create_entry(title=entry_title, data=self._config_data)
+                    self._preview_next = "subjects"
+                    return await self.async_step_preview()
+                except Stundenplan24AuthError:
+                    errors["base"] = "invalid_auth"
+                except Exception:
+                    errors["base"] = "cannot_connect"
 
         # Build schema: dropdown if classes available, text input otherwise
         if self._available_classes:
@@ -415,6 +412,49 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="class",
             data_schema=class_schema,
             errors=errors,
+        )
+
+    async def async_step_preview(self, user_input=None):
+        """Explain the actual probe result before completing setup."""
+        if user_input is not None:
+            if user_input.get("continue_setup", False):
+                await self._api.async_close()
+                return await getattr(self, f"async_step_{self._preview_next}")()
+            if self._config_data.get(CONF_TEACHER_SHORT):
+                return await self.async_step_teacher()
+            return await self.async_step_class()
+        found = successful = missing = failures = 0
+        status = "empty"
+        for offset in range(7):
+            try:
+                data = await self._api.async_get_schedule(
+                    target_date=date.today() + timedelta(days=offset),
+                    class_name=self._config_data.get(CONF_CLASS_NAME),
+                    teacher_short=self._config_data.get(CONF_TEACHER_SHORT),
+                )
+                successful += 1
+                found += len(data.get("lessons", [])) + len(data.get("changes", []))
+            except Stundenplan24AuthError:
+                status = "auth"
+                break
+            except Stundenplan24NotFoundError:
+                missing += 1
+            except Exception:
+                failures += 1
+        if status != "auth":
+            status = "partial" if failures and (successful or missing) else "connection" if failures else "found" if found else "empty" if successful else "unpublished"
+        return self.async_show_form(
+            step_id="preview",
+            data_schema=vol.Schema({vol.Optional("continue_setup", default=False): bool}),
+            errors={},
+            description_placeholders={"count": str(found), "status": {
+                "found": ("Stundenplaneinträge gefunden.", "Timetable entries found."),
+                "empty": ("Abruf erfolgreich, aber keine passenden Stunden. Klasse/Kürzel prüfen; Ferien oder freie Tage sind ebenfalls möglich.", "Fetch succeeded, but no matching lessons. Check class/abbreviation; holidays or days off are also possible."),
+                "unpublished": ("Noch kein Tagesplan für diese 7 Tage veröffentlicht.", "No daily plan published for these 7 days yet."),
+                "connection": ("Abruf fehlgeschlagen. Server oder Verbindung prüfen.", "Fetch failed. Check server or connection."),
+                "partial": ("Nur ein Teil der Tage konnte geprüft werden.", "Only some days could be checked."),
+                "auth": ("Anmeldung abgelehnt. Zugangsdaten prüfen und Einrichtung neu starten.", "Authentication rejected. Check credentials and restart setup."),
+            }[status][0 if self.hass.config.language.startswith("de") else 1]},
         )
 
     async def async_step_subjects(
@@ -601,6 +641,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             # Save enable_calendar immediately (it doesn't require further steps)
             new_options = dict(self._config_entry.options)
             new_options[CONF_ENABLE_CALENDAR] = enable_calendar
+            new_options["enable_change_events"] = user_input.get("enable_change_events", False)
             self.hass.config_entries.async_update_entry(
                 self._config_entry, options=new_options
             )
@@ -640,6 +681,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         is_teacher_mode = bool(current_teacher)
 
         schema_dict: dict = {
+            vol.Optional("enable_change_events", default=self._config_entry.options.get("enable_change_events", False)): bool,
             vol.Optional("change_holidays", default=False): bool,
             vol.Optional("change_credentials", default=False): bool,
             vol.Optional(
@@ -811,7 +853,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 or self._config_entry.data.get(CONF_SERVER, "www")
             )
             base_url = DOWNLOAD_SERVERS.get(server_key, DEFAULT_BASE_URL)
-            from .api_new import Stundenplan24API
+            from .api_new import Stundenplan24API, Stundenplan24AuthError, Stundenplan24NotFoundError
             api = Stundenplan24API(
                 school_id=self._config_entry.data[CONF_SCHOOL_ID],
                 username=self._config_entry.data[CONF_USERNAME],
@@ -917,7 +959,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         # Load available classes from XML if not already loaded
         if not self._available_classes:
             try:
-                from .api_new import Stundenplan24API
+                from .api_new import Stundenplan24API, Stundenplan24AuthError, Stundenplan24NotFoundError
                 from .const import DEFAULT_BASE_URL, CONF_SERVER, DOWNLOAD_SERVERS
                 server_key = (
                     self._config_entry.options.get(CONF_SERVER)
