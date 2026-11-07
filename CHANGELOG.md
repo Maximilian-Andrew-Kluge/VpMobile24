@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Anmeldefehler lösen wieder die erneute Anmeldung aus; komplette Abrufausfälle werden als Fehler gemeldet, fehlende Pläne separat behandelt.
+- Vorschaupläne werden regelmäßig aktualisiert; zurückgezogene Pläne verschwinden aus dem Cache.
+- Feriendaten werden zentral zwischengespeichert und nicht mehr beim nächsten Sensorupdate überschrieben; Abrufe erfolgen täglich, bei Fehlern frühestens nach einer Stunde.
+- Kalender berücksichtigt laufende Stunden und exakte Abfragegrenzen; ungültige Uhrzeiten werden sicher verworfen.
+- Neuer Datenstatus-Sensor zeigt veraltete Daten, fehlgeschlagene Tage und den letzten vollständig erfolgreichen Abruf.
+- Regressionstests für Anmeldung, Abrufausfälle, Vorschau, Ferien und Kalender ergänzt.
+
 - Lehrerkürzel können beim Einrichten und in den Optionen auch manuell eingegeben werden, wenn die Vorschlagsliste unvollständig ist (#26).
 - Bereits gespeicherte Kürzel bleiben in den Optionen auswählbar, auch wenn sie im aktuellen Stundenplan fehlen.
 
@@ -147,3 +154,4 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 -   New sensors and entities
+
