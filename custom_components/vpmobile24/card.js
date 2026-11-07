@@ -252,104 +252,56 @@ class VpMobile24Card extends HTMLElement {
   // Layer 2: --vpm-* nutzen nur die --ha-*-Variablen, die auf :host definiert
   //          und damit im Shadow DOM zuverlässig verfügbar sind.
   // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
+  // ── HA Standard Theme: follow the active Home Assistant theme ──────────
+  // Resolve the selected HA theme through inherited CSS variables. This works
+  // for both explicit light/dark HA modes and theme-specific palettes, regardless
+  // of the browser's prefers-color-scheme setting.
   static _themeVarsHA() {
     return `
-  /* HA Standard Light — passt zum HA Default Light Theme */
-  --vpm-bg: #fafafa;
-  --vpm-card: var(--ha-resolved-card-bg, #ffffff);
-  --vpm-surface: #f5f5f5;
-  --vpm-elevated: #ffffff;
-  --vpm-popup-bg: #ffffff;
-  --vpm-border: rgba(0,0,0,0.10);
-  --vpm-border-strong: rgba(0,0,0,0.16);
-  --vpm-hairline: rgba(0,0,0,0.07);
-  --vpm-card-border: rgba(0,0,0,0.10);
-  --vpm-divider: rgba(0,0,0,0.07);
-  --vpm-hover: rgba(0,0,0,0.04);
-  --vpm-shadow: none;
-  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.12);
+  --vpm-bg: var(--primary-background-color, #fafafa);
+  --vpm-card: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-surface: var(--secondary-background-color, #f5f5f5);
+  --vpm-elevated: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-popup-bg: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
+  --vpm-border-strong: var(--divider-color, rgba(0,0,0,0.16));
+  --vpm-hairline: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
+  --vpm-divider: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-hover: rgba(128,128,128,0.08);
+  --vpm-shadow: var(--ha-card-box-shadow, none);
+  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.24);
   --vpm-header-bg: transparent;
-  --vpm-text: var(--ha-resolved-text, #212121);
-  --vpm-text-muted: #757575;
-  --vpm-text-faint: #9e9e9e;
-  --vpm-primary: var(--ha-resolved-primary, #03a9f4);
-  --vpm-primary-2: var(--ha-resolved-primary, #0288d1);
-  --vpm-primary-soft: rgba(3,169,244,0.10);
-  --vpm-primary-border: rgba(3,169,244,0.30);
-  --vpm-success: #43A047;
-  --vpm-warning: #FB8C00;
-  --vpm-error: #E53935;
-  --vpm-pause: #039BE5;
-  --vpm-info: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-normal: #43A047;
-  --vpm-c-sub: #FB8C00;
-  --vpm-c-cancel: #E53935;
-  --vpm-c-current: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-holiday: #FB8C00;
-  --vpm-tile-bg: #f5f5f5;
-  --vpm-tile-normal: #f5f5f5;
-  --vpm-tile-normal-color: #212121;
-  --vpm-tile-normal-border: rgba(0,0,0,0.10);
-  --vpm-tile-sub: #fff8e1;
-  --vpm-tile-sub-color: #e65100;
-  --vpm-tile-sub-border: rgba(251,140,0,0.40);
-  --vpm-tile-cancelled: #ffebee;
-  --vpm-tile-cancelled-color: #b71c1c;
-  --vpm-tile-cancelled-border: rgba(229,57,53,0.40);
-  --vpm-tile-current: #e3f2fd;
-  --vpm-tile-current-color: #0d47a1;
-  --vpm-tile-current-border: var(--ha-resolved-primary, #03a9f4);
-  --vpm-tile-empty: transparent;
-  --vpm-tile-empty-border: transparent;`;
-  }
-
-  /* HA Standard Dark-Overrides — im :host eingebettet via _designTokens */
-  static _themeVarsHADark() {
-    return `
-  --vpm-bg: #1d1d1d;
-  --vpm-card: #1d1d1d;
-  --vpm-surface: #2d2d2d;
-  --vpm-elevated: #2d2d2d;
-  --vpm-popup-bg: #2d2d2d;
-  --vpm-border: rgba(255,255,255,0.06);
-  --vpm-border-strong: rgba(255,255,255,0.10);
-  --vpm-hairline: rgba(255,255,255,0.05);
-  --vpm-card-border: rgba(255,255,255,0.06);
-  --vpm-divider: rgba(255,255,255,0.05);
-  --vpm-hover: rgba(255,255,255,0.04);
-  --vpm-shadow: none;
-  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.5);
-  --vpm-header-bg: transparent;
-  --vpm-text: #e1e1e1;
-  --vpm-text-muted: #9e9e9e;
-  --vpm-text-faint: #6e6e6e;
-  --vpm-primary: var(--ha-resolved-primary, #03a9f4);
-  --vpm-primary-2: var(--ha-resolved-primary, #0288d1);
-  --vpm-primary-soft: rgba(3,169,244,0.12);
-  --vpm-primary-border: rgba(3,169,244,0.25);
-  --vpm-success: #4CAF50;
-  --vpm-warning: #FF9800;
-  --vpm-error: #F44336;
-  --vpm-pause: #0284C7;
-  --vpm-info: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-normal: #4CAF50;
-  --vpm-c-sub: #FF9800;
-  --vpm-c-cancel: #F44336;
-  --vpm-c-current: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-holiday: #FF9800;
-  --vpm-tile-bg: #2d2d2d;
-  --vpm-tile-normal: #2d2d2d;
-  --vpm-tile-normal-color: #e1e1e1;
-  --vpm-tile-normal-border: rgba(255,255,255,0.08);
-  --vpm-tile-sub: #3a2e1a;
-  --vpm-tile-sub-color: #FFB74D;
-  --vpm-tile-sub-border: rgba(255,152,0,0.35);
-  --vpm-tile-cancelled: #3a1a1a;
-  --vpm-tile-cancelled-color: #EF9A9A;
-  --vpm-tile-cancelled-border: rgba(244,67,54,0.35);
-  --vpm-tile-current: #1a2a3a;
-  --vpm-tile-current-color: #90CAF9;
-  --vpm-tile-current-border: var(--ha-resolved-primary, #03a9f4);
+  --vpm-text: var(--primary-text-color, #212121);
+  --vpm-text-muted: var(--secondary-text-color, #757575);
+  --vpm-text-faint: var(--disabled-text-color, #9e9e9e);
+  --vpm-primary: var(--primary-color, #03a9f4);
+  --vpm-primary-2: var(--dark-primary-color, #0288d1);
+  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 12%, transparent);
+  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 34%, transparent);
+  --vpm-success: var(--success-color, #43A047);
+  --vpm-warning: var(--warning-color, #FB8C00);
+  --vpm-error: var(--error-color, #E53935);
+  --vpm-pause: var(--info-color, #039BE5);
+  --vpm-info: var(--info-color, var(--primary-color, #03a9f4));
+  --vpm-c-normal: var(--success-color, #43A047);
+  --vpm-c-sub: var(--warning-color, #FB8C00);
+  --vpm-c-cancel: var(--error-color, #E53935);
+  --vpm-c-current: var(--primary-color, #03a9f4);
+  --vpm-c-holiday: var(--warning-color, #FB8C00);
+  --vpm-tile-bg: var(--secondary-background-color, #f5f5f5);
+  --vpm-tile-normal: var(--secondary-background-color, #f5f5f5);
+  --vpm-tile-normal-color: var(--primary-text-color, #212121);
+  --vpm-tile-normal-border: var(--divider-color, rgba(0,0,0,0.12));
+  --vpm-tile-sub: color-mix(in srgb, var(--warning-color, #FB8C00) 16%, transparent);
+  --vpm-tile-sub-color: var(--warning-color, #e65100);
+  --vpm-tile-sub-border: color-mix(in srgb, var(--warning-color, #FB8C00) 40%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, var(--error-color, #E53935) 14%, transparent);
+  --vpm-tile-cancelled-color: var(--error-color, #b71c1c);
+  --vpm-tile-cancelled-border: color-mix(in srgb, var(--error-color, #E53935) 40%, transparent);
+  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-tile-current-color: var(--primary-text-color, #0d47a1);
+  --vpm-tile-current-border: var(--primary-color, #03a9f4);
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
   }
@@ -499,7 +451,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-t-fast: 150ms; --vpm-t-hover: 180ms; --vpm-t-theme: 200ms;
   --ha-primary-text: var(--primary-text-color, #212121);
   --ha-secondary-text: var(--secondary-text-color, #727272);
-  --ha-card-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --ha-card-bg: var(--ha-card-background, var(--card-background-color, #ffffff));
   --ha-primary-color: var(--primary-color, #03a9f4);
   --ha-divider: var(--divider-color, rgba(128,128,128,0.15));
   --ha-success: var(--success-color, #4CAF50);
@@ -511,9 +463,8 @@ class VpMobile24Card extends HTMLElement {
     // Explizites Theme gewählt → dessen Palette fest anwenden.
     if (hasExplicitTheme && theme) {
       if (theme.ha_mode) {
-        // HA Standard: Light als Default, Dark per Media Query
-        return `:host{${shared}${VpMobile24Card._themeVarsHA()}}
-@media (prefers-color-scheme: dark){ :host{${VpMobile24Card._themeVarsHADark()}} }`;
+        // The active HA theme exposes its current palette as inherited CSS variables.
+        return `:host{${shared}${VpMobile24Card._themeVarsHA()}}`;
       }
       return `:host{${shared}${VpMobile24Card._themeVars(theme)}}`;
     }
@@ -781,18 +732,6 @@ class VpMobile24Card extends HTMLElement {
     this._hass = hass;
     // Wenn ha_default Theme aktiv: HA-Farben aus dem Light DOM auslesen und
     // als CSS-Variablen auf :host setzen, damit sie im Shadow DOM verfügbar sind.
-    if (this._config && this._config.theme === 'ha_default') {
-      try {
-        const styles = window.getComputedStyle(document.documentElement);
-        const primary = styles.getPropertyValue('--primary-color').trim();
-        const cardBg  = styles.getPropertyValue('--card-background-color').trim()
-                     || styles.getPropertyValue('--ha-card-background').trim();
-        const textCol = styles.getPropertyValue('--primary-text-color').trim();
-        if (primary)  this.style.setProperty('--ha-resolved-primary', primary);
-        if (cardBg)   this.style.setProperty('--ha-resolved-card-bg', cardBg);
-        if (textCol)  this.style.setProperty('--ha-resolved-text', textCol);
-      } catch(e) {}
-    }
     if (this._config) {
       const dow = new Date().getDay();
       // Auto-switch to next week on weekends — but only if user hasn't navigated manually
