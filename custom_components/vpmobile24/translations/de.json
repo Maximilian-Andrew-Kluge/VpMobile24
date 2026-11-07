@@ -34,12 +34,12 @@
       },
       "teacher": {
         "title": "Lehrerkürzel auswählen",
-        "description": "Wähle dein Lehrerkürzel aus der Liste. Alle Stunden und Vertretungen mit diesem Kürzel werden automatisch angezeigt.",
+        "description": "Wähle dein Lehrerkürzel aus oder gib es manuell ein, wenn es in den Vorschlägen fehlt. Unterricht, Vertretungen und Aufsichten werden nach diesem Kürzel gefiltert.",
         "data": {
           "teacher_short": "Lehrerkürzel"
         },
         "data_description": {
-          "teacher_short": "Dein Kürzel genau so wie es im Vertretungsplan steht (Groß-/Kleinschreibung egal)."
+          "teacher_short": "Du kannst ein Kürzel eingeben, das nicht in der Liste steht. Verwende das Kürzel deiner Schule; Groß- und Kleinschreibung wird ignoriert."
         }
       },
       "demo": {
@@ -78,7 +78,8 @@
     "error": {
       "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen.",
       "invalid_auth": "Passwort falsch.",
-      "unknown": "Ein unbekannter Fehler ist aufgetreten."
+      "unknown": "Ein unbekannter Fehler ist aufgetreten.",
+      "invalid_teacher": "Gib ein Lehrerkürzel ein."
     },
     "abort": {
       "already_configured": "Diese Klasse ist bereits eingerichtet.",
@@ -130,9 +131,12 @@
       },
       "change_teacher": {
         "title": "Lehrerkürzel ändern",
-        "description": "Wähle dein Lehrerkürzel aus der Liste.",
+        "description": "Wähle dein Lehrerkürzel aus oder gib es manuell ein, wenn es in den Vorschlägen fehlt. Unterricht, Vertretungen und Aufsichten werden nach diesem Kürzel gefiltert.",
         "data": {
           "teacher_short": "Lehrerkürzel"
+        },
+        "data_description": {
+          "teacher_short": "Du kannst ein Kürzel eingeben, das nicht in der Liste steht. Verwende das Kürzel deiner Schule; Groß- und Kleinschreibung wird ignoriert."
         }
       },
       "change_holidays": {
@@ -144,7 +148,8 @@
       }
     },
     "error": {
-      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen."
+      "cannot_connect": "Verbindung zu VpMobile24 fehlgeschlagen.",
+      "invalid_teacher": "Gib ein Lehrerkürzel ein."
     }
   },
   "issues": {
