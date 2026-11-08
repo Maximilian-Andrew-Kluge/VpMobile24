@@ -8,7 +8,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.6.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.6.8-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.6.9-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -26,7 +26,7 @@
 
 ---
 
-## Unveröffentlichte Verbesserungen auf `main`
+## Funktionen seit v2.6.8
 
 Diese Funktionen sind im Entwicklungsstand enthalten, **im Beta-Release v2.6.8 enthalten**. Die Änderungen sind über HACS als Beta verfügbar. Die bestehende Installation muss nicht gelöscht werden.
 
@@ -59,7 +59,7 @@ Automatische Regressionstests prüfen Fehlerfälle und Änderungsvergleiche. Ein
 ## 🚀 Was ist neu in v2.6.x?
 
 > [!IMPORTANT]
-> **VpMobile24 v2.6.5** ist das aktuelle Stable Release. **v2.6.8** ist die aktuelle Beta mit Änderungsmeldungen, verbesserter Einrichtung und Datenschutz-Diagnose.
+> **VpMobile24 v2.6.5** ist das aktuelle Stable Release. **v2.6.9-beta** ist die aktuelle Beta mit verbesserten HA-Themes, stabiler Farbdarstellung und neu gestalteten Popups.
 >
 > 🔗 [Alle Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 
@@ -219,6 +219,24 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 ---
 
 ## 📸 Screenshots
+
+### Neue Wochenkarte und Popups (v2.6.9 Beta)
+
+Die Wochenkarte folgt mit `theme: ha_default` dem aktiven Home-Assistant-Theme. Helle Stundenflächen, geschlossene Rahmen und stärkere Trennlinien verbessern die Lesbarkeit. Farben werden bei HA-Updates ohne zwischenzeitliches Zurücksetzen übernommen.
+
+Stunden-, Vertretungs- und Ausfall-Popups zeigen kompakte Unterrichtsdetails. Tatsächliche Mitteilungen der Schule stehen bei Änderungen zuerst; Zusatzinformationen sind nach Tag gegliedert. Lange Inhalte scrollen, während die Schließen-Schaltfläche erreichbar bleibt.
+
+Die folgenden Bilder wurden zur Anonymisierung bearbeitet; Namen und Lehrerkürzel sind abgedeckt.
+
+<img src="https://github.com/user-attachments/assets/50a9e4c6-32ac-44eb-9984-429ec9116901" alt="Wochenkarte im dunklen HA-Theme, anonymisiert" width="380"/>
+
+| Vertretung | Ausfall |
+|---|---|
+| <img src="https://github.com/user-attachments/assets/206b77f3-2c67-43bc-8970-35ddc3e321c1" alt="Vertretung: kompakte Unterrichtsdetails, anonymisiert" width="400"/> | <img src="https://github.com/user-attachments/assets/6b92b0f7-4901-4d42-bcea-270bf6bde93f" alt="Ausfall: Mitteilung der Schule und Unterrichtsdetails, anonymisiert" width="400"/> |
+
+**Update:** In HACS Beta-Versionen anzeigen, `v2.6.9-beta` installieren und Home Assistant neu starten. Bei einer veralteten Ansicht das Dashboard mit Strg + F5 neu laden.
+
+**Geprüft:** 288 lokale Theme-Kombinationen, 540 aufeinanderfolgende HA-Updates sowie 16 Popup-Layouts (Handy/Desktop, hell/dunkel). Diese Browserprüfungen ersetzen keinen vollständigen Live-Test aller HA-Themes.
 
 ### 🗓️ Stundenplan
 
