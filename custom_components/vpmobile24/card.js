@@ -2164,11 +2164,11 @@ ha-card {
   background: transparent;
   border: 1px dashed color-mix(in srgb, var(--vpm-primary) 18%, transparent);
 }
-/* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
+/* NORMAL: neutral, geschlossener Rahmen und dezenter grüner Statuspunkt */
 .vp-tile.vp-normal {
   background: var(--vpm-tile-normal) !important;
   color: var(--vpm-tile-normal-color) !important;
-  border-left: 3px solid var(--vpm-tile-normal-border);
+  border-left: 1px solid var(--vpm-hairline);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
 .vp-tile.vp-today-tile { background: color-mix(in srgb, var(--vpm-primary) 14.000000000000002%, transparent); color: var(--vpm-text); }
