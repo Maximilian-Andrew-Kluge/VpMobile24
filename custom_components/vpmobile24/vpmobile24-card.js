@@ -580,10 +580,11 @@ class VpMobile24Card extends HTMLElement {
 :host .vp-detail-cell-top { flex-shrink: 0; gap: 9px; }
 :host .vp-detail-label { font-size: .85rem; font-weight: 500; text-transform: none; letter-spacing: 0; }
 :host .vp-detail-val { text-align: right; font-size: .95rem; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
-:host .vp-dialog-status { margin: 20px 24px 0; padding: 14px 16px; border-radius: 12px; font-size: .9rem; line-height: 1.5; color: var(--vpm-text); background: var(--vpm-surface); border-left: 4px solid var(--vpm-primary); }
-:host .vp-popup-sub .vp-dialog-status { border-left-color: var(--vpm-warning); }
-:host .vp-popup-ausfall .vp-dialog-status { border-left-color: var(--vpm-error); }
 :host .vp-dialog-notes { margin: 0 24px 24px; padding: 16px; border: 1px solid var(--vpm-border); border-radius: 14px; background: var(--vpm-surface); }
+:host .vp-dialog-status-note { margin: 20px 24px 0; border-left: 4px solid var(--vpm-primary); }
+:host .vp-popup-sub .vp-dialog-status-note { border-left-color: var(--vpm-warning); }
+:host .vp-popup-ausfall .vp-dialog-status-note { border-left-color: var(--vpm-error); }
+@media(max-width:480px) { :host .vp-dialog-notes.vp-dialog-status-note { margin: 16px 16px 0; } }
 :host .vp-dialog-note-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .95rem; line-height: 1.65; color: var(--vpm-text); }
 :host .vp-info-summary { margin: 20px 24px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 1rem; font-weight: 700; color: var(--vpm-text); }
 :host .vp-info-count { border-radius: 999px; padding: 4px 10px; font-size: .8rem; background: var(--vpm-surface); border: 1px solid var(--vpm-border); }
@@ -597,7 +598,6 @@ class VpMobile24Card extends HTMLElement {
 :host .vp-popup-btn { min-width: 120px; }
 @media(max-width:480px) {
  :host .vp-dialog-section { padding: 18px 16px; }
- :host .vp-dialog-status { margin: 16px 16px 0; }
  :host .vp-dialog-notes { margin: 0 16px 16px; }
  :host .vp-info-summary { margin: 16px 16px 0; }
  :host .vp-info-section { padding: 16px; }
@@ -1134,7 +1134,7 @@ class VpMobile24Card extends HTMLElement {
     }
     if (isCurrentNow) popup.classList.add('vp-popup-current');
     title.style.display = '';
-    const nowBadge = isActuallyCancelled ? '<span class="vp-status-badge vp-status-badge-cancel">' + esc(t.cancel) + '</span>' : isVertretung ? '<span class="vp-status-badge vp-status-badge-sub">' + esc(t.substitution) + '</span>' : isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
+    const nowBadge = isActuallyCancelled ? '' : isVertretung ? '<span class="vp-status-badge vp-status-badge-sub">' + esc(t.substitution) + '</span>' : isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
     title.innerHTML =
       '<div class="vp-detail-head">' +
         '<div class="vp-detail-head-left">' +
@@ -1159,12 +1159,13 @@ class VpMobile24Card extends HTMLElement {
     if (raum)   cells += cell(IC.door, t.room, raum);
     if (klasse) cells += cell(IC.school, t.classLabel, klasse);
     const lang = (this._hass?.language || 'de').slice(0,2);
-    const labels = lang === 'en' ? {details:'Lesson details',note:'Notes',cancel:'This lesson is cancelled.',sub:'Substitution — see the details below.'}
-      : lang === 'fr' ? {details:'Détails du cours',note:'Remarques',cancel:'Ce cours est annulé.',sub:'Remplacement — consultez les détails ci-dessous.'}
-      : {details:'Unterrichtsdetails',note:'Hinweise',cancel:'Diese Unterrichtsstunde entfällt.',sub:'Vertretung – die Angaben für diese Stunde stehen unten.'};
-    let rows = isActuallyCancelled || isVertretung ? '<div class="vp-dialog-status">' + esc(isActuallyCancelled ? labels.cancel : labels.sub) + '</div>' : '';
-    rows += '<section class="vp-dialog-section"><h3 class="vp-dialog-section-title">' + esc(labels.details) + '</h3><div class="vp-detail-grid">' + cells + '</div></section>';
-    if (info) rows += '<section class="vp-dialog-notes"><h3 class="vp-dialog-section-title">' + IC.info + esc(labels.note) + '</h3><div class="vp-dialog-note-text">' + esc(info) + '</div></section>';
+    const labels = lang === 'en' ? {details:'Lesson details',note:'Notes',statusNote:'School notice'}
+      : lang === 'fr' ? {details:'Détails du cours',note:'Remarques',statusNote:'Information de l’école'}
+      : {details:'Unterrichtsdetails',note:'Hinweise',statusNote:'Mitteilung der Schule'};
+    const statusPopup = isActuallyCancelled || isVertretung;
+    const note = info ? '<section class="vp-dialog-notes' + (statusPopup ? ' vp-dialog-status-note' : '') + '"><h3 class="vp-dialog-section-title">' + IC.info + esc(statusPopup ? labels.statusNote : labels.note) + '</h3><div class="vp-dialog-note-text">' + esc(info) + '</div></section>' : '';
+    const details = '<section class="vp-dialog-section"><h3 class="vp-dialog-section-title">' + esc(labels.details) + '</h3><div class="vp-detail-grid">' + cells + '</div></section>';
+    const rows = statusPopup ? note + details : details + note;
 
     content.innerHTML = rows;
     popup.classList.remove('hidden');
