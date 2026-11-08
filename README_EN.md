@@ -9,7 +9,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.6.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.6.8-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.6.9-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -25,75 +25,24 @@
 
 </div>
 
----
+## VpMobile24 for Home Assistant
 
-# 🚀 Latest Release
+Your school timetable, substitutions and school notices in one dashboard.
 
-> [!IMPORTANT]
->
-> 🎉 **VpMobile24 v2.6.5** — Stable Release
->
-> 📅 Released on **October 17, 2026**
->
-> 📥 Update now via HACS.
->
-> 🧪 **Beta v2.6.8** — change events, setup checks, data freshness status and privacy-safe diagnostics.
->
-> 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
+**Stable: v2.6.5 · Beta: [v2.6.9-beta](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.6.9-beta)**
 
----
+The gallery shows the updated beta cards. For this appearance, install the beta via HACS, restart Home Assistant and reload the dashboard.
 
-# 📅 Release Cycle
+## Contents
 
-> [!IMPORTANT]
->
-> 🚀 Regular updates are released on the **15th of every month**.
->
-> Critical bugs or security issues are released immediately as hotfixes.
-
----
-
-# 🔄 Issues after an update?
-
-> [!TIP]
->
-> If the integration doesn't work after an update:
->
-> 1. Remove the integration
-> 2. Re-configure
-> 3. Restart Home Assistant
->
-> If the problem persists, open a GitHub issue or visit the Discord server.
-
----
-
-## Unreleased improvements on `main`
-
-These features are included in the development branch, **not in the published v2.6.7 Beta release**. HACS users will receive them with a future release. There is no need to delete an existing installation.
-
-### Targeted change notifications
-
-Under **Settings → Devices & services → VpMobile24 → Configure**, enable **Enable timetable change events for automations**. It is off by default. The integration then emits local `vpmobile24_schedule_changed` events; it does not send push notifications itself.
-
-Comparison covers successfully fetched days from today, including preview weeks. It detects cancellations, reinstatements, room changes and other updates to previously known lessons. Identical fetches do not emit another event. The first fetch after startup/restart, newly loaded days and changed filters establish a silent baseline. Changes made while HA was stopped are therefore not replayed. Failed days retain their baseline; withdrawn plans do not imply cancellations. Ambiguous parallel lessons are not guessed. Added/removed lessons without an unambiguous match are not reported.
-
-[Automation blueprint with quiet hours and change-type selection](blueprints/automation/vpmobile24_changes.yaml): import the file as a blueprint, copy the integration's `entry_id` from an event, and select your notification action. Use `{{ message }}` in its message field. German and English are supported. Observe events in **Developer tools → Events**. Events contain personal timetable data; do not share them publicly.
-
-Quiet hours default to 22:00–06:00; identical start and end disable them. Notifications during quiet hours are discarded, not queued for later. Use one automation per recipient to avoid duplicate pushes from multiple automations.
-
-### Setup, cards and data status
-
-After class/teacher selection, setup checks the next seven days and displays the count and result: entries found, no matching lessons, unpublished plans, partial fetch, connection failure or authentication failure. No matching lessons do not prove an invalid abbreviation: holidays and days off are possible. Leave confirmation unchecked to return to the selection. Restart setup to correct invalid credentials.
-
-During a fetch problem, the weekly card retains the last cached timetable and displays **Data stale** with the last fully successful fetch time. Partial/failed fetches and more than 30 minutes without complete success count as stale. This in-memory cache does not survive HA restarts. The data-status sensor exposes `data_stale`, `last_successful_update` and `failed_dates`. Cancellations and substitutions already have text labels in addition to color.
-
-### Privacy-friendly diagnostics
-
-Select **Download diagnostics** from the integration entry's menu. Diagnostics contain only version, operating mode, fetch status/time and counts of cached/failed days and holidays. They exclude credentials, school IDs, class/teacher abbreviations, URLs and timetables. Review the content before attaching it to an issue.
-
-### Validation before a stable release
-
-Automated regression tests cover failure handling and change comparisons. Full testing in a running Home Assistant instance with real school data remains outstanding. Check student and teacher setup, empty plans/holidays, restart, password change/reauthentication, week rollover, server outage/recovery, and one real timetable change with one notification. This is a checklist, not a claim that those checks passed.
+1. [Installation](#-installation)
+2. [Setup](#️-setup)
+3. [Card examples](#-lovelace-card-examples)
+4. [Screenshots: HA Standard](#-screenshots)
+5. [Features](#-features)
+6. [Automations and diagnostics](#beta-automations-and-diagnostics)
+7. [FAQ](#-faq)
+8. [Contributing](#-contributing)
 
 ---
 
@@ -112,6 +61,63 @@ The integration brings your school timetable directly into Home Assistant and au
 * **School holidays** (automatically by federal state)
 
 Additionally, modern Lovelace cards are included.
+
+---
+
+## 📸 Screenshots
+
+All 13 images show **HA Standard (`ha_default`)**, in light and dark mode. Names and teacher abbreviations were obscured for publication; affected screenshots were edited for anonymisation. The interface language in these examples is German.
+
+With `theme: ha_default`, the cards follow the active Home Assistant theme. Light and dark are modes of the same theme, not separate card themes.
+
+### Weekly timetable
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-timetable-light.png" alt="Weekly timetable · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-timetable-dark.png" alt="Weekly timetable · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Multiple classes
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-multiclass-light.png" alt="Multiple classes · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-multiclass-dark.png" alt="Multiple classes · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Current lesson
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-current-light.png" alt="Current lesson · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-current-dark.png" alt="Current lesson · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Additional information
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-information-light.png" alt="Additional information · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-information-dark.png" alt="Additional information · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Substitution
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-substitution-light.png" alt="Substitution · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-substitution-dark.png" alt="Substitution · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Cancellation
+
+<table><tr><th>Light</th><th>Dark</th></tr><tr>
+<td width="50%" valign="top"><img src="docs/ha-default-cancellation-light.png" alt="Cancellation · ha_default · Light" width="100%"/></td>
+<td width="50%" valign="top"><img src="docs/ha-default-cancellation-dark.png" alt="Cancellation · ha_default · Dark" width="100%"/></td>
+</tr></table>
+
+### Lesson details
+
+<img src="docs/ha-default-lesson-dark.png" alt="Lesson details · ha_default · Dark" width="520"/>
+
+A dark-mode screenshot is available for this dialog.
+
 
 ---
 
@@ -176,7 +182,97 @@ Additionally, modern Lovelace cards are included.
 
 ---
 
-# 📸 Screenshots
+## Beta: automations and diagnostics
+
+Available in the beta release.
+
+### Targeted change notifications
+
+Under **Settings → Devices & services → VpMobile24 → Configure**, enable **Enable timetable change events for automations**. It is off by default. The integration then emits local `vpmobile24_schedule_changed` events; it does not send push notifications itself.
+
+Comparison covers successfully fetched days from today, including preview weeks. It detects cancellations, reinstatements, room changes and other updates to previously known lessons. Identical fetches do not emit another event. The first fetch after startup/restart, newly loaded days and changed filters establish a silent baseline. Changes made while HA was stopped are therefore not replayed. Failed days retain their baseline; withdrawn plans do not imply cancellations. Ambiguous parallel lessons are not guessed. Added/removed lessons without an unambiguous match are not reported.
+
+[Automation blueprint with quiet hours and change-type selection](blueprints/automation/vpmobile24_changes.yaml): import the file as a blueprint, copy the integration's `entry_id` from an event, and select your notification action. Use `{{ message }}` in its message field. German and English are supported. Observe events in **Developer tools → Events**. Events contain personal timetable data; do not share them publicly.
+
+Quiet hours default to 22:00–06:00; identical start and end disable them. Notifications during quiet hours are discarded, not queued for later. Use one automation per recipient to avoid duplicate pushes from multiple automations.
+
+### Setup, cards and data status
+
+After class/teacher selection, setup checks the next seven days and displays the count and result: entries found, no matching lessons, unpublished plans, partial fetch, connection failure or authentication failure. No matching lessons do not prove an invalid abbreviation: holidays and days off are possible. Leave confirmation unchecked to return to the selection. Restart setup to correct invalid credentials.
+
+During a fetch problem, the weekly card retains the last cached timetable and displays **Data stale** with the last fully successful fetch time. Partial/failed fetches and more than 30 minutes without complete success count as stale. This in-memory cache does not survive HA restarts. The data-status sensor exposes `data_stale`, `last_successful_update` and `failed_dates`. Cancellations and substitutions already have text labels in addition to color.
+
+### Privacy-friendly diagnostics
+
+Select **Download diagnostics** from the integration entry's menu. Diagnostics contain only version, operating mode, fetch status/time and counts of cached/failed days and holidays. They exclude credentials, school IDs, class/teacher abbreviations, URLs and timetables. Review the content before attaching it to an issue.
+
+### Validation before a stable release
+
+Automated regression tests cover failure handling and change comparisons. Full testing in a running Home Assistant instance with real school data remains outstanding. Check student and teacher setup, empty plans/holidays, restart, password change/reauthentication, week rollover, server outage/recovery, and one real timetable change with one notification. This is a checklist, not a claim that those checks passed.
+
+
+---
+
+## 📡 Sensors
+
+| Sensor               | Description                                  |
+| -------------------- | -------------------------------------------- |
+| week_table           | Full week timetable                          |
+| naechste_stunde      | Next lesson                                  |
+| heutiger_stundenplan | Today's timetable                            |
+| zusatzinfos          | Additional information                       |
+| aenderungen          | Changes & substitutions                      |
+| aktueller_unterricht | Current lesson                               |
+| ferien               | School holidays (automatic by federal state) |
+
+### 🃏 Lovelace Cards
+
+* Weekly overview with KW display and week navigation
+* Multiple classes (collapsible sections, statistics badges)
+* Current lesson (live progress bar, countdown, next lesson)
+* **Teacher mode** — plan by teacher abbreviation incl. break supervisions
+* **Daily info per weekday** — hover for full text, click for all details
+* **Resizable** in HA's section (grid) view
+* **Holiday display** — all three cards show 🏖️ during school holidays
+* Responsive design (desktop + mobile)
+* Multilingual: DE / EN / FR
+* Parallel course filter (incl. short upper-secondary courses like `la1`)
+* Zeroth period (period 0) support
+* Smart status bar (cancellations, substitutions, end of day)
+* Tooltips with teacher & room
+* CSP-safe (nginx, DuckDNS, reverse proxy)
+* Automatic updates every 15 minutes
+
+### 🆕 New Features in v2.6.x (Beta)
+
+* **Teacher mode** — dedicated mode for teachers: plan filtered by teacher abbreviation, abbreviation selectable via dropdown
+* **Break supervisions** — Aufsichten are detected in teacher mode and highlighted
+* **Daily info per day** — additional info shown as its own row per weekday; hover for the full text, click for all details of that day
+* **Upper-secondary courses** — short course codes (e.g. `la1`) are now correctly detected and shown
+* **Zeroth period** — period 0 (e.g. 07:50–08:35) is fetched and displayed
+* **Reauth flow** — on a password change a dialog appears directly in HA — no more delete/re-add
+* **Resizable cards** — all cards can be resized in HA's section (grid) view
+* **Reliable refresh** — week table & reload button now pick up subsequent changes correctly
+
+<details>
+<summary>Earlier highlights (v2.5.0 – v2.5.5)</summary>
+
+* **Holiday sensor** — automatic school holiday detection for all 16 German federal states (official KMK data)
+* **Holidays in cards** — schedule card shows holiday screen, current lesson + multi-class show banner
+* **Federal state selectable** — during setup or later via Configure
+* **Current lesson** — real-time detection including substitutions
+* **SmartHint** — next lesson shown during breaks, cancelled lessons filtered
+* **Before school** — card shows `🌙 No lessons yet`
+* **Info popup** — shows today's additional information correctly
+* **Reload button** — spins green when refreshing
+* **Parallel course filter** — cancellations of other course groups filtered automatically
+* **Sensors** — now detect substitution lessons
+
+</details>
+
+---
+
+## 📸 Screenshots
 
 ### 🗓️ Weekly Overview
 
@@ -195,7 +291,7 @@ Additionally, modern Lovelace cards are included.
 
 ---
 
-# 🚀 Installation
+## 🚀 Installation
 
 ### Install via HACS
 
@@ -213,7 +309,7 @@ Copy folder `custom_components/vpmobile24` to `config/custom_components/vpmobile
 
 ---
 
-# ⚙️ Setup
+## ⚙️ Setup
 
 1. Settings → Devices & Services → Add Integration → **VpMobile24**
 2. **Choose user type:** Student, Teacher or Demo
@@ -226,12 +322,13 @@ Copy folder `custom_components/vpmobile24` to `config/custom_components/vpmobile
 
 ---
 
-# 🃏 Lovelace Card Examples
+## 🃏 Lovelace Card Examples
 
 ### Schedule Card
 
 ```yaml
 type: custom:vpmobile24-card
+theme: ha_default
 entity: sensor.vpmobile24_week_table
 ```
 
@@ -239,6 +336,7 @@ entity: sensor.vpmobile24_week_table
 
 ```yaml
 type: custom:vpmobile24-multi-card
+theme: ha_default
 entities:
   - sensor.vpmobile24_7a_week_table
   - sensor.vpmobile24_7b_week_table
@@ -248,6 +346,7 @@ entities:
 
 ```yaml
 type: custom:vpmobile24-current-card
+theme: ha_default
 entity: sensor.vpmobile24_aktueller_unterricht
 next_entity: sensor.vpmobile24_naechste_stunde
 week_entity: sensor.vpmobile24_heutiger_stundenplan
@@ -255,7 +354,7 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 ---
 
-# 📡 Sensors
+## 📡 Sensors
 
 | Sensor               | State      | Attributes                         |
 | -------------------- | ---------- | ---------------------------------- |
@@ -269,7 +368,7 @@ week_entity: sensor.vpmobile24_heutiger_stundenplan
 
 ---
 
-# ❓ FAQ
+## ❓ FAQ
 
 ### Which schools are supported?
 
@@ -305,13 +404,13 @@ Select your federal state during setup or via Configure. Data comes from the off
 
 ---
 
-# 🔧 Diagnostics
+## 🔧 Diagnostics
 
 Settings → Devices & Services → VpMobile24 → Download Diagnostics
 
 ---
 
-# 🤝 Contributing
+## 🤝 Contributing
 
 > [!NOTE]
 >
@@ -334,3 +433,4 @@ Settings → Devices & Services → VpMobile24 → Download Diagnostics
 ⭐ Leave a star on GitHub if you like this project.
 
 </div>
+
