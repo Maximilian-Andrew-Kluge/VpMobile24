@@ -254,11 +254,24 @@ class VpMobile24Card extends HTMLElement {
         ['tile-cancelled-color', 'tile-cancelled'], ['tile-current-color', 'tile-current'],
         ['on-primary', 'primary'],
       ];
-      for (const [fg] of pairs) card.style.removeProperty('--vpm-' + fg);
-      for (const token of ['surface','elevated','tile-bg','tile-normal','popup-bg']) card.style.removeProperty('--vpm-' + token);
+      // Resolve theme fallbacks in an isolated sibling. Never temporarily reset
+      // the visible card: HA updates can arrive on every animation frame.
+      const managed = [...new Set(pairs.map(([fg]) => fg).concat(
+        ['surface','elevated','tile-bg','tile-normal','popup-bg',
+         'border','border-strong','hairline','card-border','divider']))];
+      const measurement = document.createElement('div');
+      measurement.style.cssText = card.style.cssText;
+      for (const token of managed) measurement.style.removeProperty('--vpm-' + token);
+      measurement.style.setProperty('position', 'fixed');
+      measurement.style.setProperty('visibility', 'hidden');
+      measurement.style.setProperty('pointer-events', 'none');
+      measurement.attachShadow({mode:'open'});
+      for (const style of card.shadowRoot.querySelectorAll('style')) {
+        measurement.shadowRoot.append(style.cloneNode(true));
+      }
       const probe = document.createElement('span');
-      probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none';
-      card.shadowRoot.append(probe);
+      measurement.shadowRoot.append(probe);
+      card.parentNode.append(measurement);
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = 1;
       const ctx = canvas.getContext('2d', {willReadFrequently:true});
@@ -276,7 +289,7 @@ class VpMobile24Card extends HTMLElement {
       try {
         const base = blend(read('card'), card._hass?.themes?.darkMode ? [28,28,28] : [255,255,255]);
         // A dialog must remain opaque even with translucent HA card themes.
-        card.style.setProperty('--vpm-popup-bg', 'rgb(' + base.join(',') + ')');
+        measurement.style.setProperty('--vpm-popup-bg', 'rgb(' + base.join(',') + ')');
         const selected = VpMobile24Card._resolveThemeId(card._config?.theme || 'ha_default');
         if (selected === 'ha_default') {
           // Derive subordinate surfaces from the active card background. Some
@@ -285,8 +298,14 @@ class VpMobile24Card extends HTMLElement {
           const amount = lum(base) > .179 ? .035 : .055;
           const surface = base.map(v => Math.round(v+(target-v)*amount));
           for (const token of ['surface','elevated','tile-bg','tile-normal']) {
-            card.style.setProperty('--vpm-' + token, 'rgb(' + surface.join(',') + ')');
+            measurement.style.setProperty('--vpm-' + token, 'rgb(' + surface.join(',') + ')');
           }
+        }
+        // Theme divider variables may be transparent or intended for dark mode.
+        // Use an opaque, visible separator on the actual resolved surface.
+        const edge = base.map(v => Math.round(v + ((lum(base) > .179 ? 0 : 255) - v) * .22));
+        for (const token of ['border','border-strong','hairline','card-border','divider']) {
+          measurement.style.setProperty('--vpm-' + token, 'rgb(' + edge.join(',') + ')');
         }
         for (const [fg,bg] of pairs) {
           const surface = blend(read(bg), base), color = blend(read(fg),surface);
@@ -298,10 +317,21 @@ class VpMobile24Card extends HTMLElement {
               const candidate = color.map((v,i) => Math.round(v+(chosen[i]-v)*step/20));
               if (ratio(candidate,surface) >= 4.5) { adjusted = candidate; break; }
             }
-            card.style.setProperty('--vpm-' + fg, 'rgb(' + adjusted.join(',') + ')');
+            measurement.style.setProperty('--vpm-' + fg, 'rgb(' + adjusted.join(',') + ')');
           }
         }
-      } finally { probe.remove(); }
+        // Commit only final values, together. Stable HA updates do not mutate
+        // the card's inline styles at all.
+        const next = document.createElement('div').style;
+        next.cssText = card.style.cssText;
+        for (const token of managed) {
+          const name = '--vpm-' + token;
+          const value = measurement.style.getPropertyValue(name);
+          if (value) next.setProperty(name, value);
+          else next.removeProperty(name);
+        }
+        if (card.style.cssText !== next.cssText) card.style.cssText = next.cssText;
+      } finally { measurement.remove(); }
     });
   }
 
