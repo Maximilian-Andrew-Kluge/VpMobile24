@@ -298,7 +298,9 @@ class VpMobile24Card extends HTMLElement {
           const amount = lum(base) > .179 ? .035 : .055;
           const surface = base.map(v => Math.round(v+(target-v)*amount));
           for (const token of ['surface','elevated','tile-bg','tile-normal']) {
-            measurement.style.setProperty('--vpm-' + token, 'rgb(' + surface.join(',') + ')');
+            const tileSurface = lum(base) > .179 && ['tile-bg','tile-normal'].includes(token)
+              ? base.map(v => Math.round(v * .93)) : surface;
+            measurement.style.setProperty('--vpm-' + token, 'rgb(' + tileSurface.join(',') + ')');
           }
         }
         // Theme divider variables may be transparent or intended for dark mode.
@@ -546,7 +548,7 @@ class VpMobile24Card extends HTMLElement {
 }
 :host .vp-popup-overlay { background: rgba(0,0,0,.38); backdrop-filter: blur(4px); }
 :host .vp-popup-title, :host .vp-info-popup-title {
-  padding: 24px; border-bottom: 1px solid var(--vpm-border);
+  padding: 24px; border-bottom: 2px solid var(--vpm-border);
   background: var(--vpm-popup-bg); color: var(--vpm-text);
 }
 :host .vp-detail-head { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
@@ -558,7 +560,7 @@ class VpMobile24Card extends HTMLElement {
 :host .vp-detail-label { color: var(--vpm-text-muted); font-size: .72rem; letter-spacing: .025em; }
 :host .vp-detail-val { color: var(--vpm-text); font-size: 1rem; line-height: 1.5; }
 :host .vp-detail-info-row { margin: 0 24px 20px; padding: 16px; line-height: 1.5; }
-:host .vp-popup-footer { padding: 16px 24px; background: var(--vpm-popup-bg); border-top: 1px solid var(--vpm-border); }
+:host .vp-popup-footer { padding: 16px 24px; background: var(--vpm-popup-bg); border-top: 2px solid var(--vpm-border); }
 :host .vp-popup-btn { min-height: 44px; border-radius: 12px; padding: 10px 24px; }
 :host .vp-popup-btn:hover { background: var(--vpm-primary); filter: brightness(.95); transform: none; }
 @media(max-width:480px) {
@@ -1946,7 +1948,7 @@ ha-card {
   align-items: center; gap: 12px;
   padding: 16px 18px 14px;
   background: var(--vpm-header-bg);
-  border-bottom: 1px solid var(--vpm-divider);
+  border-bottom: 2px solid var(--vpm-divider);
   flex-wrap: wrap;
 }
 .vp-hdr-icon {
@@ -2272,7 +2274,7 @@ ha-card {
   text-align: center; color: var(--vpm-text-faint); font-size: .72em;
   padding: 5px 0; font-weight: 500;
   background: transparent;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
   border-bottom: none;
   letter-spacing: 0.3px;
 }
@@ -2281,7 +2283,7 @@ ha-card {
 .vp-legend {
   display: flex; gap: 8px; flex-wrap: wrap;
   padding: 10px 16px 14px; font-size: .72em;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 .vp-legend-item {
   display: flex; align-items: center; gap: 6px; color: var(--vpm-text-muted);
@@ -2349,8 +2351,8 @@ ha-card {
 .vp-mob-subj-empty    { background: var(--vpm-tile-empty) !important; color: var(--vpm-text-faint) !important; }
 .vp-mob-pause-row {
   text-align: center; padding: 7px 14px;
-  border-top: 1px solid var(--vpm-divider);
-  border-bottom: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
+  border-bottom: 2px solid var(--vpm-divider);
   background: var(--vpm-primary-soft);
   color: var(--vpm-primary); font-size: .74em; font-style: italic; font-weight: 600;
 }
@@ -3094,7 +3096,7 @@ ha-card {
 .vc-next {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   padding: 10px 20px;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
   font-size: .78em;
 }
 .vc-next-label { font-weight: 700; color: var(--vpm-text-muted); text-transform: uppercase; letter-spacing: .06em; }
@@ -3104,7 +3106,7 @@ ha-card {
 .vc-day {
   display: flex; gap: 6px; flex-wrap: wrap;
   padding: 10px 20px 14px;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 </style>
 <ha-card>
@@ -3930,7 +3932,7 @@ ha-card {
 .mc-legend {
   display: flex; gap: 16px; flex-wrap: wrap;
   padding: 10px 18px 14px; font-size: .74em; color: ${PAL.txt2};
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 .mc-leg-item { display: flex; align-items: center; gap: 6px; }
 .mc-leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
