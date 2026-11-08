@@ -9,7 +9,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.6.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.6.8-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.6.9-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -37,7 +37,7 @@
 >
 > 📥 Update now via HACS.
 >
-> 🧪 **Beta v2.6.8** — change events, setup checks, data freshness status and privacy-safe diagnostics.
+> 🧪 **Beta v2.6.9** — improved HA themes, stable colors and redesigned dialogs, including the integration improvements from v2.6.8.
 >
 > 🔗 [Release Notes →](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
 
@@ -177,6 +177,24 @@ Additionally, modern Lovelace cards are included.
 ---
 
 # 📸 Screenshots
+
+### Updated timetable and dialogs (v2.6.9 Beta)
+
+With `theme: ha_default`, the timetable follows the active Home Assistant theme. Light gray lesson tiles, complete borders and stronger dividers improve readability. HA updates apply resolved colors without temporarily resetting visible styles.
+
+Lesson, substitution and cancellation dialogs use compact detail rows. Actual school notices come first for substitutions and cancellations. Daily information is grouped by day; long content scrolls while the close button remains accessible.
+
+These images were edited for anonymization; personal names and teacher abbreviations are covered.
+
+<img src="https://github.com/user-attachments/assets/50a9e4c6-32ac-44eb-9984-429ec9116901" alt="Dark HA timetable, anonymized" width="380"/>
+
+| Substitution | Cancellation |
+|---|---|
+| <img src="https://github.com/user-attachments/assets/206b77f3-2c67-43bc-8970-35ddc3e321c1" alt="Substitution details, anonymized" width="400"/> | <img src="https://github.com/user-attachments/assets/6b92b0f7-4901-4d42-bcea-270bf6bde93f" alt="Cancellation and school notice, anonymized" width="400"/> |
+
+**Update:** Show beta versions in HACS, install `v2.6.9-beta`, restart Home Assistant and refresh the dashboard (Ctrl + F5 if needed).
+
+**Validation:** 288 local theme combinations, 540 consecutive HA updates and 16 dialog layouts across mobile/desktop and light/dark. These browser checks are not a comprehensive live test of every HA theme.
 
 ### 🗓️ Weekly Overview
 
