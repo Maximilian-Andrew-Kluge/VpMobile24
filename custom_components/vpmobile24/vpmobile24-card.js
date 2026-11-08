@@ -563,6 +563,47 @@ class VpMobile24Card extends HTMLElement {
 :host .vp-popup-footer { padding: 16px 24px; background: var(--vpm-popup-bg); border-top: 2px solid var(--vpm-border); }
 :host .vp-popup-btn { min-height: 44px; border-radius: 12px; padding: 10px 24px; }
 :host .vp-popup-btn:hover { background: var(--vpm-primary); filter: brightness(.95); transform: none; }
+
+:host .vp-popup { width: min(520px, calc(100vw - 32px)); max-width: 520px; border-radius: 24px; }
+:host .vp-popup-title, :host .vp-info-popup-title { padding: 24px; flex-shrink: 0; }
+:host .vp-detail-head { gap: 16px; align-items: flex-start; }
+:host .vp-detail-head-left { gap: 8px; }
+:host .vp-detail-num { font-size: .8rem; text-transform: none; letter-spacing: 0; }
+:host .vp-detail-fach { font-size: 1.9rem; line-height: 1.2; }
+:host .vp-status-badge { font-size: .75rem; padding: 6px 10px; text-transform: none; letter-spacing: 0; }
+:host #popup-content, :host #info-popup-content { min-height: 0; overflow-y: auto; flex: 1; padding: 0; }
+:host .vp-dialog-section { padding: 22px 24px; }
+:host .vp-dialog-section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: .8rem; font-weight: 700; color: var(--vpm-text-muted); letter-spacing: 0; }
+:host .vp-detail-grid { display: flex; flex-direction: column; gap: 0; padding: 0; border: 1px solid var(--vpm-border); border-radius: 14px; overflow: hidden; }
+:host .vp-detail-cell { display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 14px 16px; gap: 16px; border: 0; border-radius: 0; background: var(--vpm-surface); }
+:host .vp-detail-cell + .vp-detail-cell { border-top: 1px solid var(--vpm-border); }
+:host .vp-detail-cell-top { flex-shrink: 0; gap: 9px; }
+:host .vp-detail-label { font-size: .85rem; font-weight: 500; text-transform: none; letter-spacing: 0; }
+:host .vp-detail-val { text-align: right; font-size: .95rem; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+:host .vp-dialog-status { margin: 20px 24px 0; padding: 14px 16px; border-radius: 12px; font-size: .9rem; line-height: 1.5; color: var(--vpm-text); background: var(--vpm-surface); border-left: 4px solid var(--vpm-primary); }
+:host .vp-popup-sub .vp-dialog-status { border-left-color: var(--vpm-warning); }
+:host .vp-popup-ausfall .vp-dialog-status { border-left-color: var(--vpm-error); }
+:host .vp-dialog-notes { margin: 0 24px 24px; padding: 16px; border: 1px solid var(--vpm-border); border-radius: 14px; background: var(--vpm-surface); }
+:host .vp-dialog-note-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .95rem; line-height: 1.65; color: var(--vpm-text); }
+:host .vp-info-summary { margin: 20px 24px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 1rem; font-weight: 700; color: var(--vpm-text); }
+:host .vp-info-count { border-radius: 999px; padding: 4px 10px; font-size: .8rem; background: var(--vpm-surface); border: 1px solid var(--vpm-border); }
+:host .vp-info-section { padding: 18px 24px 24px; }
+:host .vp-info-section-label { margin: 0 0 12px; text-transform: none; font-size: .8rem; letter-spacing: 0; color: var(--vpm-text-muted); }
+:host .vp-info-list { margin: 0; padding: 0; list-style: none; counter-reset: notices; display: flex; flex-direction: column; gap: 10px; }
+:host .vp-info-notice { counter-increment: notices; display: flex; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--vpm-border); background: var(--vpm-surface); color: var(--vpm-text); font-size: .95rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+:host .vp-info-notice::before { content: counter(notices); font-size: .8rem; font-weight: 700; color: var(--vpm-primary); flex-shrink: 0; }
+:host .vp-info-none { margin: 20px 24px 24px; padding: 20px; border-radius: 14px; background: var(--vpm-surface); color: var(--vpm-text-muted); }
+:host .vp-popup-footer { flex-shrink: 0; padding: 16px 24px; }
+:host .vp-popup-btn { min-width: 120px; }
+@media(max-width:480px) {
+ :host .vp-dialog-section { padding: 18px 16px; }
+ :host .vp-dialog-status { margin: 16px 16px 0; }
+ :host .vp-dialog-notes { margin: 0 16px 16px; }
+ :host .vp-info-summary { margin: 16px 16px 0; }
+ :host .vp-info-section { padding: 16px; }
+ :host .vp-detail-grid { padding: 0 !important; gap: 0 !important; }
+ :host .vp-detail-cell { padding: 12px !important; }
+}
 @media(max-width:480px) {
   :host .vp-popup { width: calc(100vw - 24px); border-radius: 18px; }
   :host .vp-detail-grid { padding: 16px; gap: 8px; }
@@ -971,19 +1012,18 @@ class VpMobile24Card extends HTMLElement {
     // are intentionally NOT shown here — they belong in the timetable itself.
     // This popup shows ONLY general daily information (allgemeine_infos).
 
-    let bodyHtml = '';
-    // Day heading so the user knows which day the infos belong to
-    bodyHtml += `<div class="vp-info-day-head">${selName}</div>`;
+    const esc = value => String(value == null ? '' : value).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    let bodyHtml = `<div class="vp-info-summary"><span>${esc(selName)}</span><span class="vp-info-count">${allg.length}</span></div>`;
     if (allg.length > 0) {
-      bodyHtml += `<div class="vp-info-section">
-        <div class="vp-info-section-label">${(t.genInfo || 'Allgemeine Informationen').replace(/^[^\p{L}]+/u, '')}</div>
-        ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
-      </div>`;
+      bodyHtml += `<section class="vp-info-section">
+        <h3 class="vp-info-section-label">${esc((t.genInfo || 'Allgemeine Informationen').replace(/^[^\p{L}]+/u, ''))}</h3>
+        <ol class="vp-info-list">${allg.map(a => `<li class="vp-info-notice">${esc(a)}</li>`).join('')}</ol>
+      </section>`;
     } else {
       const noInfoMsg = haLang === 'en' ? `No additional info for ${selName} available.`
                       : haLang === 'fr' ? `Aucune info pour ${selName}.`
                       : `Keine Zusatzinformationen für ${selName} verfügbar.`;
-      bodyHtml += `<div class="vp-info-none">${noInfoMsg}</div>`;
+      bodyHtml += `<div class="vp-info-none">${esc(noInfoMsg)}</div>`;
     }
 
     let overlay = this.shadowRoot.getElementById('info-popup-overlay');
@@ -1007,7 +1047,11 @@ class VpMobile24Card extends HTMLElement {
     }
 
     const content = this.shadowRoot.getElementById('info-popup-content');
-    if (content) content.innerHTML = bodyHtml + '<div style="height:8px"></div>';
+    if (content) content.innerHTML = bodyHtml;
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    const heading = popup.querySelector('.vp-info-popup-title');
+    if (heading) { heading.id = 'info-popup-title'; popup.setAttribute('aria-labelledby', heading.id); }
     overlay.classList.remove('hidden');
     popup.classList.remove('hidden');
   }
@@ -1063,7 +1107,7 @@ class VpMobile24Card extends HTMLElement {
     const raum   = (lesson && lesson.raum)   || '';
     const zeit   = (lesson && lesson.zeit)   || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
-    const klasse = (lesson && lesson.klasse)  || '';
+    const klasse = (lesson && lesson.klasse) || this._hass?.states[this._config.entity]?.attributes?.class || '';
     // If lesson has a real fach value, never treat as cancelled — even if isCancelled flag was set
     const hasFach = fach !== '—';
     const isActuallyCancelled = !hasFach && (isCancelled || fach === '—');
@@ -1084,7 +1128,8 @@ class VpMobile24Card extends HTMLElement {
       const a = p[0].trim().split(':').map(Number), b = p[1].trim().split(':').map(Number);
       if (a.length === 2 && b.length === 2 && !isNaN(a[0]) && !isNaN(b[0])) {
         const todayDow = now.getDay();
-        if (todayDow >= 1 && todayDow <= 5 && nowMins >= a[0]*60+a[1] && nowMins <= b[0]*60+b[1]) isCurrentNow = true;
+        const todayNames = [new Intl.DateTimeFormat('de', {weekday:'long'}).format(now), new Intl.DateTimeFormat(this._hass?.language || 'de', {weekday:'long'}).format(now)];
+        if (!isActuallyCancelled && (this._weekOffset || 0) === 0 && todayNames.includes(dayName) && todayDow >= 1 && todayDow <= 5 && nowMins >= a[0]*60+a[1] && nowMins < b[0]*60+b[1]) isCurrentNow = true;
       }
     }
     if (isCurrentNow) popup.classList.add('vp-popup-current');
@@ -1113,8 +1158,13 @@ class VpMobile24Card extends HTMLElement {
     if (lehrer) cells += cell(IC.account, t.teacher, lehrer);
     if (raum)   cells += cell(IC.door, t.room, raum);
     if (klasse) cells += cell(IC.school, t.classLabel, klasse);
-    let rows = '<div class="vp-detail-grid">' + cells + '</div>';
-    if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">' + IC.info + '</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
+    const lang = (this._hass?.language || 'de').slice(0,2);
+    const labels = lang === 'en' ? {details:'Lesson details',note:'Notes',cancel:'This lesson is cancelled.',sub:'Substitution — see the details below.'}
+      : lang === 'fr' ? {details:'Détails du cours',note:'Remarques',cancel:'Ce cours est annulé.',sub:'Remplacement — consultez les détails ci-dessous.'}
+      : {details:'Unterrichtsdetails',note:'Hinweise',cancel:'Diese Unterrichtsstunde entfällt.',sub:'Vertretung – die Angaben für diese Stunde stehen unten.'};
+    let rows = isActuallyCancelled || isVertretung ? '<div class="vp-dialog-status">' + esc(isActuallyCancelled ? labels.cancel : labels.sub) + '</div>' : '';
+    rows += '<section class="vp-dialog-section"><h3 class="vp-dialog-section-title">' + esc(labels.details) + '</h3><div class="vp-detail-grid">' + cells + '</div></section>';
+    if (info) rows += '<section class="vp-dialog-notes"><h3 class="vp-dialog-section-title">' + IC.info + esc(labels.note) + '</h3><div class="vp-dialog-note-text">' + esc(info) + '</div></section>';
 
     content.innerHTML = rows;
     popup.classList.remove('hidden');
