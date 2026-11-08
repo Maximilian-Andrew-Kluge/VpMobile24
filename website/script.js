@@ -55,7 +55,7 @@ nav.querySelectorAll("a").forEach(a=>a.addEventListener("click",closeMenu));docu
 document.querySelector('a[href="#automationExample"]').addEventListener("click",()=>$("#automationExample").open=true);
 window.addEventListener("message",e=>{
  if(e.origin!==location.origin||!e.data)return;
- const frames=[$("#heroPreview"),$("#cardPreview")];const frame=frames.find(f=>f.contentWindow===e.source);if(!frame)return;
+ const frames=[$("#heroPreview"),$("#cardPreview")];const frame=frames.find(f=>f && f.contentWindow===e.source);if(!frame)return;
  if(e.data.kind==="vpm-preview-height"&&Number.isFinite(e.data.height))frame.style.height=Math.min(2400,Math.max(180,e.data.height))+"px";
  if(e.data.kind==="vpm-preview-ready"&&frame.id==="cardPreview")sendPreview();
  if(e.data.kind==="vpm-preview-action")notify("Die Vorschau verwendet Beispieldaten. In Home Assistant führt dieser Button die entsprechende Aktion aus.")
@@ -66,3 +66,4 @@ fetch("https://api.github.com/repos/Maximilian-Andrew-Kluge/VpMobile24/releases?
  const stable=releases.find(r=>!r.draft&&!r.prerelease), beta=releases.find(r=>!r.draft&&r.prerelease);
  for(const [name,rel] of [["stable",stable],["beta",beta]]){if(!rel)continue;const url=new URL(rel.html_url);if(url.origin!=="https://github.com")continue;$("#"+name+"Version").textContent=rel.tag_name;$("#"+name+"Release").href=url.href;if(name==="beta")$("#betaNotesLink").href=url.href}
 }).catch(()=>{});
+
