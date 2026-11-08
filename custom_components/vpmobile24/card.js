@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.8
-console.info('%c VpMobile24-CARD %c v2.6.8 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.9
+console.info('%c VpMobile24-CARD %c v2.6.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -239,117 +239,170 @@ class VpMobile24Card extends HTMLElement {
   // oder @media-Selektor) aus einem Theme-Objekt. Statusfarben sind fix je
   // nach Dark/Light — nur der Primary-Akzent und die Oberflächen kommen aus
   // dem Theme. Tile-Tokens werden daraus abgeleitet.
+  // Resolve contrast against the actual rendered surfaces, including custom HA
+  // themes whose light mode retains dark text variables. Recalculate on hass
+  // updates so mode switches do not retain corrections from the previous mode.
+  static _scheduleContrast(card) {
+    if (card._contrastFrame) cancelAnimationFrame(card._contrastFrame);
+    card._contrastFrame = requestAnimationFrame(() => {
+      card._contrastFrame = null;
+      if (!card.isConnected || !card.shadowRoot) return;
+      const pairs = [
+        ['text', 'card'], ['text-muted', 'card'], ['text-faint', 'card'],
+        ['primary', 'card'], ['success', 'card'], ['warning', 'card'], ['error', 'card'], ['info', 'card'], ['pause', 'card'],
+        ['tile-normal-color', 'tile-normal'], ['tile-sub-color', 'tile-sub'],
+        ['tile-cancelled-color', 'tile-cancelled'], ['tile-current-color', 'tile-current'],
+        ['on-primary', 'primary'],
+      ];
+      // Resolve theme fallbacks in an isolated sibling. Never temporarily reset
+      // the visible card: HA updates can arrive on every animation frame.
+      const managed = [...new Set(pairs.map(([fg]) => fg).concat(
+        ['surface','elevated','tile-bg','tile-normal','popup-bg',
+         'border','border-strong','hairline','card-border','divider']))];
+      const measurement = document.createElement('div');
+      measurement.style.cssText = card.style.cssText;
+      for (const token of managed) measurement.style.removeProperty('--vpm-' + token);
+      measurement.style.setProperty('position', 'fixed');
+      measurement.style.setProperty('visibility', 'hidden');
+      measurement.style.setProperty('pointer-events', 'none');
+      measurement.attachShadow({mode:'open'});
+      for (const style of card.shadowRoot.querySelectorAll('style')) {
+        measurement.shadowRoot.append(style.cloneNode(true));
+      }
+      const probe = document.createElement('span');
+      measurement.shadowRoot.append(probe);
+      card.parentNode.append(measurement);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext('2d', {willReadFrequently:true});
+      const read = token => {
+        probe.style.color = 'var(--vpm-' + token + ')';
+        ctx.clearRect(0,0,1,1);
+        ctx.fillStyle = getComputedStyle(probe).color;
+        ctx.fillRect(0,0,1,1);
+        const v = ctx.getImageData(0,0,1,1).data;
+        return [v[0],v[1],v[2],v[3]/255];
+      };
+      const blend = (a,b) => a.slice(0,3).map((v,i) => v*a[3]+b[i]*(1-a[3]));
+      const lum = rgb => rgb.slice(0,3).map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4).reduce((v,c,i) => v+c*[.2126,.7152,.0722][i],0);
+      const ratio = (a,b) => (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+      try {
+        const base = blend(read('card'), card._hass?.themes?.darkMode ? [28,28,28] : [255,255,255]);
+        // A dialog must remain opaque even with translucent HA card themes.
+        measurement.style.setProperty('--vpm-popup-bg', 'rgb(' + base.join(',') + ')');
+        const selected = VpMobile24Card._resolveThemeId(card._config?.theme || 'ha_default');
+        if (selected === 'ha_default') {
+          // Derive subordinate surfaces from the active card background. Some
+          // HA themes leave secondary-background-color dark in light mode.
+          const target = lum(base) > .179 ? 0 : 255;
+          const amount = lum(base) > .179 ? .035 : .055;
+          const surface = base.map(v => Math.round(v+(target-v)*amount));
+          for (const token of ['surface','elevated','tile-bg','tile-normal']) {
+            const tileSurface = lum(base) > .179 && ['tile-bg','tile-normal'].includes(token)
+              ? base.map(v => Math.round(v * .93)) : surface;
+            measurement.style.setProperty('--vpm-' + token, 'rgb(' + tileSurface.join(',') + ')');
+          }
+        }
+        // Theme divider variables may be transparent or intended for dark mode.
+        // Use an opaque, visible separator on the actual resolved surface.
+        const edge = base.map(v => Math.round(v + ((lum(base) > .179 ? 0 : 255) - v) * .22));
+        for (const token of ['border','border-strong','hairline','card-border','divider']) {
+          measurement.style.setProperty('--vpm-' + token, 'rgb(' + edge.join(',') + ')');
+        }
+        for (const [fg,bg] of pairs) {
+          const surface = blend(read(bg), base), color = blend(read(fg),surface);
+          if (ratio(color,surface) < 4.5) {
+            const dark = [0,0,0], light = [255,255,255];
+            const chosen = ratio(dark,surface) > ratio(light,surface) ? dark : light;
+            let adjusted = chosen;
+            for (let step=1; step<=20; step++) {
+              const candidate = color.map((v,i) => Math.round(v+(chosen[i]-v)*step/20));
+              if (ratio(candidate,surface) >= 4.5) { adjusted = candidate; break; }
+            }
+            measurement.style.setProperty('--vpm-' + fg, 'rgb(' + adjusted.join(',') + ')');
+          }
+        }
+        // Commit only final values, together. Stable HA updates do not mutate
+        // the card's inline styles at all.
+        const next = document.createElement('div').style;
+        next.cssText = card.style.cssText;
+        for (const token of managed) {
+          const name = '--vpm-' + token;
+          const value = measurement.style.getPropertyValue(name);
+          if (value) next.setProperty(name, value);
+          else next.removeProperty(name);
+        }
+        if (card.style.cssText !== next.cssText) card.style.cssText = next.cssText;
+      } finally { measurement.remove(); }
+    });
+  }
+
+  static _onPrimary(color) {
+    const rgb = color.replace('#', '').match(/../g).map(v => parseInt(v, 16) / 255);
+    const linear = rgb.map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const luminance = linear[0] * 0.2126 + linear[1] * 0.7152 + linear[2] * 0.0722;
+    return luminance > 0.179 ? '#000000' : '#ffffff';
+  }
+
   static _themeVars(theme) {
     if (theme.ha_mode) return VpMobile24Card._themeVarsHA();
     const light = !!theme.light;
-    if (light) return VpMobile24Card._themeVarsLight(theme);
-    return VpMobile24Card._themeVarsDark(theme);
+    if (light) return VpMobile24Card._themeVarsLight(theme) + '--vpm-on-primary: ' + VpMobile24Card._onPrimary(theme.primary) + ';';
+    return VpMobile24Card._themeVarsDark(theme) + '--vpm-on-primary: ' + VpMobile24Card._onPrimary(theme.primary) + ';';
   }
 
 
-  // ── HA Standard Theme (folgt dem aktiven HA Theme) ─────────────────────
-  // Layer 1: :host liest HA-Variablen mit sicheren Fallbacks ein (--ha-*).
-  // Layer 2: --vpm-* nutzen nur die --ha-*-Variablen, die auf :host definiert
-  //          und damit im Shadow DOM zuverlässig verfügbar sind.
-  // Tile-Farben sind feste rgba()-Werte — kein color-mix() mit CSS-Variablen.
+  // ── HA Standard Theme: follow the active Home Assistant theme ──────────
+  // Resolve the selected HA theme through inherited CSS variables. This works
+  // for both explicit light/dark HA modes and theme-specific palettes, regardless
+  // of the browser's prefers-color-scheme setting.
   static _themeVarsHA() {
     return `
-  /* HA Standard Light — passt zum HA Default Light Theme */
-  --vpm-bg: #fafafa;
-  --vpm-card: var(--ha-resolved-card-bg, #ffffff);
-  --vpm-surface: #f5f5f5;
-  --vpm-elevated: #ffffff;
-  --vpm-popup-bg: #ffffff;
-  --vpm-border: rgba(0,0,0,0.10);
-  --vpm-border-strong: rgba(0,0,0,0.16);
-  --vpm-hairline: rgba(0,0,0,0.07);
-  --vpm-card-border: rgba(0,0,0,0.10);
-  --vpm-divider: rgba(0,0,0,0.07);
-  --vpm-hover: rgba(0,0,0,0.04);
-  --vpm-shadow: none;
-  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.12);
+  --vpm-on-primary: var(--text-primary-color, #ffffff);
+  --vpm-bg: var(--primary-background-color, #fafafa);
+  --vpm-card: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-surface: var(--secondary-background-color, #f5f5f5);
+  --vpm-elevated: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-popup-bg: var(--ha-card-background, var(--card-background-color, #ffffff));
+  --vpm-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
+  --vpm-border-strong: var(--divider-color, rgba(0,0,0,0.16));
+  --vpm-hairline: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-card-border: var(--ha-card-border-color, var(--divider-color, rgba(0,0,0,0.12)));
+  --vpm-divider: var(--divider-color, rgba(0,0,0,0.08));
+  --vpm-hover: rgba(128,128,128,0.08);
+  --vpm-shadow: var(--ha-card-box-shadow, none);
+  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.24);
   --vpm-header-bg: transparent;
-  --vpm-text: var(--ha-resolved-text, #212121);
-  --vpm-text-muted: #757575;
-  --vpm-text-faint: #9e9e9e;
-  --vpm-primary: var(--ha-resolved-primary, #03a9f4);
-  --vpm-primary-2: var(--ha-resolved-primary, #0288d1);
-  --vpm-primary-soft: rgba(3,169,244,0.10);
-  --vpm-primary-border: rgba(3,169,244,0.30);
-  --vpm-success: #43A047;
-  --vpm-warning: #FB8C00;
-  --vpm-error: #E53935;
-  --vpm-pause: #039BE5;
-  --vpm-info: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-normal: #43A047;
-  --vpm-c-sub: #FB8C00;
-  --vpm-c-cancel: #E53935;
-  --vpm-c-current: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-holiday: #FB8C00;
-  --vpm-tile-bg: #f5f5f5;
-  --vpm-tile-normal: #f5f5f5;
-  --vpm-tile-normal-color: #212121;
-  --vpm-tile-normal-border: rgba(0,0,0,0.10);
-  --vpm-tile-sub: #fff8e1;
-  --vpm-tile-sub-color: #e65100;
-  --vpm-tile-sub-border: rgba(251,140,0,0.40);
-  --vpm-tile-cancelled: #ffebee;
-  --vpm-tile-cancelled-color: #b71c1c;
-  --vpm-tile-cancelled-border: rgba(229,57,53,0.40);
-  --vpm-tile-current: #e3f2fd;
-  --vpm-tile-current-color: #0d47a1;
-  --vpm-tile-current-border: var(--ha-resolved-primary, #03a9f4);
-  --vpm-tile-empty: transparent;
-  --vpm-tile-empty-border: transparent;`;
-  }
-
-  /* HA Standard Dark-Overrides — im :host eingebettet via _designTokens */
-  static _themeVarsHADark() {
-    return `
-  --vpm-bg: #1d1d1d;
-  --vpm-card: #1d1d1d;
-  --vpm-surface: #2d2d2d;
-  --vpm-elevated: #2d2d2d;
-  --vpm-popup-bg: #2d2d2d;
-  --vpm-border: rgba(255,255,255,0.06);
-  --vpm-border-strong: rgba(255,255,255,0.10);
-  --vpm-hairline: rgba(255,255,255,0.05);
-  --vpm-card-border: rgba(255,255,255,0.06);
-  --vpm-divider: rgba(255,255,255,0.05);
-  --vpm-hover: rgba(255,255,255,0.04);
-  --vpm-shadow: none;
-  --vpm-shadow-popup: 0 12px 40px rgba(0,0,0,0.5);
-  --vpm-header-bg: transparent;
-  --vpm-text: #e1e1e1;
-  --vpm-text-muted: #9e9e9e;
-  --vpm-text-faint: #6e6e6e;
-  --vpm-primary: var(--ha-resolved-primary, #03a9f4);
-  --vpm-primary-2: var(--ha-resolved-primary, #0288d1);
-  --vpm-primary-soft: rgba(3,169,244,0.12);
-  --vpm-primary-border: rgba(3,169,244,0.25);
-  --vpm-success: #4CAF50;
-  --vpm-warning: #FF9800;
-  --vpm-error: #F44336;
-  --vpm-pause: #0284C7;
-  --vpm-info: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-normal: #4CAF50;
-  --vpm-c-sub: #FF9800;
-  --vpm-c-cancel: #F44336;
-  --vpm-c-current: var(--ha-resolved-primary, #03a9f4);
-  --vpm-c-holiday: #FF9800;
-  --vpm-tile-bg: #2d2d2d;
-  --vpm-tile-normal: #2d2d2d;
-  --vpm-tile-normal-color: #e1e1e1;
-  --vpm-tile-normal-border: rgba(255,255,255,0.08);
-  --vpm-tile-sub: #3a2e1a;
-  --vpm-tile-sub-color: #FFB74D;
-  --vpm-tile-sub-border: rgba(255,152,0,0.35);
-  --vpm-tile-cancelled: #3a1a1a;
-  --vpm-tile-cancelled-color: #EF9A9A;
-  --vpm-tile-cancelled-border: rgba(244,67,54,0.35);
-  --vpm-tile-current: #1a2a3a;
-  --vpm-tile-current-color: #90CAF9;
-  --vpm-tile-current-border: var(--ha-resolved-primary, #03a9f4);
+  --vpm-text: var(--primary-text-color, #212121);
+  --vpm-text-muted: var(--secondary-text-color, #757575);
+  --vpm-text-faint: var(--disabled-text-color, #9e9e9e);
+  --vpm-primary: var(--primary-color, #03a9f4);
+  --vpm-primary-2: var(--dark-primary-color, #0288d1);
+  --vpm-primary-soft: color-mix(in srgb, var(--primary-color, #03a9f4) 12%, transparent);
+  --vpm-primary-border: color-mix(in srgb, var(--primary-color, #03a9f4) 34%, transparent);
+  --vpm-success: var(--success-color, #43A047);
+  --vpm-warning: var(--warning-color, #FB8C00);
+  --vpm-error: var(--error-color, #E53935);
+  --vpm-pause: var(--info-color, #039BE5);
+  --vpm-info: var(--info-color, var(--primary-color, #03a9f4));
+  --vpm-c-normal: var(--success-color, #43A047);
+  --vpm-c-sub: var(--warning-color, #FB8C00);
+  --vpm-c-cancel: var(--error-color, #E53935);
+  --vpm-c-current: var(--primary-color, #03a9f4);
+  --vpm-c-holiday: var(--warning-color, #FB8C00);
+  --vpm-tile-bg: var(--secondary-background-color, #f5f5f5);
+  --vpm-tile-normal: var(--secondary-background-color, #f5f5f5);
+  --vpm-tile-normal-color: var(--primary-text-color, #212121);
+  --vpm-tile-normal-border: var(--divider-color, rgba(0,0,0,0.12));
+  --vpm-tile-sub: color-mix(in srgb, var(--warning-color, #FB8C00) 16%, transparent);
+  --vpm-tile-sub-color: var(--warning-color, #e65100);
+  --vpm-tile-sub-border: color-mix(in srgb, var(--warning-color, #FB8C00) 40%, transparent);
+  --vpm-tile-cancelled: color-mix(in srgb, var(--error-color, #E53935) 14%, transparent);
+  --vpm-tile-cancelled-color: var(--error-color, #b71c1c);
+  --vpm-tile-cancelled-border: color-mix(in srgb, var(--error-color, #E53935) 40%, transparent);
+  --vpm-tile-current: color-mix(in srgb, var(--primary-color, #03a9f4) 16%, transparent);
+  --vpm-tile-current-color: var(--primary-text-color, #0d47a1);
+  --vpm-tile-current-border: var(--primary-color, #03a9f4);
   --vpm-tile-empty: transparent;
   --vpm-tile-empty-border: transparent;`;
   }
@@ -484,6 +537,84 @@ class VpMobile24Card extends HTMLElement {
   }
 
   static _designTokens(theme, hasExplicitTheme) {
+    return VpMobile24Card._baseDesignTokens(theme, hasExplicitTheme) + `
+:host .vp-popup {
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+  border: 1px solid var(--vpm-border); border-radius: 22px;
+  width: min(480px, calc(100vw - 32px)); max-width: 480px;
+  max-height: calc(100dvh - 40px); overflow: auto;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 24px 80px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+:host .vp-popup-overlay { background: rgba(0,0,0,.38); backdrop-filter: blur(4px); }
+:host .vp-popup-title, :host .vp-info-popup-title {
+  padding: 24px; border-bottom: 2px solid var(--vpm-border);
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+}
+:host .vp-detail-head { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+:host .vp-detail-head-left { gap: 10px; min-width: 0; }
+:host .vp-detail-fach { font-size: 1.65rem; line-height: 1.2; overflow-wrap: anywhere; }
+:host .vp-detail-num { color: var(--vpm-text-muted); font-size: .75rem; letter-spacing: .025em; }
+:host .vp-detail-grid { padding: 20px 24px; gap: 12px; }
+:host .vp-detail-cell { background: var(--vpm-surface); padding: 16px; gap: 10px; border-radius: 14px; min-width: 0; }
+:host .vp-detail-label { color: var(--vpm-text-muted); font-size: .72rem; letter-spacing: .025em; }
+:host .vp-detail-val { color: var(--vpm-text); font-size: 1rem; line-height: 1.5; }
+:host .vp-detail-info-row { margin: 0 24px 20px; padding: 16px; line-height: 1.5; }
+:host .vp-popup-footer { padding: 16px 24px; background: var(--vpm-popup-bg); border-top: 2px solid var(--vpm-border); }
+:host .vp-popup-btn { min-height: 44px; border-radius: 12px; padding: 10px 24px; }
+:host .vp-popup-btn:hover { background: var(--vpm-primary); filter: brightness(.95); transform: none; }
+
+:host .vp-popup { width: min(520px, calc(100vw - 32px)); max-width: 520px; border-radius: 24px; }
+:host .vp-popup-title, :host .vp-info-popup-title { padding: 24px; flex-shrink: 0; }
+:host .vp-detail-head { gap: 16px; align-items: flex-start; }
+:host .vp-detail-head-left { gap: 8px; }
+:host .vp-detail-num { font-size: .8rem; text-transform: none; letter-spacing: 0; }
+:host .vp-detail-fach { font-size: 1.9rem; line-height: 1.2; }
+:host .vp-status-badge { font-size: .75rem; padding: 6px 10px; text-transform: none; letter-spacing: 0; }
+:host #popup-content, :host #info-popup-content { min-height: 0; overflow-y: auto; flex: 1; padding: 0; }
+:host .vp-dialog-section { padding: 22px 24px; }
+:host .vp-dialog-section-title { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: .8rem; font-weight: 700; color: var(--vpm-text-muted); letter-spacing: 0; }
+:host .vp-detail-grid { display: flex; flex-direction: column; gap: 0; padding: 0; border: 1px solid var(--vpm-border); border-radius: 14px; overflow: hidden; }
+:host .vp-detail-cell { display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 14px 16px; gap: 16px; border: 0; border-radius: 0; background: var(--vpm-surface); }
+:host .vp-detail-cell + .vp-detail-cell { border-top: 1px solid var(--vpm-border); }
+:host .vp-detail-cell-top { flex-shrink: 0; gap: 9px; }
+:host .vp-detail-label { font-size: .85rem; font-weight: 500; text-transform: none; letter-spacing: 0; }
+:host .vp-detail-val { text-align: right; font-size: .95rem; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+:host .vp-dialog-notes { margin: 0 24px 24px; padding: 16px; border: 1px solid var(--vpm-border); border-radius: 14px; background: var(--vpm-surface); }
+:host .vp-dialog-status-note { margin: 20px 24px 0; border-left: 4px solid var(--vpm-primary); }
+:host .vp-popup-sub .vp-dialog-status-note { border-left-color: var(--vpm-warning); }
+:host .vp-popup-ausfall .vp-dialog-status-note { border-left-color: var(--vpm-error); }
+@media(max-width:480px) { :host .vp-dialog-notes.vp-dialog-status-note { margin: 16px 16px 0; } }
+:host .vp-dialog-note-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .95rem; line-height: 1.65; color: var(--vpm-text); }
+:host .vp-info-summary { margin: 20px 24px 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 1rem; font-weight: 700; color: var(--vpm-text); }
+:host .vp-info-count { border-radius: 999px; padding: 4px 10px; font-size: .8rem; background: var(--vpm-surface); border: 1px solid var(--vpm-border); }
+:host .vp-info-section { padding: 18px 24px 24px; }
+:host .vp-info-section-label { margin: 0 0 12px; text-transform: none; font-size: .8rem; letter-spacing: 0; color: var(--vpm-text-muted); }
+:host .vp-info-list { margin: 0; padding: 0; list-style: none; counter-reset: notices; display: flex; flex-direction: column; gap: 10px; }
+:host .vp-info-notice { counter-increment: notices; display: flex; gap: 12px; padding: 16px; border-radius: 14px; border: 1px solid var(--vpm-border); background: var(--vpm-surface); color: var(--vpm-text); font-size: .95rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+:host .vp-info-notice::before { content: counter(notices); font-size: .8rem; font-weight: 700; color: var(--vpm-primary); flex-shrink: 0; }
+:host .vp-info-none { margin: 20px 24px 24px; padding: 20px; border-radius: 14px; background: var(--vpm-surface); color: var(--vpm-text-muted); }
+:host .vp-popup-footer { flex-shrink: 0; padding: 16px 24px; }
+:host .vp-popup-btn { min-width: 120px; }
+@media(max-width:480px) {
+ :host .vp-dialog-section { padding: 18px 16px; }
+ :host .vp-dialog-notes { margin: 0 16px 16px; }
+ :host .vp-info-summary { margin: 16px 16px 0; }
+ :host .vp-info-section { padding: 16px; }
+ :host .vp-detail-grid { padding: 0 !important; gap: 0 !important; }
+ :host .vp-detail-cell { padding: 12px !important; }
+}
+@media(max-width:480px) {
+  :host .vp-popup { width: calc(100vw - 24px); border-radius: 18px; }
+  :host .vp-detail-grid { padding: 16px; gap: 8px; }
+  :host .vp-popup-title, :host .vp-info-popup-title { padding: 20px 16px; }
+  :host .vp-detail-cell { padding: 12px; }
+  :host .vp-popup-footer { padding: 12px 16px; }
+  :host .vp-popup-btn { width: 100%; }
+}`;
+  }
+
+  static _baseDesignTokens(theme, hasExplicitTheme) {
     // Radien + Motion sind theme-unabhängig.
     // --ha-* lesen HA-CSS-Custom-Properties mit Fallbacks in den Shadow DOM
     // ein, damit _themeVarsHA() darauf zugreifen kann (Shadow DOM erbt
@@ -499,7 +630,7 @@ class VpMobile24Card extends HTMLElement {
   --vpm-t-fast: 150ms; --vpm-t-hover: 180ms; --vpm-t-theme: 200ms;
   --ha-primary-text: var(--primary-text-color, #212121);
   --ha-secondary-text: var(--secondary-text-color, #727272);
-  --ha-card-bg: var(--card-background-color, var(--ha-card-background, #ffffff));
+  --ha-card-bg: var(--ha-card-background, var(--card-background-color, #ffffff));
   --ha-primary-color: var(--primary-color, #03a9f4);
   --ha-divider: var(--divider-color, rgba(128,128,128,0.15));
   --ha-success: var(--success-color, #4CAF50);
@@ -511,9 +642,8 @@ class VpMobile24Card extends HTMLElement {
     // Explizites Theme gewählt → dessen Palette fest anwenden.
     if (hasExplicitTheme && theme) {
       if (theme.ha_mode) {
-        // HA Standard: Light als Default, Dark per Media Query
-        return `:host{${shared}${VpMobile24Card._themeVarsHA()}}
-@media (prefers-color-scheme: dark){ :host{${VpMobile24Card._themeVarsHADark()}} }`;
+        // The active HA theme exposes its current palette as inherited CSS variables.
+        return `:host{${shared}${VpMobile24Card._themeVarsHA()}}`;
       }
       return `:host{${shared}${VpMobile24Card._themeVars(theme)}}`;
     }
@@ -759,7 +889,7 @@ class VpMobile24Card extends HTMLElement {
     this._infoPopupOpen = false;
     this._mobDayIdx = null;
     this._weekOffset = 0;
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   _switchWeek(offset) {
@@ -779,20 +909,7 @@ class VpMobile24Card extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Wenn ha_default Theme aktiv: HA-Farben aus dem Light DOM auslesen und
-    // als CSS-Variablen auf :host setzen, damit sie im Shadow DOM verfügbar sind.
-    if (this._config && this._config.theme === 'ha_default') {
-      try {
-        const styles = window.getComputedStyle(document.documentElement);
-        const primary = styles.getPropertyValue('--primary-color').trim();
-        const cardBg  = styles.getPropertyValue('--card-background-color').trim()
-                     || styles.getPropertyValue('--ha-card-background').trim();
-        const textCol = styles.getPropertyValue('--primary-text-color').trim();
-        if (primary)  this.style.setProperty('--ha-resolved-primary', primary);
-        if (cardBg)   this.style.setProperty('--ha-resolved-card-bg', cardBg);
-        if (textCol)  this.style.setProperty('--ha-resolved-text', textCol);
-      } catch(e) {}
-    }
+    VpMobile24Card._scheduleContrast(this);
     if (this._config) {
       const dow = new Date().getDay();
       // Auto-switch to next week on weekends — but only if user hasn't navigated manually
@@ -895,19 +1012,18 @@ class VpMobile24Card extends HTMLElement {
     // are intentionally NOT shown here — they belong in the timetable itself.
     // This popup shows ONLY general daily information (allgemeine_infos).
 
-    let bodyHtml = '';
-    // Day heading so the user knows which day the infos belong to
-    bodyHtml += `<div class="vp-info-day-head">${selName}</div>`;
+    const esc = value => String(value == null ? '' : value).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    let bodyHtml = `<div class="vp-info-summary"><span>${esc(selName)}</span><span class="vp-info-count">${allg.length}</span></div>`;
     if (allg.length > 0) {
-      bodyHtml += `<div class="vp-info-section">
-        <div class="vp-info-section-label">${(t.genInfo || 'Allgemeine Informationen').replace(/^[^\p{L}]+/u, '')}</div>
-        ${allg.map(a => `<div class="vp-info-entry"><span>${a}</span></div>`).join('')}
-      </div>`;
+      bodyHtml += `<section class="vp-info-section">
+        <h3 class="vp-info-section-label">${esc((t.genInfo || 'Allgemeine Informationen').replace(/^[^\p{L}]+/u, ''))}</h3>
+        <ol class="vp-info-list">${allg.map(a => `<li class="vp-info-notice">${esc(a)}</li>`).join('')}</ol>
+      </section>`;
     } else {
       const noInfoMsg = haLang === 'en' ? `No additional info for ${selName} available.`
                       : haLang === 'fr' ? `Aucune info pour ${selName}.`
                       : `Keine Zusatzinformationen für ${selName} verfügbar.`;
-      bodyHtml += `<div class="vp-info-none">${noInfoMsg}</div>`;
+      bodyHtml += `<div class="vp-info-none">${esc(noInfoMsg)}</div>`;
     }
 
     let overlay = this.shadowRoot.getElementById('info-popup-overlay');
@@ -931,7 +1047,11 @@ class VpMobile24Card extends HTMLElement {
     }
 
     const content = this.shadowRoot.getElementById('info-popup-content');
-    if (content) content.innerHTML = bodyHtml + '<div style="height:8px"></div>';
+    if (content) content.innerHTML = bodyHtml;
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    const heading = popup.querySelector('.vp-info-popup-title');
+    if (heading) { heading.id = 'info-popup-title'; popup.setAttribute('aria-labelledby', heading.id); }
     overlay.classList.remove('hidden');
     popup.classList.remove('hidden');
   }
@@ -987,7 +1107,7 @@ class VpMobile24Card extends HTMLElement {
     const raum   = (lesson && lesson.raum)   || '';
     const zeit   = (lesson && lesson.zeit)   || slotTime || '';
     const info   = (lesson && lesson.zusatzinfo) || '';
-    const klasse = (lesson && lesson.klasse)  || '';
+    const klasse = (lesson && lesson.klasse) || this._hass?.states[this._config.entity]?.attributes?.class || '';
     // If lesson has a real fach value, never treat as cancelled — even if isCancelled flag was set
     const hasFach = fach !== '—';
     const isActuallyCancelled = !hasFach && (isCancelled || fach === '—');
@@ -996,45 +1116,8 @@ class VpMobile24Card extends HTMLElement {
     // Reset accent classes each render
     popup.classList.remove('vp-popup-ausfall', 'vp-popup-sub', 'vp-popup-current');
 
-    // ── AUSFALL: kompaktes, akzentuiertes Popup ──
-    if (isActuallyCancelled) {
-      title.innerHTML = ''; title.style.display = 'none';
-      const lines = [];
-      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
-      if (info)   lines.push(esc(info));
-      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
-      content.innerHTML =
-        '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-cancel"><span class="vp-status-dot"></span>' + esc(t.cancel) + '</div>' +
-          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
-          meta +
-        '</div>';
-      popup.classList.add('vp-popup-ausfall');
-      popup.classList.remove('hidden');
-      overlay.classList.remove('hidden');
-      return;
-    }
-
-    // ── VERTRETUNG: gleiches System, amber Akzent ──
-    if (isVertretung) {
-      title.innerHTML = ''; title.style.display = 'none';
-      const lines = [];
-      if (raum)   lines.push(esc(t.room) + ': ' + esc(raum));
-      if (zeit)   lines.push(esc(zeit));
-      if (info)   lines.push(esc(info));
-      const meta = lines.length ? '<div class="vp-status-meta">' + lines.join('<br>') + '</div>' : '';
-      content.innerHTML =
-        '<div class="vp-status-body">' +
-          '<div class="vp-status-badge vp-status-badge-sub"><span class="vp-status-dot"></span>' + esc(t.substitution) + '</div>' +
-          '<div class="vp-status-fach">' + esc(fach) + '</div>' +
-          (lehrer ? '<div class="vp-status-teacher">' + esc(lehrer) + '</div>' : '') +
-          meta +
-        '</div>';
-      popup.classList.add('vp-popup-sub');
-      popup.classList.remove('hidden');
-      overlay.classList.remove('hidden');
-      return;
-    }
+    if (isActuallyCancelled) popup.classList.add('vp-popup-ausfall');
+    else if (isVertretung) popup.classList.add('vp-popup-sub');
 
     // ── NORMAL / AKTUELL: modernes Detail-Popup ──
     // Aktuelle Stunde erkennen (Zeitfenster jetzt?)
@@ -1045,21 +1128,24 @@ class VpMobile24Card extends HTMLElement {
       const a = p[0].trim().split(':').map(Number), b = p[1].trim().split(':').map(Number);
       if (a.length === 2 && b.length === 2 && !isNaN(a[0]) && !isNaN(b[0])) {
         const todayDow = now.getDay();
-        if (todayDow >= 1 && todayDow <= 5 && nowMins >= a[0]*60+a[1] && nowMins <= b[0]*60+b[1]) isCurrentNow = true;
+        const todayNames = [new Intl.DateTimeFormat('de', {weekday:'long'}).format(now), new Intl.DateTimeFormat(this._hass?.language || 'de', {weekday:'long'}).format(now)];
+        if (!isActuallyCancelled && (this._weekOffset || 0) === 0 && todayNames.includes(dayName) && todayDow >= 1 && todayDow <= 5 && nowMins >= a[0]*60+a[1] && nowMins < b[0]*60+b[1]) isCurrentNow = true;
       }
     }
     if (isCurrentNow) popup.classList.add('vp-popup-current');
     title.style.display = '';
-    const nowBadge = isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
+    const nowBadge = isActuallyCancelled ? '' : isVertretung ? '<span class="vp-status-badge vp-status-badge-sub">' + esc(t.substitution) + '</span>' : isCurrentNow ? '<span class="vp-detail-badge vp-detail-now"><span class="vp-status-dot"></span>' + esc(t.now) + '</span>' : '';
     title.innerHTML =
       '<div class="vp-detail-head">' +
         '<div class="vp-detail-head-left">' +
-          '<span class="vp-detail-num">' + esc(slotPeriod) + '. ' + esc(t.period) + '</span>' +
-          '<span class="vp-detail-fach">' + esc(fach) + '</span>' +
+          '<span class="vp-detail-num">' + (dayName ? esc(dayName) + ' · ' : '') + esc(slotPeriod) + '. ' + esc(t.period) + '</span>' +
+          '<span class="vp-detail-fach">' + esc(isActuallyCancelled ? t.cancel : fach) + '</span>' +
         '</div>' +
         nowBadge +
-      '</div>' +
-      (zeit ? '<div class="vp-detail-headtime">' + esc(zeit) + '</div>' : '');
+      '</div>';
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    popup.setAttribute('aria-labelledby', 'popup-title');
 
     const cell = (icon, label, val) =>
       '<div class="vp-detail-cell">' +
@@ -1072,9 +1158,15 @@ class VpMobile24Card extends HTMLElement {
     if (lehrer) cells += cell(IC.account, t.teacher, lehrer);
     if (raum)   cells += cell(IC.door, t.room, raum);
     if (klasse) cells += cell(IC.school, t.classLabel, klasse);
-    let rows = '<div class="vp-detail-grid">' + cells + '</div>';
-    if (info) rows += '<div class="vp-detail-info-row"><span class="vp-detail-icon">' + IC.info + '</span><span class="vp-detail-val">' + esc(info) + '</span></div>';
-    if (!lehrer && !raum && !klasse && !info) rows = '<div class="vp-detail-empty">' + esc(t.noDetail) + '</div>';
+    const lang = (this._hass?.language || 'de').slice(0,2);
+    const labels = lang === 'en' ? {details:'Lesson details',note:'Notes',statusNote:'School notice'}
+      : lang === 'fr' ? {details:'Détails du cours',note:'Remarques',statusNote:'Information de l’école'}
+      : {details:'Unterrichtsdetails',note:'Hinweise',statusNote:'Mitteilung der Schule'};
+    const statusPopup = isActuallyCancelled || isVertretung;
+    const note = info ? '<section class="vp-dialog-notes' + (statusPopup ? ' vp-dialog-status-note' : '') + '"><h3 class="vp-dialog-section-title">' + IC.info + esc(statusPopup ? labels.statusNote : labels.note) + '</h3><div class="vp-dialog-note-text">' + esc(info) + '</div></section>' : '';
+    const details = '<section class="vp-dialog-section"><h3 class="vp-dialog-section-title">' + esc(labels.details) + '</h3><div class="vp-detail-grid">' + cells + '</div></section>';
+    const rows = statusPopup ? note + details : details + note;
+
     content.innerHTML = rows;
     popup.classList.remove('hidden');
     overlay.classList.remove('hidden');
@@ -1468,7 +1560,7 @@ ha-card {
   background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important; overflow: hidden;
   box-shadow: var(--vpm-shadow) !important;
-  border: 1px solid rgba(245,158,11,.22) !important;
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 22%, transparent) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
 }
@@ -1476,11 +1568,11 @@ ha-card {
 .hol-hdr {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 16px 12px;
-  border-bottom: 1px solid rgba(245,158,11,.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-warning) 12%, transparent);
 }
 .hol-hdr-icon {
   width: 42px; height: 42px; flex-shrink: 0;
-  background: linear-gradient(135deg,#f59e0b,#d97706);
+  background: linear-gradient(135deg,var(--vpm-warning),var(--vpm-warning));
   border-radius: 11px; display: flex; align-items: center; justify-content: center;
 }
 .hol-hdr-body { display: flex; flex-direction: column; gap: 4px; }
@@ -1488,7 +1580,7 @@ ha-card {
 .hol-hdr-class {
   display: inline-flex; align-items: center;
   font-size: .72em; font-weight: 700; color: var(--vpm-warning);
-  background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.22);
+  background: color-mix(in srgb, var(--vpm-warning) 12%, transparent); border: 1px solid color-mix(in srgb, var(--vpm-warning) 22%, transparent);
   border-radius: 20px; padding: 2px 10px; width: fit-content;
 }
 /* ── Body ── */
@@ -1498,27 +1590,27 @@ ha-card {
 }
 .hol-sun {
   width: 56px; height: 56px; flex-shrink: 0;
-  background: rgba(245,158,11,.10);
-  border: 1px solid rgba(245,158,11,.25);
+  background: color-mix(in srgb, var(--vpm-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 25%, transparent);
   border-radius: 14px; display: flex; align-items: center; justify-content: center;
-  color: #f59e0b;
+  color: var(--vpm-warning);
 }
 .hol-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.hol-name { font-size: 1.18em; font-weight: 800; color: #f59e0b; letter-spacing: -.01em; line-height: 1.2; }
+.hol-name { font-size: 1.18em; font-weight: 800; color: var(--vpm-warning); letter-spacing: -.01em; line-height: 1.2; }
 .hol-until {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .82em; font-weight: 500; color: var(--vpm-text-muted);
 }
-.hol-until-dot { width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; flex-shrink: 0; }
+.hol-until-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vpm-warning); flex-shrink: 0; }
 .hol-next {
   font-size: .76em; color: var(--vpm-text-faint);
-  border-top: 1px solid rgba(245,158,11,.10);
+  border-top: 1px solid color-mix(in srgb, var(--vpm-warning) 10%, transparent);
   padding: 10px 18px 12px;
 }
 </style>
 <ha-card>${this._dataStatus(entity)}
   <div class="hol-hdr">
-    <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="hol-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="hol-hdr-body">
       <div class="hol-hdr-title">${title}</div>
       ${className ? `<span class="hol-hdr-class">${t.classLabel || 'Klasse'} ${className}</span>` : ''}
@@ -1552,9 +1644,9 @@ ha-card {
       this.shadowRoot.innerHTML = `<style>${VpMobile24Card._designTokens(th, !!(this._config && this._config.theme))}</style>
 <ha-card style="background:var(--vpm-card);border-radius:var(--vpm-radius-card);border:1px solid var(--vpm-card-border)">${this._dataStatus(entity)}
   <div style="padding:32px 20px;text-align:center;font-family:'Inter',-apple-system,sans-serif">
-    <div style="font-weight:700;font-size:1em;color:#212121;margin-bottom:8px">${t.nextWeek}</div>
-    <div style="font-size:.85em;color:#616161">Daten werden geladen…</div>
-    <div style="font-size:.78em;color:#9e9e9e;margin-top:6px">Bitte kurz warten oder Reload-Button drücken.</div>
+    <div style="font-weight:700;font-size:1em;color:var(--vpm-text);margin-bottom:8px">${t.nextWeek}</div>
+    <div style="font-size:.85em;color:var(--vpm-text-muted)">Daten werden geladen…</div>
+    <div style="font-size:.78em;color:var(--vpm-text-faint);margin-top:6px">Bitte kurz warten oder Reload-Button drücken.</div>
   </div>
 </ha-card>`;
       return;
@@ -1898,7 +1990,7 @@ ha-card {
   border: 1px solid var(--vpm-card-border) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--vpm-text) !important;
-  transition: background var(--vpm-t-theme), color var(--vpm-t-theme), border-color var(--vpm-t-theme);
+  transition: none;
 }
 
 /* ══ HEADER ══════════════════════════════════════════════════════════════ */
@@ -1907,7 +1999,7 @@ ha-card {
   align-items: center; gap: 12px;
   padding: 16px 18px 14px;
   background: var(--vpm-header-bg);
-  border-bottom: 1px solid var(--vpm-divider);
+  border-bottom: 2px solid var(--vpm-divider);
   flex-wrap: wrap;
 }
 .vp-hdr-icon {
@@ -1944,8 +2036,8 @@ ha-card {
 .vp-hdr-ausfall {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: .72em; font-weight: 700; white-space: nowrap;
-  color: var(--vpm-error); background: rgba(239,68,68,.12);
-  border: 1px solid rgba(239,68,68,.28); border-radius: var(--vpm-radius-pill);
+  color: var(--vpm-error); background: color-mix(in srgb, var(--vpm-error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-error) 28.000000000000004%, transparent); border-radius: var(--vpm-radius-pill);
   padding: 3px 10px;
 }
 .vp-hdr-ausfall::before {
@@ -1963,7 +2055,7 @@ ha-card {
   border-radius: var(--vpm-radius-pill); padding: 7px 14px;
   font-size: 0.75em; font-weight: 600; color: var(--vpm-text-muted);
   white-space: nowrap; cursor: pointer; font-family: inherit;
-  transition: background .18s, color .18s, border-color .18s, transform .18s;
+  transition: transform .18s, border-color .18s;
   line-height: 1.2; min-height: 34px;
 }
 .vp-pill:hover { background: var(--vpm-border-strong); color: var(--vpm-text); transform: translateY(-1px); }
@@ -1971,15 +2063,15 @@ ha-card {
 /* Icon-Pill (Reload): nahezu quadratisch, gleiche Höhe wie die Text-Pill */
 .vp-pill-icon { width: 34px; padding: 7px 0; font-size: .95em; }
 .vp-pill-blue  { color: var(--vpm-primary); border-color: var(--vpm-primary-border); background: var(--vpm-primary-soft); }
-.vp-pill-blue:hover  { background: rgba(79,124,255,0.2); border-color: var(--vpm-primary); }
-.vp-pill-green { color: var(--vpm-success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.09); }
-.vp-pill-green:hover { background: rgba(34,197,94,0.2); border-color: var(--vpm-success); }
-.vp-pill-amber { color: var(--vpm-warning); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.09); }
-.vp-pill-amber:hover { background: rgba(245,158,11,0.2); border-color: var(--vpm-warning); }
+.vp-pill-blue:hover  { background: color-mix(in srgb, var(--vpm-primary) 20%, transparent); border-color: var(--vpm-primary); }
+.vp-pill-green { color: var(--vpm-success); border-color: color-mix(in srgb, var(--vpm-success) 30%, transparent); background: color-mix(in srgb, var(--vpm-success) 9%, transparent); }
+.vp-pill-green:hover { background: color-mix(in srgb, var(--vpm-success) 20%, transparent); border-color: var(--vpm-success); }
+.vp-pill-amber { color: var(--vpm-warning); border-color: color-mix(in srgb, var(--vpm-warning) 30%, transparent); background: color-mix(in srgb, var(--vpm-warning) 9%, transparent); }
+.vp-pill-amber:hover { background: color-mix(in srgb, var(--vpm-warning) 20%, transparent); border-color: var(--vpm-warning); }
 .vp-pill-amber.has-info { animation: vp-pulse 2.5s ease-in-out infinite; }
 @keyframes vp-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
-  50%      { box-shadow: 0 0 0 5px rgba(245,158,11,0); }
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-warning) 40%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--vpm-warning) 0%, transparent); }
 }
 @keyframes vpm-spin {
   0%   { transform: rotate(0deg); }
@@ -1990,9 +2082,9 @@ ha-card {
   100% { transform: rotate(-360deg); }
 }
 .vp-pill-reloading {
-  background: rgba(34,197,94,0.25) !important;
-  color: #22c55e !important;
-  border-color: rgba(34,197,94,0.6) !important;
+  background: color-mix(in srgb, var(--vpm-success) 25%, transparent) !important;
+  color: var(--vpm-success) !important;
+  border-color: color-mix(in srgb, var(--vpm-success) 60%, transparent) !important;
 }
 .vp-pill-reloading .vp-reload-icon {
   animation: vpm-spin-ccw 0.8s linear !important;
@@ -2014,11 +2106,11 @@ ha-card {
   content: ''; width: 7px; height: 7px; border-radius: 50%;
   background: currentColor; flex-shrink: 0; opacity: .9;
 }
-.vp-hint-red    { background: rgba(239,68,68,.12);  color: var(--vpm-error);   border: 1px solid rgba(239,68,68,.2); }
-.vp-hint-yellow { background: rgba(245,158,11,.12); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.2); }
-.vp-hint-blue   { background: rgba(79,124,255,.12); color: var(--vpm-primary); border: 1px solid rgba(79,124,255,.2); }
-.vp-hint-green  { background: rgba(34,197,94,.12);  color: var(--vpm-success); border: 1px solid rgba(34,197,94,.2); }
-.vp-hint-holiday { background: rgba(139,92,246,.14); color: #7c3aed; border: 1px solid rgba(139,92,246,.3); font-weight: 700; }
+.vp-hint-red    { background: color-mix(in srgb, var(--vpm-error) 12%, transparent);  color: var(--vpm-error);   border: 1px solid color-mix(in srgb, var(--vpm-error) 20%, transparent); }
+.vp-hint-yellow { background: color-mix(in srgb, var(--vpm-warning) 12%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 20%, transparent); }
+.vp-hint-blue   { background: color-mix(in srgb, var(--vpm-primary) 12%, transparent); color: var(--vpm-primary); border: 1px solid color-mix(in srgb, var(--vpm-primary) 20%, transparent); }
+.vp-hint-green  { background: color-mix(in srgb, var(--vpm-success) 12%, transparent);  color: var(--vpm-success); border: 1px solid color-mix(in srgb, var(--vpm-success) 20%, transparent); }
+.vp-hint-holiday { background: color-mix(in srgb, var(--vpm-info) 14.000000000000002%, transparent); color: var(--vpm-info); border: 1px solid color-mix(in srgb, var(--vpm-info) 30%, transparent); font-weight: 700; }
 
 /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
 /* table-layout:fixed => alle Tages-Spalten exakt gleich breit, unabhängig
@@ -2040,7 +2132,7 @@ ha-card {
 .vp-today-pill {
   display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
   background: linear-gradient(135deg, var(--vpm-primary), var(--vpm-primary-2));
-  color: #fff; border-radius: 10px; padding: 5px 12px;
+  color: var(--vpm-on-primary); border-radius: 10px; padding: 5px 12px;
   font-weight: 800; font-size: .82em; text-transform: uppercase; letter-spacing: .5px;
   box-shadow: none;
 }
@@ -2051,7 +2143,7 @@ ha-card {
 .vp-snum    { font-size: .92em; font-weight: 800; color: var(--vpm-text); line-height: 1.25; }
 .vp-stime   { font-size: .66em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-today-col td,
-.vp-today-col    { background: rgba(79,124,255,0.05) !important; border-radius: var(--vpm-radius-tile); }
+.vp-today-col    { background: color-mix(in srgb, var(--vpm-primary) 5%, transparent) !important; border-radius: var(--vpm-radius-tile); }
 
 /* ── Tiles ── */
 /* Ruhiges Grunddesign: dezenter Hintergrund, Status als linker Rand + Punkt
@@ -2065,7 +2157,7 @@ ha-card {
   height: 58px; min-height: 58px; max-height: 58px;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
-  transition: background .15s, transform .15s, box-shadow .15s;
+  transition: transform .15s, box-shadow .15s;
   background: transparent;
   border: 1px solid var(--vpm-hairline);
   line-height: 1.2; text-align: center;
@@ -2121,16 +2213,16 @@ ha-card {
 }
 .vp-today-col .vp-tile.vp-empty {
   background: transparent;
-  border: 1px dashed rgba(79,124,255,0.18);
+  border: 1px dashed color-mix(in srgb, var(--vpm-primary) 18%, transparent);
 }
-/* NORMAL: neutral, nur dezenter grüner Statuspunkt + linker Rand */
+/* NORMAL: neutral, geschlossener Rahmen und dezenter grüner Statuspunkt */
 .vp-tile.vp-normal {
   background: var(--vpm-tile-normal) !important;
   color: var(--vpm-tile-normal-color) !important;
-  border-left: 3px solid var(--vpm-tile-normal-border);
+  border-left: 1px solid var(--vpm-hairline);
 }
 .vp-tile.vp-normal::after { background: var(--vpm-c-normal); opacity: .8; }
-.vp-tile.vp-today-tile { background: rgba(79,124,255,0.14); color: var(--vpm-text); }
+.vp-tile.vp-today-tile { background: color-mix(in srgb, var(--vpm-primary) 14.000000000000002%, transparent); color: var(--vpm-text); }
 /* VERTRETUNG: leichte amber-Tönung + linker Rand + Punkt */
 .vp-change-label { display:block; font-size:10px; line-height:1.3; font-weight:500; }
 .vp-tile.vp-sub {
@@ -2143,9 +2235,9 @@ ha-card {
 .vp-tile.vp-sub::after { background: var(--vpm-c-sub); }
 /* AUFSICHT: violette Tönung */
 .vp-tile.vp-supervision {
-  background: rgba(139,92,246,0.10);
-  color: #c4b5fd;
-  border: 1px solid rgba(139,92,246,0.2);
+  background: color-mix(in srgb, var(--vpm-info) 10%, transparent);
+  color: var(--vpm-info);
+  border: 1px solid color-mix(in srgb, var(--vpm-info) 20%, transparent);
   border-left: 3px solid var(--vpm-c-holiday);
   font-weight: 700;
 }
@@ -2162,9 +2254,9 @@ ha-card {
   border: 1px solid var(--vpm-primary-border); border-radius: 6px;
   padding: 0 6px; font-size: 10.5px; line-height: 1.2;
   cursor: pointer; overflow: visible;
-  transition: background .15s ease, border-color .15s ease;
+  transition: border-color .15s ease;
 }
-.vp-dayinfo-cell:hover { background: rgba(79,124,255,0.20); border-color: var(--vpm-primary); }
+.vp-dayinfo-cell:hover { background: color-mix(in srgb, var(--vpm-primary) 20%, transparent); border-color: var(--vpm-primary); }
 .vp-dayinfo-ico { flex: 0 0 auto; font-size: 11px; }
 .vp-dayinfo-txt {
   flex: 1 1 auto; min-width: 0;
@@ -2174,8 +2266,8 @@ ha-card {
 .vp-dayinfo-tooltip {
   position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
   z-index: 50; min-width: 120px; max-width: 240px; width: max-content;
-  background: #0f1729; color: #e2e8f0;
-  border: 1px solid rgba(59,130,246,0.5); border-radius: 8px;
+  background: var(--vpm-popup-bg); color: var(--vpm-text);
+  border: 1px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent); border-radius: 8px;
   padding: 7px 10px; font-size: 11px; line-height: 1.35;
   white-space: normal; text-align: left;
   box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -2184,7 +2276,7 @@ ha-card {
 }
 .vp-dayinfo-tooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-  border: 6px solid transparent; border-top-color: #0f1729;
+  border: 6px solid transparent; border-top-color: var(--vpm-popup-bg);
 }
 .vp-dayinfo-cell:hover .vp-dayinfo-tooltip { opacity: 1; visibility: visible; }
 /* Day heading inside the info popup */
@@ -2206,9 +2298,9 @@ ha-card {
 .vp-today-col .vp-tile.vp-cancelled { background: var(--vpm-tile-cancelled) !important; }
 /* AKTUELLE STUNDE: klar hervorgehoben, dezenter blauer Glow (kein Überglühen) */
 .vp-tile.vp-current {
-  background: linear-gradient(135deg, rgba(79,124,255,0.22), rgba(109,93,251,0.18)) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--vpm-primary) 22%, transparent), color-mix(in srgb, var(--vpm-primary) 18%, transparent)) !important;
   color: var(--vpm-text) !important; font-weight: 800;
-  border: 1px solid rgba(79,124,255,0.5) !important;
+  border: 1px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent) !important;
   border-left: 3px solid var(--vpm-c-current) !important;
   box-shadow: none !important;
 }
@@ -2216,12 +2308,12 @@ ha-card {
   content: ''; position: absolute; top: 6px; right: 6px;
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--vpm-c-current);
-  box-shadow: 0 0 0 0 rgba(79,124,255,0.6);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-primary) 60%, transparent);
   animation: vp-dot-pulse 2s ease-in-out infinite;
 }
 @keyframes vp-dot-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(79,124,255,0.5); }
-  50%      { box-shadow: 0 0 0 5px rgba(79,124,255,0); }
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--vpm-primary) 50%, transparent); }
+  50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--vpm-primary) 0%, transparent); }
 }
 .vp-tile-clickable { cursor: pointer; }
 .vp-tile-clickable:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
@@ -2233,7 +2325,7 @@ ha-card {
   text-align: center; color: var(--vpm-text-faint); font-size: .72em;
   padding: 5px 0; font-weight: 500;
   background: transparent;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
   border-bottom: none;
   letter-spacing: 0.3px;
 }
@@ -2242,18 +2334,18 @@ ha-card {
 .vp-legend {
   display: flex; gap: 8px; flex-wrap: wrap;
   padding: 10px 16px 14px; font-size: .72em;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 .vp-legend-item {
   display: flex; align-items: center; gap: 6px; color: var(--vpm-text-muted);
-  background: rgba(255,255,255,0.04); border-radius: var(--vpm-radius-pill);
+  background: color-mix(in srgb, var(--vpm-text) 4%, transparent); border-radius: var(--vpm-radius-pill);
   padding: 4px 10px;
 }
 .vp-ldot { width: 8px; height: 8px; border-radius: 50%; }
 .vp-ldot-today   { background: var(--vpm-c-current); }
 .vp-ldot-sub     { background: var(--vpm-c-sub); }
 .vp-ldot-cancel  { background: var(--vpm-c-cancel); }
-.vp-ldot-current { background: var(--vpm-c-current); box-shadow: 0 0 5px rgba(79,124,255,.6); }
+.vp-ldot-current { background: var(--vpm-c-current); box-shadow: 0 0 5px color-mix(in srgb, var(--vpm-primary) 60%, transparent); }
 .vp-lbl-today, .vp-lbl-sub, .vp-lbl-cancel, .vp-lbl-current { color: var(--vpm-text-muted); font-weight: 600; }
 
 /* ══ MOBILE ══════════════════════════════════════════════════════════════ */
@@ -2278,7 +2370,7 @@ ha-card {
   gap: 1px; padding: 7px 3px;
 }
 .vp-mob-tab:hover { background: var(--vpm-border-strong); color: var(--vpm-text-muted); }
-.vp-mob-tab-active { background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2)) !important; color: #fff !important; box-shadow: 0 2px 8px rgba(79,124,255,.4); }
+.vp-mob-tab-active { background: linear-gradient(135deg,var(--vpm-primary),var(--vpm-primary-2)) !important; color: var(--vpm-on-primary) !important; box-shadow: 0 2px 8px color-mix(in srgb, var(--vpm-primary) 40%, transparent); }
 .vp-mob-tab-day  { font-size: .85em; font-weight: 800; line-height: 1.2; }
 .vp-mob-tab-date { font-size: .7em;  font-weight: 500; opacity: .8; line-height: 1.2; }
 
@@ -2289,9 +2381,9 @@ ha-card {
   transition: background .12s;
 }
 .vp-mob-lesson:last-child { border-bottom: none; }
-.vp-mob-sub       { background: rgba(245,158,11,.08); border-left: 3px solid var(--vpm-c-sub); }
-.vp-mob-cancelled { background: rgba(239,68,68,.08);  border-left: 3px solid var(--vpm-c-cancel); }
-.vp-mob-current   { background: rgba(79,124,255,.10); border-left: 3px solid var(--vpm-c-current); }
+.vp-mob-sub       { background: color-mix(in srgb, var(--vpm-warning) 8%, transparent); border-left: 3px solid var(--vpm-c-sub); }
+.vp-mob-cancelled { background: color-mix(in srgb, var(--vpm-error) 8%, transparent);  border-left: 3px solid var(--vpm-c-cancel); }
+.vp-mob-current   { background: color-mix(in srgb, var(--vpm-primary) 10%, transparent); border-left: 3px solid var(--vpm-c-current); }
 .vp-mob-empty     { opacity: .4; }
 .vp-mob-left { display: flex; flex-direction: column; align-items: center; min-width: 42px; }
 .vp-mob-left-current .vp-mob-num  { color: var(--vpm-success) !important; }
@@ -2310,8 +2402,8 @@ ha-card {
 .vp-mob-subj-empty    { background: var(--vpm-tile-empty) !important; color: var(--vpm-text-faint) !important; }
 .vp-mob-pause-row {
   text-align: center; padding: 7px 14px;
-  border-top: 1px solid var(--vpm-divider);
-  border-bottom: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
+  border-bottom: 2px solid var(--vpm-divider);
   background: var(--vpm-primary-soft);
   color: var(--vpm-primary); font-size: .74em; font-style: italic; font-weight: 600;
 }
@@ -2331,13 +2423,13 @@ ha-card {
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
   border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
   max-height: 85vh; display: flex; flex-direction: column;
-  animation: vp-popup-in .18s ease;
+  animation: none;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 /* ── Popup: einheitliches Design-System (Normal / Aktuell / Vertretung / Ausfall) ── */
 .vp-popup-title {
   padding: 20px 22px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-text) 6%, transparent);
   display: flex; flex-direction: column; gap: 6px;
 }
 .vp-detail-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -2362,19 +2454,19 @@ ha-card {
 .vp-detail-info-row {
   display: flex; align-items: flex-start; gap: 9px;
   margin: 8px 18px 0; padding: 11px 13px;
-  background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); border-radius: 12px;
+  background: color-mix(in srgb, var(--vpm-warning) 8%, transparent); border: 1px solid color-mix(in srgb, var(--vpm-warning) 20%, transparent); border-radius: 12px;
 }
 .vp-detail-info-row .vp-detail-val { font-weight: 500; font-size: .9em; }
 .vp-detail-empty  { padding: 18px 22px; color: var(--vpm-text-faint); font-size: .88em; text-align: center; }
 
 .vp-popup-footer  { padding: 16px 18px 18px; text-align: right; border-top: 1px solid var(--vpm-border); }
-.vp-popup-btn     { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn     { background: var(--vpm-primary); color: var(--vpm-on-primary); border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-weight: 600; font-family: inherit; transition: background .2s, transform .2s; min-height: 42px; }
 .vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
 .vp-popup-btn:active { transform: scale(.98); }
-.vp-popup-btn:focus-visible { outline: 2px solid rgba(79,124,255,0.5); outline-offset: 2px; }
+.vp-popup-btn:focus-visible { outline: 2px solid color-mix(in srgb, var(--vpm-primary) 50%, transparent); outline-offset: 2px; }
 
 /* Aktuelle Stunde: dezenter blauer Akzentrahmen */
-.vp-popup-current { border-color: rgba(79,124,255,.45) !important; box-shadow: 0 0 0 1px rgba(79,124,255,.25), 0 20px 60px rgba(0,0,0,.6) !important; }
+.vp-popup-current { border-color: color-mix(in srgb, var(--vpm-primary) 45%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-primary) 25%, transparent), 0 20px 60px rgba(0,0,0,.6) !important; }
 
 /* Status-Popups (Ausfall/Vertretung): kompakt, zentriert, Akzent statt Vollfläche */
 .vp-status-body {
@@ -2386,8 +2478,8 @@ ha-card {
   font-size: .82em; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
   padding: 7px 16px; border-radius: 999px;
 }
-.vp-status-badge-cancel { background: rgba(239,68,68,.14); color: var(--vpm-error); border: 1px solid rgba(239,68,68,.4); }
-.vp-status-badge-sub    { background: rgba(245,158,11,.14); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.4); }
+.vp-status-badge-cancel { background: color-mix(in srgb, var(--vpm-error) 14.000000000000002%, transparent); color: var(--vpm-error); border: 1px solid color-mix(in srgb, var(--vpm-error) 40%, transparent); }
+.vp-status-badge-sub    { background: color-mix(in srgb, var(--vpm-warning) 14.000000000000002%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 40%, transparent); }
 /* Statuspunkt in Badges (ersetzt Emojis) */
 .vp-status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; display: inline-block; }
 .vp-detail-badge { display: inline-flex; align-items: center; gap: 6px; }
@@ -2395,10 +2487,10 @@ ha-card {
 .vp-status-teacher { font-size: 1.05em; font-weight: 600; color: var(--vpm-text); }
 .vp-status-meta    { font-size: .9em; font-weight: 500; color: var(--vpm-text-muted); line-height: 1.55; }
 
-.vp-popup-ausfall { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 20px 60px rgba(239,68,68,.18) !important; }
-.vp-popup-ausfall .vp-popup-title { display: none !important; }
-.vp-popup-sub { border-color: rgba(245,158,11,0.45) !important; box-shadow: 0 0 0 1px rgba(245,158,11,.22), 0 20px 60px rgba(245,158,11,.16) !important; }
-.vp-popup-sub .vp-popup-title { display: none !important; }
+.vp-popup-ausfall { border-color: color-mix(in srgb, var(--vpm-error) 50%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-error) 25%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-error) 18%, transparent) !important; }
+
+.vp-popup-sub { border-color: color-mix(in srgb, var(--vpm-warning) 45%, transparent) !important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-warning) 22%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-warning) 16%, transparent) !important; }
+
 /* ── Info popup (modernes Informations-Panel) ── */
 .vp-info-popup-title {
   padding: 18px 20px 6px; font-size: 1.12em; font-weight: 800; color: var(--vpm-text);
@@ -2413,10 +2505,10 @@ ha-card {
 }
 #info-popup-content { overflow-y: auto; flex: 1; padding-bottom: 6px; }
 /* Dünne, dezente Scrollbar passend zum Dark-Theme */
-#info-popup-content { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+#info-popup-content { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--vpm-text) 18%, transparent) transparent; }
 #info-popup-content::-webkit-scrollbar { width: 7px; }
-#info-popup-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; }
-#info-popup-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.26); }
+#info-popup-content::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--vpm-text) 16%, transparent); border-radius: 999px; }
+#info-popup-content::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--vpm-text) 26%, transparent); }
 #info-popup-content::-webkit-scrollbar-track { background: transparent; }
 /* Tages-Überschrift unter dem Titel */
 .vp-info-day-head {
@@ -2467,7 +2559,7 @@ ha-card {
 
   <!-- ── Header ── -->
   <div class="vp-hdr">
-    <div class="vp-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="vp-hdr-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <div class="vp-hdr-body">
       <div class="vp-hdr-top">
         <span class="vp-hdr-title">${title}</span>
@@ -2606,11 +2698,12 @@ class VpMobile24CurrentCard extends HTMLElement {
   setConfig(config) {
     if (!config || !config.entity) throw new Error('Entity erforderlich');
     this._config = config;
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   set hass(hass) {
     this._hass = hass;
+    VpMobile24Card._scheduleContrast(this);
     if (this._config) this._render();
     // Auto-update every minute for countdown/progress
     if (!this._timer) {
@@ -2871,14 +2964,14 @@ class VpMobile24CurrentCard extends HTMLElement {
     // Design-System-Farben (blau primär) — als Tokens, damit Dark/Light automatisch stimmt
     const themes = {
       lesson:  { color:'var(--vpm-primary)', bg:'var(--vpm-primary-soft)',   border:'var(--vpm-primary-border)',  icon:_ic(MDI.book),  label: tc.currentLesson },
-      sub:     { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)',      border:'rgba(245,158,11,.35)',       icon:_ic(MDI.swap),  label: tc.sub },
+      sub:     { color:'var(--vpm-warning)', bg:'color-mix(in srgb, var(--vpm-warning) 10%, transparent)',      border:'color-mix(in srgb, var(--vpm-warning) 35%, transparent)',       icon:_ic(MDI.swap),  label: tc.sub },
       free:    { color: isBeforeSchool ? 'var(--vpm-text-muted)' : 'var(--vpm-pause)',
-                 bg:    isBeforeSchool ? 'rgba(148,163,184,.10)' : 'rgba(56,189,248,.10)',
-                 border:isBeforeSchool ? 'rgba(148,163,184,.25)' : 'rgba(56,189,248,.35)',
+                 bg:    isBeforeSchool ? 'color-mix(in srgb, var(--vpm-text-muted) 10%, transparent)' : 'color-mix(in srgb, var(--vpm-pause) 10%, transparent)',
+                 border:isBeforeSchool ? 'color-mix(in srgb, var(--vpm-text-muted) 25%, transparent)' : 'color-mix(in srgb, var(--vpm-pause) 35%, transparent)',
                  icon:  isBeforeSchool ? _ic(MDI.moon) : _ic(MDI.pause),
                  label: isBeforeSchool ? tc.beforeSchool : tc.freePause },
-      done:    { color:'var(--vpm-success)', bg:'rgba(34,197,94,.10)', border:'rgba(34,197,94,.28)', icon:_ic(MDI.flag), label: tc.done },
-      holiday: { color:'var(--vpm-warning)', bg:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.35)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
+      done:    { color:'var(--vpm-success)', bg:'color-mix(in srgb, var(--vpm-success) 10%, transparent)', border:'color-mix(in srgb, var(--vpm-success) 28.000000000000004%, transparent)', icon:_ic(MDI.flag), label: tc.done },
+      holiday: { color:'var(--vpm-warning)', bg:'color-mix(in srgb, var(--vpm-warning) 10%, transparent)', border:'color-mix(in srgb, var(--vpm-warning) 35%, transparent)', icon:_ic(MDI.beach), label: tc.holiday || 'Ferien' },
     };
     const effectiveType = isHoliday ? 'holiday' : s.type;
     const lessonTh = themes[effectiveType] || themes.done;
@@ -3027,8 +3120,8 @@ ha-card {
 .vc-chip {
   display: inline-flex; align-items: center; gap: 3px;
   font-size: .72em; font-weight: 600; color: var(--vpm-text-muted);
-  background: rgba(148,163,184,.10); border-radius: var(--vpm-radius-pill); padding: 3px 10px;
-  border: 1px solid rgba(148,163,184,.14);
+  background: color-mix(in srgb, var(--vpm-text-muted) 10%, transparent); border-radius: var(--vpm-radius-pill); padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--vpm-text-muted) 14.000000000000002%, transparent);
 }
 .vc-chip-sm { font-size: .68em; padding: 2px 8px; }
 .vc-info { font-size: .78em; color: var(--vpm-warning); margin-bottom: 5px; }
@@ -3039,7 +3132,7 @@ ha-card {
 /* Progress bar (dezent) */
 .vc-progress-wrap {
   margin-top: 12px; height: 4px;
-  background: rgba(148,163,184,.15); border-radius: 999px;
+  background: color-mix(in srgb, var(--vpm-text-muted) 15%, transparent); border-radius: 999px;
   overflow: hidden; position: relative;
 }
 .vc-progress-bar {
@@ -3054,7 +3147,7 @@ ha-card {
 .vc-next {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   padding: 10px 20px;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
   font-size: .78em;
 }
 .vc-next-label { font-weight: 700; color: var(--vpm-text-muted); text-transform: uppercase; letter-spacing: .06em; }
@@ -3064,7 +3157,7 @@ ha-card {
 .vc-day {
   display: flex; gap: 6px; flex-wrap: wrap;
   padding: 10px 20px 14px;
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 </style>
 <ha-card>
@@ -3181,11 +3274,12 @@ class VpMobile24MultiCard extends HTMLElement {
     this._config = config;
     // init collapse state from localStorage
     this._loadCollapseState();
-    if (this._hass) this._render();
+    if (this._hass) { this._render(); VpMobile24Card._scheduleContrast(this); }
   }
 
   set hass(hass) {
     this._hass = hass;
+    VpMobile24Card._scheduleContrast(this);
     const dow = new Date().getDay();
     // Auto-switch on weekends only if user hasn't navigated manually
     if ((dow === 0 || dow === 6) && this._weekOffset === 0 && !this._manualWeekOffset) this._weekOffset = 1;
@@ -3244,11 +3338,11 @@ class VpMobile24MultiCard extends HTMLElement {
   }
 
   _statusColor(type) {
-    return { normal:'#22c55e', sub:'#eab308', cancelled:'#ef4444', empty:'transparent' }[type] || '#22c55e';
+    return { normal:'var(--vpm-success)', sub:'var(--vpm-warning)', cancelled:'var(--vpm-error)', empty:'transparent' }[type] || 'var(--vpm-success)';
   }
 
   _statusBg(type) {
-    return { normal:'rgba(34,197,94,.12)', sub:'rgba(234,179,8,.13)', cancelled:'rgba(239,68,68,.15)', empty:'transparent' }[type] || 'rgba(34,197,94,.12)';
+    return { normal:'color-mix(in srgb, var(--vpm-success) 12%, transparent)', sub:'color-mix(in srgb, var(--vpm-warning) 13%, transparent)', cancelled:'color-mix(in srgb, var(--vpm-error) 15%, transparent)', empty:'transparent' }[type] || 'color-mix(in srgb, var(--vpm-success) 12%, transparent)';
   }
 
   _className(entity, entityId) {
@@ -3460,7 +3554,7 @@ class VpMobile24MultiCard extends HTMLElement {
     pop.innerHTML = '<div class="vp-popup-title">'
       + '<span class="vp-detail-num">' + period + '. Stunde</span>'
       + '<span class="vp-detail-fach">' + fach + '</span>' + badge
-      + '<span style="margin-left:auto;font-size:.72em;color:#64748b;background:rgba(255,255,255,.07);padding:2px 8px;border-radius:5px">' + className + '</span>'
+      + '<span style="margin-left:auto;font-size:.72em;color:var(--vpm-text-muted);background:color-mix(in srgb, var(--vpm-text) 7.000000000000001%, transparent);padding:2px 8px;border-radius:5px">' + className + '</span>'
       + '</div>'
       + '<div>' + rows + '</div>'
       + '<div class="vp-popup-footer"><button class="vp-popup-btn" data-mc="close-detail">Schließen</button></div>';
@@ -3751,7 +3845,7 @@ ha-card {
   box-shadow: var(--vpm-shadow) !important;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: ${PAL.txt} !important;
-  transition: background var(--vpm-t-theme), color var(--vpm-t-theme);
+  transition: none;
 }
 /* ── HEADER ── */
 .mc-hdr {
@@ -3779,19 +3873,19 @@ ha-card {
 .mc-controls {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-text) 5%, transparent);
   flex-wrap: wrap;
 }
 .mc-search {
   flex: 1; min-width: 120px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.1);
+  background: color-mix(in srgb, var(--vpm-text) 7.000000000000001%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-text) 10%, transparent);
   border-radius: 20px; padding: 6px 14px;
-  color: #e2e8f0; font-size: .82em; font-family: inherit;
+  color: var(--vpm-text); font-size: .82em; font-family: inherit;
   outline: none; transition: border .2s;
 }
-.mc-search:focus { border-color: #3b82f6; background: rgba(59,130,246,.1); }
-.mc-search::placeholder { color: #475569; }
+.mc-search:focus { border-color: var(--vpm-primary); background: color-mix(in srgb, var(--vpm-primary) 10%, transparent); }
+.mc-search::placeholder { color: var(--vpm-text-faint); }
 .mc-pill {
   display: inline-flex; align-items: center; gap: 4px;
   background: ${PAL.surface};
@@ -3802,10 +3896,10 @@ ha-card {
   transition: all .18s; line-height: 1.3;
 }
 .mc-pill:hover { background: ${PAL.surfaceH}; color: ${PAL.txt}; }
-.mc-pill-blue { color: ${PAL.primary}; border-color: rgba(79,124,255,.35); background: rgba(79,124,255,.08); }
-.mc-pill-blue:hover { background: rgba(79,124,255,.16); border-color: ${PAL.primary}; }
-.mc-pill-green { color: ${PAL.success}; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); }
-.mc-pill-green:hover { background: rgba(34,197,94,.16); border-color: ${PAL.success}; }
+.mc-pill-blue { color: ${PAL.primary}; border-color: color-mix(in srgb, var(--vpm-primary) 35%, transparent); background: color-mix(in srgb, var(--vpm-primary) 8%, transparent); }
+.mc-pill-blue:hover { background: color-mix(in srgb, var(--vpm-primary) 16%, transparent); border-color: ${PAL.primary}; }
+.mc-pill-green { color: ${PAL.success}; border-color: color-mix(in srgb, var(--vpm-success) 35%, transparent); background: color-mix(in srgb, var(--vpm-success) 8%, transparent); }
+.mc-pill-green:hover { background: color-mix(in srgb, var(--vpm-success) 16%, transparent); border-color: ${PAL.success}; }
 /* ── GRID LAYOUT for sections ── */
 .mc-sections-grid {
   display: grid;
@@ -3822,7 +3916,7 @@ ha-card {
   display: flex; align-items: center; justify-content: space-between;
   padding: 11px 8px; cursor: pointer;
   background: transparent;
-  transition: background .15s; user-select: none; gap: 10px;
+  transition: none; user-select: none; gap: 10px;
   border-radius: 10px;
 }
 .mc-section-head:hover { background: ${PAL.surface}; }
@@ -3844,7 +3938,7 @@ ha-card {
 .mc-section-body { padding: 0; }
 .mc-section-body.hidden { display: none; }
 .mc-no-data { padding: 14px 16px; color: ${PAL.txt3}; font-size: .85em; font-style: italic; }
-.mc-error { padding: 14px; color: ${PAL.error}; font-size: .82em; border: 1px solid rgba(239,68,68,.2); border-radius: 12px; }
+.mc-error { padding: 14px; color: ${PAL.error}; font-size: .82em; border: 1px solid color-mix(in srgb, var(--vpm-error) 20%, transparent); border-radius: 12px; }
 /* ── TIMETABLE ── */
 .mc-grid-wrap { overflow-x: auto; padding: 2px 4px 6px; }
 .mc-tbl { width: 100%; border-collapse: separate; border-spacing: 0; }
@@ -3854,11 +3948,11 @@ ha-card {
   text-align: center;
 }
 .mc-th-today { display: inline-flex; flex-direction: column; align-items: center; gap: 1px;
-  background: ${PAL.primary}; color: #fff; border-radius: 8px; padding: 3px 10px;
+  background: ${PAL.primary}; color: var(--vpm-on-primary); border-radius: 8px; padding: 3px 10px;
   font-size: .9em; font-weight: 700; }
 .mc-th-day  { display: block; font-size: .9em; }
 .mc-th-date { display: block; font-size: .82em; color: ${PAL.txt3}; font-weight: 500; }
-.mc-th-today .mc-th-date { color: rgba(255,255,255,.8); }
+.mc-th-today .mc-th-date { color: color-mix(in srgb, var(--vpm-text) 80%, transparent); }
 .mc-td-num { width: 42px; min-width: 42px; padding: 3px 4px; text-align: center; }
 .mc-pnum  { font-size: .82em; font-weight: 700; color: ${PAL.txt2}; line-height: 1.3; }
 .mc-ptime { font-size: .58em; color: ${PAL.txt3}; white-space: nowrap; margin-top: 1px; }
@@ -3889,7 +3983,7 @@ ha-card {
 .mc-legend {
   display: flex; gap: 16px; flex-wrap: wrap;
   padding: 10px 18px 14px; font-size: .74em; color: ${PAL.txt2};
-  border-top: 1px solid var(--vpm-divider);
+  border-top: 2px solid var(--vpm-divider);
 }
 .mc-leg-item { display: flex; align-items: center; gap: 6px; }
 .mc-leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -3901,7 +3995,7 @@ ha-card {
   box-shadow: var(--vpm-shadow-popup);
   max-width: 440px; width: calc(100% - 32px); z-index: 9999;
   border: 1px solid var(--vpm-border); color: var(--vpm-text); overflow: hidden;
-  animation: vp-popup-in .18s ease;
+  animation: none;
 }
 @keyframes vp-popup-in { from { opacity: 0; transform: translate(-50%,-48%); } to { opacity: 1; transform: translate(-50%,-50%); } }
 .vp-popup-title {
@@ -3913,22 +4007,22 @@ ha-card {
 .vp-detail-num  { font-size: .75em; font-weight: 700; color: var(--vpm-text-muted); background: var(--vpm-hover); padding: 3px 8px; border-radius: 6px; }
 .vp-detail-fach { font-size: 1.1em; font-weight: 800; color: var(--vpm-text); }
 .vp-detail-badge{ font-size: .68em; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-.vp-detail-sub  { background: rgba(245,158,11,.15); color: var(--vpm-warning); border: 1px solid rgba(245,158,11,.3); }
+.vp-detail-sub  { background: color-mix(in srgb, var(--vpm-warning) 15%, transparent); color: var(--vpm-warning); border: 1px solid color-mix(in srgb, var(--vpm-warning) 30%, transparent); }
 .vp-detail-row  { display: flex; align-items: center; gap: 12px; padding: 13px 20px; border-bottom: 1px solid var(--vpm-border); }
 .vp-detail-row:last-child { border-bottom: none; }
-.vp-detail-info-row { background: rgba(245,158,11,.06); }
+.vp-detail-info-row { background: color-mix(in srgb, var(--vpm-warning) 6%, transparent); }
 .vp-detail-icon { font-size: 1.1em; width: 24px; text-align: center; flex-shrink: 0; }
 .vp-detail-label{ font-size: .76em; font-weight: 700; color: var(--vpm-text-faint); text-transform: uppercase; letter-spacing: .5px; min-width: 54px; }
 .vp-detail-val  { font-size: .92em; font-weight: 500; color: var(--vpm-text); flex: 1; }
 .vp-detail-empty{ padding: 16px 20px; color: var(--vpm-text-faint); font-size: .86em; font-style: italic; }
 .vp-popup-footer{ padding: 12px 20px 16px; text-align: right; border-top: 1px solid var(--vpm-border); }
-.vp-popup-btn   { background: var(--vpm-primary); color: #fff; border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
+.vp-popup-btn   { background: var(--vpm-primary); color: var(--vpm-on-primary); border: none; border-radius: var(--vpm-radius-btn); padding: 10px 24px; cursor: pointer; font-size: .9em; font-family: inherit; font-weight: 600; transition: background .2s, transform .2s; min-height: 42px; }
 .vp-popup-btn:hover { background: var(--vpm-primary-2); transform: translateY(-1px); }
 .vp-popup-btn:active { transform: scale(.98); }
 .vp-popup-ausfall {
   background: var(--vpm-popup-bg) !important;
-  border-color: rgba(239,68,68,.45) !important;
-  box-shadow: 0 0 0 1px rgba(239,68,68,.22), 0 20px 60px rgba(239,68,68,.16) !important;
+  border-color: color-mix(in srgb, var(--vpm-error) 45%, transparent) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--vpm-error) 22%, transparent), 0 20px 60px color-mix(in srgb, var(--vpm-error) 16%, transparent) !important;
   display: flex !important; flex-direction: column !important;
 }
 .vp-popup-ausfall .vp-popup-footer { border-top: none !important; padding: 0 20px 20px; }
@@ -3937,32 +4031,32 @@ ha-card {
 .mc-holiday-row {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 16px;
-  color: var(--vpm-warning, #F59E0B);
+  color: var(--vpm-warning, var(--vpm-warning));
   font-size: .88em; font-weight: 600;
 }
-.mc-holiday-text { color: var(--vpm-warning, #F59E0B); }
+.mc-holiday-text { color: var(--vpm-warning, var(--vpm-warning)); }
 .mc-holiday-badge {
   font-size: .7em; font-weight: 700;
-  color: var(--vpm-warning, #F59E0B);
-  background: rgba(245,158,11,.12);
-  border: 1px solid rgba(245,158,11,.25);
+  color: var(--vpm-warning, var(--vpm-warning));
+  background: color-mix(in srgb, var(--vpm-warning) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--vpm-warning) 25%, transparent);
   border-radius: 20px; padding: 2px 8px;
 }
 /* All-holiday banner */
 .mc-all-holiday {
   display: flex; align-items: center; gap: 12px;
   padding: 14px 18px 10px;
-  color: var(--vpm-warning, #F59E0B);
+  color: var(--vpm-warning, var(--vpm-warning));
   font-size: .9em; font-weight: 700;
-  border-bottom: 1px solid rgba(245,158,11,.15);
-  background: rgba(245,158,11,.05);
+  border-bottom: 1px solid color-mix(in srgb, var(--vpm-warning) 15%, transparent);
+  background: color-mix(in srgb, var(--vpm-warning) 5%, transparent);
 }
 .hidden { display: none !important; }
 </style>
 <ha-card>
   <!-- Header -->
   <div class="mc-hdr">
-    <div class="mc-hdr-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
+    <div class="mc-hdr-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--vpm-on-primary)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m0 16H5V9h14zm0-12H5V5h14z"/></svg></div>
     <span class="mc-hdr-title">${title}</span>
     <span class="mc-hdr-kw">${weekLabel}</span>
     ${showWeekNav ? (this._weekOffset === 0
@@ -3994,4 +4088,6 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.8 loaded');
+console.log('✅ VpMobile24 Card v2.6.9 loaded');
+
+

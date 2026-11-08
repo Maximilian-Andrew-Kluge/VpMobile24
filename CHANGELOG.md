@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- All built-in card palettes now consistently style mobile views, tooltips, controls, status highlights and loading messages; primary accent labels choose contrasting text.
+
+### Fixed
+
+- HA Standard card theme now follows the active Home Assistant theme variables, including explicit dark themes such as Nordic, instead of the browser color-scheme preference.
+
 ## [2.6.8] - 2026-11-07 (Beta)
 
 ### Added
