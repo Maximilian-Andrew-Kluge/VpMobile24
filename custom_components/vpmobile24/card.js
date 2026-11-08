@@ -1,5 +1,5 @@
-// VpMobile24 Card v2.6.8
-console.info('%c VpMobile24-CARD %c v2.6.8 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
+// VpMobile24 Card v2.6.9
+console.info('%c VpMobile24-CARD %c v2.6.9 ', 'color: orange; font-weight: bold; background: black', 'color: white; font-weight: bold; background: dimgray');
 
 // Global registry — CSP-safe, no inline onclick needed
 window._vpm24 = window._vpm24 || {};
@@ -4088,6 +4088,6 @@ ha-card {
 
 customElements.define('vpmobile24-multi-card', VpMobile24MultiCard);
 window.customCards.push({ type:'vpmobile24-multi-card', name:'VpMobile24 Mehrere Klassen', description:'Moderne Mehrklassen-Stundenplankarte für Familien', preview:true });
-console.log('✅ VpMobile24 Card v2.6.8 loaded');
+console.log('✅ VpMobile24 Card v2.6.9 loaded');
 
 
