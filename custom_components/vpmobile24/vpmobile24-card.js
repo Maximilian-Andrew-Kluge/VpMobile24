@@ -207,6 +207,35 @@ class VpMobile24Card extends HTMLElement {
     return 'navy';
   }
 
+  static _lessonTypography(config = {}) {
+    const rawSize = Number(config.lesson_font_size);
+    const sizePx = Number.isFinite(rawSize) ? Math.min(24, Math.max(12, Math.round(rawSize))) : 15;
+    const families = {
+      system: 'inherit',
+      roboto: 'Roboto, "Segoe UI", sans-serif',
+      arial: 'Arial, Helvetica, sans-serif',
+      verdana: 'Verdana, Geneva, sans-serif',
+      tahoma: 'Tahoma, Geneva, sans-serif',
+      georgia: 'Georgia, serif',
+      times: '"Times New Roman", serif',
+      courier: '"Courier New", monospace',
+    };
+    return { sizePx, family: families[config.lesson_font_family] || families.system };
+  }
+
+  static _fontFamilyOptions() {
+    return [
+      { value: 'system', label: 'Home Assistant / System' },
+      { value: 'roboto', label: 'Roboto' },
+      { value: 'arial', label: 'Arial' },
+      { value: 'verdana', label: 'Verdana' },
+      { value: 'tahoma', label: 'Tahoma' },
+      { value: 'georgia', label: 'Georgia' },
+      { value: 'times', label: 'Times New Roman' },
+      { value: 'courier', label: 'Courier New' },
+    ];
+  }
+
   _getTheme() {
     const themeName = (this._config && this._config.theme) || 'ha_default';
     return VpMobile24Card._THEMES[VpMobile24Card._resolveThemeId(themeName)];
@@ -764,18 +793,18 @@ class VpMobile24Card extends HTMLElement {
     const _cfgLabels = (hass) => {
       const hl = _hl(hass);
       const L = {
-        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",theme:"Farbschema",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
-        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",theme:"Color Theme",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
-        fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",theme:"Th\u00e8me de couleur",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
+        de:{entity:"Wochentabellen-Sensor",additional_info_entity:"Zusatzinfo-Sensor",reload_entity:"Neu laden Button",title:"Kartentitel",class_name:"Klassenname (leer = automatisch)",show_time:"Uhrzeiten anzeigen",lesson_font_size:"Schriftgröße der Stunden (px)",lesson_font_family:"Schriftart der Stunden",show_header:"Header anzeigen",highlight_today:"Heutigen Tag hervorheben",use_custom_times:"Eigene Uhrzeiten verwenden",theme:"Farbschema",sensors:"Weitere Sensoren",header_settings:"Header & Anzeige",time_settings:"Uhrzeiten-Anpassung",lesson_count:"Anzahl der Stunden",pause_count:"Anzahl der Pausen",time_1:"1. Stunde",time_2:"2. Stunde",time_3:"3. Stunde",time_4:"4. Stunde",time_5:"5. Stunde",time_6:"6. Stunde",time_7:"7. Stunde",time_8:"8. Stunde",time_9:"9. Stunde",time_10:"10. Stunde",pause_1:"1. Pause - Zeit",pause_1_after:"1. Pause - Nach Stunde",pause_2:"2. Pause - Zeit",pause_2_after:"2. Pause - Nach Stunde",pause_3:"3. Pause - Zeit",pause_3_after:"3. Pause - Nach Stunde",pause_4:"4. Pause - Zeit",pause_4_after:"4. Pause - Nach Stunde",pause_5:"5. Pause - Zeit",pause_5_after:"5. Pause - Nach Stunde"},
+        en:{entity:"Week Table Sensor",additional_info_entity:"Additional Info Sensor",reload_entity:"Reload Button",title:"Title",class_name:"Class Name (empty = auto)",show_time:"Show Times",lesson_font_size:"Lesson text size (px)",lesson_font_family:"Lesson font",show_header:"Show Header",highlight_today:"Highlight Today",use_custom_times:"Use Custom Times",theme:"Color Theme",header_settings:"Header Settings",time_settings:"Time Settings",lesson_count:"Number of Periods",pause_count:"Number of Breaks",time_1:"Period 1",time_2:"Period 2",time_3:"Period 3",time_4:"Period 4",time_5:"Period 5",time_6:"Period 6",time_7:"Period 7",time_8:"Period 8",time_9:"Period 9",time_10:"Period 10",pause_1:"Break 1 - Time",pause_1_after:"Break 1 - After Period",pause_2:"Break 2 - Time",pause_2_after:"Break 2 - After Period",pause_3:"Break 3 - Time",pause_3_after:"Break 3 - After Period",pause_4:"Break 4 - Time",pause_4_after:"Break 4 - After Period",pause_5:"Break 5 - Time",pause_5_after:"Break 5 - After Period"},
+        fr:{entity:"Capteur Semaine",additional_info_entity:"Capteur Infos Supp.",reload_entity:"Bouton Actualiser",title:"Titre",class_name:"Nom de Classe",show_time:"Afficher Horaires",lesson_font_size:"Taille du texte des cours (px)",lesson_font_family:"Police des cours",show_header:"Afficher En-t\u00eate",highlight_today:"Mettre en avant Aujourd'hui",use_custom_times:"Horaires Personnalis\u00e9s",theme:"Th\u00e8me de couleur",header_settings:"Param\u00e8tres En-t\u00eate",time_settings:"Personnalisation des Horaires",lesson_count:"Nombre d'Heures",pause_count:"Nombre de Pauses",time_1:"1\u00e8re Heure",time_2:"2\u00e8me Heure",time_3:"3\u00e8me Heure",time_4:"4\u00e8me Heure",time_5:"5\u00e8me Heure",time_6:"6\u00e8me Heure",time_7:"7\u00e8me Heure",time_8:"8\u00e8me Heure",time_9:"9\u00e8me Heure",time_10:"10\u00e8me Heure",pause_1:"Pause 1 - Heure",pause_1_after:"Pause 1 - Apr\u00e8s Heure",pause_2:"Pause 2 - Heure",pause_2_after:"Pause 2 - Apr\u00e8s Heure",pause_3:"Pause 3 - Heure",pause_3_after:"Pause 3 - Apr\u00e8s Heure",pause_4:"Pause 4 - Heure",pause_4_after:"Pause 4 - Apr\u00e8s Heure",pause_5:"Pause 5 - Heure",pause_5_after:"Pause 5 - Apr\u00e8s Heure"}
       };
       return (L[hl]||L.de);
     };
     const _cfgHelpers = (hass) => {
       const hl = _hl(hass);
       const H = {
-        de:{entity:"Wähle den sensor.vpmobile24_week_table Sensor",additional_info_entity:"Zusatzinfo-Sensor für ⓘ-Button",reload_entity:"Button-Entity zum Neuladen (z.B. button.vpmobile24_reload)",title:"Titel der Card",class_name:"Klassenname (z.B. 5a, 10b)",show_time:"Zeigt Uhrzeiten unter der Stundennummer",show_header:"Zeigt den Header mit Titel und Klassenname",highlight_today:"Hebt die heutige Spalte blau hervor",use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen",theme:"Wähle ein Farbschema für die Card"},
-        en:{entity:"Select the sensor.vpmobile24_week_table sensor",additional_info_entity:"Info sensor for ⓘ button",reload_entity:"Button entity for manual reload (e.g. button.vpmobile24_reload)",title:"Card title",class_name:"Class name (e.g. 5a, 10b)",show_time:"Show times below period number",show_header:"Show header with title and class name",highlight_today:"Highlight today column in blue",use_custom_times:"Enable to enter custom times",theme:"Choose a color theme for the card"},
-        fr:{entity:"S\u00e9lectionner le capteur sensor.vpmobile24_week_table",additional_info_entity:"Capteur infos pour bouton info",reload_entity:"Entit\u00e9 bouton pour actualisation (ex. button.vpmobile24_reload)",title:"Titre de la carte",class_name:"Nom de classe (ex. 5a, 10b)",show_time:"Afficher les horaires sous le num\u00e9ro",show_header:"Afficher en-t\u00eate avec titre et classe",highlight_today:"Mettre en avant la colonne du jour",use_custom_times:"Activer pour saisir des horaires personnalis\u00e9s",theme:"Choisir un th\u00e8me de couleur"}
+        de:{entity:"Wähle den sensor.vpmobile24_week_table Sensor",additional_info_entity:"Zusatzinfo-Sensor für ⓘ-Button",reload_entity:"Button-Entity zum Neuladen (z.B. button.vpmobile24_reload)",title:"Titel der Card",class_name:"Klassenname (z.B. 5a, 10b)",show_time:"Zeigt Uhrzeiten unter der Stundennummer",lesson_font_size:"Schriftgröße der Fächer in Pixeln (12–24)",lesson_font_family:"Schriftart für Fächer wählen",show_header:"Zeigt den Header mit Titel und Klassenname",highlight_today:"Hebt die heutige Spalte blau hervor",use_custom_times:"Aktiviere um eigene Uhrzeiten einzutragen",theme:"Wähle ein Farbschema für die Card"},
+        en:{entity:"Select the sensor.vpmobile24_week_table sensor",additional_info_entity:"Info sensor for ⓘ button",reload_entity:"Button entity for manual reload (e.g. button.vpmobile24_reload)",title:"Card title",class_name:"Class name (e.g. 5a, 10b)",show_time:"Show times below period number",lesson_font_size:"Subject text size in pixels (12–24)",lesson_font_family:"Choose subject font",show_header:"Show header with title and class name",highlight_today:"Highlight today column in blue",use_custom_times:"Enable to enter custom times",theme:"Choose a color theme for the card"},
+        fr:{entity:"S\u00e9lectionner le capteur sensor.vpmobile24_week_table",additional_info_entity:"Capteur infos pour bouton info",reload_entity:"Entit\u00e9 bouton pour actualisation (ex. button.vpmobile24_reload)",title:"Titre de la carte",class_name:"Nom de classe (ex. 5a, 10b)",show_time:"Afficher les horaires sous le num\u00e9ro",lesson_font_size:"Taille du texte des matières (12–24 px)",lesson_font_family:"Choisir la police des matières",show_header:"Afficher en-t\u00eate avec titre et classe",highlight_today:"Mettre en avant la colonne du jour",use_custom_times:"Activer pour saisir des horaires personnalis\u00e9s",theme:"Choisir un th\u00e8me de couleur"}
       };
       return (H[hl]||H.de);
     };
@@ -827,6 +856,8 @@ class VpMobile24Card extends HTMLElement {
             { name: "class_name",      default: "",    selector: { text: { type: "text" } } },
             { name: "highlight_today", default: true,  selector: { boolean: {} } },
             { name: "show_time",       default: true,  selector: { boolean: {} } },
+            { name: "lesson_font_size", default: 15, selector: { number: { min: 12, max: 24, step: 1, mode: "slider" } } },
+            { name: "lesson_font_family", default: "system", selector: { select: { options: VpMobile24Card._fontFamilyOptions() } } },
           ]
         },
 
@@ -878,6 +909,7 @@ class VpMobile24Card extends HTMLElement {
   static getStubConfig() {
     return { entity:'sensor.vpmobile24_week_table', show_header:true, show_time:true,
       highlight_today:true, use_custom_times:false, theme:'ha_default',
+      lesson_font_size:15, lesson_font_family:'system',
       header_settings:{ title:'Stundenplan', class_name:'5a' } };
   }
 
@@ -1978,10 +2010,15 @@ ha-card {
     }
 
     const _hasTheme = !!(this._config && this._config.theme);
+    const lessonTypography = VpMobile24Card._lessonTypography(this._config);
     this.shadowRoot.innerHTML = `
 <style>
 ${VpMobile24Card._designTokens(th, _hasTheme)}
-:host { display: block; }
+:host {
+  display: block;
+  --vpm-lesson-font-size: ${lessonTypography.sizePx}px;
+  --vpm-lesson-font-family: ${lessonTypography.family};
+}
 ha-card {
   background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important;
@@ -2153,8 +2190,9 @@ ha-card {
   box-sizing: border-box;
   width: 100%; max-width: 100%;
   border-radius: var(--vpm-radius-tile); padding: 6px 7px 6px 11px;
-  font-size: .95em; font-weight: 600; color: var(--vpm-text);
-  height: 58px; min-height: 58px; max-height: 58px;
+  font-size: var(--vpm-lesson-font-size, .95em); font-family: var(--vpm-lesson-font-family, inherit);
+  font-weight: 600; color: var(--vpm-text);
+  height: auto; min-height: 58px; max-height: none;
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;
   transition: transform .15s, box-shadow .15s;
@@ -2177,7 +2215,7 @@ ha-card {
   width: 6px; height: 6px; border-radius: 50%;
 }
 .vp-tile.vp-teacher-tile {
-  height: 68px; min-height: 68px; max-height: 68px;
+  height: auto; min-height: 68px; max-height: none;
   padding: 5px 5px 5px 11px;
   hyphens: none;
   word-break: normal;
@@ -2391,7 +2429,7 @@ ha-card {
 .vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: .92em; font-weight: 600; color: var(--vpm-tile-normal-color);
+  flex: 1; font-size: var(--vpm-lesson-font-size, .92em); font-family: var(--vpm-lesson-font-family, inherit); font-weight: 600; color: var(--vpm-tile-normal-color);
   background: var(--vpm-tile-normal); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
@@ -3223,6 +3261,8 @@ class VpMobile24MultiCard extends HTMLElement {
       columns: 'auto',
       sort_order: 'custom',
       default_expanded: true,
+      lesson_font_size: 15,
+      lesson_font_family: 'system',
     };
   }
 
@@ -3251,6 +3291,8 @@ class VpMobile24MultiCard extends HTMLElement {
         { name: 'theme', default: 'ha_default', selector: { select: { options: [
           ...VpMobile24Card._themeSelectOptions(),
         ]}}},
+        { name: 'lesson_font_size', default: 15, selector: { number: { min: 12, max: 24, step: 1, mode: 'slider' } } },
+        { name: 'lesson_font_family', default: 'system', selector: { select: { options: VpMobile24Card._fontFamilyOptions() } } },
       ],
       computeLabel: (s) => ({
         title:            'Kartentitel',
@@ -3260,6 +3302,8 @@ class VpMobile24MultiCard extends HTMLElement {
         default_expanded: 'Standardmäßig ausgeklappt',
         show_week_nav:    'Wochennavigation anzeigen',
         show_legend:      'Legende anzeigen',
+        lesson_font_size: 'Schriftgröße der Stunden (px)',
+        lesson_font_family: 'Schriftart der Stunden',
       })[s.name] || s.name,
     };
   }
@@ -3581,6 +3625,7 @@ class VpMobile24MultiCard extends HTMLElement {
     };
     const mcTh = this._getTheme();
     const _hasTheme = !!(this._config && this._config.theme);
+    const lessonTypography = VpMobile24Card._lessonTypography(this._config);
 
     // ── Palette als CSS-Token-Referenzen (Dark/Light automatisch) ────────
     // Alle Werte zeigen auf das globale --vpm-* Designsystem, damit die
@@ -3836,7 +3881,11 @@ class VpMobile24MultiCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
 <style>
 ${VpMobile24Card._designTokens(mcTh, _hasTheme)}
-:host { display: block; }
+:host {
+  display: block;
+  --vpm-lesson-font-size: ${lessonTypography.sizePx}px;
+  --vpm-lesson-font-family: ${lessonTypography.family};
+}
 ha-card {
   background: var(--vpm-card) !important;
   border-radius: var(--vpm-radius-card) !important;
@@ -3961,7 +4010,7 @@ ha-card {
 .mc-td-today:first-of-type { border-radius: 8px 0 0 8px; }
 .mc-tile {
   border-radius: 8px; padding: 4px 3px;
-  font-size: .78em; font-weight: 600;
+  font-size: var(--vpm-lesson-font-size, .78em); font-family: var(--vpm-lesson-font-family, inherit); font-weight: 600;
   min-height: 38px; display: flex; align-items: center; justify-content: center;
   text-align: center; transition: filter .12s, transform .12s;
   line-height: 1.2;
