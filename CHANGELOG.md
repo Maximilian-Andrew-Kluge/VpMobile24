@@ -10,6 +10,12 @@ All notable changes to this project will be documented in this file.
 
 - HA Standard card theme now follows the active Home Assistant theme variables, including explicit dark themes such as Nordic, instead of the browser color-scheme preference.
 
+## [2.6.9.3] - 2026-11-19 (Beta)
+
+### Added
+
+- Einstellbare Schriftgröße (12–24 px) und Schriftart für Wochenplan- und Mehrklassenkarten. Die Auswahl bleibt bei Home-Assistant-Aktualisierungen erhalten.
+
 ## [2.6.8] - 2026-11-07 (Beta)
 
 ### Added
