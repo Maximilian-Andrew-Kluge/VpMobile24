@@ -8,7 +8,7 @@
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Version](https://img.shields.io/badge/Stable-v2.6.5-22c55e?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/latest)
-[![Beta](https://img.shields.io/badge/Beta-v2.6.9-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
+[![Beta](https://img.shields.io/badge/Beta-v2.6.9.3-f59e0b?style=for-the-badge)](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases)
 [![License](https://img.shields.io/github/license/Maximilian-Andrew-Kluge/VpMobile24?style=for-the-badge\&color=22c55e)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Community-5865F2?style=for-the-badge\&logo=discord\&logoColor=white)](https://discord.gg/57uvCeRw43)
 
@@ -28,7 +28,7 @@
 
 Stundenplan, Vertretungen und Schulhinweise gemeinsam auf deinem Dashboard.
 
-**Stable: v2.6.5 · Beta: [v2.6.9.2-beta](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.6.9.2-beta)**
+**Stable: v2.6.5 · Beta: [v2.6.9.3-beta](https://github.com/Maximilian-Andrew-Kluge/VpMobile24/releases/tag/v2.6.9.3-beta)**
 
 Die Bilder zeigen die überarbeiteten Karten der Beta. Für diese Darstellung die Beta über HACS installieren, Home Assistant neu starten und das Dashboard neu laden.
 
