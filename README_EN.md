@@ -330,7 +330,11 @@ Copy folder `custom_components/vpmobile24` to `config/custom_components/vpmobile
 type: custom:vpmobile24-card
 theme: ha_default
 entity: sensor.vpmobile24_week_table
+lesson_font_size: 18
+lesson_font_family: roboto
 ```
+
+`lesson_font_size` accepts 12–24 px (default 15). `lesson_font_family` supports `system`, `roboto`, `arial`, `verdana`, `tahoma`, `georgia`, `times` and `courier`. These settings are available on the weekly timetable and multi-class cards.
 
 ### Multi-Class Card
 

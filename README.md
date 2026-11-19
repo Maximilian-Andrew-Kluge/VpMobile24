@@ -89,7 +89,11 @@ Die Bilder zeigen die überarbeiteten Karten der Beta. Für diese Darstellung di
 type: custom:vpmobile24-card
 theme: ha_default
 entity: sensor.vpmobile24_week_table
+lesson_font_size: 18
+lesson_font_family: roboto
 ```
+
+`lesson_font_size` accepts 12–24 px (default 15). `lesson_font_family` supports `system`, `roboto`, `arial`, `verdana`, `tahoma`, `georgia`, `times` and `courier`. The options are available on the timetable and multi-class cards.
 </details>
 
 <details>
