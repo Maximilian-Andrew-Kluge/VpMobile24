@@ -208,10 +208,14 @@ class VpMobile24Card extends HTMLElement {
   }
 
   static _lessonTypography(config = {}) {
-    const rawSize = Number(config.lesson_font_size);
+    // The visual editor saves weekly card options inside header_settings.
+    // Prefer those values over defaults left at the root by older cards.
+    const header = config.header_settings;
+    const rawSize = Number(header?.lesson_font_size ?? config.lesson_font_size ?? 15);
+    const font = header?.lesson_font_family ?? config.lesson_font_family;
     const sizePx = Number.isFinite(rawSize) ? Math.min(24, Math.max(12, Math.round(rawSize))) : 15;
     const families = {
-      system: 'inherit',
+      system: 'initial',
       roboto: 'Roboto, "Segoe UI", sans-serif',
       arial: 'Arial, Helvetica, sans-serif',
       verdana: 'Verdana, Geneva, sans-serif',
@@ -220,7 +224,7 @@ class VpMobile24Card extends HTMLElement {
       times: '"Times New Roman", serif',
       courier: '"Courier New", monospace',
     };
-    return { sizePx, family: families[config.lesson_font_family] || families.system };
+    return { sizePx, family: Object.hasOwn(families, font) ? families[font] : families.system };
   }
 
   static _fontFamilyOptions() {
@@ -909,8 +913,8 @@ class VpMobile24Card extends HTMLElement {
   static getStubConfig() {
     return { entity:'sensor.vpmobile24_week_table', show_header:true, show_time:true,
       highlight_today:true, use_custom_times:false, theme:'ha_default',
-      lesson_font_size:15, lesson_font_family:'system',
-      header_settings:{ title:'Stundenplan', class_name:'5a' } };
+      header_settings:{ title:'Stundenplan', class_name:'5a',
+        lesson_font_size:15, lesson_font_family:'system' } };
   }
 
   setConfig(config) {
@@ -2199,8 +2203,7 @@ ha-card {
   background: transparent;
   border: 1px solid var(--vpm-hairline);
   line-height: 1.2; text-align: center;
-  /* Text darf die feste Zellengröße niemals verändern: fester Höhenrahmen +
-     overflow:hidden clippen langen Text, kein Wachsen der Zelle. */
+  /* Allow large text to wrap and grow the tile without widening the column. */
   overflow: hidden;
   word-break: break-word;
   overflow-wrap: anywhere;
@@ -2223,9 +2226,7 @@ ha-card {
 .vp-tile.vp-teacher-tile > span.vp-tile-fach {
   font-size: 1em; font-weight: 700;
   line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   max-width: 100%;
 }
 .vp-tile.vp-empty {
@@ -2330,7 +2331,7 @@ ha-card {
   border: 1px solid var(--vpm-tile-cancelled-border);
   border-left: 3px solid var(--vpm-c-cancel);
   font-weight: 700;
-  font-size: .82em; line-height: 1.15;
+  line-height: 1.15;
 }
 .vp-tile.vp-cancelled::after { background: var(--vpm-c-cancel); }
 .vp-today-col .vp-tile.vp-cancelled { background: var(--vpm-tile-cancelled) !important; }
@@ -2429,7 +2430,8 @@ ha-card {
 .vp-mob-num  { font-size: .88em; font-weight: 800; color: var(--vpm-text); line-height: 1.2; }
 .vp-mob-time { font-size: .64em; font-weight: 600; color: var(--vpm-text-muted); margin-top: 1px; white-space: nowrap; }
 .vp-mob-subj {
-  flex: 1; font-size: var(--vpm-lesson-font-size, .92em); font-family: var(--vpm-lesson-font-family, inherit); font-weight: 600; color: var(--vpm-tile-normal-color);
+  flex: 1; min-width: 0; overflow-wrap: anywhere;
+  font-size: var(--vpm-lesson-font-size, .92em); font-family: var(--vpm-lesson-font-family, inherit); font-weight: 600; color: var(--vpm-tile-normal-color);
   background: var(--vpm-tile-normal); border-radius: 8px;
   padding: 8px 12px; text-align: center; line-height: 1.3;
 }
@@ -4013,7 +4015,7 @@ ha-card {
   font-size: var(--vpm-lesson-font-size, .78em); font-family: var(--vpm-lesson-font-family, inherit); font-weight: 600;
   min-height: 38px; display: flex; align-items: center; justify-content: center;
   text-align: center; transition: filter .12s, transform .12s;
-  line-height: 1.2;
+  line-height: 1.2; overflow-wrap: anywhere;
 }
 .mc-tile-hover { cursor: pointer; }
 .mc-tile-hover:hover { filter: brightness(1.12); transform: translateY(-1px); }

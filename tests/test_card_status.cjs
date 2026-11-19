@@ -17,4 +17,26 @@ assert.match(render({last_successful_update:'2020-01-01T00:00:00Z'}),/Daten vera
 assert.match(render({last_successful_update:'<script>alert(1)</script>'},'en','unavailable'),/Data stale/);
 assert.ok(!render({data_stale:true,last_successful_update:'<script>alert(1)</script>'}).includes('<script>'));
 assert.equal(fs.readFileSync('custom_components/vpmobile24/card.js','utf8'),fs.readFileSync('custom_components/vpmobile24/vpmobile24-card.js','utf8'));
-console.log('Card status translations, age, invalid timestamp and shipped file parity passed.');
+const Card = registry['vpmobile24-card'];
+const MultiCard = registry['vpmobile24-multi-card'];
+const { _lessonTypography: typography } = Card;
+const header = Card.getConfigForm().schema.find(field => field.name === 'header_settings');
+assert.ok(header.schema.some(field => field.name === 'lesson_font_size'));
+assert.ok(header.schema.some(field => field.name === 'lesson_font_family'));
+assert.ok(MultiCard.getConfigForm().schema.some(field => field.name === 'lesson_font_size'));
+assert.ok(MultiCard.getConfigForm().schema.some(field => field.name === 'lesson_font_family'));
+const edited = typography({
+  lesson_font_size: 15,
+  lesson_font_family: 'system',
+  header_settings: { lesson_font_size: 24, lesson_font_family: 'georgia' },
+});
+assert.equal(edited.sizePx, 24);
+assert.equal(edited.family, 'Georgia, serif');
+const yaml = typography({ lesson_font_size: '18', lesson_font_family: 'courier' });
+assert.equal(yaml.sizePx, 18);
+assert.equal(yaml.family, '"Courier New", monospace');
+assert.equal(typography({ lesson_font_size: 0 }).sizePx, 12);
+assert.equal(typography({ lesson_font_size: 30 }).sizePx, 24);
+assert.equal(typography({ lesson_font_size: 'invalid' }).sizePx, 15);
+assert.equal(typography({ lesson_font_family: 'constructor' }).family, 'initial');
+console.log('Card status, lesson typography configuration, and shipped file parity passed.');
